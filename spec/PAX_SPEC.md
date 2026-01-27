@@ -1,4 +1,4 @@
-# PAX Format Specification v2.0-beta.1
+# PAX Format Specification v2.0.0-beta.1
 
 > **Status: Beta / Request for Comments**
 >
@@ -54,7 +54,9 @@ For an introduction, usage guide, API reference, and comparison with other forma
 6. [JSON Interoperability](#6-json-interoperability)
    - [6.1 JSON to Pax](#61-json-to-pax)
    - [6.2 Pax to JSON](#62-pax-to-json)
-7. [Error Types](#7-error-types)
+   - [6.3 Schema Inference](#63-schema-inference)
+7. [CLI Commands](#7-cli-commands)
+8. [Error Types](#8-error-types)
 
 ---
 
@@ -149,7 +151,7 @@ precise: 2024-01-15T10:30:00.123Z
 local: 2024-01-15T10:30:00+05:30
 ```
 
-Format: `YYYY-MM-DD[THH:MM[:SS[.sss]][Z|±HH:MM]]`
+Format: `YYYY-MM-DD[THH:MM[:SS[.sss]][Z|+HH:MM|-HH:MM]]`
 
 Seconds (`:SS`) are optional and default to `00` if omitted.
 
@@ -196,6 +198,13 @@ points: @table point [
 ```pax
 # This is an array [0, 0], NOT a point struct
 origin: (0, 0)
+```
+
+**Optional type annotations:** Field types can be omitted and default to `string`:
+
+```pax
+@struct config (host, port: int, debug: bool)
+# host defaults to string type
 ```
 
 With types and nullable fields:
@@ -346,6 +355,8 @@ shapes: [
 
 Union variants can have zero or more fields.
 
+> **Implementation Note:** Unions are parsed and stored but not yet fully implemented. They are not encoded in the binary schema table, and tagged values are not validated against union definitions. Use tagged values (`:tag value`) directly for discriminated data.
+
 ### 1.16 File Includes
 
 Import other Pax files with `@include`:
@@ -388,9 +399,10 @@ Paths are resolved relative to the including file.
 | `bytes` | Raw binary | variable |
 | `timestamp` | Unix milliseconds | 8 bytes |
 
-**Note on bytes:** There is no dedicated bytes literal syntax. Bytes values can only be created through programmatic construction via the API (`Value::Bytes`). JSON round-trips bytes as hex strings (e.g., `"0xdeadbeef"`), but JSON import does not auto-convert strings to bytes. For bytes data, either:
-- Construct `Value::Bytes` programmatically before compilation
-- Use strings in text/JSON and decode at the application level
+**Note on bytes:** There is no dedicated bytes literal syntax in text format. The lexer parses `0x...` as integers, not bytes. When bytes are serialized to text (e.g., via decompile), they are written as `0x...` hex strings, but these will be parsed back as integers—**bytes do not round-trip through text format**. For bytes data:
+- Use binary format (`.paxb`) for lossless round-trips
+- Construct `Value::Bytes` programmatically via the API
+- JSON export encodes bytes as `"0xdeadbeef"` strings; JSON import does not auto-convert these back to bytes
 
 **Note:** `object`, `map`, `ref`, and `tagged` are value types, not schema types. They can appear in data but cannot be declared as field types in `@struct` definitions. For structured fields, define a named struct and use it as the field type.
 
@@ -404,7 +416,7 @@ field: []string?       # nullable array of strings (field can be ~)
 field: []user          # array of structs
 ```
 
-**Note:** The `?` modifier applies to the field, not array elements. Array elements are always non-nullable; use `~` at the field level only.
+**Note:** The `?` modifier applies to the field, not array elements. However, the parser does accept `~` (null) values inside arrays, including schema-typed arrays. Null elements are tracked in the null bitmap for struct arrays.
 
 ### 2.3 Type Widening
 
@@ -420,9 +432,11 @@ Automatic safe conversions when reading:
 - Unsigned: u8 if fits, else u16, else u32, else u64
 - Floats: always f64 at runtime
 
-**Homogeneous arrays:** For simplicity, arrays of uniform type use fixed-width encoding:
-- Integer arrays: always Int32
-- String arrays: string table indices (u32)
+**Homogeneous arrays:** Arrays of uniform type use optimized encoding:
+- Schema-typed arrays (objects matching a `@struct`): struct array encoding with null bitmaps
+- `Value::Int` arrays: packed Int32 encoding
+- `Value::String` arrays: string table indices (u32)
+- All other arrays (including `Value::UInt`, `Value::Float`, `Value::Bool`, mixed types): heterogeneous encoding with per-element type tags
 
 ### 2.5 Type Coercion at Compile Time
 
@@ -571,13 +585,15 @@ Schema:
 0x01  BOOL        0x0B  FLOAT64     0x21  OBJECT     0x31  TAGGED
 0x02  INT8        0x10  STRING      0x22  STRUCT     0x32  TIMESTAMP
 0x03  INT16       0x11  BYTES       0x23  MAP
-0x04  INT32                         0x24  TUPLE
+0x04  INT32                         0x24  TUPLE (reserved)
 0x05  INT64
 0x06  UINT8
 0x07  UINT16
 0x08  UINT32
 0x09  UINT64
 ```
+
+> **Note:** `TUPLE` (0x24) is reserved but not currently emitted by the writer. Tuples in text format are parsed as arrays. The reader can decode this type code for forward compatibility.
 
 ### 4.7 Section Index
 
@@ -618,23 +634,33 @@ Entry (32 bytes):
 - Continuation bit (0x80) + 7 value bits
 - Least-significant group first
 
-**Arrays (homogeneous):**
+**Arrays (top-level, homogeneous):**
 
-Applies only to arrays of `Int` (encoded as Int32) or `String` (encoded as string table indices):
+For top-level arrays of `Value::Int` or `Value::String`:
 ```
 Count: u32
-Element Type: u8
+Element Type: u8 (Int32 or String)
 Elements: [packed data]
 ```
 
-**Arrays (heterogeneous):**
+**Arrays (top-level, heterogeneous):**
 
-Used for all other array types (Float, Bool, Timestamp, mixed types, etc.):
+For top-level arrays of other types (Float, Bool, UInt, Timestamp, mixed, etc.):
 ```
 Count: u32
 Element Type: 0xFF (marker)
 Elements: [type: u8, data, type: u8, data, ...]
 ```
+
+**Arrays (schema-typed fields):**
+
+Array fields within schema-typed data use homogeneous encoding for ANY element type:
+```
+Count: u32
+Element Type: u8 (field's declared type)
+Elements: [packed typed values]
+```
+This applies to `[]int`, `[]float`, `[]bool`, `[]user`, etc. within `@struct` definitions.
 
 **Objects:**
 ```
@@ -685,14 +711,9 @@ value_type: u8   (PaxType code)
 value_data: [type-specific]
 ```
 
-**Tuples (non-schema-bound):**
+**Tuples:**
 
-Tuples without schema context are encoded as heterogeneous arrays:
-```
-Count: u32
-Element Type: 0xFF (heterogeneous marker)
-Elements: [type: u8, data, ...]
-```
+Tuples in text format (`(a, b, c)`) are parsed as arrays. In binary format, they are encoded as arrays—the `TUPLE` type code (0x24) is reserved but not currently used by the writer.
 
 ### 4.9 Compression
 
@@ -717,7 +738,7 @@ variants     = variant { "," variant } ;
 variant      = name "(" [ fields ] ")" ;
 
 fields       = field { "," field } ;
-field        = name ":" type ;
+field        = name [ ":" type ] ;  (* type defaults to string if omitted *)
 type         = [ "[]" ] base_type [ "?" ] ;
 base_type    = "bool" | "int" | "int8" | "int16" | "int32" | "int64"
              | "uint" | "uint8" | "uint16" | "uint32" | "uint64"
@@ -822,9 +843,93 @@ Type mappings:
 | Ref | `{"$ref": "name"}` |
 | Tagged | `{"$tag": "tagname", "$value": value}` |
 
+### 6.3 Schema Inference
+
+PAX can automatically infer schemas from JSON arrays of uniform objects:
+
+```rust
+// Rust API - with automatic schema inference
+let doc = Pax::from_json_with_schemas(json_string)?;
+let pax_text = doc.to_pax_with_schemas();
+```
+
+**How It Works:**
+
+1. **Array Detection**: Identifies arrays of objects with identical field sets
+2. **Name Inference**: Singularizes parent key names (`"products"` → `product` schema)
+3. **Type Inference**: Determines field types across all array items
+4. **Nullable Detection**: Fields with any `null` values become nullable (`string?`)
+5. **Nested Object Schemas**: Creates separate schemas for nested objects within array elements
+
+**Example:**
+
+Input JSON:
+```json
+{
+  "customers": [
+    {
+      "id": 1,
+      "name": "Alice",
+      "billing_address": {"street": "123 Main", "city": "Boston"}
+    },
+    {
+      "id": 2,
+      "name": "Bob",
+      "billing_address": {"street": "456 Oak", "city": "Denver"}
+    }
+  ]
+}
+```
+
+Inferred PAX output:
+```pax
+@struct billing_address (city: string, street: string)
+@struct customer (billing_address: billing_address, id: int, name: string)
+
+customers: @table customer [
+  ((Boston, "123 Main"), 1, Alice),
+  ((Denver, "456 Oak"), 2, Bob)
+]
+```
+
+**Nested Schema Inference:**
+
+When array elements contain nested objects, PAX creates schemas for those nested objects if they have uniform structure across all array items:
+
+- Nested objects become their own `@struct` definitions
+- Parent schemas reference nested schemas by name (not `object` type)
+- Deeply nested objects are handled recursively
+
 ---
 
-## 7. Error Types
+## 7. CLI Commands
+
+```
+pax <command> [options]
+
+Commands:
+  compile <input.pax> -o <output.paxb>      Compile text to binary
+  decompile <input.paxb> -o <output.pax>    Decompile binary to text
+  info <file.pax|file.paxb>                 Show file info (auto-detects format)
+  validate <file.pax>                       Validate text format
+
+JSON Conversion:
+  to-json <input.pax> [-o <output.json>]    Convert Pax text to JSON
+  from-json <input.json> -o <output.pax>    Convert JSON to Pax text (with schema inference)
+  paxb-to-json <input.paxb> [-o <out.json>] Convert Pax binary to JSON
+  json-to-paxb <input.json> -o <out.paxb>   Convert JSON to Pax binary
+
+  help                                      Show help
+```
+
+**Notes:**
+- `from-json` automatically infers schemas from uniform arrays
+- `info` auto-detects whether file is text or binary format
+- `compile` enables compression by default
+
+---
+
+## 8. Error Types
 
 | Error | Description |
 |-------|-------------|

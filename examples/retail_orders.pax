@@ -9,6 +9,22 @@
 @struct top_product (name: string, product_id: string, revenue: float, units_sold: int)
 @struct variant (name: string, options: []object, price: float, sku: string, stock_quantity: int)
 
+customers: @table customer [
+  ((Seattle, USA, "98101", WA, "123 Main Street"), "alice.johnson@email.com", CUST-10001, "Alice Johnson", "+1-555-123-4567", (Seattle, USA, "98102", WA, "456 Work Ave, Suite 200")),
+  ((Portland, USA, "97201", OR, "789 Oak Lane"), "bob.smith@company.com", CUST-10002, "Bob Smith", "+1-555-987-6543", ~),
+  (("San Francisco", USA, "94102", CA, "321 Pine Road"), "carol.d@techcorp.io", CUST-10003, "Carol Davis", ~, ("Palo Alto", USA, "94301", CA, "100 Corporate Blvd"))
+]
+analytics: {total_orders: 10, average_order_value: 1470.59, customer_metrics: @table customer_metric [
+  (877.88, CUST-10001, 4, 3511.51),
+  (2316.24, CUST-10002, 3, 6948.73),
+  (1415.24, CUST-10003, 3, 4245.71)
+], top_products: @table top_product [
+  ("Smart Watch Pro", PROD-003, 3582.0, 8),
+  ("Mechanical Keyboard", PROD-004, 1243.0, 8),
+  ("Premium Wireless Headphones", PROD-001, 3599.89, 11),
+  ("Ergonomic Office Chair", PROD-002, 6281.0, 9)
+], orders_by_status: [[delivered, 4], [shipped, 2], [processing, 1], [cancelled, 1], [partial_return, 1], [pending_payment, 1]], total_revenue: 14705.91, period: "2024-01-01 to 2024-03-10"}
+metadata: {description: "Sample retail order data for analysis", generated_at: "2024-03-10T17:00:00Z", source: "Retail Order Management System", version: "1.0"}
 orders: @table order [
   ("2024-01-15T10:28:00Z", [CUST-10001, "Alice Johnson", "alice.johnson@email.com", "+1-555-123-4567", ["123 Main Street", Seattle, WA, "98101", USA], ["456 Work Ave, Suite 200", Seattle, WA, "98102", USA]], [
     (1, ~, [
@@ -128,44 +144,28 @@ orders: @table order [
     ], PROD-004, "Mechanical Keyboard", 1, 149.0, 149.0, SKU-004-BRN-TKL)
   ], "Payment processing - awaiting card verification", ORD-2024-00010, WEB-1010, [credit_card, ~, ~, 0.0, awaiting, "2024-03-10T16:30:00Z"], ~, pending_payment, [1646.99, 0.1025, 168.82, 0.0, 82.35, 1733.46], "2024-03-10T16:30:00Z")
 ]
-metadata: {description: "Sample retail order data for analysis", generated_at: "2024-03-10T17:00:00Z", version: "1.0", source: "Retail Order Management System"}
-analytics: {total_orders: 10, total_revenue: 14705.91, customer_metrics: @table customer_metric [
-  (877.88, CUST-10001, 4, 3511.51),
-  (2316.24, CUST-10002, 3, 6948.73),
-  (1415.24, CUST-10003, 3, 4245.71)
-], average_order_value: 1470.59, period: "2024-01-01 to 2024-03-10", orders_by_status: [[delivered, 4], [shipped, 2], [processing, 1], [cancelled, 1], [partial_return, 1], [pending_payment, 1]], top_products: @table top_product [
-  ("Smart Watch Pro", PROD-003, 3582.0, 8),
-  ("Mechanical Keyboard", PROD-004, 1243.0, 8),
-  ("Premium Wireless Headphones", PROD-001, 3599.89, 11),
-  ("Ergonomic Office Chair", PROD-002, 6281.0, 9)
-]}
-customers: @table customer [
-  ((Seattle, USA, "98101", WA, "123 Main Street"), "alice.johnson@email.com", CUST-10001, "Alice Johnson", "+1-555-123-4567", (Seattle, USA, "98102", WA, "456 Work Ave, Suite 200")),
-  ((Portland, USA, "97201", OR, "789 Oak Lane"), "bob.smith@company.com", CUST-10002, "Bob Smith", "+1-555-987-6543", ~),
-  (("San Francisco", USA, "94102", CA, "321 Pine Road"), "carol.d@techcorp.io", CUST-10003, "Carol Davis", ~, ("Palo Alto", USA, "94301", CA, "100 Corporate Blvd"))
-]
 products: @table product [
   (299.99, "Electronics/Audio", "High-fidelity wireless headphones with active noise cancellation", PROD-001, "Premium Wireless Headphones", [
-    ("Midnight Black", [{name: color, price_modifier: 0.0, value: Black}, {name: warranty, price_modifier: 0.0, value: "2-Year Standard"}], 299.99, SKU-001-BLK, 150),
+    ("Midnight Black", [{price_modifier: 0.0, value: Black, name: color}, {price_modifier: 0.0, value: "2-Year Standard", name: warranty}], 299.99, SKU-001-BLK, 150),
     ("Pearl White", [{name: color, price_modifier: 0.0, value: White}, {price_modifier: 0.0, value: "2-Year Standard", name: warranty}], 299.99, SKU-001-WHT, 85),
-    ("Midnight Black + Extended Warranty", [{value: Black, price_modifier: 0.0, name: color}, {price_modifier: 50.0, value: "5-Year Extended", name: warranty}], 349.99, SKU-001-BLK-EXT, 45)
+    ("Midnight Black + Extended Warranty", [{price_modifier: 0.0, name: color, value: Black}, {price_modifier: 50.0, name: warranty, value: "5-Year Extended"}], 349.99, SKU-001-BLK-EXT, 45)
   ]),
   (549.0, "Furniture/Office", "Adjustable lumbar support, breathable mesh, 10-year warranty", PROD-002, "Ergonomic Office Chair", [
     ("Graphite - Standard Arms", [{price_modifier: 0.0, value: Graphite, name: color}, {name: armrest, price_modifier: 0.0, value: "Standard Fixed"}, {price_modifier: 0.0, name: headrest, value: None}], 549.0, SKU-002-GRY-STD, 32),
-    ("Graphite - Adjustable Arms", [{price_modifier: 0.0, value: Graphite, name: color}, {name: armrest, value: "4D Adjustable", price_modifier: 50.0}, {value: None, price_modifier: 0.0, name: headrest}], 599.0, SKU-002-GRY-ADJ, 28),
-    ("Graphite - Full Options", [{price_modifier: 0.0, name: color, value: Graphite}, {price_modifier: 50.0, value: "4D Adjustable", name: armrest}, {value: "Adjustable Headrest", price_modifier: 100.0, name: headrest}], 699.0, SKU-002-GRY-FULL, 15),
-    ("Ocean Blue - Full Options", [{value: "Ocean Blue", name: color, price_modifier: 30.0}, {name: armrest, value: "4D Adjustable", price_modifier: 50.0}, {value: "Adjustable Headrest", name: headrest, price_modifier: 100.0}], 729.0, SKU-002-BLU-FULL, 8)
+    ("Graphite - Adjustable Arms", [{value: Graphite, name: color, price_modifier: 0.0}, {value: "4D Adjustable", name: armrest, price_modifier: 50.0}, {value: None, name: headrest, price_modifier: 0.0}], 599.0, SKU-002-GRY-ADJ, 28),
+    ("Graphite - Full Options", [{value: Graphite, price_modifier: 0.0, name: color}, {price_modifier: 50.0, value: "4D Adjustable", name: armrest}, {name: headrest, price_modifier: 100.0, value: "Adjustable Headrest"}], 699.0, SKU-002-GRY-FULL, 15),
+    ("Ocean Blue - Full Options", [{name: color, price_modifier: 30.0, value: "Ocean Blue"}, {name: armrest, price_modifier: 50.0, value: "4D Adjustable"}, {name: headrest, price_modifier: 100.0, value: "Adjustable Headrest"}], 729.0, SKU-002-BLU-FULL, 8)
   ]),
   (399.0, "Electronics/Wearables", "Health monitoring, GPS, 5-day battery life", PROD-003, "Smart Watch Pro", [
-    ("40mm Black Sport Band", [{name: size, value: "40mm", price_modifier: 0.0}, {value: "Black Sport", price_modifier: 0.0, name: band}], 399.0, SKU-003-40-BLK, 200),
-    ("44mm Black Sport Band", [{value: "44mm", name: size, price_modifier: 30.0}, {name: band, price_modifier: 0.0, value: "Black Sport"}], 429.0, SKU-003-44-BLK, 180),
-    ("44mm Leather Band", [{price_modifier: 30.0, value: "44mm", name: size}, {price_modifier: 70.0, name: band, value: "Brown Leather"}], 499.0, SKU-003-44-LTH, 50),
-    ("44mm Stainless Steel Band", [{price_modifier: 30.0, value: "44mm", name: size}, {name: band, value: "Stainless Steel", price_modifier: 170.0}], 599.0, SKU-003-44-SS, 25)
+    ("40mm Black Sport Band", [{name: size, price_modifier: 0.0, value: "40mm"}, {name: band, price_modifier: 0.0, value: "Black Sport"}], 399.0, SKU-003-40-BLK, 200),
+    ("44mm Black Sport Band", [{name: size, price_modifier: 30.0, value: "44mm"}, {price_modifier: 0.0, name: band, value: "Black Sport"}], 429.0, SKU-003-44-BLK, 180),
+    ("44mm Leather Band", [{price_modifier: 30.0, name: size, value: "44mm"}, {name: band, value: "Brown Leather", price_modifier: 70.0}], 499.0, SKU-003-44-LTH, 50),
+    ("44mm Stainless Steel Band", [{price_modifier: 30.0, value: "44mm", name: size}, {value: "Stainless Steel", name: band, price_modifier: 170.0}], 599.0, SKU-003-44-SS, 25)
   ]),
   (159.0, "Electronics/Peripherals", "Hot-swappable switches, RGB backlight, aluminum frame", PROD-004, "Mechanical Keyboard", [
-    ("Brown Switches - Quiet", [{value: "Cherry MX Brown", price_modifier: 0.0, name: switches}, {name: layout, price_modifier: 0.0, value: "Full Size"}], 159.0, SKU-004-BRN, 75),
-    ("Red Switches - Linear", [{price_modifier: 0.0, value: "Cherry MX Red", name: switches}, {price_modifier: 0.0, name: layout, value: "Full Size"}], 159.0, SKU-004-RED, 60),
+    ("Brown Switches - Quiet", [{name: switches, price_modifier: 0.0, value: "Cherry MX Brown"}, {value: "Full Size", name: layout, price_modifier: 0.0}], 159.0, SKU-004-BRN, 75),
+    ("Red Switches - Linear", [{price_modifier: 0.0, value: "Cherry MX Red", name: switches}, {name: layout, price_modifier: 0.0, value: "Full Size"}], 159.0, SKU-004-RED, 60),
     ("Blue Switches - Clicky", [{value: "Cherry MX Blue", name: switches, price_modifier: 0.0}, {price_modifier: 0.0, value: "Full Size", name: layout}], 159.0, SKU-004-BLU, 45),
-    ("Brown Switches - TKL", [{name: switches, price_modifier: 0.0, value: "Cherry MX Brown"}, {value: Tenkeyless, name: layout, price_modifier: -10.0}], 149.0, SKU-004-BRN-TKL, 40)
+    ("Brown Switches - TKL", [{name: switches, price_modifier: 0.0, value: "Cherry MX Brown"}, {price_modifier: -10.0, value: Tenkeyless, name: layout}], 149.0, SKU-004-BRN-TKL, 40)
   ])
 ]

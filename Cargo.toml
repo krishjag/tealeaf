@@ -1,5 +1,5 @@
 [workspace]
-members = ["pax-core", "pax-ffi"]
+members = ["pax-core", "pax-ffi", "accuracy-benchmark"]
 resolver = "2"
 
 [workspace.package]

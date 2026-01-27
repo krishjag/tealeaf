@@ -34,9 +34,6 @@ $paxSample
 } | ConvertTo-Json -Depth 10
 
 Write-Host "=== Sending Retail Order Data to Claude for Analysis ===" -ForegroundColor Cyan
-Write-Host "Data: 10 orders, 4 products, 3 customers, 11 schemas"
-Write-Host "Binary size: 6.9 KB (35% of original 19.6 KB text)"
-Write-Host ""
 
 $response = Invoke-RestMethod -Uri "https://api.anthropic.com/v1/messages" `
     -Method Post `

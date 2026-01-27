@@ -1,0 +1,28 @@
+{
+  "firm": {
+    "id": "LAW-001",
+    "name": "Sterling Legal Partners",
+    "specialization": "Corporate Law"
+  },
+  "period": {
+    "start": "2024-01-01",
+    "end": "2024-01-31"
+  },
+  "contracts": [
+    {"id": "CTR001", "type": "service_agreement", "client": "Acme Corp", "counterparty": "TechVendor Inc", "value": 250000, "start_date": "2024-01-15", "end_date": "2025-01-14", "status": "active", "risk_level": "low", "auto_renewal": true},
+    {"id": "CTR002", "type": "licensing", "client": "Acme Corp", "counterparty": "SoftwareCo", "value": 180000, "start_date": "2024-01-01", "end_date": "2024-12-31", "status": "active", "risk_level": "medium", "auto_renewal": false},
+    {"id": "CTR003", "type": "nda", "client": "Acme Corp", "counterparty": "Startup XYZ", "value": 0, "start_date": "2024-01-10", "end_date": "2026-01-09", "status": "active", "risk_level": "low", "auto_renewal": false},
+    {"id": "CTR004", "type": "employment", "client": "Acme Corp", "counterparty": "John Doe", "value": 125000, "start_date": "2024-01-08", "end_date": null, "status": "active", "risk_level": "low", "auto_renewal": null},
+    {"id": "CTR005", "type": "lease", "client": "Acme Corp", "counterparty": "RealEstate Holdings", "value": 480000, "start_date": "2023-06-01", "end_date": "2026-05-31", "status": "active", "risk_level": "medium", "auto_renewal": true},
+    {"id": "CTR006", "type": "partnership", "client": "Acme Corp", "counterparty": "GlobalPartners Ltd", "value": 500000, "start_date": "2024-01-20", "end_date": "2027-01-19", "status": "pending_signature", "risk_level": "high", "auto_renewal": false}
+  ],
+  "compliance_items": [
+    {"contract_id": "CTR001", "requirement": "data_protection", "status": "compliant", "last_audit": "2024-01-10"},
+    {"contract_id": "CTR002", "requirement": "license_usage_limits", "status": "compliant", "last_audit": "2024-01-05"},
+    {"contract_id": "CTR005", "requirement": "insurance_minimum", "status": "needs_review", "last_audit": "2023-12-15"},
+    {"contract_id": "CTR006", "requirement": "regulatory_approval", "status": "pending", "last_audit": null}
+  ],
+  "disputes": [
+    {"id": "DISP001", "contract_id": "CTR002", "description": "License scope disagreement", "amount_at_risk": 45000, "status": "negotiation", "filed_date": "2024-01-12"}
+  ]
+}

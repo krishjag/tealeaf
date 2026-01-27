@@ -1,0 +1,30 @@
+{
+  "agency": {
+    "id": "RE-001",
+    "name": "Premier Realty Group",
+    "region": "Metropolitan Area"
+  },
+  "period": {
+    "start": "2024-01-01",
+    "end": "2024-01-31"
+  },
+  "properties": [
+    {"id": "PROP001", "type": "residential", "subtype": "single_family", "address": "123 Oak Street", "city": "Springfield", "bedrooms": 4, "bathrooms": 2.5, "sqft": 2400, "lot_acres": 0.35, "year_built": 2015, "list_price": 425000, "status": "active", "days_on_market": 15},
+    {"id": "PROP002", "type": "residential", "subtype": "condo", "address": "456 Downtown Ave #12B", "city": "Springfield", "bedrooms": 2, "bathrooms": 2, "sqft": 1200, "lot_acres": null, "year_built": 2020, "list_price": 285000, "status": "pending", "days_on_market": 8},
+    {"id": "PROP003", "type": "commercial", "subtype": "retail", "address": "789 Main Street", "city": "Springfield", "bedrooms": null, "bathrooms": 2, "sqft": 3500, "lot_acres": 0.5, "year_built": 1995, "list_price": 650000, "status": "active", "days_on_market": 45},
+    {"id": "PROP004", "type": "residential", "subtype": "townhouse", "address": "321 Maple Lane", "city": "Riverside", "bedrooms": 3, "bathrooms": 2.5, "sqft": 1800, "lot_acres": 0.15, "year_built": 2018, "list_price": 345000, "status": "active", "days_on_market": 22},
+    {"id": "PROP005", "type": "residential", "subtype": "single_family", "address": "555 Hilltop Drive", "city": "Springfield", "bedrooms": 5, "bathrooms": 3, "sqft": 3200, "lot_acres": 0.75, "year_built": 2010, "list_price": 575000, "status": "sold", "days_on_market": 30},
+    {"id": "PROP006", "type": "commercial", "subtype": "office", "address": "100 Business Park Way", "city": "Springfield", "bedrooms": null, "bathrooms": 4, "sqft": 8500, "lot_acres": 1.2, "year_built": 2005, "list_price": 1250000, "status": "active", "days_on_market": 60}
+  ],
+  "transactions": [
+    {"id": "TXN001", "property_id": "PROP005", "sale_price": 560000, "close_date": "2024-01-20", "buyer_type": "individual", "financing": "conventional", "commission_pct": 5.5},
+    {"id": "TXN002", "property_id": "PROP007", "sale_price": 310000, "close_date": "2024-01-12", "buyer_type": "first_time", "financing": "fha", "commission_pct": 6.0}
+  ],
+  "market_data": {
+    "median_price": 385000,
+    "avg_days_on_market": 28,
+    "inventory_months": 2.8,
+    "price_change_yoy_pct": 4.5,
+    "mortgage_rate_30yr": 6.75
+  }
+}

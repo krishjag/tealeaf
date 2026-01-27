@@ -1,0 +1,32 @@
+{
+  "company": {
+    "id": "CORP-001",
+    "name": "TechVentures Inc",
+    "industry": "Technology"
+  },
+  "period": {
+    "start": "2024-01-01",
+    "end": "2024-01-31"
+  },
+  "employees": [
+    {"id": "EMP001", "name": "Alice Johnson", "department": "Engineering", "role": "Senior Developer", "hire_date": "2019-03-15", "salary": 125000, "performance_score": 4.5, "years_experience": 8, "status": "active"},
+    {"id": "EMP002", "name": "Bob Smith", "department": "Engineering", "role": "Tech Lead", "hire_date": "2017-06-01", "salary": 155000, "performance_score": 4.8, "years_experience": 12, "status": "active"},
+    {"id": "EMP003", "name": "Carol Williams", "department": "Marketing", "role": "Marketing Manager", "hire_date": "2020-01-10", "salary": 95000, "performance_score": 4.2, "years_experience": 6, "status": "active"},
+    {"id": "EMP004", "name": "David Brown", "department": "Sales", "role": "Account Executive", "hire_date": "2021-08-20", "salary": 75000, "performance_score": 3.8, "years_experience": 4, "status": "active"},
+    {"id": "EMP005", "name": "Eva Martinez", "department": "Engineering", "role": "Junior Developer", "hire_date": "2023-02-01", "salary": 85000, "performance_score": 4.0, "years_experience": 2, "status": "active"},
+    {"id": "EMP006", "name": "Frank Lee", "department": "Finance", "role": "Financial Analyst", "hire_date": "2018-11-05", "salary": 105000, "performance_score": 4.3, "years_experience": 7, "status": "active"},
+    {"id": "EMP007", "name": "Grace Chen", "department": "HR", "role": "HR Specialist", "hire_date": "2022-04-15", "salary": 72000, "performance_score": 4.1, "years_experience": 3, "status": "active"},
+    {"id": "EMP008", "name": "Henry Wilson", "department": "Engineering", "role": "DevOps Engineer", "hire_date": "2020-09-01", "salary": 130000, "performance_score": 4.6, "years_experience": 9, "status": "active"},
+    {"id": "EMP009", "name": "Ivy Taylor", "department": "Sales", "role": "Sales Director", "hire_date": "2016-02-28", "salary": 145000, "performance_score": 4.7, "years_experience": 15, "status": "active"},
+    {"id": "EMP010", "name": "Jack Anderson", "department": "Marketing", "role": "Content Specialist", "hire_date": "2023-06-10", "salary": 65000, "performance_score": 3.5, "years_experience": 1, "status": "terminated"}
+  ],
+  "attrition": [
+    {"employee_id": "EMP010", "termination_date": "2024-01-15", "reason": "voluntary", "exit_interview_score": 3.2},
+    {"employee_id": "EMP011", "termination_date": "2024-01-08", "reason": "involuntary", "exit_interview_score": null}
+  ],
+  "benefits": {
+    "health_insurance_cost_per_employee": 850,
+    "retirement_match_pct": 4.0,
+    "pto_days_per_year": 20
+  }
+}

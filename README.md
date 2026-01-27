@@ -349,4 +349,4 @@ For the complete technical specification including text format syntax, type syst
 
 ---
 
-*PAX v2.0-beta.1 — Peace between human and machine.*
+*PAX v2.0.0-beta.1 — Peace between human and machine.*

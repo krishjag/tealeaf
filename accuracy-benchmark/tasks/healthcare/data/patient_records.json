@@ -1,0 +1,28 @@
+{
+  "facility": {
+    "id": "HOSP-001",
+    "name": "Memorial General Hospital",
+    "type": "acute_care"
+  },
+  "period": {
+    "start": "2024-01-01",
+    "end": "2024-01-31"
+  },
+  "patients": [
+    {"id": "PAT001", "age": 45, "gender": "M", "diagnosis": "Type 2 Diabetes", "admission_date": "2024-01-05", "discharge_date": "2024-01-08", "department": "Internal Medicine", "readmission": false},
+    {"id": "PAT002", "age": 67, "gender": "F", "diagnosis": "Congestive Heart Failure", "admission_date": "2024-01-03", "discharge_date": "2024-01-10", "department": "Cardiology", "readmission": true},
+    {"id": "PAT003", "age": 32, "gender": "F", "diagnosis": "Appendicitis", "admission_date": "2024-01-12", "discharge_date": "2024-01-14", "department": "Surgery", "readmission": false},
+    {"id": "PAT004", "age": 78, "gender": "M", "diagnosis": "Pneumonia", "admission_date": "2024-01-08", "discharge_date": "2024-01-15", "department": "Pulmonology", "readmission": true},
+    {"id": "PAT005", "age": 55, "gender": "M", "diagnosis": "Acute MI", "admission_date": "2024-01-18", "discharge_date": "2024-01-25", "department": "Cardiology", "readmission": false},
+    {"id": "PAT006", "age": 28, "gender": "F", "diagnosis": "Fracture", "admission_date": "2024-01-20", "discharge_date": "2024-01-22", "department": "Orthopedics", "readmission": false},
+    {"id": "PAT007", "age": 62, "gender": "M", "diagnosis": "COPD Exacerbation", "admission_date": "2024-01-15", "discharge_date": "2024-01-20", "department": "Pulmonology", "readmission": true},
+    {"id": "PAT008", "age": 41, "gender": "F", "diagnosis": "Cholecystitis", "admission_date": "2024-01-22", "discharge_date": "2024-01-24", "department": "Surgery", "readmission": false}
+  ],
+  "lab_results": [
+    {"patient_id": "PAT001", "test": "HbA1c", "value": 8.5, "unit": "%", "reference_range": "4.0-5.6", "date": "2024-01-05"},
+    {"patient_id": "PAT001", "test": "Glucose", "value": 185, "unit": "mg/dL", "reference_range": "70-100", "date": "2024-01-05"},
+    {"patient_id": "PAT002", "test": "BNP", "value": 890, "unit": "pg/mL", "reference_range": "<100", "date": "2024-01-03"},
+    {"patient_id": "PAT004", "test": "WBC", "value": 15.2, "unit": "K/uL", "reference_range": "4.5-11.0", "date": "2024-01-08"},
+    {"patient_id": "PAT005", "test": "Troponin I", "value": 2.8, "unit": "ng/mL", "reference_range": "<0.04", "date": "2024-01-18"}
+  ]
+}

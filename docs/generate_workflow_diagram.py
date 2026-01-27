@@ -7,6 +7,33 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Circle
 import numpy as np
+import os
+
+# Get actual file sizes from examples directory
+EXAMPLES_DIR = os.path.join(os.path.dirname(__file__), '..', 'examples')
+
+def get_file_size_kb(filename):
+    """Get file size in KB, returns None if file doesn't exist"""
+    filepath = os.path.join(EXAMPLES_DIR, filename)
+    if os.path.exists(filepath):
+        size_bytes = os.path.getsize(filepath)
+        return size_bytes / 1024
+    return None
+
+def format_size(size_kb):
+    """Format size in KB with one decimal place"""
+    if size_kb is None:
+        return "N/A"
+    return f"{size_kb:.1f} KB"
+
+# Read actual file sizes
+JSON_SIZE_KB = get_file_size_kb('retail_orders.json') or 36.8
+PAX_TEXT_SIZE_KB = get_file_size_kb('retail_orders.pax') or 14.6
+PAX_BIN_SIZE_KB = get_file_size_kb('retail_orders.paxb') or 6.9
+
+# Calculate percentages
+PAX_TEXT_PERCENT = (PAX_TEXT_SIZE_KB / JSON_SIZE_KB) * 100
+PAX_BIN_PERCENT = (PAX_BIN_SIZE_KB / JSON_SIZE_KB) * 100
 
 # Set up the figure with higher resolution
 fig, ax = plt.subplots(1, 1, figsize=(20, 12.5))
@@ -79,15 +106,17 @@ def draw_angled_arrow(ax, start, end, color=COLOR_ARROW, angle_first='horizontal
 # Title
 ax.text(8, 9.5, 'PAX Format: JSON-Compatible Schema-Aware Serialization',
         ha='center', va='center', fontsize=24, fontweight='bold', color=COLOR_TEXT)
-ax.text(8, 9.0, 'Lossless conversion with 65-80% size reduction',
+# Calculate size reduction: (1 - binary/json) * 100
+size_reduction = (1 - PAX_BIN_SIZE_KB / JSON_SIZE_KB) * 100
+ax.text(8, 9.0, f'Lossless conversion with {size_reduction:.0f}% size reduction (binary)',
         ha='center', va='center', fontsize=20, color=COLOR_TEXT, alpha=0.8)
 
 # === LEFT SIDE: Source Data ===
-draw_box(ax, 2, 6.5, 2.2, 1.2, COLOR_JSON, 'JSON Data', '36.8 KB', '{ }')
+draw_box(ax, 2, 6.5, 2.2, 1.2, COLOR_JSON, 'JSON Data', format_size(JSON_SIZE_KB), '{ }')
 
 # === CENTER: PAX Conversion ===
-draw_box(ax, 5.5, 6.5, 2.2, 1.2, COLOR_PAX_TEXT, 'PAX Text', '19.6 KB', '.pax')
-draw_box(ax, 9, 6.5, 2.2, 1.2, COLOR_PAX_BIN, 'PAX Binary', '6.9 KB', '.paxb')
+draw_box(ax, 5.5, 6.5, 2.2, 1.2, COLOR_PAX_TEXT, 'PAX Text', format_size(PAX_TEXT_SIZE_KB), '.pax')
+draw_box(ax, 9, 6.5, 2.2, 1.2, COLOR_PAX_BIN, 'PAX Binary', format_size(PAX_BIN_SIZE_KB), '.paxb')
 
 # Arrows for conversion flow
 draw_arrow(ax, (3.2, 6.5), (4.3, 6.5), 'white')
@@ -138,31 +167,31 @@ size_x = 3.0    # X position for size labels (right-aligned before bar)
 # JSON bar (full width reference)
 json_width = 4.2
 ax.text(label_x, bar_y, 'JSON', ha='left', va='center', fontsize=16, fontweight='bold', color=COLOR_JSON)
-ax.text(size_x, bar_y, '36.8 KB', ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
+ax.text(size_x, bar_y, format_size(JSON_SIZE_KB), ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
 ax.add_patch(FancyBboxPatch((bar_left, bar_y - bar_height/2), json_width, bar_height,
                             boxstyle="round,pad=0.03,rounding_size=0.1",
                             facecolor=COLOR_JSON, edgecolor='white', linewidth=1, alpha=0.9))
 ax.text(bar_left + json_width/2, bar_y, '100%', ha='center', va='center',
         fontsize=16, fontweight='bold', color=COLOR_TEXT)
 
-# PAX Text bar
-pax_text_width = json_width * 0.53  # 53% of JSON
+# PAX Text bar (width proportional to actual percentage)
+pax_text_width = json_width * (PAX_TEXT_PERCENT / 100)
 ax.text(label_x, bar_y - bar_spacing, 'PAX Text', ha='left', va='center', fontsize=16, fontweight='bold', color=COLOR_PAX_TEXT)
-ax.text(size_x, bar_y - bar_spacing, '19.6 KB', ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
+ax.text(size_x, bar_y - bar_spacing, format_size(PAX_TEXT_SIZE_KB), ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
 ax.add_patch(FancyBboxPatch((bar_left, bar_y - bar_height/2 - bar_spacing), pax_text_width, bar_height,
                             boxstyle="round,pad=0.03,rounding_size=0.1",
                             facecolor=COLOR_PAX_TEXT, edgecolor='white', linewidth=1, alpha=0.9))
-ax.text(bar_left + pax_text_width/2, bar_y - bar_spacing, '53%', ha='center', va='center',
+ax.text(bar_left + pax_text_width/2, bar_y - bar_spacing, f'{PAX_TEXT_PERCENT:.1f}%', ha='center', va='center',
         fontsize=16, fontweight='bold', color=COLOR_TEXT)
 
-# PAX Binary bar
-pax_bin_width = json_width * 0.19  # 19% of JSON
+# PAX Binary bar (width proportional to actual percentage)
+pax_bin_width = json_width * (PAX_BIN_PERCENT / 100)
 ax.text(label_x, bar_y - bar_spacing*2, 'PAX Binary', ha='left', va='center', fontsize=16, fontweight='bold', color=COLOR_PAX_BIN)
-ax.text(size_x, bar_y - bar_spacing*2, '6.9 KB', ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
+ax.text(size_x, bar_y - bar_spacing*2, format_size(PAX_BIN_SIZE_KB), ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
 ax.add_patch(FancyBboxPatch((bar_left, bar_y - bar_height/2 - bar_spacing*2), pax_bin_width, bar_height,
                             boxstyle="round,pad=0.03,rounding_size=0.1",
                             facecolor=COLOR_PAX_BIN, edgecolor='white', linewidth=1, alpha=0.9))
-ax.text(bar_left + pax_bin_width/2, bar_y - bar_spacing*2, '19%', ha='center', va='center',
+ax.text(bar_left + pax_bin_width/2, bar_y - bar_spacing*2, f'{PAX_BIN_PERCENT:.1f}%', ha='center', va='center',
         fontsize=16, fontweight='bold', color=COLOR_TEXT)
 
 # Size comparison title
@@ -213,8 +242,13 @@ ax.text(8, 0.05, 'PAX v2.0-beta.1 — Peace between human and machine',
 
 # Save with high resolution
 plt.tight_layout()
-plt.savefig('examples/pax_workflow.png', dpi=300, facecolor=COLOR_BG,
-            edgecolor='none', bbox_inches='tight', pad_inches=0.3)
 plt.savefig('docs/pax_workflow.png', dpi=300, facecolor=COLOR_BG,
             edgecolor='none', bbox_inches='tight', pad_inches=0.3)
+
+# Print summary
 print("Saved: docs/pax_workflow.png")
+print(f"\nFile sizes from examples/retail_orders.*:")
+print(f"  JSON:       {format_size(JSON_SIZE_KB)} (100%)")
+print(f"  PAX Text:   {format_size(PAX_TEXT_SIZE_KB)} ({PAX_TEXT_PERCENT:.1f}%)")
+print(f"  PAX Binary: {format_size(PAX_BIN_SIZE_KB)} ({PAX_BIN_PERCENT:.1f}%)")
+print(f"  Size reduction (binary): {size_reduction:.1f}%")
