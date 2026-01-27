@@ -1,0 +1,55 @@
+{
+  "description": "Expected error messages for invalid input files. Error messages should match exactly (excluding OS-specific parts in include errors).",
+  "errors": {
+    "unterminated_string.pax": {
+      "error_type": "ParseError",
+      "message": "Parse error: Unterminated string",
+      "description": "String literal without closing quote"
+    },
+    "unterminated_multiline.pax": {
+      "error_type": "ParseError",
+      "message": "Parse error: Unterminated multiline string",
+      "description": "Triple-quoted string without closing triple-quotes"
+    },
+    "invalid_hex.pax": {
+      "error_type": "ParseError",
+      "message_pattern": "Parse error: Invalid hex: 0x.*",
+      "description": "Hexadecimal number with invalid characters"
+    },
+    "invalid_binary.pax": {
+      "error_type": "ParseError",
+      "message_pattern": "Parse error: Invalid binary: 0b.*",
+      "description": "Binary number with invalid characters (not 0 or 1)"
+    },
+    "unexpected_token.pax": {
+      "error_type": "UnexpectedToken",
+      "message": "Expected Colon, got Word(\"value\")",
+      "description": "Missing colon between key and value"
+    },
+    "unclosed_brace.pax": {
+      "error_type": "UnexpectedToken",
+      "message": "Expected key, got Eof",
+      "description": "Object without closing brace"
+    },
+    "unclosed_bracket.pax": {
+      "error_type": "UnexpectedToken",
+      "message": "Expected value, got Eof",
+      "description": "Array without closing bracket"
+    },
+    "include_not_found.pax": {
+      "error_type": "ParseError",
+      "message_prefix": "Parse error: Failed to include nonexistent_file.pax:",
+      "description": "Include directive with non-existent file"
+    },
+    "invalid_magic.paxb": {
+      "error_type": "InvalidMagic",
+      "message": "Invalid Pax magic bytes",
+      "description": "Binary file with incorrect magic bytes"
+    }
+  },
+  "notes": {
+    "message": "Exact error message - must match exactly",
+    "message_prefix": "Error message must start with this prefix (OS-specific suffix)",
+    "message_pattern": "Regex pattern the error message must match"
+  }
+}

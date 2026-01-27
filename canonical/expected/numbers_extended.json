@@ -1,0 +1,54 @@
+{
+  "binary_array": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "binary_byte": 240,
+  "binary_flags": 170,
+  "binary_simple": 10,
+  "bit_flags": {
+    "all": 7,
+    "execute": 4,
+    "read": 1,
+    "write": 2
+  },
+  "color_palette": {
+    "black": 0,
+    "blue": 255,
+    "green": 65280,
+    "red": 16711680,
+    "white": 16777215
+  },
+  "float_precision": 3.141592653589793,
+  "float_tiny": 1e-6,
+  "hex_array": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "hex_color": 16733440,
+  "hex_large": 3735928559,
+  "hex_mask": 161,
+  "hex_simple": 255,
+  "int_max_i32": 2147483647,
+  "int_min_i32": -2147483648,
+  "large_negative": -9007199254740991,
+  "large_positive": 9007199254740991,
+  "negative_zero": 0,
+  "scientific_array": [
+    10.0,
+    100.0,
+    1000.0,
+    10000.0
+  ],
+  "scientific_large": 6.022e+23,
+  "scientific_negative_exp": 0.0025,
+  "scientific_positive": 100000.0,
+  "scientific_small": 1.5e-10,
+  "zero": 0
+}

@@ -1,0 +1,223 @@
+# GitHub Actions workflow for building and packaging Pax .NET library
+# with multi-platform native dependencies
+#
+# This workflow:
+# 1. Builds native libraries on Windows, Linux, and macOS
+# 2. Combines all native libraries into a single NuGet package
+# 3. Optionally publishes to NuGet.org on release
+
+name: .NET Package
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'pax-core/**'
+      - 'pax-ffi/**'
+      - 'bindings/dotnet/**'
+      - '.github/workflows/dotnet-package.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pax-core/**'
+      - 'pax-ffi/**'
+      - 'bindings/dotnet/**'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      publish_nuget:
+        description: 'Publish to NuGet.org'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  CARGO_TERM_COLOR: always
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  # Build native libraries on each platform
+  build-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows
+          - os: windows-latest
+            rid: win-x64
+            rust-target: x86_64-pc-windows-msvc
+            library: pax_ffi.dll
+          - os: windows-latest
+            rid: win-arm64
+            rust-target: aarch64-pc-windows-msvc
+            library: pax_ffi.dll
+
+          # Linux (glibc)
+          - os: ubuntu-latest
+            rid: linux-x64
+            rust-target: x86_64-unknown-linux-gnu
+            library: libpax_ffi.so
+          - os: ubuntu-latest
+            rid: linux-arm64
+            rust-target: aarch64-unknown-linux-gnu
+            library: libpax_ffi.so
+            cross: true
+
+          # Linux (musl - for Alpine)
+          - os: ubuntu-latest
+            rid: linux-musl-x64
+            rust-target: x86_64-unknown-linux-musl
+            library: libpax_ffi.so
+            cross: true
+          - os: ubuntu-latest
+            rid: linux-musl-arm64
+            rust-target: aarch64-unknown-linux-musl
+            library: libpax_ffi.so
+            cross: true
+
+          # macOS
+          - os: macos-latest
+            rid: osx-x64
+            rust-target: x86_64-apple-darwin
+            library: libpax_ffi.dylib
+          - os: macos-latest
+            rid: osx-arm64
+            rust-target: aarch64-apple-darwin
+            library: libpax_ffi.dylib
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.rid }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-target }}
+
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.rid == 'linux-arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Install cross-compilation tools (Linux musl)
+        if: contains(matrix.rid, 'musl')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+          if [[ "${{ matrix.rid }}" == "linux-musl-arm64" ]]; then
+            # For musl ARM64, we need to use cross or install additional tools
+            cargo install cross --git https://github.com/cross-rs/cross
+          fi
+
+      - name: Configure Rust for cross-compilation (Linux ARM64 glibc)
+        if: matrix.rid == 'linux-arm64'
+        run: |
+          mkdir -p .cargo
+          echo '[target.aarch64-unknown-linux-gnu]' >> .cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
+
+      - name: Build native library
+        run: |
+          cargo build --release --package pax-ffi --target ${{ matrix.rust-target }}
+
+      - name: Build native library (cross)
+        if: matrix.cross == true && matrix.rid == 'linux-musl-arm64'
+        run: |
+          cross build --release --package pax-ffi --target ${{ matrix.rust-target }}
+
+      - name: Upload native library artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.rid }}
+          path: target/${{ matrix.rust-target }}/release/${{ matrix.library }}
+          if-no-files-found: error
+          retention-days: 1
+
+  # Combine all native libraries and create NuGet package
+  package:
+    needs: build-native
+    runs-on: ubuntu-latest
+    name: Create NuGet Package
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Download all native library artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Organize native libraries
+        run: |
+          cd bindings/dotnet/Pax
+
+          # Create runtimes directory structure
+          for rid_dir in ../../../artifacts/native-*; do
+            rid=$(basename "$rid_dir" | sed 's/native-//')
+            mkdir -p "runtimes/$rid/native"
+
+            # Find and copy the library file
+            find "$rid_dir" -type f \( -name "*.dll" -o -name "*.so" -o -name "*.dylib" \) -exec cp {} "runtimes/$rid/native/" \;
+          done
+
+          # Show what we have
+          echo "Native libraries:"
+          find runtimes -type f -exec ls -la {} \;
+
+      - name: Build .NET project
+        run: dotnet build bindings/dotnet/Pax -c Release
+
+      - name: Run tests
+        run: |
+          # Copy a native library for tests
+          cp bindings/dotnet/Pax/runtimes/linux-x64/native/libpax_ffi.so bindings/dotnet/Pax.Tests/bin/Release/net8.0/ || true
+          dotnet test bindings/dotnet -c Release --no-build
+
+      - name: Create NuGet package
+        run: |
+          dotnet pack bindings/dotnet/Pax -c Release --no-build -o artifacts/packages
+
+      - name: Upload NuGet package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: artifacts/packages/*.nupkg
+          if-no-files-found: error
+
+  # Publish to NuGet.org (only on release or manual trigger)
+  publish:
+    needs: package
+    runs-on: ubuntu-latest
+    name: Publish to NuGet
+    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_nuget)
+
+    steps:
+      - name: Download NuGet package
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-package
+          path: packages
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish to NuGet.org
+        run: |
+          dotnet nuget push packages/*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate

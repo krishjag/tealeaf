@@ -1,0 +1,280 @@
+{
+  "dashboard": {
+    "featured_points": [
+      {
+        "x": 0.0,
+        "y": 0.0
+      },
+      {
+        "x": 100.0,
+        "y": 100.0
+      }
+    ],
+    "filters": {
+      "categories": [
+        "A",
+        "B",
+        "C"
+      ],
+      "date_range": {
+        "end": "2024-12-31T00:00:00Z",
+        "start": "2024-01-01T00:00:00Z"
+      },
+      "include_archived": false
+    },
+    "settings": {
+      "show_grid": true,
+      "sidebar_width": 250,
+      "theme": "dark"
+    },
+    "team": [
+      {
+        "age": 28,
+        "email": "dana@team.com",
+        "name": "Dana"
+      },
+      {
+        "age": 32,
+        "email": null,
+        "name": "Eve"
+      }
+    ]
+  },
+  "employee_statuses": [
+    {
+      "employee_id": 1,
+      "status": {
+        "$tag": "active",
+        "$value": []
+      }
+    },
+    {
+      "employee_id": 2,
+      "status": {
+        "$tag": "inactive",
+        "$value": [
+          "On leave"
+        ]
+      }
+    },
+    {
+      "employee_id": 3,
+      "status": {
+        "$tag": "pending",
+        "$value": [
+          "2024-02-01T00:00:00Z"
+        ]
+      }
+    }
+  ],
+  "employees": [
+    {
+      "address": {
+        "city": "San Jose",
+        "country": "USA",
+        "street": "123 Tech Blvd",
+        "zip": "95101"
+      },
+      "department": "Engineering",
+      "id": 1,
+      "person": {
+        "age": 30,
+        "email": "alice@corp.com",
+        "name": "Alice Smith"
+      },
+      "salary": 85000.0
+    },
+    {
+      "address": null,
+      "department": "Marketing",
+      "id": 2,
+      "person": {
+        "age": 25,
+        "email": null,
+        "name": "Bob Jones"
+      },
+      "salary": 65000.0
+    },
+    {
+      "address": {
+        "city": "Austin",
+        "country": "USA",
+        "street": "456 Code Ave",
+        "zip": "78701"
+      },
+      "department": "Engineering",
+      "id": 3,
+      "person": {
+        "age": 40,
+        "email": "carol@corp.com",
+        "name": "Carol White"
+      },
+      "salary": 95000.0
+    }
+  ],
+  "empty_points": [],
+  "logs": [
+    {
+      "level": "INFO",
+      "message": "Application started",
+      "timestamp": "2024-01-15T09:00:00Z"
+    },
+    {
+      "level": "DEBUG",
+      "message": "Loading configuration",
+      "timestamp": "2024-01-15T09:01:00Z"
+    },
+    {
+      "details": {
+        "key": "user_123"
+      },
+      "level": "WARN",
+      "message": "Cache miss",
+      "timestamp": "2024-01-15T09:02:00Z"
+    }
+  ],
+  "metadata": {
+    "author": "System",
+    "generated_at": "2024-01-15T10:30:00Z",
+    "tags": [
+      "auto-generated",
+      "test-data"
+    ],
+    "version": "1.0.0"
+  },
+  "mixed_items": [
+    {
+      "content": "Hello",
+      "type": "text"
+    },
+    {
+      "type": "number",
+      "value": 42
+    },
+    {
+      "type": "point",
+      "x": 10,
+      "y": 20
+    },
+    {
+      "data": {
+        "a": 1,
+        "b": 2,
+        "c": 3
+      },
+      "type": "nested"
+    }
+  ],
+  "people": [
+    {
+      "age": 30,
+      "email": "alice@example.com",
+      "name": "Alice"
+    },
+    {
+      "age": 25,
+      "email": null,
+      "name": "Bob"
+    },
+    {
+      "age": 35,
+      "email": "charlie@example.com",
+      "name": "Charlie"
+    }
+  ],
+  "point_like_objects": [
+    {
+      "label": "A",
+      "x": 1.0,
+      "y": 2.0
+    },
+    {
+      "color": "red",
+      "label": "B",
+      "x": 3.0,
+      "y": 4.0
+    }
+  ],
+  "points": [
+    {
+      "x": 0.0,
+      "y": 0.0
+    },
+    {
+      "x": 10.5,
+      "y": 20.3
+    },
+    {
+      "x": -5.0,
+      "y": 15.0
+    }
+  ],
+  "report": {
+    "key_employees": [
+      {
+        "address": {
+          "city": "New York",
+          "country": "USA",
+          "street": "1 Corporate Way",
+          "zip": "10001"
+        },
+        "department": "Executive",
+        "id": 100,
+        "person": {
+          "age": 45,
+          "email": "john@exec.com",
+          "name": "John Doe"
+        },
+        "salary": 150000.0
+      }
+    ],
+    "regional_data": [
+      [
+        "NA",
+        {
+          "growth": 0.15,
+          "revenue": 500000
+        }
+      ],
+      [
+        "EU",
+        {
+          "growth": 0.1,
+          "revenue": 300000
+        }
+      ],
+      [
+        "APAC",
+        {
+          "growth": 0.25,
+          "revenue": 200000
+        }
+      ]
+    ],
+    "status": {
+      "$tag": "approved",
+      "$value": {
+        "by": "CFO",
+        "date": "2024-01-15T00:00:00Z"
+      }
+    },
+    "summary": {
+      "departments": [
+        "Engineering",
+        "Sales",
+        "Marketing",
+        "HR"
+      ],
+      "expenses": 750000.25,
+      "headcount": 50,
+      "revenue": 1000000.5
+    },
+    "title": "Quarterly Report"
+  },
+  "single_point": [
+    {
+      "x": 5.0,
+      "y": 5.0
+    }
+  ]
+}

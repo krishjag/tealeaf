@@ -1,0 +1,140 @@
+{
+  "!cycle3_a": {
+    "name": "A",
+    "next": {
+      "$ref": "cycle3_b"
+    }
+  },
+  "!cycle3_b": {
+    "name": "B",
+    "next": {
+      "$ref": "cycle3_c"
+    }
+  },
+  "!cycle3_c": {
+    "name": "C",
+    "next": {
+      "$ref": "cycle3_a"
+    }
+  },
+  "!deep_a": {
+    "level1": {
+      "level2": {
+        "ref": {
+          "$ref": "deep_b"
+        }
+      }
+    }
+  },
+  "!deep_b": {
+    "level1": {
+      "level2": {
+        "ref": {
+          "$ref": "deep_a"
+        }
+      }
+    }
+  },
+  "!forward_target": {
+    "name": "Defined later",
+    "value": 42
+  },
+  "!node_a": {
+    "name": "Node A",
+    "next": {
+      "$ref": "node_b"
+    }
+  },
+  "!node_b": {
+    "name": "Node B",
+    "next": {
+      "$ref": "node_a"
+    }
+  },
+  "!self_ref": {
+    "name": "Self-referential",
+    "self": {
+      "$ref": "self_ref"
+    }
+  },
+  "!standalone": {
+    "name": "Standalone",
+    "value": 100
+  },
+  "cycle_other": {
+    "$ref": "node_b"
+  },
+  "cycle_start": {
+    "$ref": "node_a"
+  },
+  "deep_cycle": {
+    "$ref": "deep_a"
+  },
+  "forward_usage": {
+    "$ref": "forward_target"
+  },
+  "mixed": {
+    "cyclic": {
+      "$ref": "node_a"
+    },
+    "non_cyclic": {
+      "$ref": "standalone"
+    }
+  },
+  "ref_map": [
+    [
+      "first",
+      {
+        "$ref": "node_a"
+      }
+    ],
+    [
+      "second",
+      {
+        "$ref": "node_b"
+      }
+    ]
+  ],
+  "refs_in_array": [
+    {
+      "$ref": "node_a"
+    },
+    {
+      "$ref": "node_b"
+    },
+    {
+      "$ref": "node_a"
+    }
+  ],
+  "refs_in_object": {
+    "primary": {
+      "$ref": "node_a"
+    },
+    "primary_again": {
+      "$ref": "node_a"
+    },
+    "secondary": {
+      "$ref": "node_b"
+    }
+  },
+  "self_referential": {
+    "$ref": "self_ref"
+  },
+  "tagged_ref": {
+    "$tag": "active",
+    "$value": {
+      "$ref": "node_a"
+    }
+  },
+  "three_cycle": [
+    {
+      "$ref": "cycle3_a"
+    },
+    {
+      "$ref": "cycle3_b"
+    },
+    {
+      "$ref": "cycle3_c"
+    }
+  ]
+}

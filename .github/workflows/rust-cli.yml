@@ -1,0 +1,220 @@
+# GitHub Actions workflow for building and releasing Pax CLI
+#
+# This workflow:
+# 1. Builds the pax CLI binary for Windows, Linux, and macOS
+# 2. Runs tests on all platforms
+# 3. Creates release artifacts with platform-specific binaries
+# 4. Publishes to crates.io on release
+
+name: Rust CLI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'pax-core/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/rust-cli.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pax-core/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      publish_crates:
+        description: 'Publish to crates.io'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Run tests on all platforms
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    name: Test (${{ matrix.os }})
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run tests
+        run: cargo test --workspace
+
+  # Build release binaries for all platforms
+  build:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: pax-windows-x64
+            binary: pax.exe
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            artifact: pax-windows-arm64
+            binary: pax.exe
+
+          # Linux (glibc)
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: pax-linux-x64
+            binary: pax
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            artifact: pax-linux-arm64
+            binary: pax
+            cross: true
+
+          # Linux (musl - static binary)
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            artifact: pax-linux-musl-x64
+            binary: pax
+            cross: true
+
+          # macOS
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact: pax-macos-x64
+            binary: pax
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact: pax-macos-arm64
+            binary: pax
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.artifact }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          mkdir -p .cargo
+          echo '[target.aarch64-unknown-linux-gnu]' >> .cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
+
+      - name: Install cross-compilation tools (Linux musl)
+        if: contains(matrix.target, 'musl')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+
+      - name: Build release binary
+        run: cargo build --release --package pax-core --target ${{ matrix.target }}
+
+      - name: Create artifact directory
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp target/${{ matrix.target }}/release/${{ matrix.binary }} dist/
+
+          # Add README and LICENSE
+          cp README.md dist/ 2>/dev/null || echo "No README.md found"
+          cp LICENSE* dist/ 2>/dev/null || echo "No LICENSE found"
+
+      - name: Create archive (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cd dist
+          tar -czvf ../${{ matrix.artifact }}.tar.gz *
+
+      - name: Create archive (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/* -DestinationPath ${{ matrix.artifact }}.zip
+
+      - name: Upload artifact (Unix)
+        if: runner.os != 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.tar.gz
+          if-no-files-found: error
+
+      - name: Upload artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
+          if-no-files-found: error
+
+  # Create GitHub release with all binaries
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Create Release
+    if: github.event_name == 'release'
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/**/*.tar.gz
+            artifacts/**/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Publish to crates.io
+  publish:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    name: Publish to crates.io
+    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_crates)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish pax-core to crates.io
+        run: cargo publish --package pax-core --token ${{ secrets.CRATES_IO_TOKEN }}
+        continue-on-error: true  # In case version already exists

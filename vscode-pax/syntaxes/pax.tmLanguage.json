@@ -1,0 +1,186 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "PAX",
+  "scopeName": "source.pax",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#directives" },
+    { "include": "#keys" },
+    { "include": "#values" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.pax",
+          "match": "#.*$"
+        }
+      ]
+    },
+    "directives": {
+      "patterns": [
+        {
+          "name": "keyword.control.directive.struct.pax",
+          "match": "@struct"
+        },
+        {
+          "name": "keyword.control.directive.union.pax",
+          "match": "@union"
+        },
+        {
+          "name": "keyword.control.directive.table.pax",
+          "match": "@table"
+        },
+        {
+          "name": "keyword.control.directive.map.pax",
+          "match": "@map"
+        },
+        {
+          "name": "keyword.control.directive.include.pax",
+          "match": "@include"
+        }
+      ]
+    },
+    "keys": {
+      "patterns": [
+        {
+          "name": "entity.name.tag.pax",
+          "match": "^\\s*([a-zA-Z_][a-zA-Z0-9_.\\-]*)\\s*:",
+          "captures": {
+            "1": { "name": "entity.name.tag.pax" }
+          }
+        }
+      ]
+    },
+    "values": {
+      "patterns": [
+        { "include": "#strings" },
+        { "include": "#timestamps" },
+        { "include": "#numbers" },
+        { "include": "#constants" },
+        { "include": "#types" },
+        { "include": "#references" },
+        { "include": "#tagged" },
+        { "include": "#identifiers" }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.triple.pax",
+          "begin": "\"\"\"",
+          "end": "\"\"\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.pax",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.double.pax",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.pax",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.pax",
+          "match": "\\b0x[0-9a-fA-F]+\\b"
+        },
+        {
+          "name": "constant.numeric.binary.pax",
+          "match": "\\b0b[01]+\\b"
+        },
+        {
+          "name": "constant.numeric.float.pax",
+          "match": "-?\\d+\\.\\d+([eE][+-]?\\d+)?"
+        },
+        {
+          "name": "constant.numeric.integer.pax",
+          "match": "-?\\d+"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.true.pax",
+          "match": "\\btrue\\b"
+        },
+        {
+          "name": "constant.language.boolean.false.pax",
+          "match": "\\bfalse\\b"
+        },
+        {
+          "name": "constant.language.null.pax",
+          "match": "~"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.primitive.pax",
+          "match": "\\b(string|int|uint|float|bool|bytes|timestamp|int8|int16|int32|int64|uint8|uint16|uint32|uint64|float32|float64)\\b"
+        },
+        {
+          "name": "storage.type.array.pax",
+          "match": "\\[\\]"
+        },
+        {
+          "name": "storage.modifier.nullable.pax",
+          "match": "\\?"
+        },
+        {
+          "name": "entity.name.type.pax",
+          "match": "(?<=@struct\\s+|@union\\s+|@table\\s+)[A-Z][a-zA-Z0-9_]*"
+        },
+        {
+          "name": "entity.name.type.reference.pax",
+          "match": "(?<=:\\s*|\\[\\])[A-Z][a-zA-Z0-9_]*"
+        }
+      ]
+    },
+    "references": {
+      "patterns": [
+        {
+          "name": "variable.other.reference.pax",
+          "match": "![a-zA-Z_][a-zA-Z0-9_.\\-]*"
+        }
+      ]
+    },
+    "tagged": {
+      "patterns": [
+        {
+          "name": "entity.name.tag.custom.pax",
+          "match": ":[a-zA-Z_][a-zA-Z0-9_.\\-]*"
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "name": "variable.other.field.pax",
+          "match": "\\b[a-z_][a-zA-Z0-9_.\\-]*(?=\\s*:)"
+        }
+      ]
+    },
+    "timestamps": {
+      "patterns": [
+        {
+          "name": "constant.other.timestamp.pax",
+          "match": "\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2}(\\.\\d{1,3})?)?(Z|[+-]\\d{2}:\\d{2})?)?"
+        }
+      ]
+    }
+  }
+}

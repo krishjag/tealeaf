@@ -1,0 +1,314 @@
+{
+  "$schema": "./json-conversion-schema.json",
+  "version": "1.0.0",
+  "description": "Test vectors for JSON↔PAX conversion contracts",
+  "stability_policy": {
+    "plain_json_roundtrip": "STABLE - Plain JSON (primitives, arrays, objects with string keys) MUST roundtrip perfectly through PAX",
+    "pax_to_json": "STABLE - PAX special types have fixed JSON representations that MUST NOT change",
+    "json_to_pax": "STABLE - JSON is parsed as-is; special syntax ($ref, $tag) is NOT auto-converted to PAX types"
+  },
+
+  "plain_json_roundtrip": {
+    "description": "These JSON values MUST roundtrip perfectly: JSON → PAX → JSON produces identical output",
+    "vectors": [
+      {
+        "name": "null",
+        "json": "null",
+        "expected": "null"
+      },
+      {
+        "name": "boolean_true",
+        "json": "true",
+        "expected": "true"
+      },
+      {
+        "name": "boolean_false",
+        "json": "false",
+        "expected": "false"
+      },
+      {
+        "name": "integer_zero",
+        "json": "0",
+        "expected": "0"
+      },
+      {
+        "name": "integer_positive",
+        "json": "42",
+        "expected": "42"
+      },
+      {
+        "name": "integer_negative",
+        "json": "-123",
+        "expected": "-123"
+      },
+      {
+        "name": "integer_large",
+        "json": "9007199254740991",
+        "expected": "9007199254740991"
+      },
+      {
+        "name": "float_simple",
+        "json": "3.14",
+        "expected": "3.14"
+      },
+      {
+        "name": "float_scientific",
+        "json": "1.5e10",
+        "expected": "15000000000.0",
+        "note": "Scientific notation normalized to decimal"
+      },
+      {
+        "name": "string_empty",
+        "json": "\"\"",
+        "expected": "\"\""
+      },
+      {
+        "name": "string_simple",
+        "json": "\"hello world\"",
+        "expected": "\"hello world\""
+      },
+      {
+        "name": "string_unicode",
+        "json": "\"こんにちは\"",
+        "expected": "\"こんにちは\""
+      },
+      {
+        "name": "string_escapes",
+        "json": "\"line1\\nline2\\ttab\"",
+        "expected": "\"line1\\nline2\\ttab\""
+      },
+      {
+        "name": "array_empty",
+        "json": "[]",
+        "expected": "[]"
+      },
+      {
+        "name": "array_integers",
+        "json": "[1, 2, 3]",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "name": "array_mixed",
+        "json": "[1, \"two\", true, null]",
+        "expected": "[1, \"two\", true, null]"
+      },
+      {
+        "name": "array_nested",
+        "json": "[[1, 2], [3, 4]]",
+        "expected": "[[1, 2], [3, 4]]"
+      },
+      {
+        "name": "object_empty",
+        "json": "{}",
+        "expected": "{}"
+      },
+      {
+        "name": "object_simple",
+        "json": "{\"name\": \"alice\", \"age\": 30}",
+        "expected_keys": ["name", "age"],
+        "expected_values": {"name": "alice", "age": 30},
+        "note": "Key order may vary; compare by key-value pairs"
+      },
+      {
+        "name": "object_nested",
+        "json": "{\"user\": {\"name\": \"bob\", \"email\": \"bob@example.com\"}}",
+        "expected_keys": ["user"],
+        "expected_values": {"user": {"name": "bob", "email": "bob@example.com"}}
+      }
+    ]
+  },
+
+  "pax_to_json": {
+    "description": "PAX special types have these FIXED JSON representations",
+    "vectors": [
+      {
+        "name": "bytes_to_hex",
+        "pax_type": "Bytes",
+        "pax_value_hex": "deadbeef",
+        "expected_json": "\"0xdeadbeef\"",
+        "contract": "Bytes MUST serialize as lowercase hex with 0x prefix"
+      },
+      {
+        "name": "bytes_empty",
+        "pax_type": "Bytes",
+        "pax_value_hex": "",
+        "expected_json": "\"0x\"",
+        "contract": "Empty bytes MUST serialize as \"0x\""
+      },
+      {
+        "name": "timestamp_epoch",
+        "pax_type": "Timestamp",
+        "pax_value_ms": 0,
+        "expected_json": "\"1970-01-01T00:00:00Z\"",
+        "contract": "Timestamp at epoch serializes as ISO 8601 (no ms for whole seconds)"
+      },
+      {
+        "name": "timestamp_with_ms",
+        "pax_type": "Timestamp",
+        "pax_value_ms": 1705315800123,
+        "expected_json": "\"2024-01-15T10:50:00.123Z\"",
+        "contract": "Timestamp milliseconds MUST be preserved when non-zero"
+      },
+      {
+        "name": "timestamp_no_ms",
+        "pax_type": "Timestamp",
+        "pax_value_ms": 1705315800000,
+        "expected_json": "\"2024-01-15T10:50:00Z\"",
+        "contract": "Timestamps with zero milliseconds omit the .000 suffix"
+      },
+      {
+        "name": "ref_simple",
+        "pax_type": "Ref",
+        "pax_value_name": "other_key",
+        "expected_json": "{\"$ref\": \"other_key\"}",
+        "contract": "Ref MUST serialize as object with single $ref key"
+      },
+      {
+        "name": "tagged_with_primitive",
+        "pax_type": "Tagged",
+        "pax_tag": "ok",
+        "pax_inner_json": "200",
+        "expected_json": "{\"$tag\": \"ok\", \"$value\": 200}",
+        "contract": "Tagged MUST serialize with $tag and $value keys"
+      },
+      {
+        "name": "tagged_with_null",
+        "pax_type": "Tagged",
+        "pax_tag": "none",
+        "pax_inner_json": "null",
+        "expected_json": "{\"$tag\": \"none\", \"$value\": null}",
+        "contract": "Tagged with null inner value MUST include $value: null"
+      },
+      {
+        "name": "tagged_with_object",
+        "pax_type": "Tagged",
+        "pax_tag": "error",
+        "pax_inner_json": "{\"code\": 404, \"message\": \"not found\"}",
+        "expected_json": "{\"$tag\": \"error\", \"$value\": {\"code\": 404, \"message\": \"not found\"}}",
+        "contract": "Tagged inner value can be any JSON type"
+      },
+      {
+        "name": "map_int_keys",
+        "pax_type": "Map",
+        "pax_pairs": [[1, "one"], [2, "two"], [3, "three"]],
+        "expected_json": "[[1, \"one\"], [2, \"two\"], [3, \"three\"]]",
+        "contract": "Map MUST serialize as array of [key, value] pairs preserving order"
+      },
+      {
+        "name": "map_mixed_keys",
+        "pax_type": "Map",
+        "pax_pairs": [["a", 1], [true, 2], [null, 3]],
+        "expected_json": "[[\"a\", 1], [true, 2], [null, 3]]",
+        "contract": "Map keys can be any JSON type, not just strings"
+      },
+      {
+        "name": "map_empty",
+        "pax_type": "Map",
+        "pax_pairs": [],
+        "expected_json": "[]",
+        "contract": "Empty Map serializes as empty array"
+      }
+    ]
+  },
+
+  "json_to_pax_no_magic": {
+    "description": "JSON special patterns are NOT auto-converted to PAX types (stability guarantee)",
+    "vectors": [
+      {
+        "name": "dollar_ref_stays_object",
+        "input_json": "{\"$ref\": \"some_key\"}",
+        "expected_pax_type": "Object",
+        "expected_keys": ["$ref"],
+        "contract": "JSON {\"$ref\": ...} MUST remain an Object, NOT become Ref"
+      },
+      {
+        "name": "dollar_tag_stays_object",
+        "input_json": "{\"$tag\": \"ok\", \"$value\": 200}",
+        "expected_pax_type": "Object",
+        "expected_keys": ["$tag", "$value"],
+        "contract": "JSON {\"$tag\": ..., \"$value\": ...} MUST remain an Object, NOT become Tagged"
+      },
+      {
+        "name": "hex_string_stays_string",
+        "input_json": "\"0xdeadbeef\"",
+        "expected_pax_type": "String",
+        "expected_value": "0xdeadbeef",
+        "contract": "Hex strings MUST remain String, NOT become Bytes"
+      },
+      {
+        "name": "iso_timestamp_stays_string",
+        "input_json": "\"2024-01-15T10:30:00.000Z\"",
+        "expected_pax_type": "String",
+        "expected_value": "2024-01-15T10:30:00.000Z",
+        "contract": "ISO 8601 strings MUST remain String, NOT become Timestamp"
+      },
+      {
+        "name": "array_pairs_stays_array",
+        "input_json": "[[1, \"one\"], [2, \"two\"]]",
+        "expected_pax_type": "Array",
+        "contract": "Array of pairs MUST remain Array, NOT become Map"
+      }
+    ]
+  },
+
+  "number_type_inference": {
+    "description": "JSON numbers are parsed with specific type inference rules",
+    "vectors": [
+      {
+        "name": "integer_fits_i64",
+        "input_json": "42",
+        "expected_pax_type": "Int",
+        "contract": "Integers that fit in i64 become Int"
+      },
+      {
+        "name": "large_positive_uint",
+        "input_json": "18446744073709551615",
+        "expected_pax_type": "UInt",
+        "contract": "Large positive integers that fit u64 but not i64 become UInt"
+      },
+      {
+        "name": "float_with_decimal",
+        "input_json": "3.14",
+        "expected_pax_type": "Float",
+        "contract": "Numbers with decimals become Float"
+      },
+      {
+        "name": "float_scientific",
+        "input_json": "1e10",
+        "expected_pax_type": "Float",
+        "contract": "Scientific notation becomes Float"
+      }
+    ]
+  },
+
+  "edge_cases": {
+    "description": "Edge cases with defined behavior",
+    "vectors": [
+      {
+        "name": "float_nan_to_null",
+        "pax_type": "Float",
+        "pax_special": "NaN",
+        "expected_json": "null",
+        "contract": "Float NaN MUST serialize as null (JSON has no NaN)"
+      },
+      {
+        "name": "float_infinity_to_null",
+        "pax_type": "Float",
+        "pax_special": "Infinity",
+        "expected_json": "null",
+        "contract": "Float Infinity MUST serialize as null (JSON has no Infinity)"
+      },
+      {
+        "name": "deeply_nested",
+        "input_json": "{\"a\": {\"b\": {\"c\": {\"d\": {\"e\": 5}}}}}",
+        "expected_pax_type": "Object",
+        "contract": "Deep nesting MUST be preserved"
+      },
+      {
+        "name": "large_array",
+        "note": "Array with 10000 elements",
+        "contract": "Large arrays MUST be handled without truncation"
+      }
+    ]
+  }
+}

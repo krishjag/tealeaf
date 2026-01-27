@@ -1,0 +1,21 @@
+[workspace]
+members = ["pax-core", "pax-ffi"]
+resolver = "2"
+
+[workspace.package]
+version = "2.0.0-beta.1"
+edition = "2021"
+authors = ["Pax Contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/pax-format/pax"
+
+[workspace.dependencies]
+pax-core = { path = "pax-core" }
+thiserror = "1.0"
+memmap2 = "0.9"
+crc32fast = "1.3"
+flate2 = "1.0"
+
+[profile.release]
+lto = true
+codegen-units = 1

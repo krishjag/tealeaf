@@ -1,0 +1,48 @@
+{
+  "name": "pax-lang",
+  "displayName": "PAX Language Support",
+  "description": "Syntax highlighting and language support for PAX format (.pax files)",
+  "version": "0.1.0",
+  "publisher": "pax-format",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pax-format/pax"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "pax",
+    "schema",
+    "serialization",
+    "config",
+    "data format"
+  ],
+  "icon": "images/pax-icon.png",
+  "contributes": {
+    "languages": [
+      {
+        "id": "pax",
+        "aliases": [
+          "PAX",
+          "pax"
+        ],
+        "extensions": [
+          ".pax"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "pax",
+        "scopeName": "source.pax",
+        "path": "./syntaxes/pax.tmLanguage.json"
+      }
+    ]
+  }
+}

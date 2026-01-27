@@ -1,0 +1,354 @@
+{
+  "!common_tags": [
+    "important",
+    "review",
+    "2024"
+  ],
+  "!default_config": {
+    "debug": false,
+    "language": "en",
+    "theme": "dark"
+  },
+  "!default_permissions": [
+    "read",
+    "write"
+  ],
+  "!greeting": "Hello, World!",
+  "!max_retries": 3,
+  "!pi": 3.14159,
+  "!shared_address": {
+    "city": "Springfield",
+    "country": "USA",
+    "street": "123 Main St"
+  },
+  "api_response": {
+    "body": {
+      "config": {
+        "$ref": "default_config"
+      },
+      "tags": {
+        "$ref": "common_tags"
+      }
+    },
+    "headers": [
+      [
+        "Content-Type",
+        "application/json"
+      ]
+    ],
+    "status": {
+      "$tag": "ok",
+      "$value": 200
+    }
+  },
+  "app_config": {
+    "$ref": "default_config"
+  },
+  "backup_config": {
+    "$ref": "default_config"
+  },
+  "billing_address": {
+    "$ref": "shared_address"
+  },
+  "category_items": [
+    [
+      "fruits",
+      [
+        "apple",
+        "banana",
+        "cherry"
+      ]
+    ],
+    [
+      "vegetables",
+      [
+        "carrot",
+        "broccoli",
+        "spinach"
+      ]
+    ]
+  ],
+  "circle_area_constant": {
+    "$ref": "pi"
+  },
+  "document_tags": {
+    "$ref": "common_tags"
+  },
+  "empty_map": [],
+  "headers": [
+    [
+      "Content-Type",
+      "application/json"
+    ],
+    [
+      "Accept",
+      "*/*"
+    ],
+    [
+      "Authorization",
+      "Bearer token123"
+    ]
+  ],
+  "http_codes": [
+    [
+      200,
+      "OK"
+    ],
+    [
+      201,
+      "Created"
+    ],
+    [
+      400,
+      "Bad Request"
+    ],
+    [
+      404,
+      "Not Found"
+    ],
+    [
+      500,
+      "Internal Server Error"
+    ]
+  ],
+  "mixed_keys": [
+    [
+      1,
+      "one"
+    ],
+    [
+      "two",
+      2
+    ],
+    [
+      3,
+      "three"
+    ]
+  ],
+  "nested_maps": [
+    [
+      "level1",
+      [
+        [
+          "level2a",
+          "value_a"
+        ],
+        [
+          "level2b",
+          "value_b"
+        ]
+      ]
+    ]
+  ],
+  "nested_tag": {
+    "$tag": "outer",
+    "$value": {
+      "$tag": "inner",
+      "$value": "value"
+    }
+  },
+  "operation_results": [
+    {
+      "$tag": "ok",
+      "$value": {
+        "value": 100
+      }
+    },
+    {
+      "$tag": "err",
+      "$value": {
+        "code": "E001",
+        "message": "Invalid input"
+      }
+    },
+    {
+      "$tag": "ok",
+      "$value": {
+        "value": 200
+      }
+    }
+  ],
+  "optional_values": {
+    "absent": {
+      "$tag": "none",
+      "$value": null
+    },
+    "also_present": {
+      "$tag": "some",
+      "$value": 42
+    },
+    "present": {
+      "$tag": "some",
+      "$value": "Hello"
+    }
+  },
+  "responses": {
+    "api1": {
+      "$tag": "success",
+      "$value": {
+        "data": "result1"
+      }
+    },
+    "api2": {
+      "$tag": "error",
+      "$value": {
+        "code": 404,
+        "message": "Not found"
+      }
+    },
+    "api3": {
+      "$tag": "timeout",
+      "$value": null
+    }
+  },
+  "result_failure": {
+    "$tag": "error",
+    "$value": "Something went wrong"
+  },
+  "result_success": {
+    "$tag": "ok",
+    "$value": 200
+  },
+  "retry_count": {
+    "$ref": "max_retries"
+  },
+  "role_permissions": [
+    [
+      "admin",
+      [
+        "read",
+        "write",
+        "delete",
+        "admin"
+      ]
+    ],
+    [
+      "user",
+      {
+        "$ref": "default_permissions"
+      }
+    ],
+    [
+      "guest",
+      [
+        "read"
+      ]
+    ]
+  ],
+  "settings": {
+    "address": {
+      "$ref": "shared_address"
+    },
+    "config": {
+      "$ref": "default_config"
+    },
+    "tags": {
+      "$ref": "common_tags"
+    }
+  },
+  "shipping_address": {
+    "$ref": "shared_address"
+  },
+  "status_list": [
+    {
+      "$tag": "pending",
+      "$value": "task1"
+    },
+    {
+      "$tag": "completed",
+      "$value": "task2"
+    },
+    {
+      "$tag": "failed",
+      "$value": "task3"
+    }
+  ],
+  "tagged_array": {
+    "$tag": "items",
+    "$value": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "tagged_bool": {
+    "$tag": "active",
+    "$value": true
+  },
+  "tagged_float": {
+    "$tag": "ratio",
+    "$value": 0.75
+  },
+  "tagged_int": {
+    "$tag": "count",
+    "$value": 42
+  },
+  "tagged_map": [
+    [
+      "key1",
+      {
+        "$tag": "some",
+        "$value": "value1"
+      }
+    ],
+    [
+      "key2",
+      {
+        "$tag": "none",
+        "$value": null
+      }
+    ]
+  ],
+  "tagged_null": {
+    "$tag": "none",
+    "$value": null
+  },
+  "tagged_object": {
+    "$tag": "user",
+    "$value": {
+      "id": 1,
+      "name": "Alice"
+    }
+  },
+  "tagged_ref": {
+    "$tag": "config",
+    "$value": {
+      "$ref": "default_config"
+    }
+  },
+  "tagged_string": {
+    "$tag": "message",
+    "$value": "Hello"
+  },
+  "task_tags": {
+    "$ref": "common_tags"
+  },
+  "user_profiles": [
+    [
+      "alice",
+      {
+        "id": 1,
+        "role": "admin"
+      }
+    ],
+    [
+      "bob",
+      {
+        "id": 2,
+        "role": "user"
+      }
+    ],
+    [
+      "charlie",
+      {
+        "id": 3,
+        "role": "guest"
+      }
+    ]
+  ],
+  "welcome_message": {
+    "$ref": "greeting"
+  }
+}

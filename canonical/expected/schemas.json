@@ -1,0 +1,70 @@
+{
+  "company_name": "Acme Corporation",
+  "employee_count": 3,
+  "employees": [
+    {
+      "address": {
+        "city": "Seattle",
+        "country": "USA",
+        "zip": "98101"
+      },
+      "department": "Engineering",
+      "id": 101,
+      "name": "Alice Johnson",
+      "salary": 95000.0
+    },
+    {
+      "address": {
+        "city": "Portland",
+        "country": "USA",
+        "zip": null
+      },
+      "department": "Marketing",
+      "id": 102,
+      "name": "Bob Smith",
+      "salary": 75000.0
+    },
+    {
+      "address": {
+        "city": "Vancouver",
+        "country": "Canada",
+        "zip": "V6B 1A1"
+      },
+      "department": "Engineering",
+      "id": 103,
+      "name": "Charlie Brown",
+      "salary": 88000.0
+    }
+  ],
+  "points": [
+    {
+      "x": 0.0,
+      "y": 0.0
+    },
+    {
+      "x": 1.0,
+      "y": 2.0
+    },
+    {
+      "x": 3.5,
+      "y": -4.2
+    }
+  ],
+  "users": [
+    {
+      "email": "alice@example.com",
+      "id": 1,
+      "name": "alice"
+    },
+    {
+      "email": null,
+      "id": 2,
+      "name": "bob"
+    },
+    {
+      "email": "charlie@test.org",
+      "id": 3,
+      "name": "charlie"
+    }
+  ]
+}

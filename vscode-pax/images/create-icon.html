@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    canvas { border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <canvas id="c" width="128" height="128"></canvas>
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    
+    // Background
+    ctx.fillStyle = '#1e1e2e';
+    ctx.beginPath();
+    ctx.roundRect(0, 0, 128, 128, 16);
+    ctx.fill();
+    
+    // Text
+    ctx.fillStyle = '#89b4fa';
+    ctx.font = 'bold 48px Consolas, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('PAX', 64, 58);
+    
+    // Underline
+    ctx.fillStyle = '#a6e3a1';
+    ctx.beginPath();
+    ctx.roundRect(20, 95, 88, 4, 2);
+    ctx.fill();
+    
+    // Download link
+    const link = document.createElement('a');
+    link.download = 'pax-icon.png';
+    link.href = canvas.toDataURL('image/png');
+    link.textContent = 'Download PNG';
+    document.body.appendChild(link);
+  </script>
+</body>
+</html>

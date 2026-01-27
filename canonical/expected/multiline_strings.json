@@ -1,0 +1,19 @@
+{
+  "code_sample": "fn main() {\n    println!(\"Hello, world!\");\n}",
+  "compact": "Line one\nLine two\nLine three",
+  "description": "This is a multiline string.\nLeading whitespace is trimmed.\nUseful for documentation.",
+  "document": {
+    "content": "This is the document content.\nIt spans multiple lines.\nAnd preserves formatting.",
+    "footer": "Copyright 2024",
+    "title": "My Document"
+  },
+  "json_template": "{\n    \"name\": \"{{name}}\",\n    \"version\": \"{{version}}\",\n    \"dependencies\": {}\n}",
+  "markdown": "# Heading\n\nThis is a paragraph with **bold** and *italic* text.\n\n- Item 1\n- Item 2\n- Item 3\n\n```rust\nlet x = 42;\n```",
+  "nearly_empty": "x",
+  "single_line": "Just one line",
+  "sql_query": "SELECT id, name, email\nFROM users\nWHERE active = true\nORDER BY created_at DESC\nLIMIT 100;",
+  "templates": [
+    "Template One\nWith multiple lines",
+    "Template Two\nAlso with lines"
+  ]
+}

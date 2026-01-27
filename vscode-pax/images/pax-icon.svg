@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="16" fill="#1e1e2e"/>
+  <text x="64" y="78" font-family="Consolas, monospace" font-size="48" font-weight="bold" fill="#89b4fa" text-anchor="middle">PAX</text>
+  <rect x="20" y="95" width="88" height="4" rx="2" fill="#a6e3a1"/>
+</svg>

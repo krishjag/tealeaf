@@ -1,0 +1,44 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# .NET
+bindings/dotnet/**/bin/
+bindings/dotnet/**/obj/
+bindings/dotnet/**/*.user
+bindings/dotnet/**/.vs/
+*.nupkg
+
+# Native libraries (built artifacts)
+bindings/dotnet/Pax/runtimes/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.pdb
+*.dll
+*.so
+*.dylib
+
+# Test results
+TestResults/
+*.trx
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Binary PAX files (keep examples, ignore generated)
+*.paxb
+!examples/*.paxb
