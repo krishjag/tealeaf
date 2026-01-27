@@ -233,7 +233,6 @@ fn write_summary(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::tempdir;
 
     #[test]
     fn test_format_timestamp() {

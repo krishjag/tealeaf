@@ -19,6 +19,34 @@ This benchmark suite:
 
 ## Installation
 
+### Pre-built Binaries (Recommended)
+
+Download the latest release for your platform from the [GitHub Releases](https://github.com/pax-format/pax/releases) page:
+
+| Platform | Architecture | File |
+|----------|--------------|------|
+| **Windows** | x64 | `accuracy-benchmark-windows-x64.zip` |
+| **Windows** | ARM64 | `accuracy-benchmark-windows-arm64.zip` |
+| **macOS** | Intel | `accuracy-benchmark-macos-x64.tar.gz` |
+| **macOS** | Apple Silicon | `accuracy-benchmark-macos-arm64.tar.gz` |
+| **Linux** | x64 | `accuracy-benchmark-linux-x64.tar.gz` |
+| **Linux** | ARM64 | `accuracy-benchmark-linux-arm64.tar.gz` |
+| **Linux** | x64 (static) | `accuracy-benchmark-linux-musl-x64.tar.gz` |
+
+```bash
+# Example: Download and install on Linux x64
+curl -LO https://github.com/pax-format/pax/releases/latest/download/accuracy-benchmark-linux-x64.tar.gz
+tar -xzf accuracy-benchmark-linux-x64.tar.gz
+sudo mv accuracy-benchmark /usr/local/bin/
+
+# Example: Download and install on macOS Apple Silicon
+curl -LO https://github.com/pax-format/pax/releases/latest/download/accuracy-benchmark-macos-arm64.tar.gz
+tar -xzf accuracy-benchmark-macos-arm64.tar.gz
+sudo mv accuracy-benchmark /usr/local/bin/
+```
+
+### Build from Source
+
 ```bash
 # Build the benchmark suite
 cargo build -p accuracy-benchmark --release
