@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0-beta.1",
+  "authors": "Pax Contributors",
+  "license": "MIT OR Apache-2.0",
+  "repository": "https://github.com/pax-format/pax",
+  "packages": {
+    "pax-core": {
+      "description": "Schema-aware document format with human-readable text and compact binary representation"
+    },
+    "pax-ffi": {
+      "description": "Foreign function interface for PAX format"
+    },
+    "accuracy-benchmark": {
+      "description": "Accuracy benchmark suite for PAX format across multiple LLM providers"
+    },
+    "dotnet": {
+      "packageId": "Pax",
+      "description": "Schema-aware document format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization."
+    }
+  }
+}

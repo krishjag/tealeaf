@@ -47,7 +47,11 @@
       "Bash(scoop --version:*)",
       "Bash(export JAVA_HOME:*)",
       "Bash(./mvnw.cmd:*)",
-      "Bash(.build.ps1 -Test)"
+      "Bash(.build.ps1 -Test)",
+      "Bash(chmod:*)",
+      "Bash(./scripts/validate-version.sh:*)",
+      "Bash(bash:*)",
+      "Bash(./scripts/sync-version.sh:*)"
     ]
   }
 }

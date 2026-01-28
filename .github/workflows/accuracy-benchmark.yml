@@ -15,6 +15,8 @@ on:
       - 'pax-core/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
+      - 'release.json'
+      - 'scripts/**'
       - '.github/workflows/accuracy-benchmark.yml'
   pull_request:
     branches: [main]
@@ -23,6 +25,7 @@ on:
       - 'pax-core/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
+      - 'release.json'
   release:
     types: [published]
   workflow_dispatch:
@@ -31,8 +34,27 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # Validate version consistency (PR/push only)
+  validate-version:
+    runs-on: ubuntu-latest
+    name: Validate Version
+    if: github.event_name != 'release'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Validate version consistency
+        run: |
+          chmod +x scripts/validate-version.sh scripts/sync-version.sh
+          ./scripts/validate-version.sh
+
   # Run tests on all platforms
   test:
+    needs: [validate-version]
+    if: always() && (needs.validate-version.result == 'success' || needs.validate-version.result == 'skipped')
     strategy:
       fail-fast: false
       matrix:
@@ -42,6 +64,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Sync version from release.json (Unix)
+        if: runner.os != 'Windows' && github.event_name == 'release'
+        run: |
+          chmod +x scripts/sync-version.sh
+          ./scripts/sync-version.sh
+
+      - name: Sync version from release.json (Windows)
+        if: runner.os == 'Windows' && github.event_name == 'release'
+        shell: pwsh
+        run: ./scripts/sync-version.ps1
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -110,6 +143,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Sync version from release.json (Unix)
+        if: runner.os != 'Windows' && github.event_name == 'release'
+        run: |
+          chmod +x scripts/sync-version.sh
+          ./scripts/sync-version.sh
+
+      - name: Sync version from release.json (Windows)
+        if: runner.os == 'Windows' && github.event_name == 'release'
+        shell: pwsh
+        run: ./scripts/sync-version.ps1
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
