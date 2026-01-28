@@ -76,6 +76,12 @@ jobs:
         shell: pwsh
         run: ./scripts/sync-version.ps1
 
+      - name: Install protoc (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
@@ -154,6 +160,12 @@ jobs:
         if: runner.os == 'Windows' && github.event_name == 'release'
         shell: pwsh
         run: ./scripts/sync-version.ps1
+
+      - name: Install protoc (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
