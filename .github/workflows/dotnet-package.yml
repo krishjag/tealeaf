@@ -87,12 +87,6 @@ jobs:
             library: libpax_ffi.so
             cross: true
 
-          # Linux (musl - for Alpine)
-          - os: ubuntu-latest
-            rid: linux-musl-x64
-            rust-target: x86_64-unknown-linux-musl
-            library: libpax_ffi.so
-
           # macOS
           - os: macos-latest
             rid: osx-x64
@@ -139,25 +133,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
 
-      - name: Install cross-compilation tools (Linux musl)
-        if: contains(matrix.rid, 'musl')
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y musl-tools
-
       - name: Configure Rust for cross-compilation (Linux ARM64 glibc)
         if: matrix.rid == 'linux-arm64'
         run: |
           mkdir -p .cargo
           echo '[target.aarch64-unknown-linux-gnu]' >> .cargo/config.toml
           echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
-
-      - name: Configure Rust for musl (Linux musl x64)
-        if: matrix.rid == 'linux-musl-x64'
-        run: |
-          mkdir -p .cargo
-          echo '[target.x86_64-unknown-linux-musl]' >> .cargo/config.toml
-          echo 'linker = "musl-gcc"' >> .cargo/config.toml
 
       - name: Build native library
         run: |
