@@ -41,6 +41,8 @@ results/
 *.temp
 *.log
 
-# Binary PAX files (keep examples, ignore generated)
+# Binary PAX files (keep examples and canonical test fixtures, ignore generated)
 *.paxb
 !examples/*.paxb
+!canonical/binary/*.paxb
+!canonical/errors/*.paxb
