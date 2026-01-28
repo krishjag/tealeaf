@@ -16,6 +16,7 @@ bindings/dotnet/Pax/runtimes/
 # IDE
 .idea/
 .vscode/
+.claude/
 *.swp
 *.swo
 *~
