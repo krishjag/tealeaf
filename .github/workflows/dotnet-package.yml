@@ -92,12 +92,6 @@ jobs:
             rid: linux-musl-x64
             rust-target: x86_64-unknown-linux-musl
             library: libpax_ffi.so
-            cross: true
-          - os: ubuntu-latest
-            rid: linux-musl-arm64
-            rust-target: aarch64-unknown-linux-musl
-            library: libpax_ffi.so
-            cross: true
 
           # macOS
           - os: macos-latest
@@ -150,10 +144,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y musl-tools
-          if [[ "${{ matrix.rid }}" == "linux-musl-arm64" ]]; then
-            # For musl ARM64, we need to use cross or install additional tools
-            cargo install cross --git https://github.com/cross-rs/cross
-          fi
 
       - name: Configure Rust for cross-compilation (Linux ARM64 glibc)
         if: matrix.rid == 'linux-arm64'
@@ -162,14 +152,16 @@ jobs:
           echo '[target.aarch64-unknown-linux-gnu]' >> .cargo/config.toml
           echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
 
+      - name: Configure Rust for musl (Linux musl x64)
+        if: matrix.rid == 'linux-musl-x64'
+        run: |
+          mkdir -p .cargo
+          echo '[target.x86_64-unknown-linux-musl]' >> .cargo/config.toml
+          echo 'linker = "musl-gcc"' >> .cargo/config.toml
+
       - name: Build native library
         run: |
           cargo build --release --package pax-ffi --target ${{ matrix.rust-target }}
-
-      - name: Build native library (cross)
-        if: matrix.cross == true && matrix.rid == 'linux-musl-arm64'
-        run: |
-          cross build --release --package pax-ffi --target ${{ matrix.rust-target }}
 
       - name: Upload native library artifact
         uses: actions/upload-artifact@v4
