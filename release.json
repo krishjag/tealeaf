@@ -2,7 +2,7 @@
   "version": "2.0.0-beta.1",
   "authors": "Pax Contributors",
   "license": "MIT OR Apache-2.0",
-  "repository": "https://github.com/pax-format/pax",
+  "repository": "https://github.com/krishjag/pax",
   "packages": {
     "pax-core": {
       "description": "Schema-aware document format with human-readable text and compact binary representation"

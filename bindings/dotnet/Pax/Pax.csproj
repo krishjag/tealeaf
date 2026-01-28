@@ -14,8 +14,8 @@
     <Description>Schema-aware document format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization.</Description>
     <PackageTags>serialization;schema;binary;config;pax;json;document</PackageTags>
     <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/pax-format/pax</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/pax-format/pax</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/krishjag/pax</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/krishjag/pax</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 

@@ -87,5 +87,5 @@ MIT OR Apache-2.0
 
 ## Links
 
-- [GitHub Repository](https://github.com/pax-format/pax)
-- [Documentation](https://github.com/pax-format/pax#readme)
+- [GitHub Repository](https://github.com/krishjag/pax)
+- [Documentation](https://github.com/krishjag/pax#readme)

@@ -21,7 +21,7 @@ This benchmark suite:
 
 ### Pre-built Binaries (Recommended)
 
-Download the latest release for your platform from the [GitHub Releases](https://github.com/pax-format/pax/releases) page:
+Download the latest release for your platform from the [GitHub Releases](https://github.com/krishjag/pax/releases) page:
 
 | Platform | Architecture | File |
 |----------|--------------|------|
@@ -35,12 +35,12 @@ Download the latest release for your platform from the [GitHub Releases](https:/
 
 ```bash
 # Example: Download and install on Linux x64
-curl -LO https://github.com/pax-format/pax/releases/latest/download/accuracy-benchmark-linux-x64.tar.gz
+curl -LO https://github.com/krishjag/pax/releases/latest/download/accuracy-benchmark-linux-x64.tar.gz
 tar -xzf accuracy-benchmark-linux-x64.tar.gz
 sudo mv accuracy-benchmark /usr/local/bin/
 
 # Example: Download and install on macOS Apple Silicon
-curl -LO https://github.com/pax-format/pax/releases/latest/download/accuracy-benchmark-macos-arm64.tar.gz
+curl -LO https://github.com/krishjag/pax/releases/latest/download/accuracy-benchmark-macos-arm64.tar.gz
 tar -xzf accuracy-benchmark-macos-arm64.tar.gz
 sudo mv accuracy-benchmark /usr/local/bin/
 ```
