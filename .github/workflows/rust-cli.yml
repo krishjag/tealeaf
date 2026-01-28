@@ -242,7 +242,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     name: Create Release
-    if: github.event_name == 'release'
+    if: always() && needs.build.result == 'success' && github.event_name == 'release'
 
     steps:
       - name: Download all artifacts
@@ -267,7 +267,7 @@ jobs:
     needs: [test, build]
     runs-on: ubuntu-latest
     name: Publish to crates.io
-    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_crates == 'true')
+    if: always() && needs.test.result == 'success' && needs.build.result == 'success' && (github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_crates == 'true'))
 
     steps:
       - uses: actions/checkout@v4

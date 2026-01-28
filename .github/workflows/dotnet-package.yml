@@ -155,6 +155,7 @@ jobs:
   # Combine all native libraries and create NuGet package
   package:
     needs: build-native
+    if: always() && needs.build-native.result == 'success'
     runs-on: ubuntu-latest
     name: Create NuGet Package
 
@@ -221,7 +222,7 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     name: Publish to NuGet
-    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_nuget)
+    if: always() && needs.package.result == 'success' && (github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_nuget))
 
     steps:
       - name: Download NuGet package
