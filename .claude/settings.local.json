@@ -51,7 +51,9 @@
       "Bash(chmod:*)",
       "Bash(./scripts/validate-version.sh:*)",
       "Bash(bash:*)",
-      "Bash(./scripts/sync-version.sh:*)"
+      "Bash(./scripts/sync-version.sh:*)",
+      "Bash(git mv:*)",
+      "Bash(git add:*)"
     ]
   }
 }
