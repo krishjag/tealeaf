@@ -190,8 +190,8 @@ cargo run -p accuracy-benchmark -- run --compare-formats
 
 ### Format Comparison Summary
 
-| Provider | TL Score | JSON Score | Accuracy Diff | TL Input | JSON Input | Input Savings |
-|----------|----------|------------|---------------|----------|------------|---------------|
+| Provider | TeaLeaf Score | JSON Score | Accuracy Diff | TeaLeaf Input | JSON Input | Input Savings |
+|----------|---------------|------------|---------------|---------------|------------|---------------|
 | **anthropic** | 0.970 | 0.983 | -0.013 | 4,939 | 8,251 | **-40.1%** |
 | **openai** | 0.925 | 0.905 | +0.021 | 4,866 | 7,076 | **-31.2%** |
 

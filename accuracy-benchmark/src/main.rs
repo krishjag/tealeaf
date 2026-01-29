@@ -324,10 +324,10 @@ async fn run_benchmark(
 
         // Print format comparison summary
         println!("\n=== Format Comparison Summary ===");
-        println!("{:-<92}", "");
-        println!("{:<12} {:>9} {:>9} {:>8} {:>11} {:>11} {:>9} {:>9}",
-            "Provider", "TL Score", "JSON Scr", "Diff", "TL Tokens", "JSON Tokens", "Diff", "Diff %");
-        println!("{:-<92}", "");
+        println!("{:-<100}", "");
+        println!("{:<12} {:>13} {:>11} {:>8} {:>15} {:>13} {:>9} {:>9}",
+            "Provider", "TeaLeaf Score", "JSON Score", "Diff", "TeaLeaf Tokens", "JSON Tokens", "Diff", "Diff %");
+        println!("{:-<100}", "");
 
         for provider in &provider_names {
             let tl_score = aggregated.avg_scores_by_provider.get(provider).copied().unwrap_or(0.0);
@@ -355,18 +355,18 @@ async fn run_benchmark(
             };
 
             println!(
-                "{:<12} {:>9.3} {:>9.3} {:>+8.3} {:>11} {:>11} {:>+9} {:>+8.1}%",
+                "{:<12} {:>13.3} {:>11.3} {:>+8.3} {:>15} {:>13} {:>+9} {:>+8.1}%",
                 provider, tl_score, json_score, score_diff, tl_total, json_total, token_diff, token_diff_pct
             );
         }
-        println!("{:-<92}", "");
+        println!("{:-<100}", "");
 
         // Print token breakdown (input vs output)
         println!("\nToken Breakdown (Input / Output):");
-        println!("{:-<70}", "");
-        println!("{:<12} {:>15} {:>15} {:>12} {:>12}",
-            "Provider", "TL (in/out)", "JSON (in/out)", "In Diff %", "Out Diff %");
-        println!("{:-<70}", "");
+        println!("{:-<78}", "");
+        println!("{:<12} {:>19} {:>15} {:>14} {:>14}",
+            "Provider", "TeaLeaf (in/out)", "JSON (in/out)", "In Diff %", "Out Diff %");
+        println!("{:-<78}", "");
 
         for provider in &provider_names {
             let (tl_in, tl_out) = token_usage
@@ -390,11 +390,11 @@ async fn run_benchmark(
             };
 
             println!(
-                "{:<12} {:>6} / {:<6} {:>6} / {:<6} {:>+11.1}% {:>+11.1}%",
+                "{:<12} {:>8} / {:<8} {:>6} / {:<6} {:>+13.1}% {:>+13.1}%",
                 provider, tl_in, tl_out, json_in, json_out, in_diff_pct, out_diff_pct
             );
         }
-        println!("{:-<70}", "");
+        println!("{:-<78}", "");
 
         // Print summary interpretation
         println!("\nKey Findings:");
@@ -427,7 +427,7 @@ async fn run_benchmark(
 
             // Accuracy verdict
             let accuracy_verdict = if score_diff > 0.02 {
-                format!("TL +{:.1}% accuracy", score_diff * 100.0)
+                format!("TeaLeaf +{:.1}% accuracy", score_diff * 100.0)
             } else if score_diff < -0.02 {
                 format!("JSON +{:.1}% accuracy", -score_diff * 100.0)
             } else {
@@ -436,11 +436,11 @@ async fn run_benchmark(
 
             // Token verdict
             let token_verdict = if total_diff_pct < -3.0 {
-                format!("TL saves {:.0}% total tokens ({:.0}% on input)", -total_diff_pct, -input_diff_pct)
+                format!("TeaLeaf saves {:.0}% total tokens ({:.0}% on input)", -total_diff_pct, -input_diff_pct)
             } else if total_diff_pct > 3.0 {
                 format!("JSON saves {:.0}% total tokens", total_diff_pct)
             } else if input_diff_pct < -10.0 {
-                format!("TL saves {:.0}% on input tokens", -input_diff_pct)
+                format!("TeaLeaf saves {:.0}% on input tokens", -input_diff_pct)
             } else {
                 "similar token usage".to_string()
             };

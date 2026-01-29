@@ -4,7 +4,12 @@
   "scopeName": "source.tealeaf",
   "patterns": [
     { "include": "#comments" },
+    { "include": "#struct-definition" },
+    { "include": "#union-definition" },
+    { "include": "#include-directive" },
+    { "include": "#table-usage" },
     { "include": "#directives" },
+    { "include": "#ref-definition" },
     { "include": "#keys" },
     { "include": "#values" }
   ],
@@ -17,7 +22,126 @@
         }
       ]
     },
+
+    "struct-definition": {
+      "comment": "Schema definition: @struct Name (fields...)",
+      "begin": "(@struct)\\s+([A-Za-z_][A-Za-z0-9_.-]*)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.directive.struct.tealeaf" },
+        "2": { "name": "entity.name.type.tealeaf" },
+        "3": { "name": "punctuation.section.parameters.begin.tealeaf" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.parameters.end.tealeaf" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#field-definition" }
+      ]
+    },
+
+    "union-definition": {
+      "comment": "Union definition: @union Name { variants... }",
+      "begin": "(@union)\\s+([A-Za-z_][A-Za-z0-9_.-]*)\\s*(\\{)",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.directive.union.tealeaf" },
+        "2": { "name": "entity.name.type.tealeaf" },
+        "3": { "name": "punctuation.section.block.begin.tealeaf" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.block.end.tealeaf" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#union-variant" }
+      ]
+    },
+
+    "union-variant": {
+      "comment": "Union variant: variant_name (fields...)",
+      "begin": "([A-Za-z_][A-Za-z0-9_.-]*)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "entity.name.type.variant.tealeaf" },
+        "2": { "name": "punctuation.section.parameters.begin.tealeaf" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.parameters.end.tealeaf" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#field-definition" }
+      ]
+    },
+
+    "field-definition": {
+      "comment": "Fields inside @struct or @union variant: name: []?Type?",
+      "patterns": [
+        {
+          "comment": "Field with primitive type: name: []?primitive?",
+          "match": "([a-zA-Z_][a-zA-Z0-9_.-]*)\\s*:\\s*(\\[\\])?\\s*\\b(string|int|int8|int16|int32|int64|uint|uint8|uint16|uint32|uint64|float|float32|float64|bool|bytes|timestamp)\\b(\\?)?",
+          "captures": {
+            "1": { "name": "variable.parameter.field.tealeaf" },
+            "2": { "name": "storage.type.array.tealeaf" },
+            "3": { "name": "storage.type.primitive.tealeaf" },
+            "4": { "name": "storage.modifier.nullable.tealeaf" }
+          }
+        },
+        {
+          "comment": "Field with custom type reference: name: []?CustomType?",
+          "match": "([a-zA-Z_][a-zA-Z0-9_.-]*)\\s*:\\s*(\\[\\])?\\s*([A-Za-z_][A-Za-z0-9_.-]*)(\\?)?",
+          "captures": {
+            "1": { "name": "variable.parameter.field.tealeaf" },
+            "2": { "name": "storage.type.array.tealeaf" },
+            "3": { "name": "entity.name.type.reference.tealeaf" },
+            "4": { "name": "storage.modifier.nullable.tealeaf" }
+          }
+        },
+        {
+          "comment": "Field without type annotation (defaults to string per spec)",
+          "match": "([a-zA-Z_][a-zA-Z0-9_.-]*)(?=\\s*[,)])",
+          "captures": {
+            "1": { "name": "variable.parameter.field.tealeaf" }
+          }
+        }
+      ]
+    },
+
+    "include-directive": {
+      "comment": "Include directive: @include \"path\" or @include path",
+      "patterns": [
+        {
+          "comment": "@include with quoted path",
+          "match": "(@include)\\s+(\"[^\"]*\")",
+          "captures": {
+            "1": { "name": "keyword.control.directive.include.tealeaf" },
+            "2": { "name": "string.quoted.double.tealeaf" }
+          }
+        },
+        {
+          "comment": "@include with unquoted path",
+          "match": "(@include)\\s+([a-zA-Z_][a-zA-Z0-9_.\\-]*)",
+          "captures": {
+            "1": { "name": "keyword.control.directive.include.tealeaf" },
+            "2": { "name": "string.unquoted.tealeaf" }
+          }
+        }
+      ]
+    },
+
+    "table-usage": {
+      "comment": "Table directive with type name: @table TypeName",
+      "match": "(@table)\\s+([A-Za-z_][A-Za-z0-9_.-]*)",
+      "captures": {
+        "1": { "name": "keyword.control.directive.table.tealeaf" },
+        "2": { "name": "entity.name.type.tealeaf" }
+      }
+    },
+
     "directives": {
+      "comment": "Fallback for directive keywords not consumed by begin/end contexts",
       "patterns": [
         {
           "name": "keyword.control.directive.struct.tealeaf",
@@ -41,29 +165,110 @@
         }
       ]
     },
+
+    "ref-definition": {
+      "comment": "Reference definition: !name: value (distinct from ref usage !name)",
+      "match": "(![a-zA-Z_][a-zA-Z0-9_.\\-]*)\\s*:",
+      "captures": {
+        "1": { "name": "variable.other.reference.definition.tealeaf" }
+      }
+    },
+
     "keys": {
+      "comment": "Key-value pair keys: bare identifiers, quoted strings, or integers before ':'",
       "patterns": [
         {
-          "name": "entity.name.tag.tealeaf",
-          "match": "^\\s*([a-zA-Z_][a-zA-Z0-9_.\\-]*)\\s*:",
+          "comment": "Quoted string key: \"some-key\": value",
+          "match": "(\"[^\"]*\")\\s*:",
+          "captures": {
+            "1": { "name": "entity.name.tag.tealeaf" }
+          }
+        },
+        {
+          "comment": "Integer key: 42: value (for @map entries per spec map_key)",
+          "match": "(-?\\d+)\\s*:",
+          "captures": {
+            "1": { "name": "entity.name.tag.tealeaf" }
+          }
+        },
+        {
+          "comment": "Bare identifier key: name: value",
+          "match": "([a-zA-Z_][a-zA-Z0-9_.\\-]*)\\s*:",
           "captures": {
             "1": { "name": "entity.name.tag.tealeaf" }
           }
         }
       ]
     },
+
     "values": {
+      "comment": "Data values (not schema type annotations)",
       "patterns": [
         { "include": "#strings" },
+        { "include": "#tuples" },
+        { "include": "#arrays" },
+        { "include": "#objects" },
         { "include": "#timestamps" },
         { "include": "#numbers" },
         { "include": "#constants" },
-        { "include": "#types" },
         { "include": "#references" },
         { "include": "#tagged" },
-        { "include": "#identifiers" }
+        { "include": "#unquoted-strings" }
       ]
     },
+
+    "tuples": {
+      "comment": "Tuple / positional data: (value, value, ...)",
+      "begin": "\\(",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.tuple.begin.tealeaf" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.tuple.end.tealeaf" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#values" }
+      ]
+    },
+
+    "arrays": {
+      "comment": "Array: [value, value, ...] (may contain @table directives)",
+      "begin": "\\[",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.array.begin.tealeaf" }
+      },
+      "end": "\\]",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.array.end.tealeaf" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#table-usage" },
+        { "include": "#directives" },
+        { "include": "#values" }
+      ]
+    },
+
+    "objects": {
+      "comment": "Object: {key: value, ...} (also used for @map bodies)",
+      "begin": "\\{",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.object.begin.tealeaf" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.object.end.tealeaf" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#ref-definition" },
+        { "include": "#keys" },
+        { "include": "#values" }
+      ]
+    },
+
     "strings": {
       "patterns": [
         {
@@ -90,6 +295,7 @@
         }
       ]
     },
+
     "numbers": {
       "patterns": [
         {
@@ -110,6 +316,7 @@
         }
       ]
     },
+
     "constants": {
       "patterns": [
         {
@@ -126,59 +333,42 @@
         }
       ]
     },
-    "types": {
-      "patterns": [
-        {
-          "name": "storage.type.primitive.tealeaf",
-          "match": "\\b(string|int|uint|float|bool|bytes|timestamp|int8|int16|int32|int64|uint8|uint16|uint32|uint64|float32|float64)\\b"
-        },
-        {
-          "name": "storage.type.array.tealeaf",
-          "match": "\\[\\]"
-        },
-        {
-          "name": "storage.modifier.nullable.tealeaf",
-          "match": "\\?"
-        },
-        {
-          "name": "entity.name.type.tealeaf",
-          "match": "(?<=@struct\\s+|@union\\s+|@table\\s+)[A-Za-z_][A-Za-z0-9_.-]*"
-        },
-        {
-          "name": "entity.name.type.reference.tealeaf",
-          "match": "(?<=:\\s*|\\[\\])[A-Za-z_][A-Za-z0-9_.-]*"
-        }
-      ]
-    },
+
     "references": {
+      "comment": "Reference usage: !name (no colon; definitions are handled by ref-definition). Possessive *+ prevents backtracking from producing a partial match like !myre from !myref:",
       "patterns": [
         {
           "name": "variable.other.reference.tealeaf",
-          "match": "![a-zA-Z_][a-zA-Z0-9_.\\-]*"
+          "match": "![a-zA-Z_][a-zA-Z0-9_.\\-]*+(?!\\s*:)"
         }
       ]
     },
+
     "tagged": {
+      "comment": "Tagged value: :tag_name value. Negative lookbehind prevents matching after word chars",
       "patterns": [
         {
           "name": "entity.name.tag.custom.tealeaf",
-          "match": ":[a-zA-Z_][a-zA-Z0-9_.\\-]*"
+          "match": "(?<![a-zA-Z0-9_]):[a-zA-Z_][a-zA-Z0-9_.\\-]*"
         }
       ]
     },
-    "identifiers": {
-      "patterns": [
-        {
-          "name": "variable.other.field.tealeaf",
-          "match": "\\b[A-Za-z_][A-Za-z0-9_.\\-]*(?=\\s*:)"
-        }
-      ]
-    },
+
     "timestamps": {
       "patterns": [
         {
           "name": "constant.other.timestamp.tealeaf",
           "match": "\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2}(\\.\\d{1,3})?)?(Z|[+-]\\d{2}:\\d{2})?)?"
+        }
+      ]
+    },
+
+    "unquoted-strings": {
+      "comment": "Bare identifier used as a string value (spec: string = name | quoted). Listed last so constants, references, and tagged values take priority.",
+      "patterns": [
+        {
+          "name": "string.unquoted.tealeaf",
+          "match": "[a-zA-Z_][a-zA-Z0-9_.\\-]*"
         }
       ]
     }

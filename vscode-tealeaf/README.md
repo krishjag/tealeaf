@@ -33,7 +33,7 @@ Syntax highlighting and language support for the TeaLeaf format (`.tl` files).
 
 2. Install the `.vsix` file:
    - Open VS Code
-   - Press `Ctrl+Shift+P` → "Extensions: Install from VSIX..."
+   - Press `Ctrl+Shift+P` and select "Extensions: Install from VSIX..."
    - Select the generated `.vsix` file
 
 ### For Development
