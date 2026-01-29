@@ -11,6 +11,8 @@ pub struct Parser {
     schemas: HashMap<String, Schema>,
     unions: HashMap<String, Union>,
     base_path: Option<std::path::PathBuf>,
+    /// Indicates the source was a root-level JSON array (set by @root-array directive)
+    is_root_array: bool,
 }
 
 impl Parser {
@@ -21,6 +23,7 @@ impl Parser {
             schemas: HashMap::new(),
             unions: HashMap::new(),
             base_path: None,
+            is_root_array: false,
         }
     }
 
@@ -45,6 +48,10 @@ impl Parser {
                             for (k, v) in included {
                                 result.insert(k, v);
                             }
+                        }
+                        "root-array" => {
+                            // Marks this document as representing a root-level JSON array
+                            self.is_root_array = true;
                         }
                         _ => {}
                     }
@@ -74,6 +81,11 @@ impl Parser {
 
     pub fn into_unions(self) -> HashMap<String, Union> {
         self.unions
+    }
+
+    /// Check if the @root-array directive was present
+    pub fn is_root_array(&self) -> bool {
+        self.is_root_array
     }
 
     // =========================================================================

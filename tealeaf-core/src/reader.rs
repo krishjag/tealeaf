@@ -40,6 +40,8 @@ pub struct Reader {
     pub schemas: Vec<Schema>,
     schema_map: HashMap<String, usize>,
     sections: HashMap<String, SectionInfo>,
+    /// Indicates the source JSON was a root-level array (for round-trip fidelity)
+    is_root_array: bool,
 }
 
 #[allow(dead_code)]
@@ -99,6 +101,10 @@ impl Reader {
             return Err(Error::InvalidVersion { major, minor });
         }
 
+        // Read flags: bit 0 = compressed (handled per-section), bit 1 = root_array
+        let flags = u32::from_le_bytes(bytes[8..12].try_into().unwrap());
+        let is_root_array = (flags & 0x02) != 0;
+
         let str_off = u64::from_le_bytes(bytes[16..24].try_into().unwrap()) as usize;
         let sch_off = u64::from_le_bytes(bytes[24..32].try_into().unwrap()) as usize;
         let idx_off = u64::from_le_bytes(bytes[32..40].try_into().unwrap()) as usize;
@@ -125,6 +131,7 @@ impl Reader {
             schemas: Vec::new(),
             schema_map: HashMap::new(),
             sections: HashMap::new(),
+            is_root_array,
         };
 
         reader.parse_schemas(sch_off, sch_cnt)?;
@@ -152,6 +159,14 @@ impl Reader {
     /// Get section keys
     pub fn keys(&self) -> Vec<&str> {
         self.sections.keys().map(|s| s.as_str()).collect()
+    }
+
+    /// Check if the source JSON was a root-level array
+    ///
+    /// When true, the "root" key contains the array and `to_json` should
+    /// output it directly without wrapping in an object.
+    pub fn is_root_array(&self) -> bool {
+        self.is_root_array
     }
 
     /// Get a value by key

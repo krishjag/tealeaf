@@ -13,6 +13,8 @@ pub struct Writer {
     schemas: Vec<Schema>,
     schema_map: HashMap<String, u16>,
     sections: Vec<Section>,
+    /// Indicates the source JSON was a root-level array (for round-trip fidelity)
+    is_root_array: bool,
 }
 
 struct Section {
@@ -32,7 +34,13 @@ impl Writer {
             schemas: Vec::new(),
             schema_map: HashMap::new(),
             sections: Vec::new(),
+            is_root_array: false,
         }
+    }
+
+    /// Set whether the source JSON was a root-level array
+    pub fn set_root_array(&mut self, is_root_array: bool) {
+        self.is_root_array = is_root_array;
     }
 
     pub fn intern(&mut self, s: &str) -> u32 {
@@ -90,7 +98,11 @@ impl Writer {
         w.write_all(&MAGIC)?;
         w.write_all(&VERSION_MAJOR.to_le_bytes())?;
         w.write_all(&VERSION_MINOR.to_le_bytes())?;
-        w.write_all(&(if compress { 0x01u32 } else { 0u32 }).to_le_bytes())?;
+        // Flags: bit 0 = compressed, bit 1 = root_array
+        let mut flags: u32 = 0;
+        if compress { flags |= 0x01; }
+        if self.is_root_array { flags |= 0x02; }
+        w.write_all(&flags.to_le_bytes())?;
         w.write_all(&0u32.to_le_bytes())?;
         w.write_all(&str_off.to_le_bytes())?;
         w.write_all(&sch_off.to_le_bytes())?;

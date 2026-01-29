@@ -281,14 +281,29 @@ fn cmd_tlbx_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
     let reader = Reader::open(input)?;
 
-    // Build JSON object from all sections
-    let mut json_obj = serde_json::Map::new();
-    for key in reader.keys() {
-        let value = reader.get(key)?;
-        json_obj.insert(key.to_string(), value_to_json(&value));
-    }
-
-    let json = serde_json::to_string_pretty(&serde_json::Value::Object(json_obj))?;
+    // Check if source was a root-level array
+    let json = if reader.is_root_array() {
+        // Output the root array directly
+        if let Ok(root_value) = reader.get("root") {
+            serde_json::to_string_pretty(&value_to_json(&root_value))?
+        } else {
+            // Fallback to object if "root" key doesn't exist
+            let mut json_obj = serde_json::Map::new();
+            for key in reader.keys() {
+                let value = reader.get(key)?;
+                json_obj.insert(key.to_string(), value_to_json(&value));
+            }
+            serde_json::to_string_pretty(&serde_json::Value::Object(json_obj))?
+        }
+    } else {
+        // Build JSON object from all sections
+        let mut json_obj = serde_json::Map::new();
+        for key in reader.keys() {
+            let value = reader.get(key)?;
+            json_obj.insert(key.to_string(), value_to_json(&value));
+        }
+        serde_json::to_string_pretty(&serde_json::Value::Object(json_obj))?
+    };
 
     match output {
         Some(path) => {

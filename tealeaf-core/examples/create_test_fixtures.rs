@@ -36,10 +36,7 @@ fn create_bytes_fixture(dir: &std::path::Path) {
     data.insert("empty_bytes".to_string(), Value::Bytes(vec![]));
     data.insert("name".to_string(), Value::String("test".to_string()));
 
-    let doc = TeaLeaf {
-        data,
-        schemas: HashMap::new(),
-    };
+    let doc = TeaLeaf::new(HashMap::new(), data);
 
     let path = dir.join("bytes_test.tlbx");
     doc.compile(&path, false).expect("Failed to compile bytes fixture");
@@ -51,10 +48,7 @@ fn create_timestamp_fixture(dir: &std::path::Path) {
     data.insert("created".to_string(), Value::Timestamp(1705315800000)); // 2024-01-15T10:30:00Z
     data.insert("epoch".to_string(), Value::Timestamp(0)); // 1970-01-01T00:00:00Z
 
-    let doc = TeaLeaf {
-        data,
-        schemas: HashMap::new(),
-    };
+    let doc = TeaLeaf::new(HashMap::new(), data);
 
     let path = dir.join("timestamp_test.tlbx");
     doc.compile(&path, false).expect("Failed to compile timestamp fixture");
@@ -111,10 +105,7 @@ fn create_comprehensive_fixture(dir: &std::path::Path) {
         (Value::Int(2), Value::String("two".to_string())),
     ]));
 
-    let doc = TeaLeaf {
-        data,
-        schemas: HashMap::new(),
-    };
+    let doc = TeaLeaf::new(HashMap::new(), data);
 
     let path = dir.join("comprehensive.tlbx");
     doc.compile(&path, false).expect("Failed to compile comprehensive fixture");

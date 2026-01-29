@@ -37,17 +37,33 @@ use std::path::Path;
 pub struct TeaLeaf {
     pub schemas: HashMap<String, Schema>,
     pub data: HashMap<String, Value>,
+    /// Tracks if the source JSON was a root-level array (for round-trip fidelity)
+    is_root_array: bool,
 }
 
 impl TeaLeaf {
+    /// Create a new TeaLeaf document from data and schemas.
+    ///
+    /// This constructor is primarily for programmatic document creation.
+    /// For parsing from formats, use `parse()`, `load()`, or `from_json()`.
+    pub fn new(schemas: HashMap<String, Schema>, data: HashMap<String, Value>) -> Self {
+        Self {
+            schemas,
+            data,
+            is_root_array: false,
+        }
+    }
+
     /// Parse TeaLeaf text format
     pub fn parse(input: &str) -> Result<Self> {
         let tokens = Lexer::new(input).tokenize()?;
         let mut parser = Parser::new(tokens);
         let data = parser.parse()?;
+        let is_root_array = parser.is_root_array();
         Ok(Self {
             schemas: parser.into_schemas(),
             data,
+            is_root_array,
         })
     }
 
@@ -60,9 +76,11 @@ impl TeaLeaf {
         let tokens = Lexer::new(&content).tokenize()?;
         let mut parser = Parser::new(tokens).with_base_path(path);
         let data = parser.parse()?;
+        let is_root_array = parser.is_root_array();
         Ok(Self {
             schemas: parser.into_schemas(),
             data,
+            is_root_array,
         })
     }
 
@@ -79,6 +97,7 @@ impl TeaLeaf {
     /// Compile to binary format
     pub fn compile<P: AsRef<Path>>(&self, path: P, compress: bool) -> Result<()> {
         let mut writer = Writer::new();
+        writer.set_root_array(self.is_root_array);
         for schema in self.schemas.values() {
             writer.add_schema(schema.clone());
         }
@@ -131,22 +150,31 @@ impl TeaLeaf {
         let json_value: serde_json::Value = serde_json::from_str(json)
             .map_err(|e| Error::ParseError(format!("Invalid JSON: {}", e)))?;
 
-        let data = match json_value {
+        let (data, is_root_array) = match json_value {
             serde_json::Value::Object(obj) => {
-                obj.into_iter()
+                let map = obj.into_iter()
                     .map(|(k, v)| (k, json_to_tealeaf_value(v)))
-                    .collect()
+                    .collect();
+                (map, false)
             }
-            _ => {
+            serde_json::Value::Array(_) => {
+                // Root-level array: store under "root" key but track for round-trip
                 let mut map = HashMap::new();
                 map.insert("root".to_string(), json_to_tealeaf_value(json_value));
-                map
+                (map, true)
+            }
+            _ => {
+                // Other primitives (string, number, bool, null) at root
+                let mut map = HashMap::new();
+                map.insert("root".to_string(), json_to_tealeaf_value(json_value));
+                (map, false)
             }
         };
 
         Ok(Self {
             schemas: HashMap::new(),
             data,
+            is_root_array,
         })
     }
 
@@ -169,6 +197,7 @@ impl TeaLeaf {
         Ok(Self {
             schemas,
             data: doc.data,
+            is_root_array: doc.is_root_array,
         })
     }
 
@@ -176,16 +205,27 @@ impl TeaLeaf {
     ///
     /// If schemas are present (either from parsing or inference), outputs
     /// `@struct` definitions and uses `@table` format for matching arrays.
+    ///
+    /// If this document represents a root-level JSON array (from `from_json`),
+    /// the output will include `@root-array` directive for round-trip fidelity.
     pub fn to_tl_with_schemas(&self) -> String {
-        if self.schemas.is_empty() {
-            return dumps(&self.data);
+        let mut output = String::new();
+
+        // Emit @root-array directive if this represents a root-level array
+        if self.is_root_array {
+            output.push_str("@root-array\n\n");
         }
 
-        // Build schema order (alphabetical for determinism)
-        let mut schema_order: Vec<String> = self.schemas.keys().cloned().collect();
-        schema_order.sort();
+        if self.schemas.is_empty() {
+            output.push_str(&dumps(&self.data));
+        } else {
+            // Build schema order (alphabetical for determinism)
+            let mut schema_order: Vec<String> = self.schemas.keys().cloned().collect();
+            schema_order.sort();
+            output.push_str(&dumps_with_schemas(&self.data, &self.schemas, &schema_order));
+        }
 
-        dumps_with_schemas(&self.data, &self.schemas, &schema_order)
+        output
     }
 
     /// Convert to JSON string (pretty-printed).
@@ -206,6 +246,14 @@ impl TeaLeaf {
     ///
     /// These representations are **contractually stable** and will not change.
     pub fn to_json(&self) -> Result<String> {
+        // If the source was a root-level array, return it directly (not wrapped in object)
+        if self.is_root_array {
+            if let Some(root_value) = self.data.get("root") {
+                return serde_json::to_string_pretty(&tealeaf_to_json_value(root_value))
+                    .map_err(|e| Error::ParseError(format!("JSON serialization failed: {}", e)));
+            }
+        }
+
         let json_obj: serde_json::Map<String, serde_json::Value> = self.data
             .iter()
             .map(|(k, v)| (k.clone(), tealeaf_to_json_value(v)))
@@ -217,6 +265,14 @@ impl TeaLeaf {
 
     /// Convert to compact JSON string (no pretty printing)
     pub fn to_json_compact(&self) -> Result<String> {
+        // If the source was a root-level array, return it directly (not wrapped in object)
+        if self.is_root_array {
+            if let Some(root_value) = self.data.get("root") {
+                return serde_json::to_string(&tealeaf_to_json_value(root_value))
+                    .map_err(|e| Error::ParseError(format!("JSON serialization failed: {}", e)));
+            }
+        }
+
         let json_obj: serde_json::Map<String, serde_json::Value> = self.data
             .iter()
             .map(|(k, v)| (k.clone(), tealeaf_to_json_value(v)))
@@ -1353,11 +1409,56 @@ mod tests {
     }
 
     #[test]
+    fn test_json_roundtrip_root_array() {
+        // Root-level arrays should round-trip without wrapping
+        let json = r#"[{"id":"0001","type":"donut","name":"Cake"},{"id":"0002","type":"donut","name":"Raised"}]"#;
+        let doc = TeaLeaf::from_json(json).unwrap();
+
+        // Internally stored under "root" key
+        let root = doc.get("root").unwrap();
+        let arr = root.as_array().unwrap();
+        assert_eq!(arr.len(), 2);
+
+        // Round-trip should produce the array directly, NOT {"root": [...]}
+        let json_out = doc.to_json_compact().unwrap();
+        assert!(json_out.starts_with('['), "Root array should serialize directly: {}", json_out);
+        assert!(json_out.ends_with(']'), "Root array should end with ]: {}", json_out);
+        assert!(!json_out.contains("\"root\""), "Should NOT wrap in root object: {}", json_out);
+
+        // Verify content preserved
+        assert!(json_out.contains("\"id\":\"0001\"") || json_out.contains("\"id\": \"0001\""));
+        assert!(json_out.contains("\"name\":\"Cake\"") || json_out.contains("\"name\": \"Cake\""));
+    }
+
+    #[test]
+    fn test_json_roundtrip_root_array_empty() {
+        // Empty array should also round-trip correctly
+        let json = r#"[]"#;
+        let doc = TeaLeaf::from_json(json).unwrap();
+
+        let json_out = doc.to_json_compact().unwrap();
+        assert_eq!(json_out, "[]", "Empty array should round-trip: {}", json_out);
+    }
+
+    #[test]
+    fn test_json_roundtrip_root_object_with_root_key() {
+        // An object that happens to have a "root" key should NOT be confused
+        let json = r#"{"root":[1,2,3],"other":"value"}"#;
+        let doc = TeaLeaf::from_json(json).unwrap();
+
+        let json_out = doc.to_json_compact().unwrap();
+        // This was a root object, so it should stay as an object
+        assert!(json_out.starts_with('{'), "Root object should stay as object: {}", json_out);
+        assert!(json_out.contains("\"root\""), "root key should be preserved: {}", json_out);
+        assert!(json_out.contains("\"other\""), "other key should be preserved: {}", json_out);
+    }
+
+    #[test]
     fn test_json_export_bytes() {
         // Create a document with bytes programmatically
         let mut entries = std::collections::HashMap::new();
         entries.insert("data".to_string(), Value::Bytes(vec![0xde, 0xad, 0xbe, 0xef]));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let json = doc.to_json().unwrap();
         assert!(json.contains("0xdeadbeef"), "Bytes should export as hex string: {}", json);
@@ -1367,7 +1468,7 @@ mod tests {
     fn test_json_export_ref() {
         let mut entries = std::collections::HashMap::new();
         entries.insert("config".to_string(), Value::Ref("base_config".to_string()));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let json = doc.to_json().unwrap();
         assert!(json.contains("\"$ref\""), "Ref should export with $ref key: {}", json);
@@ -1378,7 +1479,7 @@ mod tests {
     fn test_json_export_tagged() {
         let mut entries = std::collections::HashMap::new();
         entries.insert("status".to_string(), Value::Tagged("ok".to_string(), Box::new(Value::Int(200))));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let json = doc.to_json().unwrap();
         assert!(json.contains("\"$tag\""), "Tagged should export with $tag key: {}", json);
@@ -1393,7 +1494,7 @@ mod tests {
             (Value::Int(1), Value::String("one".to_string())),
             (Value::Int(2), Value::String("two".to_string())),
         ]));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let json = doc.to_json().unwrap();
         // Map exports as array of [key, value] pairs
@@ -1412,7 +1513,7 @@ mod tests {
         // 2024-01-15T10:30:00Z = 1705315800000 ms, but let's verify with a known value
         // Use 0 = 1970-01-01T00:00:00Z for simplicity
         entries.insert("created".to_string(), Value::Timestamp(0));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let json = doc.to_json().unwrap();
         assert!(json.contains("1970-01-01"), "Timestamp should export as ISO 8601 date: {}", json);
@@ -1534,7 +1635,7 @@ mod tests {
         let mut entries = std::collections::HashMap::new();
         entries.insert("data".to_string(), Value::String("a".repeat(1000)));
         entries.insert("count".to_string(), Value::Int(12345));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), true).unwrap(); // compressed
@@ -1553,7 +1654,7 @@ mod tests {
             ("host".to_string(), Value::String("localhost".to_string())),
         ].into_iter().collect()));
         entries.insert("config".to_string(), Value::Ref("base".to_string()));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1569,7 +1670,7 @@ mod tests {
 
         let mut entries = std::collections::HashMap::new();
         entries.insert("status".to_string(), Value::Tagged("ok".to_string(), Box::new(Value::Int(200))));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1590,7 +1691,7 @@ mod tests {
             (Value::Int(1), Value::String("one".to_string())),
             (Value::Int(2), Value::String("two".to_string())),
         ]));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1609,7 +1710,7 @@ mod tests {
 
         let mut entries = std::collections::HashMap::new();
         entries.insert("data".to_string(), Value::Bytes(vec![0xde, 0xad, 0xbe, 0xef]));
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1625,7 +1726,7 @@ mod tests {
 
         let mut entries = std::collections::HashMap::new();
         entries.insert("created".to_string(), Value::Timestamp(1705315800000)); // 2024-01-15T10:30:00Z
-        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1697,7 +1798,7 @@ mod tests {
             (Value::Int(1), Value::String("one".to_string())),
         ]));
 
-        let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
         // Compile to binary and read back
         let temp = NamedTempFile::new().unwrap();
@@ -1841,7 +1942,7 @@ mod tests {
         fn contract_bytes_to_json_hex() {
             let mut data = std::collections::HashMap::new();
             data.insert("b".to_string(), Value::Bytes(vec![0xca, 0xfe, 0xba, 0xbe]));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Bytes serialize as lowercase hex with 0x prefix
@@ -1852,7 +1953,7 @@ mod tests {
         fn contract_bytes_empty_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("b".to_string(), Value::Bytes(vec![]));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Empty bytes serialize as "0x"
@@ -1864,7 +1965,7 @@ mod tests {
             let mut data = std::collections::HashMap::new();
             // 2024-01-15T10:50:00.123Z (verified milliseconds since epoch)
             data.insert("ts".to_string(), Value::Timestamp(1705315800123));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Timestamp serializes as ISO 8601 with milliseconds
@@ -1876,7 +1977,7 @@ mod tests {
         fn contract_timestamp_epoch_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("ts".to_string(), Value::Timestamp(0));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Unix epoch is 1970-01-01T00:00:00Z (no ms for whole seconds)
@@ -1888,7 +1989,7 @@ mod tests {
         fn contract_ref_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("r".to_string(), Value::Ref("target_key".to_string()));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Ref serializes as {"$ref": "name"}
@@ -1900,7 +2001,7 @@ mod tests {
         fn contract_tagged_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("t".to_string(), Value::Tagged("ok".to_string(), Box::new(Value::Int(200))));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Tagged serializes with $tag and $value keys
@@ -1914,7 +2015,7 @@ mod tests {
         fn contract_tagged_null_value_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("t".to_string(), Value::Tagged("none".to_string(), Box::new(Value::Null)));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Tagged with null inner still has $value: null
@@ -1929,7 +2030,7 @@ mod tests {
                 (Value::Int(1), Value::String("one".to_string())),
                 (Value::Int(2), Value::String("two".to_string())),
             ]));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Map serializes as array of [key, value] pairs
@@ -1942,7 +2043,7 @@ mod tests {
         fn contract_map_empty_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("m".to_string(), Value::Map(vec![]));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Empty map serializes as empty array
@@ -2027,7 +2128,7 @@ mod tests {
         fn contract_float_nan_to_null() {
             let mut data = std::collections::HashMap::new();
             data.insert("f".to_string(), Value::Float(f64::NAN));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: NaN serializes as null (JSON has no NaN)
@@ -2038,7 +2139,7 @@ mod tests {
         fn contract_float_infinity_to_null() {
             let mut data = std::collections::HashMap::new();
             data.insert("f".to_string(), Value::Float(f64::INFINITY));
-            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new(), is_root_array: false };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Infinity serializes as null (JSON has no Infinity)
