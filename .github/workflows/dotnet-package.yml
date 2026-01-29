@@ -40,6 +40,9 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
+permissions:
+  contents: write  # Required for release operations
+
 jobs:
   # Validate version consistency (PR/push only)
   validate-version:

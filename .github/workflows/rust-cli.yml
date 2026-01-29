@@ -38,6 +38,9 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+permissions:
+  contents: write  # Required for uploading release assets
+
 jobs:
   # Validate version consistency (PR/push only)
   validate-version:

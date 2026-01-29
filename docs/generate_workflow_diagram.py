@@ -6,6 +6,8 @@ Creates a PNG showing JSON → TeaLeaf conversion and distribution workflow
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Circle
+import matplotlib.image as mpimg
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import numpy as np
 import os
 
@@ -56,6 +58,14 @@ COLOR_ARROW = '#888888'     # Gray arrows
 # Background
 fig.patch.set_facecolor(COLOR_BG)
 ax.set_facecolor(COLOR_BG)
+
+# Add TeaLeaf icon to top left
+icon_path = os.path.join(os.path.dirname(__file__), '..', 'vscode-tealeaf', 'images', 'tealeaf-icon-darkbg.png')
+if os.path.exists(icon_path):
+    icon_img = mpimg.imread(icon_path)
+    imagebox = OffsetImage(icon_img, zoom=0.1)  # ~100px visible size
+    ab = AnnotationBbox(imagebox, (0.5, 9.5), frameon=False, box_alignment=(0, 0.5))
+    ax.add_artist(ab)
 
 def draw_box(ax, x, y, width, height, color, label, sublabel=None, icon=None):
     """Draw a rounded box with label"""
