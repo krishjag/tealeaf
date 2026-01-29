@@ -17,6 +17,7 @@
   - [File Extensions](#file-extensions)
   - [Quick Compare: JSON vs TeaLeaf](#quick-compare-json-vs-tealeaf)
   - [Workflow Real Example](#workflow-real-example)
+- [Installation](#installation)
 - [CLI](#cli)
 - [Language Bindings](#language-bindings)
 - [Design Rationale](#design-rationale)
@@ -202,6 +203,61 @@ A complete retail orders dataset demonstrating the full TeaLeaf workflow:
 | [`examples/retail_orders.tlbx`](examples/retail_orders.tlbx) | TeaLeaf binary (6.9 KB) |
 | [`examples/test_retail_analysis.ps1`](examples/test_retail_analysis.ps1) | Send to Claude API |
 | [`examples/responses/retail_analysis.tl`](examples/responses/retail_analysis.tl) | Claude's analysis |
+
+---
+
+## Installation
+
+### Pre-built Binaries
+
+Download the latest release from [GitHub Releases](https://github.com/krishjag/tealeaf/releases/latest).
+
+| Platform | Architecture | Download |
+|----------|-------------|----------|
+| Windows | x64 | [tealeaf-windows-x64.zip](https://github.com/krishjag/tealeaf/releases/latest/download/tealeaf-windows-x64.zip) |
+| Windows | ARM64 | [tealeaf-windows-arm64.zip](https://github.com/krishjag/tealeaf/releases/latest/download/tealeaf-windows-arm64.zip) |
+| Linux | x64 | [tealeaf-linux-x64.tar.gz](https://github.com/krishjag/tealeaf/releases/latest/download/tealeaf-linux-x64.tar.gz) |
+| Linux | ARM64 | [tealeaf-linux-arm64.tar.gz](https://github.com/krishjag/tealeaf/releases/latest/download/tealeaf-linux-arm64.tar.gz) |
+| Linux (musl) | x64 | [tealeaf-linux-musl-x64.tar.gz](https://github.com/krishjag/tealeaf/releases/latest/download/tealeaf-linux-musl-x64.tar.gz) |
+| macOS | x64 (Intel) | [tealeaf-macos-x64.tar.gz](https://github.com/krishjag/tealeaf/releases/latest/download/tealeaf-macos-x64.tar.gz) |
+| macOS | ARM64 (Apple Silicon) | [tealeaf-macos-arm64.tar.gz](https://github.com/krishjag/tealeaf/releases/latest/download/tealeaf-macos-arm64.tar.gz) |
+
+### Quick Install
+
+**Windows (PowerShell):**
+```powershell
+# Download and extract to current directory
+Invoke-WebRequest -Uri "https://github.com/krishjag/tealeaf/releases/latest/download/tealeaf-windows-x64.zip" -OutFile tealeaf.zip
+Expand-Archive tealeaf.zip -DestinationPath .
+```
+
+**Linux/macOS:**
+```bash
+# Download and extract (replace with your platform)
+curl -LO https://github.com/krishjag/tealeaf/releases/latest/download/tealeaf-linux-x64.tar.gz
+tar -xzf tealeaf-linux-x64.tar.gz
+
+# Optional: move to PATH
+sudo mv tealeaf /usr/local/bin/
+```
+
+### Build from Source
+
+Requires [Rust toolchain](https://rustup.rs):
+
+```bash
+git clone https://github.com/krishjag/tealeaf.git
+cd tealeaf
+cargo build --release --package tealeaf-core
+# Binary at: target/release/tealeaf (or tealeaf.exe on Windows)
+```
+
+### Verify Installation
+
+```bash
+tealeaf --version
+tealeaf help
+```
 
 ---
 

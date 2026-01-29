@@ -21,18 +21,70 @@ dotnet add package TeaLeaf
 ```csharp
 using TeaLeaf;
 
-// Convert JSON to TeaLeaf text format
+// Convert JSON to TeaLeaf document
 string json = """{"name": "Alice", "age": 30}""";
-string tl = TeaLeafConverter.JsonToTL(json);
+using var doc = TLDocument.FromJson(json);
 
-// Convert TeaLeaf back to JSON
-string roundTrip = TeaLeafConverter.TLToJson(tl);
+// Get the TeaLeaf text format (with schema definitions)
+string tlText = doc.ToText();
 
-// Convert to binary format for compact storage
-byte[] binary = TeaLeafConverter.JsonToTLBX(json);
+// Convert back to JSON
+string roundTrip = doc.ToJson();
 
-// Convert binary back to JSON
-string fromBinary = TeaLeafConverter.TLBXToJson(binary);
+// Compile to binary format for compact storage
+doc.Compile("data.tlbx", compress: true);
+
+// Read binary file
+using var reader = TLReader.Open("data.tlbx");
+string fromBinary = reader.ToJson();
+
+// Access values by key
+var name = reader.Get("name")?.AsString();
+```
+
+## Working with Text Format (.tl)
+
+```csharp
+using TeaLeaf;
+
+// Parse TeaLeaf text
+string tlText = """
+    @struct Person (name: string, age: int)
+    person: @Person ("Alice", 30)
+    """;
+using var doc = TLDocument.Parse(tlText);
+
+// Access values
+var person = doc.Get("person");
+Console.WriteLine(person?.GetField("name")?.AsString()); // "Alice"
+
+// Convert to JSON
+Console.WriteLine(doc.ToJson());
+```
+
+## Working with Binary Format (.tlbx)
+
+```csharp
+using TeaLeaf;
+
+// Create binary from JSON (one step)
+TLReader.CreateFromJson(jsonString, "output.tlbx", compress: true);
+
+// Or from a document
+using var doc = TLDocument.FromJson(jsonString);
+doc.Compile("output.tlbx", compress: true);
+
+// Read binary file
+using var reader = TLReader.Open("data.tlbx");
+
+// Access data
+foreach (var key in reader.Keys)
+{
+    Console.WriteLine($"{key}: {reader.GetAsJson(key)}");
+}
+
+// Memory-mapped reading for large files
+using var mmapReader = TLReader.OpenMmap("large.tlbx");
 ```
 
 ## Supported Platforms
@@ -40,24 +92,42 @@ string fromBinary = TeaLeafConverter.TLBXToJson(binary);
 | Platform | Architecture |
 |----------|--------------|
 | Windows | x64, ARM64 |
-| Linux (glibc) | x64, ARM64 |
-| Linux (musl/Alpine) | x64, ARM64 |
+| Linux | x64, ARM64 |
 | macOS | x64 (Intel), ARM64 (Apple Silicon) |
 
 ## API Reference
 
-### TeaLeafConverter
+### TLDocument
 
-Static class for format conversions:
+For working with TeaLeaf text format (.tl):
 
 | Method | Description |
 |--------|-------------|
-| `JsonToTL(string json)` | Convert JSON to TeaLeaf text format |
-| `TLToJson(string tl)` | Convert TeaLeaf text to JSON |
-| `JsonToTLBX(string json)` | Convert JSON to TeaLeaf binary format |
-| `TLBXToJson(byte[] binary)` | Convert TeaLeaf binary to JSON |
-| `TLToTLBX(string tl)` | Convert TeaLeaf text to binary |
-| `TLBXToTL(byte[] binary)` | Convert TeaLeaf binary to text |
+| `TLDocument.Parse(string text)` | Parse TeaLeaf text |
+| `TLDocument.ParseFile(string path)` | Parse from .tl file |
+| `TLDocument.FromJson(string json)` | Create from JSON with schema inference |
+| `doc.ToText()` | Convert to TeaLeaf text (with schemas) |
+| `doc.ToJson()` | Convert to pretty JSON |
+| `doc.ToJsonCompact()` | Convert to compact JSON |
+| `doc.Compile(path, compress)` | Write to binary .tlbx file |
+| `doc.Get(key)` | Get value by key |
+| `doc.Keys` | Get all keys |
+
+### TLReader
+
+For reading binary TeaLeaf files (.tlbx):
+
+| Method | Description |
+|--------|-------------|
+| `TLReader.Open(string path)` | Open binary file |
+| `TLReader.OpenMmap(string path)` | Open with memory mapping |
+| `TLReader.CreateFromJson(json, path, compress)` | Create binary from JSON |
+| `reader.ToJson()` | Convert to pretty JSON |
+| `reader.ToJsonCompact()` | Convert to compact JSON |
+| `reader.Get(key)` | Get value by key |
+| `reader.GetAsJson(key)` | Get value as JSON string |
+| `reader.Keys` | Get all keys |
+| `reader.Schemas` | Get schema definitions |
 
 ## TeaLeaf Format Example
 
@@ -71,14 +141,14 @@ JSON input:
 }
 ```
 
-TeaLeaf text output:
+TeaLeaf text output (with auto-inferred schema):
 ```
-@struct User { name age }
-{
-  users: [User]
-    ("Alice" 30)
-    ("Bob" 25)
-}
+@struct User (name: string, age: int)
+
+users: @table User [
+  ("Alice", 30)
+  ("Bob", 25)
+]
 ```
 
 ## License

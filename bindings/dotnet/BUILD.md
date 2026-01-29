@@ -89,12 +89,9 @@ This document describes how to build the TeaLeaf .NET library with its native de
 | RID | Rust Target | Notes |
 |-----|-------------|-------|
 | `win-x64` | x86_64-pc-windows-msvc | Windows 64-bit |
-| `win-x86` | i686-pc-windows-msvc | Windows 32-bit |
 | `win-arm64` | aarch64-pc-windows-msvc | Windows ARM64 |
 | `linux-x64` | x86_64-unknown-linux-gnu | Linux 64-bit (glibc) |
 | `linux-arm64` | aarch64-unknown-linux-gnu | Linux ARM64 (glibc) |
-| `linux-musl-x64` | x86_64-unknown-linux-musl | Alpine/musl 64-bit |
-| `linux-musl-arm64` | aarch64-unknown-linux-musl | Alpine/musl ARM64 |
 | `osx-x64` | x86_64-apple-darwin | macOS Intel |
 | `osx-arm64` | aarch64-apple-darwin | macOS Apple Silicon |
 
@@ -112,13 +109,8 @@ Windows can only natively compile for Windows targets. For other platforms, use 
 # Install ARM64 cross-compiler
 sudo apt-get install gcc-aarch64-linux-gnu
 
-# Install musl tools
-sudo apt-get install musl-tools
-
 # Install Rust targets
 rustup target add aarch64-unknown-linux-gnu
-rustup target add x86_64-unknown-linux-musl
-rustup target add aarch64-unknown-linux-musl
 ```
 
 ### macOS Cross-Compilation
@@ -175,8 +167,6 @@ TeaLeaf.2.0.0-beta.1.nupkg
     ├── win-arm64/native/tealeaf_ffi.dll
     ├── linux-x64/native/libtealeaf_ffi.so
     ├── linux-arm64/native/libtealeaf_ffi.so
-    ├── linux-musl-x64/native/libtealeaf_ffi.so
-    ├── linux-musl-arm64/native/libtealeaf_ffi.so
     ├── osx-x64/native/libtealeaf_ffi.dylib
     └── osx-arm64/native/libtealeaf_ffi.dylib
 ```
