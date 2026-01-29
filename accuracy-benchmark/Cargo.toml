@@ -5,8 +5,8 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Accuracy benchmark suite for PAX format across multiple LLM providers"
-keywords = ["benchmark", "llm", "accuracy", "pax"]
+description = "Accuracy benchmark suite for TeaLeaf format across multiple LLM providers"
+keywords = ["benchmark", "llm", "accuracy", "tealeaf"]
 categories = ["development-tools::testing"]
 
 [[bin]]
@@ -14,7 +14,7 @@ name = "accuracy-benchmark"
 path = "src/main.rs"
 
 [dependencies]
-pax-core = { path = "../pax-core" }
+tealeaf-core = { path = "../tealeaf-core" }
 tokio = { version = "1", features = ["full"] }
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 serde = { version = "1.0", features = ["derive"] }

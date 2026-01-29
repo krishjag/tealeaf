@@ -1,10 +1,10 @@
-# PAX Language Support for Visual Studio Code
+# TeaLeaf Language Support for Visual Studio Code
 
-Syntax highlighting and language support for the PAX format (`.pax` files).
+Syntax highlighting and language support for the TeaLeaf format (`.tl` files).
 
 ## Features
 
-- **Syntax Highlighting** for PAX text format
+- **Syntax Highlighting** for TeaLeaf text format
   - Directives (`@struct`, `@union`, `@table`, `@map`)
   - Primitive types (`string`, `int`, `float`, `bool`, `bytes`, `timestamp`)
   - Schema definitions and type references
@@ -27,7 +27,7 @@ Syntax highlighting and language support for the PAX format (`.pax` files).
 
 1. Package the extension:
    ```bash
-   cd vscode-pax
+   cd vscode-tealeaf
    npx vsce package
    ```
 
@@ -39,14 +39,14 @@ Syntax highlighting and language support for the PAX format (`.pax` files).
 ### For Development
 
 1. Copy or symlink this folder to your VS Code extensions directory:
-   - **Windows**: `%USERPROFILE%\.vscode\extensions\pax-lang`
-   - **macOS/Linux**: `~/.vscode/extensions/pax-lang`
+   - **Windows**: `%USERPROFILE%\.vscode\extensions\tealeaf-lang`
+   - **macOS/Linux**: `~/.vscode/extensions/tealeaf-lang`
 
 2. Reload VS Code
 
 ## Example
 
-```pax
+```tealeaf
 # Schema definitions
 @struct Location (city: string, country: string)
 @struct Person (
@@ -76,16 +76,16 @@ dev: !base
 status: :ok 200
 ```
 
-## PAX Format
+## TeaLeaf Format
 
-PAX is a schema-aware document format with:
-- Human-readable text representation (`.pax`)
-- Compact binary representation (`.paxb`)
+TeaLeaf is a schema-aware document format with:
+- Human-readable text representation (`.tl`)
+- Compact binary representation (`.tlbx`)
 - Schema definitions with types
 - String deduplication
 - JSON interoperability
 
-Learn more: [PAX Specification](../spec/PAX_SPEC.md)
+Learn more: [TeaLeaf Specification](../spec/TEALEAF_SPEC.md)
 
 ## License
 

@@ -1,15 +1,15 @@
 using System.Text.Json;
 using Xunit;
 
-namespace Pax.Tests;
+namespace TeaLeaf.Tests;
 
 /// <summary>
-/// Conversion contract tests that lock down JSON↔PAX behavior.
+/// Conversion contract tests that lock down JSON↔TL behavior.
 ///
 /// STABILITY POLICY:
 /// - Plain JSON roundtrip: MUST be lossless for primitives, arrays, objects
-/// - PAX→JSON: Special types have FIXED representations that MUST NOT change
-/// - JSON→PAX: No magic parsing; $ref/$tag/hex/ISO8601 stay as plain JSON
+/// - TL→JSON: Special types have FIXED representations that MUST NOT change
+/// - JSON→TL: No magic parsing; $ref/$tag/hex/ISO8601 stay as plain JSON
 /// </summary>
 public class ConversionContractTests
 {
@@ -37,7 +37,7 @@ public class ConversionContractTests
         // Wrap in object for top-level non-objects
         var wrappedJson = json.StartsWith("{") ? json : $"{{\"v\": {json}}}";
 
-        using var doc = PaxDocument.FromJson(wrappedJson);
+        using var doc = TLDocument.FromJson(wrappedJson);
         Assert.NotNull(doc);
 
         var outputJson = doc.ToJsonCompact();
@@ -64,7 +64,7 @@ public class ConversionContractTests
     {
         const string json = @"{""name"": ""alice"", ""age"": 30, ""active"": true}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         var outputJson = doc.ToJsonCompact();
 
         var output = JsonDocument.Parse(outputJson);
@@ -81,23 +81,23 @@ public class ConversionContractTests
     {
         const string json = @"{""a"": {""b"": {""c"": {""d"": 5}}}}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
 
         using var a = doc["a"];
-        Assert.Equal(PaxType.Object, a?.Type);
+        Assert.Equal(TLType.Object, a?.Type);
 
         using var b = a?["b"];
-        Assert.Equal(PaxType.Object, b?.Type);
+        Assert.Equal(TLType.Object, b?.Type);
 
         using var c = b?["c"];
-        Assert.Equal(PaxType.Object, c?.Type);
+        Assert.Equal(TLType.Object, c?.Type);
 
         using var d = c?["d"];
         Assert.Equal(5, d?.AsInt());
     }
 
     // =========================================================================
-    // JSON→PAX No Magic (STABLE)
+    // JSON→TL No Magic (STABLE)
     // These tests ensure JSON special patterns are NOT auto-converted
     // =========================================================================
 
@@ -107,11 +107,11 @@ public class ConversionContractTests
         // CONTRACT: JSON {"$ref": ...} MUST remain an Object, NOT become Ref
         const string json = @"{""x"": {""$ref"": ""some_key""}}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var x = doc["x"];
 
         // Must be Object type, not Ref
-        Assert.Equal(PaxType.Object, x?.Type);
+        Assert.Equal(TLType.Object, x?.Type);
         Assert.Null(x?.AsRefName()); // Should NOT be a Ref
 
         // Should have $ref as a key in the object
@@ -126,11 +126,11 @@ public class ConversionContractTests
         // CONTRACT: JSON {"$tag": ..., "$value": ...} MUST remain an Object
         const string json = @"{""x"": {""$tag"": ""ok"", ""$value"": 200}}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var x = doc["x"];
 
         // Must be Object type, not Tagged
-        Assert.Equal(PaxType.Object, x?.Type);
+        Assert.Equal(TLType.Object, x?.Type);
         Assert.Null(x?.AsTagName()); // Should NOT be a Tagged
 
         // Should have $tag and $value as keys
@@ -146,10 +146,10 @@ public class ConversionContractTests
         // CONTRACT: Hex strings MUST remain String, NOT become Bytes
         const string json = @"{""x"": ""0xdeadbeef""}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var x = doc["x"];
 
-        Assert.Equal(PaxType.String, x?.Type);
+        Assert.Equal(TLType.String, x?.Type);
         Assert.Equal("0xdeadbeef", x?.AsString());
         Assert.Null(x?.AsBytes()); // Should NOT be Bytes
     }
@@ -160,10 +160,10 @@ public class ConversionContractTests
         // CONTRACT: ISO 8601 strings MUST remain String, NOT become Timestamp
         const string json = @"{""x"": ""2024-01-15T10:30:00.000Z""}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var x = doc["x"];
 
-        Assert.Equal(PaxType.String, x?.Type);
+        Assert.Equal(TLType.String, x?.Type);
         Assert.Equal("2024-01-15T10:30:00.000Z", x?.AsString());
         Assert.Null(x?.AsTimestamp()); // Should NOT be Timestamp
     }
@@ -174,10 +174,10 @@ public class ConversionContractTests
         // CONTRACT: Array of pairs MUST remain Array, NOT become Map
         const string json = @"{""x"": [[1, ""one""], [2, ""two""]]}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var x = doc["x"];
 
-        Assert.Equal(PaxType.Array, x?.Type);
+        Assert.Equal(TLType.Array, x?.Type);
         Assert.Equal(2, x?.ArrayLength);
 
         // Verify it's not a Map
@@ -193,11 +193,11 @@ public class ConversionContractTests
     {
         const string json = @"{""n"": 42}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var n = doc["n"];
 
         // CONTRACT: Integers that fit i64 become Int
-        Assert.Equal(PaxType.Int, n?.Type);
+        Assert.Equal(TLType.Int, n?.Type);
         Assert.Equal(42, n?.AsInt());
     }
 
@@ -206,11 +206,11 @@ public class ConversionContractTests
     {
         const string json = @"{""n"": -9223372036854775808}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var n = doc["n"];
 
         // CONTRACT: Negative integers become Int
-        Assert.Equal(PaxType.Int, n?.Type);
+        Assert.Equal(TLType.Int, n?.Type);
     }
 
     [Fact]
@@ -218,18 +218,18 @@ public class ConversionContractTests
     {
         const string json = @"{""n"": 3.14159}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var n = doc["n"];
 
         // CONTRACT: Numbers with decimals become Float
-        Assert.Equal(PaxType.Float, n?.Type);
+        Assert.Equal(TLType.Float, n?.Type);
         var value = n?.AsFloat();
         Assert.NotNull(value);
         Assert.True(Math.Abs(3.14159 - value.Value) < 0.00001);
     }
 
     // =========================================================================
-    // PAX→JSON Fixed Representations (via Binary)
+    // TL→JSON Fixed Representations (via Binary)
     // These tests verify the JSON output format from binary files
     // =========================================================================
 
@@ -239,7 +239,7 @@ public class ConversionContractTests
         // Use the fixture file which has Bytes values
         var fixturePath = Path.Combine(
             AppContext.BaseDirectory,
-            "..", "..", "..", "fixtures", "bytes_test.paxb");
+            "..", "..", "..", "fixtures", "bytes_test.tlbx");
 
         if (!File.Exists(fixturePath))
         {
@@ -247,7 +247,7 @@ public class ConversionContractTests
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
         var json = reader.ToJson();
 
         // CONTRACT: Bytes serialize as lowercase hex with 0x prefix
@@ -260,14 +260,14 @@ public class ConversionContractTests
         // Use the comprehensive fixture
         var fixturePath = Path.Combine(
             AppContext.BaseDirectory,
-            "..", "..", "..", "fixtures", "comprehensive.paxb");
+            "..", "..", "..", "fixtures", "comprehensive.tlbx");
 
         if (!File.Exists(fixturePath))
         {
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
         var json = reader.ToJson();
 
         // CONTRACT: Ref serializes as {"$ref": "name"}
@@ -279,14 +279,14 @@ public class ConversionContractTests
     {
         var fixturePath = Path.Combine(
             AppContext.BaseDirectory,
-            "..", "..", "..", "fixtures", "comprehensive.paxb");
+            "..", "..", "..", "fixtures", "comprehensive.tlbx");
 
         if (!File.Exists(fixturePath))
         {
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
         var json = reader.ToJson();
 
         // CONTRACT: Tagged serializes with $tag and $value keys
@@ -299,14 +299,14 @@ public class ConversionContractTests
     {
         var fixturePath = Path.Combine(
             AppContext.BaseDirectory,
-            "..", "..", "..", "fixtures", "comprehensive.paxb");
+            "..", "..", "..", "fixtures", "comprehensive.tlbx");
 
         if (!File.Exists(fixturePath))
         {
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
         var json = reader.ToJsonCompact();
 
         // CONTRACT: Map serializes as array of [key, value] pairs
@@ -319,14 +319,14 @@ public class ConversionContractTests
     {
         var fixturePath = Path.Combine(
             AppContext.BaseDirectory,
-            "..", "..", "..", "fixtures", "timestamp_test.paxb");
+            "..", "..", "..", "fixtures", "timestamp_test.tlbx");
 
         if (!File.Exists(fixturePath))
         {
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
         var json = reader.ToJson();
 
         // CONTRACT: Timestamp serializes as ISO 8601
@@ -343,10 +343,10 @@ public class ConversionContractTests
     {
         const string json = @"{""empty"": {}}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var empty = doc["empty"];
 
-        Assert.Equal(PaxType.Object, empty?.Type);
+        Assert.Equal(TLType.Object, empty?.Type);
         var keys = empty?.GetObjectKeys();
         Assert.Empty(keys ?? Array.Empty<string>());
     }
@@ -356,10 +356,10 @@ public class ConversionContractTests
     {
         const string json = @"{""empty"": []}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var empty = doc["empty"];
 
-        Assert.Equal(PaxType.Array, empty?.Type);
+        Assert.Equal(TLType.Array, empty?.Type);
         Assert.Equal(0, empty?.ArrayLength);
     }
 
@@ -368,7 +368,7 @@ public class ConversionContractTests
     {
         const string json = @"{""greeting"": ""こんにちは世界"", ""emoji"": ""🎉🚀""}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
 
         using var greeting = doc["greeting"];
         Assert.Equal("こんにちは世界", greeting?.AsString());
@@ -382,7 +382,7 @@ public class ConversionContractTests
     {
         const string json = @"{""text"": ""line1\nline2\ttab\\backslash\"" quote""}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var text = doc["text"];
 
         Assert.Contains("\n", text?.AsString());
@@ -398,7 +398,7 @@ public class ConversionContractTests
         var items = string.Join(", ", Enumerable.Range(0, 1000));
         var json = $"{{\"arr\": [{items}]}}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var arr = doc["arr"];
 
         // CONTRACT: Large arrays MUST be handled without truncation
@@ -417,11 +417,11 @@ public class ConversionContractTests
     {
         const string json = @"{""value"": null}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var value = doc["value"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.Null, value.Type);
+        Assert.Equal(TLType.Null, value.Type);
     }
 
     [Fact]
@@ -429,30 +429,30 @@ public class ConversionContractTests
     {
         const string json = @"{""mixed"": [1, ""two"", true, null, 3.14, [1, 2], {""a"": 1}]}";
 
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         using var mixed = doc["mixed"];
 
         Assert.Equal(7, mixed?.ArrayLength);
 
         using var e0 = mixed?[0];
-        Assert.Equal(PaxType.Int, e0?.Type);
+        Assert.Equal(TLType.Int, e0?.Type);
 
         using var e1 = mixed?[1];
-        Assert.Equal(PaxType.String, e1?.Type);
+        Assert.Equal(TLType.String, e1?.Type);
 
         using var e2 = mixed?[2];
-        Assert.Equal(PaxType.Bool, e2?.Type);
+        Assert.Equal(TLType.Bool, e2?.Type);
 
         using var e3 = mixed?[3];
-        Assert.Equal(PaxType.Null, e3?.Type);
+        Assert.Equal(TLType.Null, e3?.Type);
 
         using var e4 = mixed?[4];
-        Assert.Equal(PaxType.Float, e4?.Type);
+        Assert.Equal(TLType.Float, e4?.Type);
 
         using var e5 = mixed?[5];
-        Assert.Equal(PaxType.Array, e5?.Type);
+        Assert.Equal(TLType.Array, e5?.Type);
 
         using var e6 = mixed?[6];
-        Assert.Equal(PaxType.Object, e6?.Type);
+        Assert.Equal(TLType.Object, e6?.Type);
     }
 }

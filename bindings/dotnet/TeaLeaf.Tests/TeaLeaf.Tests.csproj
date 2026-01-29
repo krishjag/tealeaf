@@ -18,13 +18,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pax\Pax.csproj" />
+    <ProjectReference Include="..\TeaLeaf\TeaLeaf.csproj" />
   </ItemGroup>
 
   <!-- Copy native library for tests -->
   <ItemGroup>
-    <None Include="..\..\..\target\release\pax_ffi.dll" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\..\target\release\pax_ffi.dll')" />
-    <None Include="..\..\..\target\debug\pax_ffi.dll" CopyToOutputDirectory="PreserveNewest" Condition="!Exists('..\..\..\target\release\pax_ffi.dll') And Exists('..\..\..\target\debug\pax_ffi.dll')" />
+    <None Include="..\..\..\target\release\tealeaf_ffi.dll" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\..\target\release\tealeaf_ffi.dll')" />
+    <None Include="..\..\..\target\debug\tealeaf_ffi.dll" CopyToOutputDirectory="PreserveNewest" Condition="!Exists('..\..\..\target\release\tealeaf_ffi.dll') And Exists('..\..\..\target\debug\tealeaf_ffi.dll')" />
   </ItemGroup>
 
 </Project>

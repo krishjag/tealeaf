@@ -1,5 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7dd956"/>
+      <stop offset="100%" stop-color="#4a9f2c"/>
+    </linearGradient>
+    <!-- Clip path to keep veins inside leaf -->
+    <clipPath id="leafClip">
+      <path d="M 0 -38
+               C 14 -30, 20 -15, 20 0
+               C 20 15, 14 30, 0 38
+               C -14 30, -20 15, -20 0
+               C -20 -15, -14 -30, 0 -38"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
   <rect width="128" height="128" rx="16" fill="#1e1e2e"/>
-  <text x="64" y="78" font-family="Consolas, monospace" font-size="48" font-weight="bold" fill="#89b4fa" text-anchor="middle">PAX</text>
-  <rect x="20" y="95" width="88" height="4" rx="2" fill="#a6e3a1"/>
+
+  <!-- Single leaf at 45 degree angle - centered (offset to account for rotation) -->
+  <g transform="translate(60, 52) rotate(-45)">
+    <!-- Leaf blade -->
+    <path d="M 0 -38
+             C 14 -30, 20 -15, 20 0
+             C 20 15, 14 30, 0 38
+             C -14 30, -20 15, -20 0
+             C -20 -15, -14 -30, 0 -38"
+          fill="url(#leafGrad)"/>
+
+    <!-- Veins clipped to leaf shape -->
+    <g clip-path="url(#leafClip)">
+      <!-- Midrib (central vein) -->
+      <path d="M 0 -36 L 0 36"
+            stroke="#2d5a18" stroke-width="2" fill="none" opacity="0.6"/>
+
+      <!-- Primary veins (left side) - curved to follow leaf shape -->
+      <path d="M 0 -26 Q -6 -24, -14 -22" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M 0 -14 Q -8 -12, -17 -6" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M 0 0 Q -8 2, -18 6" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M 0 14 Q -6 16, -14 22" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M 0 26 Q -4 28, -10 32" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+
+      <!-- Primary veins (right side) - curved to follow leaf shape -->
+      <path d="M 0 -26 Q 6 -24, 14 -22" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M 0 -14 Q 8 -12, 17 -6" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M 0 0 Q 8 2, 18 6" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M 0 14 Q 6 16, 14 22" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M 0 26 Q 4 28, 10 32" stroke="#2d5a18" stroke-width="1.2" fill="none" opacity="0.5"/>
+    </g>
+
+    <!-- Petiole (stem) - connected to leaf base -->
+    <path d="M 0 38 L 0 50"
+          stroke="#5a8a3a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Horizontal line -->
+  <rect x="20" y="100" width="88" height="3" rx="1.5" fill="#5a6577"/>
+
+  <!-- Text: tealeaf -->
+  <text x="64" y="120" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="600" fill="#a6adc8" text-anchor="middle">tealeaf</text>
 </svg>

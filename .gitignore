@@ -11,7 +11,7 @@ bindings/dotnet/**/.vs/
 *.nupkg
 
 # Native libraries (built artifacts)
-bindings/dotnet/Pax/runtimes/
+bindings/dotnet/TeaLeaf/runtimes/
 
 # IDE
 .idea/
@@ -41,8 +41,8 @@ results/
 *.temp
 *.log
 
-# Binary PAX files (keep examples and canonical test fixtures, ignore generated)
-*.paxb
-!examples/*.paxb
-!canonical/binary/*.paxb
-!canonical/errors/*.paxb
+# Binary TeaLeaf files (keep examples and canonical test fixtures, ignore generated)
+*.tlbx
+!examples/*.tlbx
+!canonical/binary/*.tlbx
+!canonical/errors/*.tlbx

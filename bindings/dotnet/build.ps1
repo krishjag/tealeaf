@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Build script for Pax .NET library with native dependencies.
+    Build script for TeaLeaf .NET library with native dependencies.
 
 .DESCRIPTION
     Compiles Rust native libraries for multiple platforms and packages
@@ -59,20 +59,20 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Resolve-Path (Join-Path $ScriptDir "../..")
 $DotnetDir = $ScriptDir
-$PaxDir = Join-Path $DotnetDir "Pax"
-$RuntimesDir = Join-Path $PaxDir "runtimes"
+$TeaLeafDir = Join-Path $DotnetDir "TeaLeaf"
+$RuntimesDir = Join-Path $TeaLeafDir "runtimes"
 
 # Rust target mappings: RID -> (Rust target, library name)
 $RustTargets = @{
-    "win-x64"          = @{ Target = "x86_64-pc-windows-msvc"; Library = "pax_ffi.dll" }
-    "win-x86"          = @{ Target = "i686-pc-windows-msvc"; Library = "pax_ffi.dll" }
-    "win-arm64"        = @{ Target = "aarch64-pc-windows-msvc"; Library = "pax_ffi.dll" }
-    "linux-x64"        = @{ Target = "x86_64-unknown-linux-gnu"; Library = "libpax_ffi.so" }
-    "linux-arm64"      = @{ Target = "aarch64-unknown-linux-gnu"; Library = "libpax_ffi.so" }
-    "linux-musl-x64"   = @{ Target = "x86_64-unknown-linux-musl"; Library = "libpax_ffi.so" }
-    "linux-musl-arm64" = @{ Target = "aarch64-unknown-linux-musl"; Library = "libpax_ffi.so" }
-    "osx-x64"          = @{ Target = "x86_64-apple-darwin"; Library = "libpax_ffi.dylib" }
-    "osx-arm64"        = @{ Target = "aarch64-apple-darwin"; Library = "libpax_ffi.dylib" }
+    "win-x64"          = @{ Target = "x86_64-pc-windows-msvc"; Library = "tealeaf_ffi.dll" }
+    "win-x86"          = @{ Target = "i686-pc-windows-msvc"; Library = "tealeaf_ffi.dll" }
+    "win-arm64"        = @{ Target = "aarch64-pc-windows-msvc"; Library = "tealeaf_ffi.dll" }
+    "linux-x64"        = @{ Target = "x86_64-unknown-linux-gnu"; Library = "libtealeaf_ffi.so" }
+    "linux-arm64"      = @{ Target = "aarch64-unknown-linux-gnu"; Library = "libtealeaf_ffi.so" }
+    "linux-musl-x64"   = @{ Target = "x86_64-unknown-linux-musl"; Library = "libtealeaf_ffi.so" }
+    "linux-musl-arm64" = @{ Target = "aarch64-unknown-linux-musl"; Library = "libtealeaf_ffi.so" }
+    "osx-x64"          = @{ Target = "x86_64-apple-darwin"; Library = "libtealeaf_ffi.dylib" }
+    "osx-arm64"        = @{ Target = "aarch64-apple-darwin"; Library = "libtealeaf_ffi.dylib" }
 }
 
 # All supported RIDs
@@ -149,7 +149,7 @@ function Build-RustLibrary {
     }
 
     # Build
-    $cargoArgs = @("build", "--package", "pax-ffi", "--target", $rustTarget)
+    $cargoArgs = @("build", "--package", "tealeaf-ffi", "--target", $rustTarget)
     if ($Configuration -eq "Release") {
         $cargoArgs += "--release"
     }
@@ -184,7 +184,7 @@ function Build-RustLibrary {
 }
 
 # Main build process
-Write-Step "Pax .NET Build Script"
+Write-Step "TeaLeaf .NET Build Script"
 Write-Host "Configuration: $Configuration"
 Write-Host "Target RIDs: $($RidsToBuild -join ', ')"
 
@@ -233,7 +233,7 @@ if (-not $SkipRust) {
 # Build .NET project
 Write-Step "Building .NET Project"
 
-dotnet build $PaxDir -c $Configuration
+dotnet build $TeaLeafDir -c $Configuration
 if ($LASTEXITCODE -ne 0) {
     throw ".NET build failed"
 }
@@ -243,10 +243,10 @@ if ($Test) {
     Write-Step "Running Tests"
 
     # Ensure native library is in test output directory
-    $testProject = Join-Path $DotnetDir "Pax.Tests"
+    $testProject = Join-Path $DotnetDir "TeaLeaf.Tests"
     if (Test-Path $testProject) {
         # Find the first available native library
-        $nativeLib = Get-ChildItem -Path $RuntimesDir -Recurse -Filter "pax_ffi.dll" | Select-Object -First 1
+        $nativeLib = Get-ChildItem -Path $RuntimesDir -Recurse -Filter "tealeaf_ffi.dll" | Select-Object -First 1
         if ($nativeLib) {
             $testBinDir = Join-Path $testProject "bin/$Configuration/net8.0"
             if (Test-Path $testBinDir) {
@@ -274,7 +274,7 @@ if ($Pack) {
     $artifactsDir = Join-Path $DotnetDir "artifacts"
     New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
 
-    dotnet pack $PaxDir -c $Configuration --no-build -o $artifactsDir
+    dotnet pack $TeaLeafDir -c $Configuration --no-build -o $artifactsDir
     if ($LASTEXITCODE -ne 0) {
         throw "NuGet pack failed"
     }
@@ -293,7 +293,7 @@ Write-Host "`nNative libraries included:"
 $libs = Get-ChildItem -Path $RuntimesDir -Recurse -File -ErrorAction SilentlyContinue
 if ($libs) {
     foreach ($lib in $libs) {
-        $relativePath = $lib.FullName.Replace($PaxDir + "\", "").Replace($PaxDir + "/", "")
+        $relativePath = $lib.FullName.Replace($TeaLeafDir + "\", "").Replace($TeaLeafDir + "/", "")
         Write-Info $relativePath
     }
 } else {

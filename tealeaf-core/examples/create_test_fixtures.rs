@@ -6,12 +6,12 @@
 //! for the same binary input. Each fixture has a corresponding .json file
 //! with the expected JSON output.
 
-use pax::{Pax, Value};
+use tealeaf::{TeaLeaf, Value};
 use std::collections::HashMap;
 use std::fs;
 
 fn main() {
-    let fixtures_dir = std::path::Path::new("bindings/dotnet/Pax.Tests/fixtures");
+    let fixtures_dir = std::path::Path::new("bindings/dotnet/TeaLeaf.Tests/fixtures");
     fs::create_dir_all(fixtures_dir).expect("Failed to create fixtures dir");
 
     // Create fixture with bytes
@@ -26,7 +26,7 @@ fn main() {
     println!("Test fixtures created in {:?}", fixtures_dir);
     println!("\nTo verify cross-language parity:");
     println!("  1. Run .NET tests: dotnet test");
-    println!("  2. Run CLI test: cargo run -- tojson fixtures/comprehensive.paxb");
+    println!("  2. Run CLI test: cargo run -- tojson fixtures/comprehensive.tlbx");
     println!("  3. Compare outputs match comprehensive.expected.json");
 }
 
@@ -36,12 +36,12 @@ fn create_bytes_fixture(dir: &std::path::Path) {
     data.insert("empty_bytes".to_string(), Value::Bytes(vec![]));
     data.insert("name".to_string(), Value::String("test".to_string()));
 
-    let doc = Pax {
+    let doc = TeaLeaf {
         data,
         schemas: HashMap::new(),
     };
 
-    let path = dir.join("bytes_test.paxb");
+    let path = dir.join("bytes_test.tlbx");
     doc.compile(&path, false).expect("Failed to compile bytes fixture");
     println!("Created: {:?}", path);
 }
@@ -51,12 +51,12 @@ fn create_timestamp_fixture(dir: &std::path::Path) {
     data.insert("created".to_string(), Value::Timestamp(1705315800000)); // 2024-01-15T10:30:00Z
     data.insert("epoch".to_string(), Value::Timestamp(0)); // 1970-01-01T00:00:00Z
 
-    let doc = Pax {
+    let doc = TeaLeaf {
         data,
         schemas: HashMap::new(),
     };
 
-    let path = dir.join("timestamp_test.paxb");
+    let path = dir.join("timestamp_test.tlbx");
     doc.compile(&path, false).expect("Failed to compile timestamp fixture");
     println!("Created: {:?}", path);
 }
@@ -111,12 +111,12 @@ fn create_comprehensive_fixture(dir: &std::path::Path) {
         (Value::Int(2), Value::String("two".to_string())),
     ]));
 
-    let doc = Pax {
+    let doc = TeaLeaf {
         data,
         schemas: HashMap::new(),
     };
 
-    let path = dir.join("comprehensive.paxb");
+    let path = dir.join("comprehensive.tlbx");
     doc.compile(&path, false).expect("Failed to compile comprehensive fixture");
     println!("Created: {:?}", path);
 

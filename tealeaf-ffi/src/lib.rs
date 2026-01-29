@@ -1,9 +1,9 @@
-//! C FFI bindings for the Pax format library
+//! C FFI bindings for the TeaLeaf format library
 //!
 //! This crate provides a C-compatible API for use from other languages
 //! like C#, Python, and Node.js.
 
-use pax::{Pax, Value, Reader, Writer, dumps};
+use tealeaf::{TeaLeaf, Value, Reader, Writer, dumps};
 use std::cell::RefCell;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -32,9 +32,9 @@ fn clear_last_error() {
 }
 
 /// Get the last error message.
-/// Returns NULL if no error. Caller must free with pax_string_free.
+/// Returns NULL if no error. Caller must free with tl_string_free.
 #[no_mangle]
-pub extern "C" fn pax_get_last_error() -> *mut c_char {
+pub extern "C" fn tl_get_last_error() -> *mut c_char {
     LAST_ERROR.with(|e| {
         match e.borrow().as_ref() {
             Some(msg) => CString::new(msg.as_str())
@@ -47,7 +47,7 @@ pub extern "C" fn pax_get_last_error() -> *mut c_char {
 
 /// Clear the last error message.
 #[no_mangle]
-pub extern "C" fn pax_clear_error() {
+pub extern "C" fn tl_clear_error() {
     clear_last_error();
 }
 
@@ -55,35 +55,35 @@ pub extern "C" fn pax_clear_error() {
 // Opaque Types
 // =============================================================================
 
-/// Opaque handle to a Pax document
-pub struct PaxDocument {
-    inner: Pax,
+/// Opaque handle to a TeaLeaf document
+pub struct TLDocument {
+    inner: TeaLeaf,
 }
 
-/// Opaque handle to a Pax value
-pub struct PaxValue {
+/// Opaque handle to a TeaLeaf value
+pub struct TLValue {
     inner: Value,
 }
 
 /// Opaque handle to a binary reader
-pub struct PaxReader {
+pub struct TLReader {
     inner: Reader,
 }
 
 /// Opaque handle to a binary writer
 #[allow(dead_code)]
-pub struct PaxWriter {
+pub struct TLWriter {
     inner: Writer,
 }
 
 /// Result type for FFI operations
 #[repr(C)]
-pub struct PaxResult {
+pub struct TLResult {
     pub success: bool,
     pub error_message: *mut c_char,
 }
 
-impl PaxResult {
+impl TLResult {
     fn ok() -> Self {
         Self {
             success: true,
@@ -104,14 +104,14 @@ impl PaxResult {
 // Document API
 // =============================================================================
 
-/// Parse a Pax text document from a string.
-/// Returns NULL on error. Use pax_get_last_error() for error details.
+/// Parse a TeaLeaf text document from a string.
+/// Returns NULL on error. Use tl_get_last_error() for error details.
 #[no_mangle]
-pub unsafe extern "C" fn pax_parse(text: *const c_char) -> *mut PaxDocument {
+pub unsafe extern "C" fn tl_parse(text: *const c_char) -> *mut TLDocument {
     clear_last_error();
 
     if text.is_null() {
-        set_last_error("Null pointer passed to pax_parse".to_string());
+        set_last_error("Null pointer passed to tl_parse".to_string());
         return ptr::null_mut();
     }
 
@@ -123,8 +123,8 @@ pub unsafe extern "C" fn pax_parse(text: *const c_char) -> *mut PaxDocument {
         }
     };
 
-    match Pax::parse(c_str) {
-        Ok(doc) => Box::into_raw(Box::new(PaxDocument { inner: doc })),
+    match TeaLeaf::parse(c_str) {
+        Ok(doc) => Box::into_raw(Box::new(TLDocument { inner: doc })),
         Err(e) => {
             set_last_error(format!("Parse error: {}", e));
             ptr::null_mut()
@@ -132,14 +132,14 @@ pub unsafe extern "C" fn pax_parse(text: *const c_char) -> *mut PaxDocument {
     }
 }
 
-/// Parse a Pax text document from a file path.
-/// Returns NULL on error. Use pax_get_last_error() for error details.
+/// Parse a TeaLeaf text document from a file path.
+/// Returns NULL on error. Use tl_get_last_error() for error details.
 #[no_mangle]
-pub unsafe extern "C" fn pax_parse_file(path: *const c_char) -> *mut PaxDocument {
+pub unsafe extern "C" fn tl_parse_file(path: *const c_char) -> *mut TLDocument {
     clear_last_error();
 
     if path.is_null() {
-        set_last_error("Null pointer passed to pax_parse_file".to_string());
+        set_last_error("Null pointer passed to tl_parse_file".to_string());
         return ptr::null_mut();
     }
 
@@ -151,8 +151,8 @@ pub unsafe extern "C" fn pax_parse_file(path: *const c_char) -> *mut PaxDocument
         }
     };
 
-    match Pax::load(path_str) {
-        Ok(doc) => Box::into_raw(Box::new(PaxDocument { inner: doc })),
+    match TeaLeaf::load(path_str) {
+        Ok(doc) => Box::into_raw(Box::new(TLDocument { inner: doc })),
         Err(e) => {
             set_last_error(format!("Failed to load '{}': {}", path_str, e));
             ptr::null_mut()
@@ -160,9 +160,9 @@ pub unsafe extern "C" fn pax_parse_file(path: *const c_char) -> *mut PaxDocument
     }
 }
 
-/// Free a Pax document.
+/// Free a TeaLeaf document.
 #[no_mangle]
-pub unsafe extern "C" fn pax_document_free(doc: *mut PaxDocument) {
+pub unsafe extern "C" fn tl_document_free(doc: *mut TLDocument) {
     if !doc.is_null() {
         drop(Box::from_raw(doc));
     }
@@ -171,10 +171,10 @@ pub unsafe extern "C" fn pax_document_free(doc: *mut PaxDocument) {
 /// Get a value from the document by key.
 /// Returns NULL if the key doesn't exist.
 #[no_mangle]
-pub unsafe extern "C" fn pax_document_get(
-    doc: *const PaxDocument,
+pub unsafe extern "C" fn tl_document_get(
+    doc: *const TLDocument,
     key: *const c_char,
-) -> *mut PaxValue {
+) -> *mut TLValue {
     if doc.is_null() || key.is_null() {
         return ptr::null_mut();
     }
@@ -185,15 +185,15 @@ pub unsafe extern "C" fn pax_document_get(
     };
 
     match (*doc).inner.get(key_str) {
-        Some(value) => Box::into_raw(Box::new(PaxValue { inner: value.clone() })),
+        Some(value) => Box::into_raw(Box::new(TLValue { inner: value.clone() })),
         None => ptr::null_mut(),
     }
 }
 
 /// Get all keys in the document.
-/// Returns a NULL-terminated array of strings. Caller must free with pax_string_array_free.
+/// Returns a NULL-terminated array of strings. Caller must free with tl_string_array_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_document_keys(doc: *const PaxDocument) -> *mut *mut c_char {
+pub unsafe extern "C" fn tl_document_keys(doc: *const TLDocument) -> *mut *mut c_char {
     if doc.is_null() {
         return ptr::null_mut();
     }
@@ -211,27 +211,27 @@ pub unsafe extern "C" fn pax_document_keys(doc: *const PaxDocument) -> *mut *mut
     ptr
 }
 
-/// Convert document to Pax text format with schema definitions.
+/// Convert document to TeaLeaf text format with schema definitions.
 /// This is the default output format that includes @struct definitions.
-/// Caller must free the returned string with pax_string_free.
+/// Caller must free the returned string with tl_string_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_document_to_text(doc: *const PaxDocument) -> *mut c_char {
+pub unsafe extern "C" fn tl_document_to_text(doc: *const TLDocument) -> *mut c_char {
     if doc.is_null() {
         return ptr::null_mut();
     }
 
-    let text = (*doc).inner.to_pax_with_schemas();
+    let text = (*doc).inner.to_tl_with_schemas();
     match CString::new(text) {
         Ok(s) => s.into_raw(),
         Err(_) => ptr::null_mut(),
     }
 }
 
-/// Convert document to Pax text format without schema definitions (data only).
+/// Convert document to TeaLeaf text format without schema definitions (data only).
 /// Use this when you only want the data portion without @struct definitions.
-/// Caller must free the returned string with pax_string_free.
+/// Caller must free the returned string with tl_string_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_document_to_text_data_only(doc: *const PaxDocument) -> *mut c_char {
+pub unsafe extern "C" fn tl_document_to_text_data_only(doc: *const TLDocument) -> *mut c_char {
     if doc.is_null() {
         return ptr::null_mut();
     }
@@ -245,23 +245,23 @@ pub unsafe extern "C" fn pax_document_to_text_data_only(doc: *const PaxDocument)
 
 /// Compile document to binary format and write to file.
 #[no_mangle]
-pub unsafe extern "C" fn pax_document_compile(
-    doc: *const PaxDocument,
+pub unsafe extern "C" fn tl_document_compile(
+    doc: *const TLDocument,
     path: *const c_char,
     compress: bool,
-) -> PaxResult {
+) -> TLResult {
     if doc.is_null() || path.is_null() {
-        return PaxResult::err("Null pointer");
+        return TLResult::err("Null pointer");
     }
 
     let path_str = match CStr::from_ptr(path).to_str() {
         Ok(s) => s,
-        Err(_) => return PaxResult::err("Invalid path encoding"),
+        Err(_) => return TLResult::err("Invalid path encoding"),
     };
 
     match (*doc).inner.compile(path_str, compress) {
-        Ok(_) => PaxResult::ok(),
-        Err(e) => PaxResult::err(&e.to_string()),
+        Ok(_) => TLResult::ok(),
+        Err(e) => TLResult::err(&e.to_string()),
     }
 }
 
@@ -269,15 +269,15 @@ pub unsafe extern "C" fn pax_document_compile(
 // JSON Conversion API
 // =============================================================================
 
-/// Parse a JSON string to create a Pax document with automatic schema inference.
+/// Parse a JSON string to create a TeaLeaf document with automatic schema inference.
 /// Detects uniform object arrays and creates @struct definitions.
-/// Returns NULL on error. Use pax_get_last_error() for error details.
+/// Returns NULL on error. Use tl_get_last_error() for error details.
 #[no_mangle]
-pub unsafe extern "C" fn pax_document_from_json(json: *const c_char) -> *mut PaxDocument {
+pub unsafe extern "C" fn tl_document_from_json(json: *const c_char) -> *mut TLDocument {
     clear_last_error();
 
     if json.is_null() {
-        set_last_error("Null pointer passed to pax_document_from_json".to_string());
+        set_last_error("Null pointer passed to tl_document_from_json".to_string());
         return ptr::null_mut();
     }
 
@@ -289,8 +289,8 @@ pub unsafe extern "C" fn pax_document_from_json(json: *const c_char) -> *mut Pax
         }
     };
 
-    match Pax::from_json_with_schemas(json_str) {
-        Ok(doc) => Box::into_raw(Box::new(PaxDocument { inner: doc })),
+    match TeaLeaf::from_json_with_schemas(json_str) {
+        Ok(doc) => Box::into_raw(Box::new(TLDocument { inner: doc })),
         Err(e) => {
             set_last_error(format!("JSON parse error: {}", e));
             ptr::null_mut()
@@ -298,15 +298,15 @@ pub unsafe extern "C" fn pax_document_from_json(json: *const c_char) -> *mut Pax
     }
 }
 
-/// Convert a Pax document to pretty-printed JSON.
-/// Caller must free the returned string with pax_string_free.
-/// Returns NULL on error. Use pax_get_last_error() for error details.
+/// Convert a TeaLeaf document to pretty-printed JSON.
+/// Caller must free the returned string with tl_string_free.
+/// Returns NULL on error. Use tl_get_last_error() for error details.
 #[no_mangle]
-pub unsafe extern "C" fn pax_document_to_json(doc: *const PaxDocument) -> *mut c_char {
+pub unsafe extern "C" fn tl_document_to_json(doc: *const TLDocument) -> *mut c_char {
     clear_last_error();
 
     if doc.is_null() {
-        set_last_error("Null pointer passed to pax_document_to_json".to_string());
+        set_last_error("Null pointer passed to tl_document_to_json".to_string());
         return ptr::null_mut();
     }
 
@@ -322,15 +322,15 @@ pub unsafe extern "C" fn pax_document_to_json(doc: *const PaxDocument) -> *mut c
     }
 }
 
-/// Convert a Pax document to compact JSON (no extra whitespace).
-/// Caller must free the returned string with pax_string_free.
-/// Returns NULL on error. Use pax_get_last_error() for error details.
+/// Convert a TeaLeaf document to compact JSON (no extra whitespace).
+/// Caller must free the returned string with tl_string_free.
+/// Returns NULL on error. Use tl_get_last_error() for error details.
 #[no_mangle]
-pub unsafe extern "C" fn pax_document_to_json_compact(doc: *const PaxDocument) -> *mut c_char {
+pub unsafe extern "C" fn tl_document_to_json_compact(doc: *const TLDocument) -> *mut c_char {
     clear_last_error();
 
     if doc.is_null() {
-        set_last_error("Null pointer passed to pax_document_to_json_compact".to_string());
+        set_last_error("Null pointer passed to tl_document_to_json_compact".to_string());
         return ptr::null_mut();
     }
 
@@ -352,7 +352,7 @@ pub unsafe extern "C" fn pax_document_to_json_compact(doc: *const PaxDocument) -
 
 /// Value type enumeration
 #[repr(C)]
-pub enum PaxValueType {
+pub enum TLValueType {
     Null = 0,
     Bool = 1,
     Int = 2,
@@ -370,31 +370,31 @@ pub enum PaxValueType {
 
 /// Get the type of a value.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_type(value: *const PaxValue) -> PaxValueType {
+pub unsafe extern "C" fn tl_value_type(value: *const TLValue) -> TLValueType {
     if value.is_null() {
-        return PaxValueType::Null;
+        return TLValueType::Null;
     }
 
     match &(*value).inner {
-        Value::Null => PaxValueType::Null,
-        Value::Bool(_) => PaxValueType::Bool,
-        Value::Int(_) => PaxValueType::Int,
-        Value::UInt(_) => PaxValueType::UInt,
-        Value::Float(_) => PaxValueType::Float,
-        Value::String(_) => PaxValueType::String,
-        Value::Bytes(_) => PaxValueType::Bytes,
-        Value::Array(_) => PaxValueType::Array,
-        Value::Object(_) => PaxValueType::Object,
-        Value::Map(_) => PaxValueType::Map,
-        Value::Ref(_) => PaxValueType::Ref,
-        Value::Tagged(_, _) => PaxValueType::Tagged,
-        Value::Timestamp(_) => PaxValueType::Timestamp,
+        Value::Null => TLValueType::Null,
+        Value::Bool(_) => TLValueType::Bool,
+        Value::Int(_) => TLValueType::Int,
+        Value::UInt(_) => TLValueType::UInt,
+        Value::Float(_) => TLValueType::Float,
+        Value::String(_) => TLValueType::String,
+        Value::Bytes(_) => TLValueType::Bytes,
+        Value::Array(_) => TLValueType::Array,
+        Value::Object(_) => TLValueType::Object,
+        Value::Map(_) => TLValueType::Map,
+        Value::Ref(_) => TLValueType::Ref,
+        Value::Tagged(_, _) => TLValueType::Tagged,
+        Value::Timestamp(_) => TLValueType::Timestamp,
     }
 }
 
-/// Free a Pax value.
+/// Free a TeaLeaf value.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_free(value: *mut PaxValue) {
+pub unsafe extern "C" fn tl_value_free(value: *mut TLValue) {
     if !value.is_null() {
         drop(Box::from_raw(value));
     }
@@ -402,7 +402,7 @@ pub unsafe extern "C" fn pax_value_free(value: *mut PaxValue) {
 
 /// Get boolean value. Returns false if not a bool.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_as_bool(value: *const PaxValue) -> bool {
+pub unsafe extern "C" fn tl_value_as_bool(value: *const TLValue) -> bool {
     if value.is_null() {
         return false;
     }
@@ -411,7 +411,7 @@ pub unsafe extern "C" fn pax_value_as_bool(value: *const PaxValue) -> bool {
 
 /// Get integer value. Returns 0 if not an int.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_as_int(value: *const PaxValue) -> i64 {
+pub unsafe extern "C" fn tl_value_as_int(value: *const TLValue) -> i64 {
     if value.is_null() {
         return 0;
     }
@@ -420,7 +420,7 @@ pub unsafe extern "C" fn pax_value_as_int(value: *const PaxValue) -> i64 {
 
 /// Get unsigned integer value. Returns 0 if not a uint.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_as_uint(value: *const PaxValue) -> u64 {
+pub unsafe extern "C" fn tl_value_as_uint(value: *const TLValue) -> u64 {
     if value.is_null() {
         return 0;
     }
@@ -429,7 +429,7 @@ pub unsafe extern "C" fn pax_value_as_uint(value: *const PaxValue) -> u64 {
 
 /// Get float value. Returns 0.0 if not a float.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_as_float(value: *const PaxValue) -> f64 {
+pub unsafe extern "C" fn tl_value_as_float(value: *const TLValue) -> f64 {
     if value.is_null() {
         return 0.0;
     }
@@ -437,9 +437,9 @@ pub unsafe extern "C" fn pax_value_as_float(value: *const PaxValue) -> f64 {
 }
 
 /// Get string value. Returns NULL if not a string.
-/// Caller must free with pax_string_free.
+/// Caller must free with tl_string_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_as_string(value: *const PaxValue) -> *mut c_char {
+pub unsafe extern "C" fn tl_value_as_string(value: *const TLValue) -> *mut c_char {
     if value.is_null() {
         return ptr::null_mut();
     }
@@ -451,7 +451,7 @@ pub unsafe extern "C" fn pax_value_as_string(value: *const PaxValue) -> *mut c_c
 
 /// Get timestamp value (Unix milliseconds). Returns 0 if not a timestamp.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_as_timestamp(value: *const PaxValue) -> i64 {
+pub unsafe extern "C" fn tl_value_as_timestamp(value: *const TLValue) -> i64 {
     if value.is_null() {
         return 0;
     }
@@ -460,7 +460,7 @@ pub unsafe extern "C" fn pax_value_as_timestamp(value: *const PaxValue) -> i64 {
 
 /// Get bytes length. Returns 0 if not bytes.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_bytes_len(value: *const PaxValue) -> usize {
+pub unsafe extern "C" fn tl_value_bytes_len(value: *const TLValue) -> usize {
     if value.is_null() {
         return 0;
     }
@@ -468,10 +468,10 @@ pub unsafe extern "C" fn pax_value_bytes_len(value: *const PaxValue) -> usize {
 }
 
 /// Get bytes data pointer. Returns NULL if not bytes.
-/// The returned pointer is valid only while the PaxValue is alive.
+/// The returned pointer is valid only while the TLValue is alive.
 /// Do not free this pointer directly.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_bytes_data(value: *const PaxValue) -> *const u8 {
+pub unsafe extern "C" fn tl_value_bytes_data(value: *const TLValue) -> *const u8 {
     if value.is_null() {
         return ptr::null();
     }
@@ -482,9 +482,9 @@ pub unsafe extern "C" fn pax_value_bytes_data(value: *const PaxValue) -> *const 
 }
 
 /// Get reference name. Returns NULL if not a ref.
-/// Caller must free with pax_string_free.
+/// Caller must free with tl_string_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_ref_name(value: *const PaxValue) -> *mut c_char {
+pub unsafe extern "C" fn tl_value_ref_name(value: *const TLValue) -> *mut c_char {
     if value.is_null() {
         return ptr::null_mut();
     }
@@ -495,9 +495,9 @@ pub unsafe extern "C" fn pax_value_ref_name(value: *const PaxValue) -> *mut c_ch
 }
 
 /// Get tag name from a tagged value. Returns NULL if not tagged.
-/// Caller must free with pax_string_free.
+/// Caller must free with tl_string_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_tag_name(value: *const PaxValue) -> *mut c_char {
+pub unsafe extern "C" fn tl_value_tag_name(value: *const TLValue) -> *mut c_char {
     if value.is_null() {
         return ptr::null_mut();
     }
@@ -508,21 +508,21 @@ pub unsafe extern "C" fn pax_value_tag_name(value: *const PaxValue) -> *mut c_ch
 }
 
 /// Get inner value from a tagged value. Returns NULL if not tagged.
-/// Caller must free with pax_value_free.
+/// Caller must free with tl_value_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_tag_value(value: *const PaxValue) -> *mut PaxValue {
+pub unsafe extern "C" fn tl_value_tag_value(value: *const TLValue) -> *mut TLValue {
     if value.is_null() {
         return ptr::null_mut();
     }
     match (*value).inner.as_tagged() {
-        Some((_, inner)) => Box::into_raw(Box::new(PaxValue { inner: inner.clone() })),
+        Some((_, inner)) => Box::into_raw(Box::new(TLValue { inner: inner.clone() })),
         None => ptr::null_mut(),
     }
 }
 
 /// Get map length. Returns 0 if not a map.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_map_len(value: *const PaxValue) -> usize {
+pub unsafe extern "C" fn tl_value_map_len(value: *const TLValue) -> usize {
     if value.is_null() {
         return 0;
     }
@@ -530,30 +530,30 @@ pub unsafe extern "C" fn pax_value_map_len(value: *const PaxValue) -> usize {
 }
 
 /// Get map entry key by index. Returns NULL if out of bounds or not a map.
-/// Caller must free with pax_value_free.
+/// Caller must free with tl_value_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_map_get_key(value: *const PaxValue, index: usize) -> *mut PaxValue {
+pub unsafe extern "C" fn tl_value_map_get_key(value: *const TLValue, index: usize) -> *mut TLValue {
     if value.is_null() {
         return ptr::null_mut();
     }
     match (*value).inner.as_map() {
         Some(m) if index < m.len() => {
-            Box::into_raw(Box::new(PaxValue { inner: m[index].0.clone() }))
+            Box::into_raw(Box::new(TLValue { inner: m[index].0.clone() }))
         }
         _ => ptr::null_mut(),
     }
 }
 
 /// Get map entry value by index. Returns NULL if out of bounds or not a map.
-/// Caller must free with pax_value_free.
+/// Caller must free with tl_value_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_map_get_value(value: *const PaxValue, index: usize) -> *mut PaxValue {
+pub unsafe extern "C" fn tl_value_map_get_value(value: *const TLValue, index: usize) -> *mut TLValue {
     if value.is_null() {
         return ptr::null_mut();
     }
     match (*value).inner.as_map() {
         Some(m) if index < m.len() => {
-            Box::into_raw(Box::new(PaxValue { inner: m[index].1.clone() }))
+            Box::into_raw(Box::new(TLValue { inner: m[index].1.clone() }))
         }
         _ => ptr::null_mut(),
     }
@@ -561,7 +561,7 @@ pub unsafe extern "C" fn pax_value_map_get_value(value: *const PaxValue, index: 
 
 /// Get array length. Returns 0 if not an array.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_array_len(value: *const PaxValue) -> usize {
+pub unsafe extern "C" fn tl_value_array_len(value: *const TLValue) -> usize {
     if value.is_null() {
         return 0;
     }
@@ -570,16 +570,16 @@ pub unsafe extern "C" fn pax_value_array_len(value: *const PaxValue) -> usize {
 
 /// Get array element by index. Returns NULL if out of bounds or not an array.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_array_get(
-    value: *const PaxValue,
+pub unsafe extern "C" fn tl_value_array_get(
+    value: *const TLValue,
     index: usize,
-) -> *mut PaxValue {
+) -> *mut TLValue {
     if value.is_null() {
         return ptr::null_mut();
     }
     match (*value).inner.as_array() {
         Some(arr) if index < arr.len() => {
-            Box::into_raw(Box::new(PaxValue { inner: arr[index].clone() }))
+            Box::into_raw(Box::new(TLValue { inner: arr[index].clone() }))
         }
         _ => ptr::null_mut(),
     }
@@ -587,10 +587,10 @@ pub unsafe extern "C" fn pax_value_array_get(
 
 /// Get object field by key. Returns NULL if not found or not an object.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_object_get(
-    value: *const PaxValue,
+pub unsafe extern "C" fn tl_value_object_get(
+    value: *const TLValue,
     key: *const c_char,
-) -> *mut PaxValue {
+) -> *mut TLValue {
     if value.is_null() || key.is_null() {
         return ptr::null_mut();
     }
@@ -602,7 +602,7 @@ pub unsafe extern "C" fn pax_value_object_get(
 
     match (*value).inner.as_object() {
         Some(obj) => match obj.get(key_str) {
-            Some(v) => Box::into_raw(Box::new(PaxValue { inner: v.clone() })),
+            Some(v) => Box::into_raw(Box::new(TLValue { inner: v.clone() })),
             None => ptr::null_mut(),
         },
         None => ptr::null_mut(),
@@ -610,9 +610,9 @@ pub unsafe extern "C" fn pax_value_object_get(
 }
 
 /// Get object keys. Returns NULL-terminated array.
-/// Caller must free with pax_string_array_free.
+/// Caller must free with tl_string_array_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_value_object_keys(value: *const PaxValue) -> *mut *mut c_char {
+pub unsafe extern "C" fn tl_value_object_keys(value: *const TLValue) -> *mut *mut c_char {
     if value.is_null() {
         return ptr::null_mut();
     }
@@ -637,14 +637,14 @@ pub unsafe extern "C" fn pax_value_object_keys(value: *const PaxValue) -> *mut *
 // Binary Reader API
 // =============================================================================
 
-/// Open a binary Pax file for reading (reads file into memory).
-/// Returns NULL on error. Use pax_get_last_error() for error details.
+/// Open a binary TeaLeaf file for reading (reads file into memory).
+/// Returns NULL on error. Use tl_get_last_error() for error details.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_open(path: *const c_char) -> *mut PaxReader {
+pub unsafe extern "C" fn tl_reader_open(path: *const c_char) -> *mut TLReader {
     clear_last_error();
 
     if path.is_null() {
-        set_last_error("Null pointer passed to pax_reader_open".to_string());
+        set_last_error("Null pointer passed to tl_reader_open".to_string());
         return ptr::null_mut();
     }
 
@@ -657,7 +657,7 @@ pub unsafe extern "C" fn pax_reader_open(path: *const c_char) -> *mut PaxReader 
     };
 
     match Reader::open(path_str) {
-        Ok(reader) => Box::into_raw(Box::new(PaxReader { inner: reader })),
+        Ok(reader) => Box::into_raw(Box::new(TLReader { inner: reader })),
         Err(e) => {
             set_last_error(format!("Failed to open '{}': {}", path_str, e));
             ptr::null_mut()
@@ -665,18 +665,18 @@ pub unsafe extern "C" fn pax_reader_open(path: *const c_char) -> *mut PaxReader 
     }
 }
 
-/// Open a binary Pax file with memory mapping (zero-copy access).
+/// Open a binary TeaLeaf file with memory mapping (zero-copy access).
 /// This is more efficient for large files as the OS handles paging.
-/// Returns NULL on error. Use pax_get_last_error() for error details.
+/// Returns NULL on error. Use tl_get_last_error() for error details.
 ///
 /// # Safety
 /// The file must not be modified while the reader is open.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_open_mmap(path: *const c_char) -> *mut PaxReader {
+pub unsafe extern "C" fn tl_reader_open_mmap(path: *const c_char) -> *mut TLReader {
     clear_last_error();
 
     if path.is_null() {
-        set_last_error("Null pointer passed to pax_reader_open_mmap".to_string());
+        set_last_error("Null pointer passed to tl_reader_open_mmap".to_string());
         return ptr::null_mut();
     }
 
@@ -689,7 +689,7 @@ pub unsafe extern "C" fn pax_reader_open_mmap(path: *const c_char) -> *mut PaxRe
     };
 
     match Reader::open_mmap(path_str) {
-        Ok(reader) => Box::into_raw(Box::new(PaxReader { inner: reader })),
+        Ok(reader) => Box::into_raw(Box::new(TLReader { inner: reader })),
         Err(e) => {
             set_last_error(format!("Failed to memory-map '{}': {}", path_str, e));
             ptr::null_mut()
@@ -699,7 +699,7 @@ pub unsafe extern "C" fn pax_reader_open_mmap(path: *const c_char) -> *mut PaxRe
 
 /// Free a binary reader.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_free(reader: *mut PaxReader) {
+pub unsafe extern "C" fn tl_reader_free(reader: *mut TLReader) {
     if !reader.is_null() {
         drop(Box::from_raw(reader));
     }
@@ -707,10 +707,10 @@ pub unsafe extern "C" fn pax_reader_free(reader: *mut PaxReader) {
 
 /// Get a value from a binary file by key.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_get(
-    reader: *const PaxReader,
+pub unsafe extern "C" fn tl_reader_get(
+    reader: *const TLReader,
     key: *const c_char,
-) -> *mut PaxValue {
+) -> *mut TLValue {
     if reader.is_null() || key.is_null() {
         return ptr::null_mut();
     }
@@ -721,14 +721,14 @@ pub unsafe extern "C" fn pax_reader_get(
     };
 
     match (*reader).inner.get(key_str) {
-        Ok(value) => Box::into_raw(Box::new(PaxValue { inner: value })),
+        Ok(value) => Box::into_raw(Box::new(TLValue { inner: value })),
         Err(_) => ptr::null_mut(),
     }
 }
 
 /// Get all keys from a binary file.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_keys(reader: *const PaxReader) -> *mut *mut c_char {
+pub unsafe extern "C" fn tl_reader_keys(reader: *const TLReader) -> *mut *mut c_char {
     if reader.is_null() {
         return ptr::null_mut();
     }
@@ -751,7 +751,7 @@ pub unsafe extern "C" fn pax_reader_keys(reader: *const PaxReader) -> *mut *mut 
 
 /// Get the number of schemas in a binary file.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_schema_count(reader: *const PaxReader) -> usize {
+pub unsafe extern "C" fn tl_reader_schema_count(reader: *const TLReader) -> usize {
     if reader.is_null() {
         return 0;
     }
@@ -759,10 +759,10 @@ pub unsafe extern "C" fn pax_reader_schema_count(reader: *const PaxReader) -> us
 }
 
 /// Get a schema name by index.
-/// Caller must free the returned string with pax_string_free.
+/// Caller must free the returned string with tl_string_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_schema_name(
-    reader: *const PaxReader,
+pub unsafe extern "C" fn tl_reader_schema_name(
+    reader: *const TLReader,
     index: usize,
 ) -> *mut c_char {
     if reader.is_null() {
@@ -778,8 +778,8 @@ pub unsafe extern "C" fn pax_reader_schema_name(
 
 /// Get the number of fields in a schema.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_schema_field_count(
-    reader: *const PaxReader,
+pub unsafe extern "C" fn tl_reader_schema_field_count(
+    reader: *const TLReader,
     schema_index: usize,
 ) -> usize {
     if reader.is_null() {
@@ -792,10 +792,10 @@ pub unsafe extern "C" fn pax_reader_schema_field_count(
 }
 
 /// Get a field name from a schema.
-/// Caller must free the returned string with pax_string_free.
+/// Caller must free the returned string with tl_string_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_schema_field_name(
-    reader: *const PaxReader,
+pub unsafe extern "C" fn tl_reader_schema_field_name(
+    reader: *const TLReader,
     schema_index: usize,
     field_index: usize,
 ) -> *mut c_char {
@@ -815,10 +815,10 @@ pub unsafe extern "C" fn pax_reader_schema_field_name(
 }
 
 /// Get a field's base type from a schema.
-/// Caller must free the returned string with pax_string_free.
+/// Caller must free the returned string with tl_string_free.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_schema_field_type(
-    reader: *const PaxReader,
+pub unsafe extern "C" fn tl_reader_schema_field_type(
+    reader: *const TLReader,
     schema_index: usize,
     field_index: usize,
 ) -> *mut c_char {
@@ -839,8 +839,8 @@ pub unsafe extern "C" fn pax_reader_schema_field_type(
 
 /// Check if a field is nullable.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_schema_field_nullable(
-    reader: *const PaxReader,
+pub unsafe extern "C" fn tl_reader_schema_field_nullable(
+    reader: *const TLReader,
     schema_index: usize,
     field_index: usize,
 ) -> bool {
@@ -859,8 +859,8 @@ pub unsafe extern "C" fn pax_reader_schema_field_nullable(
 
 /// Check if a field is an array type.
 #[no_mangle]
-pub unsafe extern "C" fn pax_reader_schema_field_is_array(
-    reader: *const PaxReader,
+pub unsafe extern "C" fn tl_reader_schema_field_is_array(
+    reader: *const TLReader,
     schema_index: usize,
     field_index: usize,
 ) -> bool {
@@ -883,7 +883,7 @@ pub unsafe extern "C" fn pax_reader_schema_field_is_array(
 
 /// Free a string returned by the library.
 #[no_mangle]
-pub unsafe extern "C" fn pax_string_free(s: *mut c_char) {
+pub unsafe extern "C" fn tl_string_free(s: *mut c_char) {
     if !s.is_null() {
         drop(CString::from_raw(s));
     }
@@ -891,7 +891,7 @@ pub unsafe extern "C" fn pax_string_free(s: *mut c_char) {
 
 /// Free a string array returned by the library.
 #[no_mangle]
-pub unsafe extern "C" fn pax_string_array_free(arr: *mut *mut c_char) {
+pub unsafe extern "C" fn tl_string_array_free(arr: *mut *mut c_char) {
     if arr.is_null() {
         return;
     }
@@ -912,9 +912,9 @@ pub unsafe extern "C" fn pax_string_array_free(arr: *mut *mut c_char) {
     drop(Vec::from_raw_parts(arr, i + 1, i + 1));
 }
 
-/// Free a PaxResult's error message if present.
+/// Free a TLResult's error message if present.
 #[no_mangle]
-pub unsafe extern "C" fn pax_result_free(result: *mut PaxResult) {
+pub unsafe extern "C" fn tl_result_free(result: *mut TLResult) {
     if !result.is_null() && !(*result).error_message.is_null() {
         drop(CString::from_raw((*result).error_message));
         (*result).error_message = ptr::null_mut();
@@ -927,7 +927,7 @@ pub unsafe extern "C" fn pax_result_free(result: *mut PaxResult) {
 
 /// Get the library version string.
 #[no_mangle]
-pub extern "C" fn pax_version() -> *const c_char {
+pub extern "C" fn tl_version() -> *const c_char {
     static VERSION: &[u8] = b"2.0.0-beta.1\0";
     VERSION.as_ptr() as *const c_char
 }

@@ -1,4 +1,4 @@
-//! Core types for Pax
+//! Core types for TeaLeaf
 
 use std::collections::HashMap;
 use std::fmt;
@@ -8,7 +8,7 @@ use std::io;
 // Constants
 // =============================================================================
 
-pub const MAGIC: [u8; 4] = *b"PAX\0";
+pub const MAGIC: [u8; 4] = *b"TLBX";
 /// Binary format version (major) - for compatibility checks
 pub const VERSION_MAJOR: u16 = 2;
 /// Binary format version (minor) - for compatibility checks
@@ -39,7 +39,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::Io(e) => write!(f, "IO error: {}", e),
-            Error::InvalidMagic => write!(f, "Invalid Pax magic bytes"),
+            Error::InvalidMagic => write!(f, "Invalid TeaLeaf magic bytes"),
             Error::InvalidVersion { major, minor } => {
                 write!(f, "Unsupported version: {}.{}", major, minor)
             }
@@ -72,7 +72,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PaxType {
+pub enum TLType {
     Null = 0x00,
     Bool = 0x01,
     Int8 = 0x02,
@@ -97,7 +97,7 @@ pub enum PaxType {
     Timestamp = 0x32,
 }
 
-impl TryFrom<u8> for PaxType {
+impl TryFrom<u8> for TLType {
     type Error = Error;
 
     fn try_from(v: u8) -> Result<Self> {
@@ -183,33 +183,33 @@ impl FieldType {
         }
     }
 
-    pub fn to_pax_type(&self) -> PaxType {
+    pub fn to_tl_type(&self) -> TLType {
         if self.is_array {
-            return PaxType::Array;
+            return TLType::Array;
         }
         match self.base.as_str() {
-            "bool" => PaxType::Bool,
-            "int8" => PaxType::Int8,
-            "int16" => PaxType::Int16,
-            "int" | "int32" => PaxType::Int32,
-            "int64" => PaxType::Int64,
-            "uint8" => PaxType::UInt8,
-            "uint16" => PaxType::UInt16,
-            "uint" | "uint32" => PaxType::UInt32,
-            "uint64" => PaxType::UInt64,
-            "float32" => PaxType::Float32,
-            "float" | "float64" => PaxType::Float64,
-            "string" => PaxType::String,
-            "bytes" => PaxType::Bytes,
-            "timestamp" => PaxType::Timestamp,
+            "bool" => TLType::Bool,
+            "int8" => TLType::Int8,
+            "int16" => TLType::Int16,
+            "int" | "int32" => TLType::Int32,
+            "int64" => TLType::Int64,
+            "uint8" => TLType::UInt8,
+            "uint16" => TLType::UInt16,
+            "uint" | "uint32" => TLType::UInt32,
+            "uint64" => TLType::UInt64,
+            "float32" => TLType::Float32,
+            "float" | "float64" => TLType::Float64,
+            "string" => TLType::String,
+            "bytes" => TLType::Bytes,
+            "timestamp" => TLType::Timestamp,
             // Note: map, object, ref, tagged are value types, not schema types
             // They fall through to Struct and will fail on lookup
-            _ => PaxType::Struct, // Assume struct reference
+            _ => TLType::Struct, // Assume struct reference
         }
     }
 
     pub fn is_struct(&self) -> bool {
-        !self.is_array && self.to_pax_type() == PaxType::Struct
+        !self.is_array && self.to_tl_type() == TLType::Struct
     }
 }
 
@@ -425,41 +425,41 @@ impl Value {
         self.as_array()?.get(idx)
     }
 
-    pub fn pax_type(&self) -> PaxType {
+    pub fn tl_type(&self) -> TLType {
         match self {
-            Value::Null => PaxType::Null,
-            Value::Bool(_) => PaxType::Bool,
+            Value::Null => TLType::Null,
+            Value::Bool(_) => TLType::Bool,
             Value::Int(i) => {
                 if *i >= i8::MIN as i64 && *i <= i8::MAX as i64 {
-                    PaxType::Int8
+                    TLType::Int8
                 } else if *i >= i16::MIN as i64 && *i <= i16::MAX as i64 {
-                    PaxType::Int16
+                    TLType::Int16
                 } else if *i >= i32::MIN as i64 && *i <= i32::MAX as i64 {
-                    PaxType::Int32
+                    TLType::Int32
                 } else {
-                    PaxType::Int64
+                    TLType::Int64
                 }
             }
             Value::UInt(u) => {
                 if *u <= u8::MAX as u64 {
-                    PaxType::UInt8
+                    TLType::UInt8
                 } else if *u <= u16::MAX as u64 {
-                    PaxType::UInt16
+                    TLType::UInt16
                 } else if *u <= u32::MAX as u64 {
-                    PaxType::UInt32
+                    TLType::UInt32
                 } else {
-                    PaxType::UInt64
+                    TLType::UInt64
                 }
             }
-            Value::Float(_) => PaxType::Float64,
-            Value::String(_) => PaxType::String,
-            Value::Bytes(_) => PaxType::Bytes,
-            Value::Array(_) => PaxType::Array,
-            Value::Object(_) => PaxType::Object,
-            Value::Map(_) => PaxType::Map,
-            Value::Ref(_) => PaxType::Ref,
-            Value::Tagged(_, _) => PaxType::Tagged,
-            Value::Timestamp(_) => PaxType::Timestamp,
+            Value::Float(_) => TLType::Float64,
+            Value::String(_) => TLType::String,
+            Value::Bytes(_) => TLType::Bytes,
+            Value::Array(_) => TLType::Array,
+            Value::Object(_) => TLType::Object,
+            Value::Map(_) => TLType::Map,
+            Value::Ref(_) => TLType::Ref,
+            Value::Tagged(_, _) => TLType::Tagged,
+            Value::Timestamp(_) => TLType::Timestamp,
         }
     }
 

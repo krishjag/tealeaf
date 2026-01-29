@@ -2,39 +2,112 @@
 <html>
 <head>
   <style>
-    canvas { border: 1px solid #ccc; }
+    canvas { border: 1px solid #ccc; margin: 20px; }
+    body { font-family: sans-serif; }
   </style>
 </head>
 <body>
+  <h2>TeaLeaf Icon Generator</h2>
   <canvas id="c" width="128" height="128"></canvas>
   <script>
     const canvas = document.getElementById('c');
     const ctx = canvas.getContext('2d');
-    
-    // Background
+
+    // Background with rounded corners
     ctx.fillStyle = '#1e1e2e';
     ctx.beginPath();
     ctx.roundRect(0, 0, 128, 128, 16);
     ctx.fill();
-    
-    // Text
-    ctx.fillStyle = '#89b4fa';
-    ctx.font = 'bold 48px Consolas, monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('PAX', 64, 58);
-    
-    // Underline
-    ctx.fillStyle = '#a6e3a1';
+
+    // Leaf gradient
+    const leafGrad = ctx.createLinearGradient(30, 20, 98, 80);
+    leafGrad.addColorStop(0, '#7dd956');
+    leafGrad.addColorStop(1, '#4a9f2c');
+
+    // Single leaf at 45 degree angle - centered (offset to account for rotation)
+    ctx.save();
+    ctx.translate(60, 52);
+    ctx.rotate(-45 * Math.PI / 180);
+
+    // Draw leaf blade
+    ctx.fillStyle = leafGrad;
     ctx.beginPath();
-    ctx.roundRect(20, 95, 88, 4, 2);
+    ctx.moveTo(0, -38);
+    ctx.bezierCurveTo(14, -30, 20, -15, 20, 0);
+    ctx.bezierCurveTo(20, 15, 14, 30, 0, 38);
+    ctx.bezierCurveTo(-14, 30, -20, 15, -20, 0);
+    ctx.bezierCurveTo(-20, -15, -14, -30, 0, -38);
     ctx.fill();
-    
+
+    // Clip veins to leaf shape
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(0, -38);
+    ctx.bezierCurveTo(14, -30, 20, -15, 20, 0);
+    ctx.bezierCurveTo(20, 15, 14, 30, 0, 38);
+    ctx.bezierCurveTo(-14, 30, -20, 15, -20, 0);
+    ctx.bezierCurveTo(-20, -15, -14, -30, 0, -38);
+    ctx.clip();
+
+    // Midrib (central vein)
+    ctx.strokeStyle = 'rgba(45, 90, 24, 0.6)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, -36);
+    ctx.lineTo(0, 36);
+    ctx.stroke();
+
+    // Primary veins - left side
+    ctx.strokeStyle = 'rgba(45, 90, 24, 0.5)';
+    ctx.lineWidth = 1.2;
+    [[0, -26, -6, -24, -14, -22], [0, -14, -8, -12, -17, -6], [0, 0, -8, 2, -18, 6], [0, 14, -6, 16, -14, 22], [0, 26, -4, 28, -10, 32]].forEach(([x1, y1, cx, cy, x2, y2]) => {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.quadraticCurveTo(cx, cy, x2, y2);
+      ctx.stroke();
+    });
+
+    // Primary veins - right side
+    [[0, -26, 6, -24, 14, -22], [0, -14, 8, -12, 17, -6], [0, 0, 8, 2, 18, 6], [0, 14, 6, 16, 14, 22], [0, 26, 4, 28, 10, 32]].forEach(([x1, y1, cx, cy, x2, y2]) => {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.quadraticCurveTo(cx, cy, x2, y2);
+      ctx.stroke();
+    });
+
+    ctx.restore(); // Remove clip
+
+    // Petiole (stem) - connected to leaf base
+    ctx.strokeStyle = '#5a8a3a';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, 38);
+    ctx.lineTo(0, 50);
+    ctx.stroke();
+
+    ctx.restore();
+
+    // Horizontal line
+    ctx.fillStyle = '#5a6577';
+    ctx.beginPath();
+    ctx.roundRect(20, 100, 88, 3, 1.5);
+    ctx.fill();
+
+    // Text: tealeaf
+    ctx.fillStyle = '#a6adc8';
+    ctx.font = '600 14px Consolas, "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('tealeaf', 64, 108);
+
     // Download link
     const link = document.createElement('a');
-    link.download = 'pax-icon.png';
+    link.download = 'tealeaf-icon.png';
     link.href = canvas.toDataURL('image/png');
     link.textContent = 'Download PNG';
+    link.style.display = 'block';
+    link.style.marginLeft = '20px';
     document.body.appendChild(link);
   </script>
 </body>

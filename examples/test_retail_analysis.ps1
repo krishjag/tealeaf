@@ -1,13 +1,13 @@
 # Retail Order Analysis with Claude API
-# Sends order data in PAX format for business intelligence analysis
+# Sends order data in TeaLeaf format for business intelligence analysis
 
 $apiKey = [Environment]::GetEnvironmentVariable('ANTHROPIC_API_KEY', 'User')
 
-# Read the PAX file content
-$paxContent = Get-Content -Path "examples/retail_orders.pax" -Raw
+# Read the TeaLeaf file content
+$tlContent = Get-Content -Path "examples/retail_orders.tl" -Raw
 
 # Use actual file content (or truncated sample for large files)
-$paxSample = $paxContent
+$tlSample = $tlContent
 
 $body = @{
     model = "claude-sonnet-4-20250514"
@@ -16,7 +16,7 @@ $body = @{
         @{
             role = "user"
             content = @"
-You are a retail business analyst. I'm providing you order data from our e-commerce system in PAX format (a schema-aware data format).
+You are a retail business analyst. I'm providing you order data from our e-commerce system in TeaLeaf format (a schema-aware data format).
 
 Analyze this data and provide:
 1. **Executive Summary**: Key metrics and business health (2-3 sentences)
@@ -27,7 +27,7 @@ Analyze this data and provide:
 
 Here's the order data:
 
-$paxSample
+$tlSample
 "@
         }
     )
@@ -52,10 +52,10 @@ Write-Host $response.content[0].text
 # Save responses
 $response | ConvertTo-Json -Depth 10 | Out-File -FilePath "examples/responses/retail_analysis.json" -Encoding UTF8
 
-$paxOutput = @"
+$tlOutput = @"
 # Claude's Retail Order Analysis
 # Generated: $(Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
-# Source: examples/retail_orders.pax
+# Source: examples/retail_orders.tl
 
 analysis: {
   model: $($response.model),
@@ -66,7 +66,7 @@ $($response.content[0].text)
 """,
 }
 "@
-$paxOutput | Out-File -FilePath "examples/responses/retail_analysis.pax" -Encoding UTF8
+$tlOutput | Out-File -FilePath "examples/responses/retail_analysis.tl" -Encoding UTF8
 
 Write-Host ""
-Write-Host "Saved to examples/responses/retail_analysis.json and .pax" -ForegroundColor Cyan
+Write-Host "Saved to examples/responses/retail_analysis.json and .tl" -ForegroundColor Cyan

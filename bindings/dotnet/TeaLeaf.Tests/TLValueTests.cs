@@ -1,24 +1,24 @@
 using Xunit;
 
-namespace Pax.Tests;
+namespace TeaLeaf.Tests;
 
-public class PaxValueTests
+public class TLValueTests
 {
     [Fact]
     public void ToObject_Null_ReturnsNull()
     {
-        using var doc = PaxDocument.Parse("value: ~");
+        using var doc = TLDocument.Parse("value: ~");
         using var value = doc["value"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.Null, value.Type);
+        Assert.Equal(TLType.Null, value.Type);
         Assert.Null(value.ToObject());
     }
 
     [Fact]
     public void ToObject_Bool_ReturnsBool()
     {
-        using var doc = PaxDocument.Parse("value: true");
+        using var doc = TLDocument.Parse("value: true");
         using var value = doc["value"];
 
         var obj = value?.ToObject();
@@ -29,7 +29,7 @@ public class PaxValueTests
     [Fact]
     public void ToObject_Int_ReturnsLong()
     {
-        using var doc = PaxDocument.Parse("value: 12345");
+        using var doc = TLDocument.Parse("value: 12345");
         using var value = doc["value"];
 
         var obj = value?.ToObject();
@@ -40,7 +40,7 @@ public class PaxValueTests
     [Fact]
     public void ToObject_Float_ReturnsDouble()
     {
-        using var doc = PaxDocument.Parse("value: 3.14");
+        using var doc = TLDocument.Parse("value: 3.14");
         using var value = doc["value"];
 
         var obj = value?.ToObject();
@@ -51,7 +51,7 @@ public class PaxValueTests
     [Fact]
     public void ToObject_String_ReturnsString()
     {
-        using var doc = PaxDocument.Parse("value: hello");
+        using var doc = TLDocument.Parse("value: hello");
         using var value = doc["value"];
 
         var obj = value?.ToObject();
@@ -62,7 +62,7 @@ public class PaxValueTests
     [Fact]
     public void ToObject_Array_ReturnsArray()
     {
-        using var doc = PaxDocument.Parse("value: [1, 2, 3]");
+        using var doc = TLDocument.Parse("value: [1, 2, 3]");
         using var value = doc["value"];
 
         var obj = value?.ToObject();
@@ -75,7 +75,7 @@ public class PaxValueTests
     [Fact]
     public void ToObject_Object_ReturnsDictionary()
     {
-        using var doc = PaxDocument.Parse("value: {a: 1, b: 2}");
+        using var doc = TLDocument.Parse("value: {a: 1, b: 2}");
         using var value = doc["value"];
 
         var obj = value?.ToObject();
@@ -88,7 +88,7 @@ public class PaxValueTests
     [Fact]
     public void NestedObject_AccessWorks()
     {
-        using var doc = PaxDocument.Parse(@"
+        using var doc = TLDocument.Parse(@"
             user: {
                 name: alice,
                 address: {
@@ -107,7 +107,7 @@ public class PaxValueTests
     [Fact]
     public void ObjectKeys_ReturnsAllKeys()
     {
-        using var doc = PaxDocument.Parse("value: {a: 1, b: 2, c: 3}");
+        using var doc = TLDocument.Parse("value: {a: 1, b: 2, c: 3}");
         using var value = doc["value"];
 
         var keys = value?.ObjectKeys;
@@ -121,7 +121,7 @@ public class PaxValueTests
     [Fact]
     public void ArrayAccess_OutOfBounds_ReturnsNull()
     {
-        using var doc = PaxDocument.Parse("value: [1, 2]");
+        using var doc = TLDocument.Parse("value: [1, 2]");
         using var value = doc["value"];
 
         Assert.Null(value?[100]);
@@ -131,21 +131,21 @@ public class PaxValueTests
     public void AsRefName_OnReference_ReturnsName()
     {
         // Parse a document with a reference
-        using var doc = PaxDocument.Parse(@"
+        using var doc = TLDocument.Parse(@"
             base: {host: localhost}
             config: !base
         ");
         using var value = doc["config"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.Ref, value.Type);
+        Assert.Equal(TLType.Ref, value.Type);
         Assert.Equal("base", value.AsRefName());
     }
 
     [Fact]
     public void AsRefName_OnNonRef_ReturnsNull()
     {
-        using var doc = PaxDocument.Parse("value: 123");
+        using var doc = TLDocument.Parse("value: 123");
         using var value = doc["value"];
 
         Assert.NotNull(value);
@@ -155,11 +155,11 @@ public class PaxValueTests
     [Fact]
     public void AsTagged_OnTaggedValue_ReturnsTagAndValue()
     {
-        using var doc = PaxDocument.Parse("status: :ok 200");
+        using var doc = TLDocument.Parse("status: :ok 200");
         using var value = doc["status"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.Tagged, value.Type);
+        Assert.Equal(TLType.Tagged, value.Type);
         Assert.Equal("ok", value.AsTagName());
 
         using var inner = value.AsTagValue();
@@ -170,7 +170,7 @@ public class PaxValueTests
     [Fact]
     public void AsTagged_OnNonTagged_ReturnsNull()
     {
-        using var doc = PaxDocument.Parse("value: 123");
+        using var doc = TLDocument.Parse("value: 123");
         using var value = doc["value"];
 
         Assert.NotNull(value);
@@ -181,7 +181,7 @@ public class PaxValueTests
     [Fact]
     public void AsBytes_OnNonBytes_ReturnsNull()
     {
-        using var doc = PaxDocument.Parse("value: hello");
+        using var doc = TLDocument.Parse("value: hello");
         using var value = doc["value"];
 
         Assert.NotNull(value);
@@ -191,7 +191,7 @@ public class PaxValueTests
     [Fact]
     public void MapAccessors_OnNonMap_ReturnsZeroOrNull()
     {
-        using var doc = PaxDocument.Parse("value: [1, 2, 3]");
+        using var doc = TLDocument.Parse("value: [1, 2, 3]");
         using var value = doc["value"];
 
         Assert.NotNull(value);
@@ -203,7 +203,7 @@ public class PaxValueTests
     [Fact]
     public void ToObject_Ref_ReturnsDictionaryWithRefKey()
     {
-        using var doc = PaxDocument.Parse(@"
+        using var doc = TLDocument.Parse(@"
             base: {x: 1}
             ref: !base
         ");
@@ -219,7 +219,7 @@ public class PaxValueTests
     [Fact]
     public void ToObject_Tagged_ReturnsDictionaryWithTagAndValue()
     {
-        using var doc = PaxDocument.Parse("status: :error 404");
+        using var doc = TLDocument.Parse("status: :error 404");
         using var value = doc["status"];
 
         var obj = value?.ToObject();
@@ -235,7 +235,7 @@ public class PaxValueTests
     public void Map_ParseAndAccess_Works()
     {
         // Parse a document with a @map
-        using var doc = PaxDocument.Parse(@"
+        using var doc = TLDocument.Parse(@"
             lookup: @map {
                 1: one,
                 2: two,
@@ -245,7 +245,7 @@ public class PaxValueTests
         using var value = doc["lookup"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.Map, value.Type);
+        Assert.Equal(TLType.Map, value.Type);
         Assert.Equal(3, value.MapLength);
 
         // Access first entry
@@ -260,7 +260,7 @@ public class PaxValueTests
     [Fact]
     public void Map_AsMap_EnumeratesAllPairs()
     {
-        using var doc = PaxDocument.Parse(@"
+        using var doc = TLDocument.Parse(@"
             lookup: @map {
                 a: 1,
                 b: 2
@@ -272,7 +272,7 @@ public class PaxValueTests
         var pairs = value.AsMap().ToList();
         Assert.Equal(2, pairs.Count);
 
-        // Clean up the yielded PaxValue instances
+        // Clean up the yielded TLValue instances
         foreach (var (k, v) in pairs)
         {
             k.Dispose();
@@ -283,7 +283,7 @@ public class PaxValueTests
     [Fact]
     public void ToObject_Map_ReturnsKeyValuePairArray()
     {
-        using var doc = PaxDocument.Parse(@"
+        using var doc = TLDocument.Parse(@"
             lookup: @map {
                 1: one,
                 2: two

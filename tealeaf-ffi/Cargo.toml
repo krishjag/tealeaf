@@ -1,18 +1,18 @@
 [package]
-name = "pax-ffi"
+name = "tealeaf-ffi"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "C FFI bindings for the Pax format library"
+description = "C FFI bindings for the TeaLeaf format library"
 
 [lib]
-name = "pax_ffi"
+name = "tealeaf_ffi"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-pax-core.workspace = true
+tealeaf-core.workspace = true
 
 [build-dependencies]
 cbindgen = "0.27"

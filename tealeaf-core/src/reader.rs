@@ -1,4 +1,4 @@
-//! Binary format reader for Pax
+//! Binary format reader for TeaLeaf
 //!
 //! Supports two modes:
 //! - `open()` - Reads file into memory (Vec<u8>)
@@ -12,7 +12,7 @@ use std::sync::Arc;
 
 use memmap2::Mmap;
 
-use crate::{Error, Result, Value, Schema, Field, FieldType, PaxType, MAGIC, HEADER_SIZE};
+use crate::{Error, Result, Value, Schema, Field, FieldType, TLType, MAGIC, HEADER_SIZE};
 
 /// Storage backend for reader data
 enum DataSource {
@@ -48,14 +48,14 @@ struct SectionInfo {
     size: u32,
     uncompressed_size: u32,
     schema_idx: i32,
-    pax_type: PaxType,
+    tl_type: TLType,
     compressed: bool,
     is_array: bool,
     item_count: u32,
 }
 
 impl Reader {
-    /// Open a binary Pax file (reads into memory)
+    /// Open a binary TeaLeaf file (reads into memory)
     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
         let mut file = File::open(path)?;
         let mut data = Vec::new();
@@ -63,7 +63,7 @@ impl Reader {
         Self::from_bytes(data)
     }
 
-    /// Open a binary Pax file with memory mapping (zero-copy)
+    /// Open a binary TeaLeaf file with memory mapping (zero-copy)
     ///
     /// This is faster for large files as the OS handles paging.
     /// The file must not be modified while the reader is open.
@@ -174,12 +174,12 @@ impl Reader {
             return self.decode_struct_array(&mut cursor, section.schema_idx as usize);
         }
 
-        match section.pax_type {
-            PaxType::Array => self.decode_array(&mut cursor),
-            PaxType::Object => self.decode_object(&mut cursor),
-            PaxType::Struct => self.decode_struct(&mut cursor),
-            PaxType::Map => self.decode_map(&mut cursor),
-            _ => self.decode_value(&mut cursor, section.pax_type),
+        match section.tl_type {
+            TLType::Array => self.decode_array(&mut cursor),
+            TLType::Object => self.decode_object(&mut cursor),
+            TLType::Struct => self.decode_struct(&mut cursor),
+            TLType::Map => self.decode_map(&mut cursor),
+            _ => self.decode_value(&mut cursor, section.tl_type),
         }
     }
 
@@ -211,24 +211,24 @@ impl Reader {
                 let fextra = u16::from_le_bytes(data[fo + 6..fo + 8].try_into().unwrap());
 
                 let fname = self.get_string(fname_idx as usize)?;
-                let pax_type = PaxType::try_from(ftype)?;
+                let tl_type = TLType::try_from(ftype)?;
 
-                let base = match pax_type {
-                    PaxType::Bool => "bool".to_string(),
-                    PaxType::Int8 => "int8".to_string(),
-                    PaxType::Int16 => "int16".to_string(),
-                    PaxType::Int32 => "int".to_string(),
-                    PaxType::Int64 => "int64".to_string(),
-                    PaxType::UInt8 => "uint8".to_string(),
-                    PaxType::UInt16 => "uint16".to_string(),
-                    PaxType::UInt32 => "uint".to_string(),
-                    PaxType::UInt64 => "uint64".to_string(),
-                    PaxType::Float32 => "float32".to_string(),
-                    PaxType::Float64 => "float".to_string(),
-                    PaxType::String => "string".to_string(),
-                    PaxType::Bytes => "bytes".to_string(),
-                    PaxType::Timestamp => "timestamp".to_string(),
-                    PaxType::Struct => {
+                let base = match tl_type {
+                    TLType::Bool => "bool".to_string(),
+                    TLType::Int8 => "int8".to_string(),
+                    TLType::Int16 => "int16".to_string(),
+                    TLType::Int32 => "int".to_string(),
+                    TLType::Int64 => "int64".to_string(),
+                    TLType::UInt8 => "uint8".to_string(),
+                    TLType::UInt16 => "uint16".to_string(),
+                    TLType::UInt32 => "uint".to_string(),
+                    TLType::UInt64 => "uint64".to_string(),
+                    TLType::Float32 => "float32".to_string(),
+                    TLType::Float64 => "float".to_string(),
+                    TLType::String => "string".to_string(),
+                    TLType::Bytes => "bytes".to_string(),
+                    TLType::Timestamp => "timestamp".to_string(),
+                    TLType::Struct => {
                         // Read struct type name from string table (0xFFFF = no type)
                         if fextra != 0xFFFF {
                             self.get_string(fextra as usize)?
@@ -278,7 +278,7 @@ impl Reader {
                 size,
                 uncompressed_size: uncompressed,
                 schema_idx: if schema_idx == 0xFFFF { -1 } else { schema_idx as i32 },
-                pax_type: PaxType::try_from(ptype)?,
+                tl_type: TLType::try_from(ptype)?,
                 compressed: flags & 0x01 != 0,
                 is_array: flags & 0x02 != 0,
                 item_count,
@@ -308,8 +308,8 @@ impl Reader {
                 if bitmap & (1 << i) != 0 {
                     obj.insert(field.name.clone(), Value::Null);
                 } else {
-                    let pax_type = field.field_type.to_pax_type();
-                    obj.insert(field.name.clone(), self.decode_value(cursor, pax_type)?);
+                    let tl_type = field.field_type.to_tl_type();
+                    obj.insert(field.name.clone(), self.decode_value(cursor, tl_type)?);
                 }
             }
             result.push(Value::Object(obj));
@@ -329,11 +329,11 @@ impl Reader {
 
         if elem_type == 0xFF {
             for _ in 0..count {
-                let t = PaxType::try_from(cursor.read_u8())?;
+                let t = TLType::try_from(cursor.read_u8())?;
                 result.push(self.decode_value(cursor, t)?);
             }
         } else {
-            let t = PaxType::try_from(elem_type)?;
+            let t = TLType::try_from(elem_type)?;
             for _ in 0..count {
                 result.push(self.decode_value(cursor, t)?);
             }
@@ -348,7 +348,7 @@ impl Reader {
 
         for _ in 0..count {
             let key_idx = cursor.read_u32();
-            let t = PaxType::try_from(cursor.read_u8())?;
+            let t = TLType::try_from(cursor.read_u8())?;
             let key = self.get_string(key_idx as usize)?;
             obj.insert(key, self.decode_value(cursor, t)?);
         }
@@ -371,8 +371,8 @@ impl Reader {
             if bitmap & (1 << i) != 0 {
                 obj.insert(field.name.clone(), Value::Null);
             } else {
-                let pax_type = field.field_type.to_pax_type();
-                obj.insert(field.name.clone(), self.decode_value(cursor, pax_type)?);
+                let tl_type = field.field_type.to_tl_type();
+                obj.insert(field.name.clone(), self.decode_value(cursor, tl_type)?);
             }
         }
 
@@ -384,9 +384,9 @@ impl Reader {
         let mut pairs = Vec::with_capacity(count as usize);
 
         for _ in 0..count {
-            let key_type = PaxType::try_from(cursor.read_u8())?;
+            let key_type = TLType::try_from(cursor.read_u8())?;
             let key = self.decode_value(cursor, key_type)?;
-            let val_type = PaxType::try_from(cursor.read_u8())?;
+            let val_type = TLType::try_from(cursor.read_u8())?;
             let val = self.decode_value(cursor, val_type)?;
             pairs.push((key, val));
         }
@@ -394,45 +394,45 @@ impl Reader {
         Ok(Value::Map(pairs))
     }
 
-    fn decode_value(&self, cursor: &mut Cursor, pax_type: PaxType) -> Result<Value> {
-        Ok(match pax_type {
-            PaxType::Null => Value::Null,
-            PaxType::Bool => Value::Bool(cursor.read_u8() != 0),
-            PaxType::Int8 => Value::Int(cursor.read_i8() as i64),
-            PaxType::Int16 => Value::Int(cursor.read_i16() as i64),
-            PaxType::Int32 => Value::Int(cursor.read_i32() as i64),
-            PaxType::Int64 => Value::Int(cursor.read_i64()),
-            PaxType::UInt8 => Value::UInt(cursor.read_u8() as u64),
-            PaxType::UInt16 => Value::UInt(cursor.read_u16() as u64),
-            PaxType::UInt32 => Value::UInt(cursor.read_u32() as u64),
-            PaxType::UInt64 => Value::UInt(cursor.read_u64()),
-            PaxType::Float32 => Value::Float(cursor.read_f32() as f64),
-            PaxType::Float64 => Value::Float(cursor.read_f64()),
-            PaxType::String => {
+    fn decode_value(&self, cursor: &mut Cursor, tl_type: TLType) -> Result<Value> {
+        Ok(match tl_type {
+            TLType::Null => Value::Null,
+            TLType::Bool => Value::Bool(cursor.read_u8() != 0),
+            TLType::Int8 => Value::Int(cursor.read_i8() as i64),
+            TLType::Int16 => Value::Int(cursor.read_i16() as i64),
+            TLType::Int32 => Value::Int(cursor.read_i32() as i64),
+            TLType::Int64 => Value::Int(cursor.read_i64()),
+            TLType::UInt8 => Value::UInt(cursor.read_u8() as u64),
+            TLType::UInt16 => Value::UInt(cursor.read_u16() as u64),
+            TLType::UInt32 => Value::UInt(cursor.read_u32() as u64),
+            TLType::UInt64 => Value::UInt(cursor.read_u64()),
+            TLType::Float32 => Value::Float(cursor.read_f32() as f64),
+            TLType::Float64 => Value::Float(cursor.read_f64()),
+            TLType::String => {
                 let idx = cursor.read_u32();
                 Value::String(self.get_string(idx as usize)?)
             }
-            PaxType::Bytes => {
+            TLType::Bytes => {
                 let len = cursor.read_varint() as usize;
                 Value::Bytes(cursor.read_bytes(len))
             }
-            PaxType::Array => self.decode_array(cursor)?,
-            PaxType::Object => self.decode_object(cursor)?,
-            PaxType::Struct => self.decode_struct(cursor)?,
-            PaxType::Ref => {
+            TLType::Array => self.decode_array(cursor)?,
+            TLType::Object => self.decode_object(cursor)?,
+            TLType::Struct => self.decode_struct(cursor)?,
+            TLType::Ref => {
                 let idx = cursor.read_u32();
                 Value::Ref(self.get_string(idx as usize)?)
             }
-            PaxType::Tagged => {
+            TLType::Tagged => {
                 let tag_idx = cursor.read_u32();
-                let inner_type = PaxType::try_from(cursor.read_u8())?;
+                let inner_type = TLType::try_from(cursor.read_u8())?;
                 let tag = self.get_string(tag_idx as usize)?;
                 let inner = self.decode_value(cursor, inner_type)?;
                 Value::Tagged(tag, Box::new(inner))
             }
-            PaxType::Map => self.decode_map(cursor)?,
-            PaxType::Timestamp => Value::Timestamp(cursor.read_i64()),
-            PaxType::Tuple => {
+            TLType::Map => self.decode_map(cursor)?,
+            TLType::Timestamp => Value::Timestamp(cursor.read_i64()),
+            TLType::Tuple => {
                 // Tuple is decoded as an array
                 self.decode_array(cursor)?
             }

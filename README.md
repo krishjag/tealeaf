@@ -1,28 +1,28 @@
-# PAX
+# TeaLeaf
 
-***Pax is Latin for peace* [Peace between human and machine.]**
+**A schema-aware document format with human-readable text and compact binary representation.**
 
-A schema-aware document format with human-readable text and compact binary representation.
+*Peace between human and machine.*
 
 
 
-![PAX Workflow](docs/pax_workflow.png)
+![TeaLeaf Workflow](docs/tealeaf_workflow.png)
 
 ---
 
 ## Table of Contents
 
-- [Overview](#overview)  
+- [Overview](#overview)
   - [Motivation](#motivation)
   - [File Extensions](#file-extensions)
-  - [Quick Compare: JSON vs PAX](#quick-compare-json-vs-pax)
+  - [Quick Compare: JSON vs TeaLeaf](#quick-compare-json-vs-tealeaf)
   - [Workflow Real Example](#workflow-real-example)
 - [CLI](#cli)
 - [Language Bindings](#language-bindings)
 - [Design Rationale](#design-rationale)
 - [Comparison](#comparison)
-  - [When to Use PAX](#when-to-use-pax)
-  - [When NOT to Use PAX](#when-not-to-use-pax)
+  - [When to Use TeaLeaf](#when-to-use-tealeaf)
+  - [When NOT to Use TeaLeaf](#when-not-to-use-tealeaf)
   - [Size Comparison](#size-comparison)
 - [Use Cases](#use-cases)
 - [Specification](#specification)
@@ -31,16 +31,16 @@ A schema-aware document format with human-readable text and compact binary repre
 
 ## Overview
 
-Pax is a data format that combines:
-- **Human-readable text** (`.pax`) for editing and version control
-- **Compact binary** (`.paxb`) for storage and transmission
+TeaLeaf is a data format that combines:
+- **Human-readable text** (`.tl`) for editing and version control
+- **Compact binary** (`.tlbx`) for storage and transmission
 - **Inline schemas** for validation and compression
 - **JSON interoperability** for easy integration
 
 
 ### Motivation
 
-PAX emerged from practical experience with large-scale data and systems engineering. The existing landscape presented trade-offs that didn't align well with modern workflows:
+TeaLeaf emerged from practical experience with large-scale data and systems engineering. The existing landscape presented trade-offs that didn't align well with modern workflows:
 
 | Format | Limitation |
 |--------|------------|
@@ -53,16 +53,16 @@ PAX emerged from practical experience with large-scale data and systems engineer
 
 Converting some formats to binary yielded marginal benefits. Schema information was almost always external, requiring coordination between files.
 
-PAX was designed to unify these concerns: a single file that humans can read and edit, that compiles to an efficient binary, with schemas inline rather than external. The primary use case is **context engineering** for LLM applications—structured prompts, tool definitions, conversation history—but the format is general-purpose.
+TeaLeaf was designed to unify these concerns: a single file that humans can read and edit, that compiles to an efficient binary, with schemas inline rather than external. The primary use case is **context engineering** for LLM applications—structured prompts, tool definitions, conversation history—but the format is general-purpose.
 
-### Quick Compare: JSON vs PAX
+### Quick Compare: JSON vs TeaLeaf
 
-The same data — PAX uses **schemas** so field names are defined once, not repeated per record:
+The same data — TeaLeaf uses **schemas** so field names are defined once, not repeated per record:
 
 <table>
 <tr>
 <th>JSON (no schema, names repeated)</th>
-<th>PAX (schema-first, compact data)</th>
+<th>TeaLeaf (schema-first, compact data)</th>
 </tr>
 <tr>
 <td valign="top">
@@ -116,7 +116,7 @@ The same data — PAX uses **schemas** so field names are defined once, not repe
 </td>
 <td valign="top">
 
-```pax
+```tl
 # Schema: define structure once
 @struct Location (city: string, country: string)
 @struct Department (name: string, location: Location)
@@ -148,8 +148,8 @@ employees: @table Employee [
 
 **Why This Matters:**
 
-| Aspect | JSON | PAX |
-|--------|------|-----|
+| Aspect | JSON | TeaLeaf |
+|--------|------|---------|
 | Field names | Repeated for every record | Defined once in schema |
 | Types | Implicit, inferred at runtime | Explicit in schema, structural checks at parse |
 | Binary size | Large (names + values) | Compact (positional data only) |
@@ -163,14 +163,14 @@ The schema approach means:
 
 ### Workflow Real Example
 
-A complete retail orders dataset demonstrating the full PAX workflow:
+A complete retail orders dataset demonstrating the full TeaLeaf workflow:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           RETAIL ORDERS WORKFLOW                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│   retail_orders.json ──────► retail_orders.pax ──────► retail_orders.paxb   │
+│   retail_orders.json ──────► retail_orders.tl ───────► retail_orders.tlbx   │
 │        36.8 KB       from-json     19.6 KB     compile       6.9 KB         │
 │                                                                             │
 │   • 10 orders            • 11 schemas defined      • 81% size reduction     │
@@ -184,9 +184,9 @@ A complete retail orders dataset demonstrating the full PAX workflow:
 │   test_retail_analysis.ps1                                                  │
 │         │                                                                   │
 │         ▼                                                                   │
-│   Claude API (retail_orders.pax) ──────► responses/retail_analysis.pax      │
+│   Claude API (retail_orders.tl) ───────► responses/retail_analysis.tl       │
 │                                                                             │
-│   • Sends PAX-formatted order data      • Business intelligence insights    │
+│   • Sends TeaLeaf-formatted order data  • Business intelligence insights    │
 │   • Schema-first = fewer tokens         • Revenue analysis                  │
 │   • Structured prompts                  • Customer segmentation             │
 │                                                                             │
@@ -198,30 +198,30 @@ A complete retail orders dataset demonstrating the full PAX workflow:
 | File | Description |
 |------|-------------|
 | [`examples/retail_orders.json`](examples/retail_orders.json) | Original JSON (36.8 KB) |
-| [`examples/retail_orders.pax`](examples/retail_orders.pax) | PAX text format (19.6 KB) |
-| [`examples/retail_orders.paxb`](examples/retail_orders.paxb) | PAX binary (6.9 KB) |
+| [`examples/retail_orders.tl`](examples/retail_orders.tl) | TeaLeaf text format (19.6 KB) |
+| [`examples/retail_orders.tlbx`](examples/retail_orders.tlbx) | TeaLeaf binary (6.9 KB) |
 | [`examples/test_retail_analysis.ps1`](examples/test_retail_analysis.ps1) | Send to Claude API |
-| [`examples/responses/retail_analysis.pax`](examples/responses/retail_analysis.pax) | Claude's analysis |
+| [`examples/responses/retail_analysis.tl`](examples/responses/retail_analysis.tl) | Claude's analysis |
 
 ---
 
 ## CLI
 
 ```bash
-pax <command> [options]
+tealeaf <command> [options]
 
 Commands:
   compile       Convert text to binary
   decompile     Convert binary to text
   info          Show file info
   validate      Validate text syntax
-  to-json       Convert Pax text to JSON
-  from-json     Convert JSON to Pax text
-  paxb-to-json  Convert Pax binary to JSON
-  json-to-paxb  Convert JSON to Pax binary
+  to-json       Convert TeaLeaf text to JSON
+  from-json     Convert JSON to TeaLeaf text
+  tlbx-to-json  Convert TeaLeaf binary to JSON
+  json-to-tlbx  Convert JSON to TeaLeaf binary
 ```
 
-Run `pax help <command>` for detailed usage.
+Run `tealeaf help <command>` for detailed usage.
 
 ---
 
@@ -229,11 +229,11 @@ Run `pax help <command>` for detailed usage.
 
 | Language | Type | Package |
 |----------|------|---------|
-| **Rust** | Native | `pax-core` crate |
-| **.NET** | FFI | `Pax` NuGet package |
+| **Rust** | Native | `tealeaf-core` crate |
+| **.NET** | FFI | `TeaLeaf` NuGet package |
 
 Both bindings provide:
-- Parse text (`.pax`) and read binary (`.paxb`)
+- Parse text (`.tl`) and read binary (`.tlbx`)
 - Dynamic key-based value access
 - Schema introspection at runtime
 - JSON conversion (bidirectional)
@@ -245,12 +245,12 @@ Community contributions welcome for Python, Java, and other languages.
 
 ## Design Rationale
 
-PAX combines ideas from several formats: human-readable text like JSON/YAML, schema-embedded binaries like Avro, and positional encoding like Protobuf. The key difference is that PAX keeps schemas inline with data in the text format, making `.pax` files self-documenting and git-friendly.
+TeaLeaf combines ideas from several formats: human-readable text like JSON/YAML, schema-embedded binaries like Avro, and positional encoding like Protobuf. The key difference is that TeaLeaf keeps schemas inline with data in the text format, making `.tl` files self-documenting and git-friendly.
 
-The binary format (`.paxb`) embeds schemas, enabling readers to decode files without external `.proto` or `.avsc` files. No code generation is required—schemas are discovered at runtime.
+The binary format (`.tlbx`) embeds schemas, enabling readers to decode files without external `.proto` or `.avsc` files. No code generation is required—schemas are discovered at runtime.
 
-| Feature | JSON | Protobuf | Avro | MsgPack | PAX |
-|---------|------|----------|------|---------|-----|
+| Feature | JSON | Protobuf | Avro | MsgPack | TeaLeaf |
+|---------|------|----------|------|---------|---------|
 | Human-readable data format | ✅ | ⚠️* | ❌ | ❌ | ✅ |
 | Compact binary | ❌ | ✅ | ✅ | ✅ | ✅ |
 | Schema embedded in binary | ❌ | ❌ | ✅ | ❌ | ✅ |
@@ -265,16 +265,16 @@ The binary format (`.paxb`) embeds schemas, enabling readers to decode files wit
 
 ## Comparison
 
-### When to Use PAX
+### When to Use TeaLeaf
 
-| Use Case | Why PAX |
-|----------|---------|
+| Use Case | Why TeaLeaf |
+|----------|-------------|
 | Config files (human-edited + machine-efficient) | Text format with comments, compiles to compact binary |
 | Large numeric arrays | 6-7x smaller than JSON with compression |
 | LLM context serialization | Schema eliminates repeated field names |
 | Game save files, asset manifests | Self-describing, no external schema files |
 
-### When NOT to Use PAX
+### When NOT to Use TeaLeaf
 
 | Requirement | Use Instead |
 |-------------|-------------|
@@ -286,18 +286,18 @@ The binary format (`.paxb`) embeds schemas, enabling readers to decode files wit
 
 ### Size Comparison
 
-*Data from `cargo run --example size_report` on pax-core.*
+*Data from `cargo run --example size_report` on tealeaf-core.*
 
 | Format | Small Object | 10K Points | 1K Users |
 |--------|--------------|------------|----------|
 | JSON | 1.00x | 1.00x | 1.00x |
 | Protobuf | 0.38x | 0.65x | 0.41x |
 | MessagePack | 0.35x | 0.63x | 0.38x |
-| **Pax Compressed** | 3.56x | **0.15x** | 0.47x |
+| **TeaLeaf Compressed** | 3.56x | **0.15x** | 0.47x |
 
-PAX has 64-byte header overhead (bad for small objects). For large arrays with compression, PAX achieves **6-7x better compression** than JSON.
+TeaLeaf has 64-byte header overhead (bad for small objects). For large arrays with compression, TeaLeaf achieves **6-7x better compression** than JSON.
 
-**Trade-off:** PAX decode is ~2-5x slower than Protobuf due to dynamic key-based access. Choose PAX when size matters more than decode speed.
+**Trade-off:** TeaLeaf decode is ~2-5x slower than Protobuf due to dynamic key-based access. Choose TeaLeaf when size matters more than decode speed.
 
 ---
 
@@ -305,9 +305,9 @@ PAX has 64-byte header overhead (bad for small objects). For large arrays with c
 
 ### Context Engineering (LLM/AI)
 
-Pax is well-suited for assembling and managing context for large language models:
+TeaLeaf is well-suited for assembling and managing context for large language models:
 
-```pax
+```tl
 @struct Message (role: string, content: string, tokens: int?)
 @struct Tool (name: string, description: string, params: []string)
 
@@ -323,13 +323,13 @@ history: @table Message [
 ]
 ```
 
-**Why PAX for LLM context:**
+**Why TeaLeaf for LLM context:**
 - Schema eliminates repeated field names → fewer tokens
 - Binary format for fast cached context retrieval
 - String deduplication (roles, tool names stored once)
 - Human-readable text for prompt authoring
 
-**Example: 50 messages + 10 tools** — JSON ~15KB vs PAX Binary ~4KB
+**Example: 50 messages + 10 tools** — JSON ~15KB vs TeaLeaf Binary ~4KB
 
 ### Other Use Cases
 
@@ -345,8 +345,8 @@ history: @table Message [
 
 For the complete technical specification including text format syntax, type system, binary format details, and grammar, see:
 
-**[spec/PAX_SPEC.md](spec/PAX_SPEC.md)**
+**[spec/TEALEAF_SPEC.md](spec/TEALEAF_SPEC.md)**
 
 ---
 
-*PAX v2.0.0-beta.1 — Peace between human and machine.*
+*TeaLeaf v2.0.0-beta.1 — Peace between human and machine.*

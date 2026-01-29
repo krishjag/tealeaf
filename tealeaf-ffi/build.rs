@@ -13,7 +13,7 @@ fn main() {
         .with_config(config)
         .generate()
         .expect("Failed to generate bindings")
-        .write_to_file(out_dir.join("pax.h"));
+        .write_to_file(out_dir.join("tealeaf.h"));
 
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=cbindgen.toml");

@@ -1,17 +1,17 @@
 using System.Collections;
-using Pax.Native;
+using TeaLeaf.Native;
 
-namespace Pax;
+namespace TeaLeaf;
 
 /// <summary>
-/// Represents a value in a Pax document.
+/// Represents a value in a TeaLeaf document.
 /// </summary>
-public sealed class PaxValue : IDisposable
+public sealed class TLValue : IDisposable
 {
     private IntPtr _handle;
     private bool _disposed;
 
-    internal PaxValue(IntPtr handle)
+    internal TLValue(IntPtr handle)
     {
         _handle = handle;
     }
@@ -19,19 +19,19 @@ public sealed class PaxValue : IDisposable
     /// <summary>
     /// Gets the type of this value.
     /// </summary>
-    public PaxType Type
+    public TLType Type
     {
         get
         {
             ThrowIfDisposed();
-            return (PaxType)NativeMethods.pax_value_type(_handle);
+            return (TLType)NativeMethods.tl_value_type(_handle);
         }
     }
 
     /// <summary>
     /// Returns true if this value is null.
     /// </summary>
-    public bool IsNull => Type == PaxType.Null;
+    public bool IsNull => Type == TLType.Null;
 
     /// <summary>
     /// Gets this value as a boolean. Returns null if not a boolean.
@@ -39,8 +39,8 @@ public sealed class PaxValue : IDisposable
     public bool? AsBool()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Bool) return null;
-        return NativeMethods.pax_value_as_bool(_handle);
+        if (Type != TLType.Bool) return null;
+        return NativeMethods.tl_value_as_bool(_handle);
     }
 
     /// <summary>
@@ -49,8 +49,8 @@ public sealed class PaxValue : IDisposable
     public long? AsInt()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Int) return null;
-        return NativeMethods.pax_value_as_int(_handle);
+        if (Type != TLType.Int) return null;
+        return NativeMethods.tl_value_as_int(_handle);
     }
 
     /// <summary>
@@ -59,8 +59,8 @@ public sealed class PaxValue : IDisposable
     public ulong? AsUInt()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.UInt) return null;
-        return NativeMethods.pax_value_as_uint(_handle);
+        if (Type != TLType.UInt) return null;
+        return NativeMethods.tl_value_as_uint(_handle);
     }
 
     /// <summary>
@@ -69,8 +69,8 @@ public sealed class PaxValue : IDisposable
     public double? AsFloat()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Float) return null;
-        return NativeMethods.pax_value_as_float(_handle);
+        if (Type != TLType.Float) return null;
+        return NativeMethods.tl_value_as_float(_handle);
     }
 
     /// <summary>
@@ -79,8 +79,8 @@ public sealed class PaxValue : IDisposable
     public string? AsString()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.String) return null;
-        var ptr = NativeMethods.pax_value_as_string(_handle);
+        if (Type != TLType.String) return null;
+        var ptr = NativeMethods.tl_value_as_string(_handle);
         return NativeMethods.PtrToStringAndFree(ptr);
     }
 
@@ -90,8 +90,8 @@ public sealed class PaxValue : IDisposable
     public long? AsTimestamp()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Timestamp) return null;
-        return NativeMethods.pax_value_as_timestamp(_handle);
+        if (Type != TLType.Timestamp) return null;
+        return NativeMethods.tl_value_as_timestamp(_handle);
     }
 
     /// <summary>
@@ -110,10 +110,10 @@ public sealed class PaxValue : IDisposable
     public byte[]? AsBytes()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Bytes) return null;
-        var len = (int)NativeMethods.pax_value_bytes_len(_handle);
+        if (Type != TLType.Bytes) return null;
+        var len = (int)NativeMethods.tl_value_bytes_len(_handle);
         if (len == 0) return Array.Empty<byte>();
-        var ptr = NativeMethods.pax_value_bytes_data(_handle);
+        var ptr = NativeMethods.tl_value_bytes_data(_handle);
         if (ptr == IntPtr.Zero) return Array.Empty<byte>();
         var result = new byte[len];
         System.Runtime.InteropServices.Marshal.Copy(ptr, result, 0, len);
@@ -126,8 +126,8 @@ public sealed class PaxValue : IDisposable
     public string? AsRefName()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Ref) return null;
-        var ptr = NativeMethods.pax_value_ref_name(_handle);
+        if (Type != TLType.Ref) return null;
+        var ptr = NativeMethods.tl_value_ref_name(_handle);
         return NativeMethods.PtrToStringAndFree(ptr);
     }
 
@@ -137,20 +137,20 @@ public sealed class PaxValue : IDisposable
     public string? AsTagName()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Tagged) return null;
-        var ptr = NativeMethods.pax_value_tag_name(_handle);
+        if (Type != TLType.Tagged) return null;
+        var ptr = NativeMethods.tl_value_tag_name(_handle);
         return NativeMethods.PtrToStringAndFree(ptr);
     }
 
     /// <summary>
     /// Gets the inner value if this is a Tagged value. Returns null otherwise.
     /// </summary>
-    public PaxValue? AsTagValue()
+    public TLValue? AsTagValue()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Tagged) return null;
-        var ptr = NativeMethods.pax_value_tag_value(_handle);
-        return ptr == IntPtr.Zero ? null : new PaxValue(ptr);
+        if (Type != TLType.Tagged) return null;
+        var ptr = NativeMethods.tl_value_tag_value(_handle);
+        return ptr == IntPtr.Zero ? null : new TLValue(ptr);
     }
 
     /// <summary>
@@ -161,40 +161,40 @@ public sealed class PaxValue : IDisposable
         get
         {
             ThrowIfDisposed();
-            if (Type != PaxType.Map) return 0;
-            return (int)NativeMethods.pax_value_map_len(_handle);
+            if (Type != TLType.Map) return 0;
+            return (int)NativeMethods.tl_value_map_len(_handle);
         }
     }
 
     /// <summary>
     /// Gets the key at the specified index from this map value. Returns null if not a map or out of bounds.
     /// </summary>
-    public PaxValue? GetMapKey(int index)
+    public TLValue? GetMapKey(int index)
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Map || index < 0) return null;
-        var ptr = NativeMethods.pax_value_map_get_key(_handle, (nuint)index);
-        return ptr == IntPtr.Zero ? null : new PaxValue(ptr);
+        if (Type != TLType.Map || index < 0) return null;
+        var ptr = NativeMethods.tl_value_map_get_key(_handle, (nuint)index);
+        return ptr == IntPtr.Zero ? null : new TLValue(ptr);
     }
 
     /// <summary>
     /// Gets the value at the specified index from this map value. Returns null if not a map or out of bounds.
     /// </summary>
-    public PaxValue? GetMapValue(int index)
+    public TLValue? GetMapValue(int index)
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Map || index < 0) return null;
-        var ptr = NativeMethods.pax_value_map_get_value(_handle, (nuint)index);
-        return ptr == IntPtr.Zero ? null : new PaxValue(ptr);
+        if (Type != TLType.Map || index < 0) return null;
+        var ptr = NativeMethods.tl_value_map_get_value(_handle, (nuint)index);
+        return ptr == IntPtr.Zero ? null : new TLValue(ptr);
     }
 
     /// <summary>
     /// Gets all key-value pairs from this map value.
     /// </summary>
-    public IEnumerable<(PaxValue Key, PaxValue Value)> AsMap()
+    public IEnumerable<(TLValue Key, TLValue Value)> AsMap()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Map)
+        if (Type != TLType.Map)
             yield break;
 
         int len = MapLength;
@@ -215,29 +215,29 @@ public sealed class PaxValue : IDisposable
         get
         {
             ThrowIfDisposed();
-            if (Type != PaxType.Array) return 0;
-            return (int)NativeMethods.pax_value_array_len(_handle);
+            if (Type != TLType.Array) return 0;
+            return (int)NativeMethods.tl_value_array_len(_handle);
         }
     }
 
     /// <summary>
     /// Gets an element from this array value by index. Returns null if not an array or out of bounds.
     /// </summary>
-    public PaxValue? GetArrayElement(int index)
+    public TLValue? GetArrayElement(int index)
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Array || index < 0) return null;
-        var ptr = NativeMethods.pax_value_array_get(_handle, (nuint)index);
-        return ptr == IntPtr.Zero ? null : new PaxValue(ptr);
+        if (Type != TLType.Array || index < 0) return null;
+        var ptr = NativeMethods.tl_value_array_get(_handle, (nuint)index);
+        return ptr == IntPtr.Zero ? null : new TLValue(ptr);
     }
 
     /// <summary>
     /// Gets all elements from this array value.
     /// </summary>
-    public IEnumerable<PaxValue> AsArray()
+    public IEnumerable<TLValue> AsArray()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Array)
+        if (Type != TLType.Array)
             yield break;
 
         int len = ArrayLength;
@@ -252,12 +252,12 @@ public sealed class PaxValue : IDisposable
     /// <summary>
     /// Gets a field from this object value by key. Returns null if not an object or key not found.
     /// </summary>
-    public PaxValue? GetField(string key)
+    public TLValue? GetField(string key)
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Object) return null;
-        var ptr = NativeMethods.pax_value_object_get(_handle, key);
-        return ptr == IntPtr.Zero ? null : new PaxValue(ptr);
+        if (Type != TLType.Object) return null;
+        var ptr = NativeMethods.tl_value_object_get(_handle, key);
+        return ptr == IntPtr.Zero ? null : new TLValue(ptr);
     }
 
     /// <summary>
@@ -266,8 +266,8 @@ public sealed class PaxValue : IDisposable
     public string[] GetObjectKeys()
     {
         ThrowIfDisposed();
-        if (Type != PaxType.Object) return Array.Empty<string>();
-        var ptr = NativeMethods.pax_value_object_keys(_handle);
+        if (Type != TLType.Object) return Array.Empty<string>();
+        var ptr = NativeMethods.tl_value_object_keys(_handle);
         return NativeMethods.PtrToStringArrayAndFree(ptr);
     }
 
@@ -279,12 +279,12 @@ public sealed class PaxValue : IDisposable
     /// <summary>
     /// Indexer for array access.
     /// </summary>
-    public PaxValue? this[int index] => GetArrayElement(index);
+    public TLValue? this[int index] => GetArrayElement(index);
 
     /// <summary>
     /// Indexer for object field access.
     /// </summary>
-    public PaxValue? this[string key] => GetField(key);
+    public TLValue? this[string key] => GetField(key);
 
     /// <summary>
     /// Converts this value to its .NET equivalent.
@@ -295,19 +295,19 @@ public sealed class PaxValue : IDisposable
 
         return Type switch
         {
-            PaxType.Null => null,
-            PaxType.Bool => AsBool(),
-            PaxType.Int => AsInt(),
-            PaxType.UInt => AsUInt(),
-            PaxType.Float => AsFloat(),
-            PaxType.String => AsString(),
-            PaxType.Bytes => AsBytes(),
-            PaxType.Timestamp => AsDateTime(),
-            PaxType.Array => AsArray().Select(v => v.ToObject()).ToArray(),
-            PaxType.Object => GetObjectKeys().ToDictionary(k => k, k => GetField(k)?.ToObject()),
-            PaxType.Map => AsMap().Select(kv => new KeyValuePair<object?, object?>(kv.Key.ToObject(), kv.Value.ToObject())).ToArray(),
-            PaxType.Ref => new Dictionary<string, object?> { ["$ref"] = AsRefName() },
-            PaxType.Tagged => new Dictionary<string, object?> { ["$tag"] = AsTagName(), ["$value"] = AsTagValue()?.ToObject() },
+            TLType.Null => null,
+            TLType.Bool => AsBool(),
+            TLType.Int => AsInt(),
+            TLType.UInt => AsUInt(),
+            TLType.Float => AsFloat(),
+            TLType.String => AsString(),
+            TLType.Bytes => AsBytes(),
+            TLType.Timestamp => AsDateTime(),
+            TLType.Array => AsArray().Select(v => v.ToObject()).ToArray(),
+            TLType.Object => GetObjectKeys().ToDictionary(k => k, k => GetField(k)?.ToObject()),
+            TLType.Map => AsMap().Select(kv => new KeyValuePair<object?, object?>(kv.Key.ToObject(), kv.Value.ToObject())).ToArray(),
+            TLType.Ref => new Dictionary<string, object?> { ["$ref"] = AsRefName() },
+            TLType.Tagged => new Dictionary<string, object?> { ["$tag"] = AsTagName(), ["$value"] = AsTagValue()?.ToObject() },
             _ => null
         };
     }
@@ -315,14 +315,14 @@ public sealed class PaxValue : IDisposable
     private void ThrowIfDisposed()
     {
         if (_disposed)
-            throw new ObjectDisposedException(nameof(PaxValue));
+            throw new ObjectDisposedException(nameof(TLValue));
     }
 
     public void Dispose()
     {
         if (!_disposed && _handle != IntPtr.Zero)
         {
-            NativeMethods.pax_value_free(_handle);
+            NativeMethods.tl_value_free(_handle);
             _handle = IntPtr.Zero;
             _disposed = true;
         }
@@ -330,9 +330,9 @@ public sealed class PaxValue : IDisposable
 }
 
 /// <summary>
-/// The type of a Pax value.
+/// The type of a TeaLeaf value.
 /// </summary>
-public enum PaxType
+public enum TLType
 {
     Null = 0,
     Bool = 1,

@@ -1,11 +1,11 @@
-//! Binary format writer for Pax
+//! Binary format writer for TeaLeaf
 
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufWriter, Write, Seek, SeekFrom};
 use std::path::Path;
 
-use crate::{Result, Value, Schema, FieldType, PaxType, MAGIC, VERSION_MAJOR, VERSION_MINOR, HEADER_SIZE};
+use crate::{Result, Value, Schema, FieldType, TLType, MAGIC, VERSION_MAJOR, VERSION_MINOR, HEADER_SIZE};
 
 pub struct Writer {
     strings: Vec<String>,
@@ -19,7 +19,7 @@ struct Section {
     key: String,
     data: Vec<u8>,
     schema_idx: i16,
-    pax_type: PaxType,
+    tl_type: TLType,
     is_array: bool,
     item_count: u32,
 }
@@ -56,8 +56,8 @@ impl Writer {
     pub fn add_section(&mut self, key: &str, value: &Value, schema: Option<&Schema>) {
         self.intern(key);
         let schema_idx = schema.map(|s| self.schema_map.get(&s.name).copied().unwrap_or(0xFFFF) as i16).unwrap_or(-1);
-        let (data, pax_type, is_array, item_count) = self.encode_value(value, schema);
-        self.sections.push(Section { key: key.to_string(), data, schema_idx, pax_type, is_array, item_count });
+        let (data, tl_type, is_array, item_count) = self.encode_value(value, schema);
+        self.sections.push(Section { key: key.to_string(), data, schema_idx, tl_type, is_array, item_count });
     }
 
     pub fn write<P: AsRef<Path>>(&self, path: P, compress: bool) -> Result<()> {
@@ -82,7 +82,7 @@ impl Writer {
                 if c.len() < (sec.data.len() as f64 * 0.9) as usize { (c, true) } else { (sec.data.clone(), false) }
             } else { (sec.data.clone(), false) };
             w.write_all(&written)?;
-            entries.push((self.string_map[&sec.key], cur_off, written.len() as u32, sec.data.len() as u32, sec.schema_idx, sec.pax_type, compressed, sec.is_array, sec.item_count));
+            entries.push((self.string_map[&sec.key], cur_off, written.len() as u32, sec.data.len() as u32, sec.schema_idx, sec.tl_type, compressed, sec.is_array, sec.item_count));
             cur_off += written.len() as u64;
         }
 
@@ -158,13 +158,13 @@ impl Writer {
             data.extend_from_slice(&0u16.to_le_bytes());
             for f in &schema.fields {
                 data.extend_from_slice(&self.string_map[&f.name].to_le_bytes());
-                data.push(f.field_type.to_pax_type() as u8);
+                data.push(f.field_type.to_tl_type() as u8);
                 let mut flags: u8 = 0;
                 if f.field_type.nullable { flags |= 0x01; }
                 if f.field_type.is_array { flags |= 0x02; }
                 data.push(flags);
                 // Store struct type name string index (0xFFFF = no type)
-                if f.field_type.to_pax_type() == PaxType::Struct {
+                if f.field_type.to_tl_type() == TLType::Struct {
                     let type_name_idx = self.string_map.get(&f.field_type.base)
                         .copied()
                         .map(|i| i as u16)
@@ -183,32 +183,32 @@ impl Writer {
         Ok(())
     }
 
-    fn encode_value(&mut self, value: &Value, schema: Option<&Schema>) -> (Vec<u8>, PaxType, bool, u32) {
+    fn encode_value(&mut self, value: &Value, schema: Option<&Schema>) -> (Vec<u8>, TLType, bool, u32) {
         match value {
-            Value::Null => (vec![], PaxType::Null, false, 0),
-            Value::Bool(b) => (vec![if *b { 1 } else { 0 }], PaxType::Bool, false, 0),
+            Value::Null => (vec![], TLType::Null, false, 0),
+            Value::Bool(b) => (vec![if *b { 1 } else { 0 }], TLType::Bool, false, 0),
             Value::Int(i) => encode_int(*i),
             Value::UInt(u) => encode_uint(*u),
-            Value::Float(f) => (f.to_le_bytes().to_vec(), PaxType::Float64, false, 0),
-            Value::String(s) => { let idx = self.intern(s); (idx.to_le_bytes().to_vec(), PaxType::String, false, 0) }
-            Value::Bytes(b) => { let mut buf = Vec::new(); write_varint(&mut buf, b.len() as u64); buf.extend(b); (buf, PaxType::Bytes, false, 0) }
+            Value::Float(f) => (f.to_le_bytes().to_vec(), TLType::Float64, false, 0),
+            Value::String(s) => { let idx = self.intern(s); (idx.to_le_bytes().to_vec(), TLType::String, false, 0) }
+            Value::Bytes(b) => { let mut buf = Vec::new(); write_varint(&mut buf, b.len() as u64); buf.extend(b); (buf, TLType::Bytes, false, 0) }
             Value::Array(arr) => self.encode_array(arr, schema),
             Value::Object(obj) => self.encode_object(obj),
             Value::Map(pairs) => self.encode_map(pairs),
-            Value::Ref(r) => { let idx = self.intern(r); (idx.to_le_bytes().to_vec(), PaxType::Ref, false, 0) }
+            Value::Ref(r) => { let idx = self.intern(r); (idx.to_le_bytes().to_vec(), TLType::Ref, false, 0) }
             Value::Tagged(tag, inner) => {
                 let ti = self.intern(tag);
                 let (d, t, _, _) = self.encode_value(inner, None);
                 let mut buf = ti.to_le_bytes().to_vec();
                 buf.push(t as u8);
                 buf.extend(d);
-                (buf, PaxType::Tagged, false, 0)
+                (buf, TLType::Tagged, false, 0)
             }
-            Value::Timestamp(ts) => (ts.to_le_bytes().to_vec(), PaxType::Timestamp, false, 0),
+            Value::Timestamp(ts) => (ts.to_le_bytes().to_vec(), TLType::Timestamp, false, 0),
         }
     }
 
-    fn encode_map(&mut self, pairs: &[(Value, Value)]) -> (Vec<u8>, PaxType, bool, u32) {
+    fn encode_map(&mut self, pairs: &[(Value, Value)]) -> (Vec<u8>, TLType, bool, u32) {
         let mut buf = (pairs.len() as u32).to_le_bytes().to_vec();
         for (k, v) in pairs {
             let (kd, kt, _, _) = self.encode_value(k, None);
@@ -218,31 +218,31 @@ impl Writer {
             buf.push(vt as u8);
             buf.extend(vd);
         }
-        (buf, PaxType::Map, false, pairs.len() as u32)
+        (buf, TLType::Map, false, pairs.len() as u32)
     }
 
-    fn encode_array(&mut self, arr: &[Value], schema: Option<&Schema>) -> (Vec<u8>, PaxType, bool, u32) {
+    fn encode_array(&mut self, arr: &[Value], schema: Option<&Schema>) -> (Vec<u8>, TLType, bool, u32) {
         let mut buf = (arr.len() as u32).to_le_bytes().to_vec();
-        if arr.is_empty() { return (buf, PaxType::Array, true, 0); }
+        if arr.is_empty() { return (buf, TLType::Array, true, 0); }
         if schema.is_some() && arr.iter().all(|v| matches!(v, Value::Object(_))) {
             return self.encode_struct_array(arr, schema.unwrap());
         }
         if arr.iter().all(|v| matches!(v, Value::Int(_))) {
-            buf.push(PaxType::Int32 as u8);
+            buf.push(TLType::Int32 as u8);
             for v in arr { if let Value::Int(i) = v { buf.extend((*i as i32).to_le_bytes()); } }
-            return (buf, PaxType::Array, true, arr.len() as u32);
+            return (buf, TLType::Array, true, arr.len() as u32);
         }
         if arr.iter().all(|v| matches!(v, Value::String(_))) {
-            buf.push(PaxType::String as u8);
+            buf.push(TLType::String as u8);
             for v in arr { if let Value::String(s) = v { buf.extend(self.intern(s).to_le_bytes()); } }
-            return (buf, PaxType::Array, true, arr.len() as u32);
+            return (buf, TLType::Array, true, arr.len() as u32);
         }
         buf.push(0xFF);
         for v in arr { let (d, t, _, _) = self.encode_value(v, None); buf.push(t as u8); buf.extend(d); }
-        (buf, PaxType::Array, true, arr.len() as u32)
+        (buf, TLType::Array, true, arr.len() as u32)
     }
 
-    fn encode_struct_array(&mut self, arr: &[Value], schema: &Schema) -> (Vec<u8>, PaxType, bool, u32) {
+    fn encode_struct_array(&mut self, arr: &[Value], schema: &Schema) -> (Vec<u8>, TLType, bool, u32) {
         let mut buf = (arr.len() as u32).to_le_bytes().to_vec();
         let si = *self.schema_map.get(&schema.name).unwrap();
         buf.extend(si.to_le_bytes());
@@ -266,12 +266,12 @@ impl Writer {
                 }
             }
         }
-        (buf, PaxType::Struct, true, arr.len() as u32)
+        (buf, TLType::Struct, true, arr.len() as u32)
     }
 
     /// Encode a value according to a specific field type (schema-aware encoding)
     fn encode_typed_value(&mut self, value: &Value, field_type: &FieldType, nested_schema: Option<&Schema>) -> Vec<u8> {
-        use crate::PaxType;
+        use crate::TLType;
 
         // Handle arrays
         if field_type.is_array {
@@ -281,7 +281,7 @@ impl Writer {
 
                 // Determine element type
                 let elem_type = FieldType::new(&field_type.base);
-                let elem_pax_type = elem_type.to_pax_type();
+                let elem_tl_type = elem_type.to_tl_type();
 
                 // For struct arrays, look up the correct element schema
                 let elem_schema = self.schemas.iter()
@@ -289,7 +289,7 @@ impl Writer {
                     .cloned();
 
                 // Write element type byte (standard array format)
-                buf.push(elem_pax_type as u8);
+                buf.push(elem_tl_type as u8);
 
                 // Encode each element with proper type
                 for v in arr {
@@ -300,58 +300,58 @@ impl Writer {
             return vec![];
         }
 
-        let pax_type = field_type.to_pax_type();
-        match pax_type {
-            PaxType::Null => vec![],
-            PaxType::Bool => {
+        let tl_type = field_type.to_tl_type();
+        match tl_type {
+            TLType::Null => vec![],
+            TLType::Bool => {
                 if let Value::Bool(b) = value { vec![if *b { 1 } else { 0 }] }
                 else { vec![0] }
             }
-            PaxType::Int8 => {
+            TLType::Int8 => {
                 let i = match value { Value::Int(i) => *i, Value::UInt(u) => *u as i64, _ => 0 };
                 (i as i8).to_le_bytes().to_vec()
             }
-            PaxType::Int16 => {
+            TLType::Int16 => {
                 let i = match value { Value::Int(i) => *i, Value::UInt(u) => *u as i64, _ => 0 };
                 (i as i16).to_le_bytes().to_vec()
             }
-            PaxType::Int32 => {
+            TLType::Int32 => {
                 let i = match value { Value::Int(i) => *i, Value::UInt(u) => *u as i64, _ => 0 };
                 (i as i32).to_le_bytes().to_vec()
             }
-            PaxType::Int64 => {
+            TLType::Int64 => {
                 let i = match value { Value::Int(i) => *i, Value::UInt(u) => *u as i64, _ => 0 };
                 i.to_le_bytes().to_vec()
             }
-            PaxType::UInt8 => {
+            TLType::UInt8 => {
                 let u = match value { Value::UInt(u) => *u, Value::Int(i) => *i as u64, _ => 0 };
                 (u as u8).to_le_bytes().to_vec()
             }
-            PaxType::UInt16 => {
+            TLType::UInt16 => {
                 let u = match value { Value::UInt(u) => *u, Value::Int(i) => *i as u64, _ => 0 };
                 (u as u16).to_le_bytes().to_vec()
             }
-            PaxType::UInt32 => {
+            TLType::UInt32 => {
                 let u = match value { Value::UInt(u) => *u, Value::Int(i) => *i as u64, _ => 0 };
                 (u as u32).to_le_bytes().to_vec()
             }
-            PaxType::UInt64 => {
+            TLType::UInt64 => {
                 let u = match value { Value::UInt(u) => *u, Value::Int(i) => *i as u64, _ => 0 };
                 u.to_le_bytes().to_vec()
             }
-            PaxType::Float32 => {
+            TLType::Float32 => {
                 let f = match value { Value::Float(f) => *f, Value::Int(i) => *i as f64, _ => 0.0 };
                 (f as f32).to_le_bytes().to_vec()
             }
-            PaxType::Float64 => {
+            TLType::Float64 => {
                 let f = match value { Value::Float(f) => *f, Value::Int(i) => *i as f64, _ => 0.0 };
                 f.to_le_bytes().to_vec()
             }
-            PaxType::String => {
+            TLType::String => {
                 if let Value::String(s) = value { self.intern(s).to_le_bytes().to_vec() }
                 else { self.intern("").to_le_bytes().to_vec() }
             }
-            PaxType::Bytes => {
+            TLType::Bytes => {
                 if let Value::Bytes(b) = value {
                     let mut buf = Vec::new();
                     write_varint(&mut buf, b.len() as u64);
@@ -359,11 +359,11 @@ impl Writer {
                     buf
                 } else { vec![0] }
             }
-            PaxType::Timestamp => {
+            TLType::Timestamp => {
                 if let Value::Timestamp(ts) = value { ts.to_le_bytes().to_vec() }
                 else { 0i64.to_le_bytes().to_vec() }
             }
-            PaxType::Struct => {
+            TLType::Struct => {
                 // Nested struct - encode recursively
                 if let (Value::Object(obj), Some(schema)) = (value, nested_schema) {
                     let mut buf = Vec::new();
@@ -403,7 +403,7 @@ impl Writer {
         }
     }
 
-    fn encode_object(&mut self, obj: &HashMap<String, Value>) -> (Vec<u8>, PaxType, bool, u32) {
+    fn encode_object(&mut self, obj: &HashMap<String, Value>) -> (Vec<u8>, TLType, bool, u32) {
         let mut buf = (obj.len() as u16).to_le_bytes().to_vec();
         for (k, v) in obj {
             buf.extend(self.intern(k).to_le_bytes());
@@ -411,24 +411,24 @@ impl Writer {
             buf.push(t as u8);
             buf.extend(d);
         }
-        (buf, PaxType::Object, false, 0)
+        (buf, TLType::Object, false, 0)
     }
 }
 
 impl Default for Writer { fn default() -> Self { Self::new() } }
 
-fn encode_int(i: i64) -> (Vec<u8>, PaxType, bool, u32) {
-    if i >= i8::MIN as i64 && i <= i8::MAX as i64 { ((i as i8).to_le_bytes().to_vec(), PaxType::Int8, false, 0) }
-    else if i >= i16::MIN as i64 && i <= i16::MAX as i64 { ((i as i16).to_le_bytes().to_vec(), PaxType::Int16, false, 0) }
-    else if i >= i32::MIN as i64 && i <= i32::MAX as i64 { ((i as i32).to_le_bytes().to_vec(), PaxType::Int32, false, 0) }
-    else { (i.to_le_bytes().to_vec(), PaxType::Int64, false, 0) }
+fn encode_int(i: i64) -> (Vec<u8>, TLType, bool, u32) {
+    if i >= i8::MIN as i64 && i <= i8::MAX as i64 { ((i as i8).to_le_bytes().to_vec(), TLType::Int8, false, 0) }
+    else if i >= i16::MIN as i64 && i <= i16::MAX as i64 { ((i as i16).to_le_bytes().to_vec(), TLType::Int16, false, 0) }
+    else if i >= i32::MIN as i64 && i <= i32::MAX as i64 { ((i as i32).to_le_bytes().to_vec(), TLType::Int32, false, 0) }
+    else { (i.to_le_bytes().to_vec(), TLType::Int64, false, 0) }
 }
 
-fn encode_uint(u: u64) -> (Vec<u8>, PaxType, bool, u32) {
-    if u <= u8::MAX as u64 { ((u as u8).to_le_bytes().to_vec(), PaxType::UInt8, false, 0) }
-    else if u <= u16::MAX as u64 { ((u as u16).to_le_bytes().to_vec(), PaxType::UInt16, false, 0) }
-    else if u <= u32::MAX as u64 { ((u as u32).to_le_bytes().to_vec(), PaxType::UInt32, false, 0) }
-    else { (u.to_le_bytes().to_vec(), PaxType::UInt64, false, 0) }
+fn encode_uint(u: u64) -> (Vec<u8>, TLType, bool, u32) {
+    if u <= u8::MAX as u64 { ((u as u8).to_le_bytes().to_vec(), TLType::UInt8, false, 0) }
+    else if u <= u16::MAX as u64 { ((u as u16).to_le_bytes().to_vec(), TLType::UInt16, false, 0) }
+    else if u <= u32::MAX as u64 { ((u as u32).to_le_bytes().to_vec(), TLType::UInt32, false, 0) }
+    else { (u.to_le_bytes().to_vec(), TLType::UInt64, false, 0) }
 }
 
 fn write_varint(buf: &mut Vec<u8>, mut v: u64) {

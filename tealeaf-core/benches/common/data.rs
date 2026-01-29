@@ -8,7 +8,7 @@ use crate::proto::benchmark as pb;
 // Scenario 1: Small Object
 // ============================================================================
 
-pub fn small_config_pax_text() -> &'static str {
+pub fn small_config_tl_text() -> &'static str {
     r#"config: {
     name: "my-service",
     version: 42,
@@ -39,7 +39,7 @@ pub fn small_config_proto() -> pb::SmallConfig {
 // Scenario 2: Large Array
 // ============================================================================
 
-pub fn large_array_pax_text(count: usize) -> String {
+pub fn large_array_tl_text(count: usize) -> String {
     let mut text = String::from("@struct point (x: float, y: float, z: float)\npoints: @table point [\n");
     for i in 0..count {
         let x = i as f64 * 0.1;
@@ -77,7 +77,7 @@ pub fn large_array_proto(count: usize) -> pb::PointList {
 // Scenario 3: Nested Structs
 // ============================================================================
 
-pub fn nested_struct_pax_text() -> &'static str {
+pub fn nested_struct_tl_text() -> &'static str {
     r#"@struct address (street: string, city: string, zip: string, country: string)
 @struct company (name: string, address: address, employee_count: int)
 @struct person (id: int64, name: string, email: string, age: int, employer: company)
@@ -88,7 +88,7 @@ people: @table person [
 ]"#
 }
 
-pub fn nested_struct_pax_text_scaled(count: usize) -> String {
+pub fn nested_struct_tl_text_scaled(count: usize) -> String {
     let mut text = String::from(
         r#"@struct address (street: string, city: string, zip: string, country: string)
 @struct company (name: string, address: address, employee_count: int)
@@ -245,7 +245,7 @@ pub fn nested_struct_proto_scaled(count: usize) -> pb::PersonList {
 // Scenario 4: Mixed Types
 // ============================================================================
 
-pub fn mixed_types_pax_text() -> &'static str {
+pub fn mixed_types_tl_text() -> &'static str {
     r#"record: {
     id: 12345678901234,
     name: "Test Record",
@@ -299,7 +299,7 @@ pub fn mixed_types_proto() -> pb::MixedData {
 // Scenario 5: Tabular Data
 // ============================================================================
 
-pub fn tabular_users_pax_text(count: usize) -> String {
+pub fn tabular_users_tl_text(count: usize) -> String {
     let mut text = String::from(
         "@struct user (id: int64, username: string, email: string, created_at: int64, is_admin: bool)\n\
          users: @table user [\n",

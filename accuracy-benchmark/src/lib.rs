@@ -1,7 +1,7 @@
-//! Accuracy Benchmark Suite for PAX Format
+//! Accuracy Benchmark Suite for TeaLeaf Format
 //!
 //! This crate provides a comprehensive benchmark suite for evaluating LLM
-//! accuracy across multiple providers using PAX-formatted analysis tasks.
+//! accuracy across multiple providers using TeaLeaf-formatted analysis tasks.
 //!
 //! # Features
 //!
@@ -9,7 +9,7 @@
 //! - Support for Anthropic (Claude), OpenAI, and xAI (Grok) providers
 //! - Automated response analysis with accuracy metrics
 //! - Cross-provider comparison and ranking
-//! - PAX and JSON result output
+//! - TeaLeaf and JSON result output
 //!
 //! # Example
 //!
@@ -64,7 +64,7 @@ pub mod prelude {
         create_all_providers, create_providers, CompletionRequest, CompletionResponse,
         LLMProvider, Message, ProviderError, ProviderResult,
     };
-    pub use crate::reporting::{print_console_report, JsonSummary, PaxWriter};
+    pub use crate::reporting::{print_console_report, JsonSummary, TLWriter};
     pub use crate::runner::{Executor, ExecutorConfig};
     pub use crate::tasks::{
         BenchmarkTask, Complexity, Domain, OutputType, TaskMetadata, TaskResult, TaskStatus,

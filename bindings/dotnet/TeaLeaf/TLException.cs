@@ -1,14 +1,14 @@
-namespace Pax;
+namespace TeaLeaf;
 
 /// <summary>
-/// Exception thrown when a Pax operation fails.
+/// Exception thrown when a TeaLeaf operation fails.
 /// </summary>
-public class PaxException : Exception
+public class TLException : Exception
 {
-    public PaxException() : base() { }
+    public TLException() : base() { }
 
-    public PaxException(string message) : base(message) { }
+    public TLException(string message) : base(message) { }
 
-    public PaxException(string message, Exception innerException)
+    public TLException(string message, Exception innerException)
         : base(message, innerException) { }
 }

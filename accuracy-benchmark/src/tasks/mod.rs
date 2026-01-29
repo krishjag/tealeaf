@@ -43,12 +43,12 @@ pub struct DataReference {
 /// Input data source for a benchmark task
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum DataSource {
-    /// Inline JSON data (will be converted to PAX)
+    /// Inline JSON data (will be converted to TeaLeaf)
     InlineJson(serde_json::Value),
-    /// Path to a JSON file (will be loaded and converted to PAX)
+    /// Path to a JSON file (will be loaded and converted to TeaLeaf)
     JsonFile(String),
-    /// Raw PAX data (already in PAX format)
-    RawPax(String),
+    /// Raw TeaLeaf data (already in TeaLeaf format)
+    RawTL(String),
     /// No data - prompt is self-contained
     None,
 }
@@ -63,7 +63,7 @@ impl Default for DataSource {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BenchmarkTask {
     pub metadata: TaskMetadata,
-    /// Prompt template with {pax_data} placeholder for data
+    /// Prompt template with {tl_data} placeholder for data
     pub prompt_template: String,
     /// The actual prompt (filled in during execution)
     #[serde(skip)]
@@ -73,7 +73,7 @@ pub struct BenchmarkTask {
     pub expected_elements: Vec<ExpectedElement>,
     pub data_context: Vec<DataReference>,
     pub grading_rubric: Option<String>,
-    /// Data source (JSON to be converted to PAX)
+    /// Data source (JSON to be converted to TeaLeaf)
     #[serde(default)]
     pub data_source: DataSource,
 }
@@ -102,7 +102,7 @@ impl BenchmarkTask {
         }
     }
 
-    /// Create a task with JSON data that will be converted to PAX
+    /// Create a task with JSON data that will be converted to TeaLeaf
     pub fn with_json_data(mut self, json: serde_json::Value) -> Self {
         self.data_source = DataSource::InlineJson(json);
         self
@@ -114,41 +114,41 @@ impl BenchmarkTask {
         self
     }
 
-    /// Prepare the prompt by converting JSON data to PAX and inserting it
+    /// Prepare the prompt by converting JSON data to TeaLeaf and inserting it
     pub fn prepare_prompt(&mut self) -> Result<(), String> {
-        self.prepare_prompt_with_format(DataFormat::Pax)
+        self.prepare_prompt_with_format(DataFormat::TL)
     }
 
-    /// Prepare the prompt with a specific data format (PAX or JSON)
+    /// Prepare the prompt with a specific data format (TeaLeaf or JSON)
     pub fn prepare_prompt_with_format(&mut self, format: DataFormat) -> Result<(), String> {
         let data = match format {
-            DataFormat::Pax => self.get_data_as_pax()?,
+            DataFormat::TL => self.get_data_as_tl()?,
             DataFormat::Json => self.get_data_as_json()?,
         };
 
-        // Replace {pax_data} or {data} placeholder in template
+        // Replace {tl_data} or {data} placeholder in template
         self.prompt = self.prompt_template
-            .replace("{pax_data}", &data)
+            .replace("{tl_data}", &data)
             .replace("{data}", &data);
         Ok(())
     }
 
-    /// Get data in PAX format
-    fn get_data_as_pax(&self) -> Result<String, String> {
+    /// Get data in TeaLeaf format
+    fn get_data_as_tl(&self) -> Result<String, String> {
         match &self.data_source {
             DataSource::InlineJson(json) => {
-                // Convert JSON to PAX using pax-core
+                // Convert JSON to TeaLeaf using tealeaf-core
                 let json_str = serde_json::to_string_pretty(json)
                     .map_err(|e| format!("Failed to serialize JSON: {}", e))?;
-                convert_json_to_pax(&json_str)
+                convert_json_to_tl(&json_str)
             }
             DataSource::JsonFile(path) => {
                 // Load and convert JSON file
                 let json_str = std::fs::read_to_string(path)
                     .map_err(|e| format!("Failed to read JSON file {}: {}", path, e))?;
-                convert_json_to_pax(&json_str)
+                convert_json_to_tl(&json_str)
             }
-            DataSource::RawPax(pax) => Ok(pax.clone()),
+            DataSource::RawTL(tl) => Ok(tl.clone()),
             DataSource::None => Ok(String::new()),
         }
     }
@@ -164,10 +164,10 @@ impl BenchmarkTask {
                 std::fs::read_to_string(path)
                     .map_err(|e| format!("Failed to read JSON file {}: {}", path, e))
             }
-            DataSource::RawPax(pax) => {
-                // PAX data stays as-is when JSON format requested
-                // (alternative: could try to convert PAX to JSON, but complex)
-                Ok(pax.clone())
+            DataSource::RawTL(tl) => {
+                // TeaLeaf data stays as-is when JSON format requested
+                // (alternative: could try to convert TeaLeaf to JSON, but complex)
+                Ok(tl.clone())
             }
             DataSource::None => Ok(String::new()),
         }
@@ -236,7 +236,7 @@ impl BenchmarkTask {
 pub struct TaskResult {
     pub task_id: String,
     pub provider: String,
-    /// Data format used for this execution (PAX or JSON)
+    /// Data format used for this execution (TeaLeaf or JSON)
     #[serde(default = "default_format")]
     pub format: DataFormat,
     pub status: TaskStatus,
@@ -246,7 +246,7 @@ pub struct TaskResult {
 }
 
 fn default_format() -> DataFormat {
-    DataFormat::Pax
+    DataFormat::TL
 }
 
 /// Key for identifying task results by task, provider, and format
@@ -304,7 +304,7 @@ impl From<CompletionResponse> for TaskResponse {
 impl TaskResult {
     /// Create a successful result
     pub fn success(task_id: String, provider: String, response: CompletionResponse) -> Self {
-        Self::success_with_format(task_id, provider, response, DataFormat::Pax)
+        Self::success_with_format(task_id, provider, response, DataFormat::TL)
     }
 
     /// Create a successful result with specific format
@@ -322,7 +322,7 @@ impl TaskResult {
 
     /// Create a failure result
     pub fn failure(task_id: String, provider: String, error: String) -> Self {
-        Self::failure_with_format(task_id, provider, error, DataFormat::Pax)
+        Self::failure_with_format(task_id, provider, error, DataFormat::TL)
     }
 
     /// Create a failure result with specific format
@@ -349,21 +349,21 @@ impl TaskResult {
     }
 }
 
-/// Convert JSON string to PAX format using pax-core
-pub fn convert_json_to_pax(json_str: &str) -> Result<String, String> {
-    // Use pax-core's from_json_with_schemas to convert and infer schemas
-    let pax = pax::Pax::from_json_with_schemas(json_str)
-        .map_err(|e| format!("Failed to convert JSON to PAX: {}", e))?;
+/// Convert JSON string to TeaLeaf format using tealeaf-core
+pub fn convert_json_to_tl(json_str: &str) -> Result<String, String> {
+    // Use tealeaf-core's from_json_with_schemas to convert and infer schemas
+    let tl = tealeaf::TeaLeaf::from_json_with_schemas(json_str)
+        .map_err(|e| format!("Failed to convert JSON to TeaLeaf: {}", e))?;
 
-    // Convert back to PAX text format
-    let pax_text = pax.to_pax_with_schemas();
+    // Convert back to TeaLeaf text format
+    let tl_text = tl.to_tl_with_schemas();
 
-    Ok(pax_text)
+    Ok(tl_text)
 }
 
-/// Convert JSON file to PAX format
-pub fn convert_json_file_to_pax(path: &str) -> Result<String, String> {
+/// Convert JSON file to TeaLeaf format
+pub fn convert_json_file_to_tl(path: &str) -> Result<String, String> {
     let json_str = std::fs::read_to_string(path)
         .map_err(|e| format!("Failed to read file {}: {}", path, e))?;
-    convert_json_to_pax(&json_str)
+    convert_json_to_tl(&json_str)
 }

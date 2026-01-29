@@ -53,7 +53,9 @@
       "Bash(bash:*)",
       "Bash(./scripts/sync-version.sh:*)",
       "Bash(git mv:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(pushd:*)",
+      "Bash(popd:*)"
     ]
   }
 }

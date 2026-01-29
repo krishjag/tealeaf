@@ -82,19 +82,19 @@ update_file "$CARGO_FILE" "Cargo.toml (version)" \
     "^(version = \")[^\"]*(\")$" "\1$VERSION\2"
 
 # Update .NET csproj
-CSPROJ_FILE="$REPO_ROOT/bindings/dotnet/Pax/Pax.csproj"
-update_file "$CSPROJ_FILE" "Pax.csproj (version)" \
+CSPROJ_FILE="$REPO_ROOT/bindings/dotnet/TeaLeaf/TeaLeaf.csproj"
+update_file "$CSPROJ_FILE" "TeaLeaf.csproj (version)" \
     "(<Version>)[^<]*(</Version>)" "\1$VERSION\2"
 
 # Update README.md footer version
 README_FILE="$REPO_ROOT/README.md"
 update_file "$README_FILE" "README.md (footer)" \
-    "(\*PAX v)[^ ]+( —)" "\1$VERSION\2"
+    "(\*TeaLeaf v)[^ ]+( —)" "\1$VERSION\2"
 
-# Update PAX_SPEC.md title version
-SPEC_FILE="$REPO_ROOT/spec/PAX_SPEC.md"
-update_file "$SPEC_FILE" "spec/PAX_SPEC.md (title)" \
-    "(# PAX Format Specification v)[^ ]+" "\1$VERSION"
+# Update TEALEAF_SPEC.md title version
+SPEC_FILE="$REPO_ROOT/spec/TEALEAF_SPEC.md"
+update_file "$SPEC_FILE" "spec/TEALEAF_SPEC.md (title)" \
+    "(# TeaLeaf Format Specification v)[^ ]+" "\1$VERSION"
 
 echo ""
 if [[ "$DRY_RUN" == "true" ]]; then

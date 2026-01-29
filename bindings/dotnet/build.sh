@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Build script for Pax .NET library with native dependencies.
+# Build script for TeaLeaf .NET library with native dependencies.
 #
 # Usage:
 #   ./build.sh [OPTIONS]
@@ -34,8 +34,8 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 DOTNET_DIR="$SCRIPT_DIR"
-PAX_DIR="$DOTNET_DIR/Pax"
-RUNTIMES_DIR="$PAX_DIR/runtimes"
+TEALEAF_DIR="$DOTNET_DIR/TeaLeaf"
+RUNTIMES_DIR="$TEALEAF_DIR/runtimes"
 
 # Default values
 CONFIGURATION="Release"
@@ -46,15 +46,15 @@ SKIP_RUST=false
 
 # Rust target mappings
 declare -A RUST_TARGETS
-RUST_TARGETS["win-x64"]="x86_64-pc-windows-msvc:pax_ffi.dll"
-RUST_TARGETS["win-x86"]="i686-pc-windows-msvc:pax_ffi.dll"
-RUST_TARGETS["win-arm64"]="aarch64-pc-windows-msvc:pax_ffi.dll"
-RUST_TARGETS["linux-x64"]="x86_64-unknown-linux-gnu:libpax_ffi.so"
-RUST_TARGETS["linux-arm64"]="aarch64-unknown-linux-gnu:libpax_ffi.so"
-RUST_TARGETS["linux-musl-x64"]="x86_64-unknown-linux-musl:libpax_ffi.so"
-RUST_TARGETS["linux-musl-arm64"]="aarch64-unknown-linux-musl:libpax_ffi.so"
-RUST_TARGETS["osx-x64"]="x86_64-apple-darwin:libpax_ffi.dylib"
-RUST_TARGETS["osx-arm64"]="aarch64-apple-darwin:libpax_ffi.dylib"
+RUST_TARGETS["win-x64"]="x86_64-pc-windows-msvc:tealeaf_ffi.dll"
+RUST_TARGETS["win-x86"]="i686-pc-windows-msvc:tealeaf_ffi.dll"
+RUST_TARGETS["win-arm64"]="aarch64-pc-windows-msvc:tealeaf_ffi.dll"
+RUST_TARGETS["linux-x64"]="x86_64-unknown-linux-gnu:libtealeaf_ffi.so"
+RUST_TARGETS["linux-arm64"]="aarch64-unknown-linux-gnu:libtealeaf_ffi.so"
+RUST_TARGETS["linux-musl-x64"]="x86_64-unknown-linux-musl:libtealeaf_ffi.so"
+RUST_TARGETS["linux-musl-arm64"]="aarch64-unknown-linux-musl:libtealeaf_ffi.so"
+RUST_TARGETS["osx-x64"]="x86_64-apple-darwin:libtealeaf_ffi.dylib"
+RUST_TARGETS["osx-arm64"]="aarch64-apple-darwin:libtealeaf_ffi.dylib"
 
 ALL_RIDS="linux-arm64 linux-musl-arm64 linux-musl-x64 linux-x64 osx-arm64 osx-x64 win-arm64 win-x64 win-x86"
 
@@ -136,7 +136,7 @@ build_rust_library() {
     fi
 
     # Build
-    local cargo_args="build --package pax-ffi --target $rust_target"
+    local cargo_args="build --package tealeaf-ffi --target $rust_target"
     if [ "$config" = "Release" ]; then
         cargo_args="$cargo_args --release"
     fi
@@ -221,7 +221,7 @@ else
 fi
 
 # Main build process
-write_step "Pax .NET Build Script"
+write_step "TeaLeaf .NET Build Script"
 echo "Configuration: $CONFIGURATION"
 echo "Target RIDs: ${RIDS_TO_BUILD[*]}"
 
@@ -273,16 +273,16 @@ fi
 # Build .NET project
 write_step "Building .NET Project"
 
-dotnet build "$PAX_DIR" -c "$CONFIGURATION"
+dotnet build "$TEALEAF_DIR" -c "$CONFIGURATION"
 
 # Run tests if requested
 if [ "$RUN_TESTS" = true ]; then
     write_step "Running Tests"
 
-    TEST_PROJECT="$DOTNET_DIR/Pax.Tests"
+    TEST_PROJECT="$DOTNET_DIR/TeaLeaf.Tests"
     if [ -d "$TEST_PROJECT" ]; then
         # Find native library to copy to test output
-        NATIVE_LIB=$(find "$RUNTIMES_DIR" -name "libpax_ffi.*" -o -name "pax_ffi.dll" 2>/dev/null | head -1)
+        NATIVE_LIB=$(find "$RUNTIMES_DIR" -name "libtealeaf_ffi.*" -o -name "tealeaf_ffi.dll" 2>/dev/null | head -1)
         if [ -n "$NATIVE_LIB" ]; then
             LIB_NAME=$(basename "$NATIVE_LIB")
             for framework in net8.0 net10.0; do
@@ -306,7 +306,7 @@ if [ "$CREATE_PACK" = true ]; then
     ARTIFACTS_DIR="$DOTNET_DIR/artifacts"
     mkdir -p "$ARTIFACTS_DIR"
 
-    dotnet pack "$PAX_DIR" -c "$CONFIGURATION" --no-build -o "$ARTIFACTS_DIR"
+    dotnet pack "$TEALEAF_DIR" -c "$CONFIGURATION" --no-build -o "$ARTIFACTS_DIR"
 
     PACKAGE=$(ls -t "$ARTIFACTS_DIR"/*.nupkg 2>/dev/null | head -1)
     if [ -n "$PACKAGE" ]; then
@@ -321,7 +321,7 @@ write_step "Build Complete"
 echo -e "\nNative libraries included:"
 if [ -d "$RUNTIMES_DIR" ]; then
     find "$RUNTIMES_DIR" -type f | while read -r lib; do
-        relative_path="${lib#$PAX_DIR/}"
+        relative_path="${lib#$TEALEAF_DIR/}"
         write_info "$relative_path"
     done
 else

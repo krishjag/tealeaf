@@ -1,4 +1,4 @@
-//! Lexer for Pax text format
+//! Lexer for TeaLeaf text format
 
 use crate::{Error, Result};
 

@@ -1,9 +1,9 @@
 using System.Text.Json;
 using Xunit;
 
-namespace Pax.Tests;
+namespace TeaLeaf.Tests;
 
-public class PaxReaderTests
+public class TLReaderTests
 {
     private string _tempDir = Path.GetTempPath();
 
@@ -14,22 +14,22 @@ public class PaxReaderTests
     [Fact]
     public void Open_CompiledFile_ReturnsReader()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_reader.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_reader.tlbx");
 
         try
         {
-            // Create a binary file from PAX text
-            using (var doc = PaxDocument.Parse(@"
+            // Create a binary file from TeaLeaf text
+            using (var doc = TLDocument.Parse(@"
                 name: alice
                 age: 30
                 active: true
             "))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
             // Open and read the binary file
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             Assert.NotNull(reader);
 
             using var name = reader["name"];
@@ -44,39 +44,39 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void TryOpen_ValidFile_ReturnsTrue()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_tryopen.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_tryopen.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse("key: value"))
+            using (var doc = TLDocument.Parse("key: value"))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            var success = PaxReader.TryOpen(paxbPath, out var reader);
+            var success = TLReader.TryOpen(tlbxPath, out var reader);
             Assert.True(success);
             Assert.NotNull(reader);
             reader?.Dispose();
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void TryOpen_InvalidFile_ReturnsFalse()
     {
-        var success = PaxReader.TryOpen("nonexistent.paxb", out var reader);
+        var success = TLReader.TryOpen("nonexistent.tlbx", out var reader);
         Assert.False(success);
         Assert.Null(reader);
     }
@@ -84,23 +84,23 @@ public class PaxReaderTests
     [Fact]
     public void Open_NonexistentFile_ExceptionHasDetailedMessage()
     {
-        var ex = Assert.Throws<PaxException>(() => PaxReader.Open("nonexistent_file.paxb"));
+        var ex = Assert.Throws<TLException>(() => TLReader.Open("nonexistent_file.tlbx"));
 
         // Error message should mention the file path and the problem
-        Assert.Contains("nonexistent_file.paxb", ex.Message);
+        Assert.Contains("nonexistent_file.tlbx", ex.Message);
         Assert.Contains("Failed to open", ex.Message);
     }
 
     [Fact]
     public void Open_InvalidBinaryFile_ExceptionHasDetailedMessage()
     {
-        var tempFile = Path.Combine(_tempDir, "invalid_binary.paxb");
+        var tempFile = Path.Combine(_tempDir, "invalid_binary.tlbx");
         try
         {
-            // Write invalid binary data (not a valid paxb)
-            File.WriteAllText(tempFile, "not a valid paxb file");
+            // Write invalid binary data (not a valid tlbx)
+            File.WriteAllText(tempFile, "not a valid tlbx file");
 
-            var ex = Assert.Throws<PaxException>(() => PaxReader.Open(tempFile));
+            var ex = Assert.Throws<TLException>(() => TLReader.Open(tempFile));
 
             // Error message should describe the problem
             Assert.Contains(tempFile, ex.Message);
@@ -113,26 +113,26 @@ public class PaxReaderTests
     }
 
     // ==========================================================================
-    // JSON Conversion Tests (PAXB -> JSON)
+    // JSON Conversion Tests (TLBX -> JSON)
     // ==========================================================================
 
     [Fact]
     public void ToJson_CompiledFile_ReturnsValidJson()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_tojson.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_tojson.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse(@"
+            using (var doc = TLDocument.Parse(@"
                 name: alice
                 age: 30
                 items: [1, 2, 3]
             "))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.ToJson();
 
             Assert.NotNull(json);
@@ -144,24 +144,24 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void ToJsonCompact_ReturnsMinifiedJson()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_compact.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_compact.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse("name: alice"))
+            using (var doc = TLDocument.Parse("name: alice"))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.ToJsonCompact();
 
             Assert.NotNull(json);
@@ -171,27 +171,27 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void GetAsJson_SingleKey_ReturnsJsonValue()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_getasjson.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_getasjson.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse(@"
+            using (var doc = TLDocument.Parse(@"
                 config: { debug: true, level: info }
                 items: [1, 2, 3]
             "))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
 
             var configJson = reader.GetAsJson("config");
             Assert.NotNull(configJson);
@@ -206,50 +206,50 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void GetAsJson_NonExistentKey_ReturnsNull()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_getasjson_null.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_getasjson_null.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse("key: value"))
+            using (var doc = TLDocument.Parse("key: value"))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.GetAsJson("nonexistent");
             Assert.Null(json);
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     // ==========================================================================
-    // JSON to PAXB Conversion Tests
+    // JSON to TLBX Conversion Tests
     // ==========================================================================
 
     [Fact]
-    public void CreateFromJson_ValidJson_CreatesPaxbFile()
+    public void CreateFromJson_ValidJson_CreatesTlbxFile()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_fromjson.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_fromjson.tlbx");
 
         try
         {
-            PaxReader.CreateFromJson(@"{""name"": ""alice"", ""age"": 30}", paxbPath);
+            TLReader.CreateFromJson(@"{""name"": ""alice"", ""age"": 30}", tlbxPath);
 
-            Assert.True(File.Exists(paxbPath));
+            Assert.True(File.Exists(tlbxPath));
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             using var name = reader["name"];
             Assert.Equal("alice", name?.AsString());
 
@@ -258,43 +258,43 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void TryCreateFromJson_ValidJson_ReturnsTrue()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_trycreate.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_trycreate.tlbx");
 
         try
         {
-            var success = PaxReader.TryCreateFromJson(@"{""key"": ""value""}", paxbPath);
+            var success = TLReader.TryCreateFromJson(@"{""key"": ""value""}", tlbxPath);
             Assert.True(success);
-            Assert.True(File.Exists(paxbPath));
+            Assert.True(File.Exists(tlbxPath));
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void TryCreateFromJson_InvalidJson_ReturnsFalse()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_trycreate_invalid.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_trycreate_invalid.tlbx");
 
         try
         {
-            var success = PaxReader.TryCreateFromJson("{invalid json", paxbPath);
+            var success = TLReader.TryCreateFromJson("{invalid json", tlbxPath);
             Assert.False(success);
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
@@ -303,13 +303,13 @@ public class PaxReaderTests
     // ==========================================================================
 
     [Fact]
-    public void JsonRoundTrip_ThroughPaxb_PreservesData()
+    public void JsonRoundTrip_ThroughTlbx_PreservesData()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_roundtrip.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_roundtrip.tlbx");
 
         try
         {
-            // JSON -> PAXB
+            // JSON -> TLBX
             const string originalJson = @"{
                 ""name"": ""Alice"",
                 ""age"": 30,
@@ -317,10 +317,10 @@ public class PaxReaderTests
                 ""scores"": [95.5, 88.0, 92.3]
             }";
 
-            PaxReader.CreateFromJson(originalJson, paxbPath);
+            TLReader.CreateFromJson(originalJson, tlbxPath);
 
-            // PAXB -> JSON
-            using var reader = PaxReader.Open(paxbPath);
+            // TLBX -> JSON
+            using var reader = TLReader.Open(tlbxPath);
             var resultJson = reader.ToJson();
 
             // Verify data preserved
@@ -334,19 +334,19 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void ToJson_NestedStructures_PreservesHierarchy()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_nested.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_nested.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse(@"
+            using (var doc = TLDocument.Parse(@"
                 user: {
                     name: alice
                     profile: {
@@ -359,10 +359,10 @@ public class PaxReaderTests
                 }
             "))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.ToJson();
 
             Assert.Contains("user", json);
@@ -376,8 +376,8 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
@@ -388,19 +388,19 @@ public class PaxReaderTests
     [Fact]
     public void ToJson_Ref_HasCorrectStructure()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_ref_json.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_ref_json.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse(@"
+            using (var doc = TLDocument.Parse(@"
                 base: {host: localhost}
                 config: !base
             "))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.ToJson();
 
             // Parse JSON and verify structure
@@ -416,24 +416,24 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void ToJson_Tagged_HasCorrectStructure()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_tagged_json.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_tagged_json.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse("status: :error 404"))
+            using (var doc = TLDocument.Parse("status: :error 404"))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.ToJson();
 
             // Parse JSON and verify structure
@@ -454,29 +454,29 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void ToJson_Map_HasCorrectStructure()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_map_json.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_map_json.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse(@"
+            using (var doc = TLDocument.Parse(@"
                 lookup: @map {
                     1: one,
                     2: two
                 }
             "))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.ToJson();
 
             // Parse JSON and verify structure
@@ -504,19 +504,19 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void ToJson_Object_HasCorrectStructure()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_object_json.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_object_json.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse(@"
+            using (var doc = TLDocument.Parse(@"
                 user: {
                     name: alice,
                     age: 30,
@@ -524,10 +524,10 @@ public class PaxReaderTests
                 }
             "))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.ToJson();
 
             // Parse JSON and verify structure
@@ -548,24 +548,24 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void ToJson_Array_HasCorrectStructure()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_array_json.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_array_json.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse("items: [1, 2, 3, 4, 5]"))
+            using (var doc = TLDocument.Parse("items: [1, 2, 3, 4, 5]"))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.ToJson();
 
             // Parse JSON and verify structure
@@ -583,19 +583,19 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void ToJson_MixedTypes_HasCorrectStructure()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_mixed_json.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_mixed_json.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse(@"
+            using (var doc = TLDocument.Parse(@"
                 config: {
                     name: app,
                     version: 1,
@@ -606,10 +606,10 @@ public class PaxReaderTests
                 }
             "))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.ToJson();
 
             // Parse JSON and verify structure
@@ -649,27 +649,27 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void GetAsJson_Ref_HasCorrectStructure()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_getasjson_ref.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_getasjson_ref.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse(@"
+            using (var doc = TLDocument.Parse(@"
                 base: {x: 1}
                 ptr: !base
             "))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.GetAsJson("ptr");
             Assert.NotNull(json);
 
@@ -682,24 +682,24 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
     [Fact]
     public void GetAsJson_Tagged_HasCorrectStructure()
     {
-        var paxbPath = Path.Combine(_tempDir, "test_getasjson_tagged.paxb");
+        var tlbxPath = Path.Combine(_tempDir, "test_getasjson_tagged.tlbx");
 
         try
         {
-            using (var doc = PaxDocument.Parse("result: :ok done"))
+            using (var doc = TLDocument.Parse("result: :ok done"))
             {
-                doc.Compile(paxbPath);
+                doc.Compile(tlbxPath);
             }
 
-            using var reader = PaxReader.Open(paxbPath);
+            using var reader = TLReader.Open(tlbxPath);
             var json = reader.GetAsJson("result");
             Assert.NotNull(json);
 
@@ -714,8 +714,8 @@ public class PaxReaderTests
         }
         finally
         {
-            if (File.Exists(paxbPath))
-                File.Delete(paxbPath);
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
         }
     }
 
@@ -747,19 +747,19 @@ public class PaxReaderTests
     [Fact]
     public void Bytes_FromFixture_ReturnsCorrectData()
     {
-        var fixturePath = GetFixturePath("bytes_test.paxb");
+        var fixturePath = GetFixturePath("bytes_test.tlbx");
         if (!File.Exists(fixturePath))
         {
             // Skip if fixture not available (run: cargo run --example create_test_fixtures)
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
 
         // Test non-empty bytes
         using var binaryData = reader["binary_data"];
         Assert.NotNull(binaryData);
-        Assert.Equal(PaxType.Bytes, binaryData.Type);
+        Assert.Equal(TLType.Bytes, binaryData.Type);
 
         var bytes = binaryData.AsBytes();
         Assert.NotNull(bytes);
@@ -772,7 +772,7 @@ public class PaxReaderTests
         // Test empty bytes
         using var emptyBytes = reader["empty_bytes"];
         Assert.NotNull(emptyBytes);
-        Assert.Equal(PaxType.Bytes, emptyBytes.Type);
+        Assert.Equal(TLType.Bytes, emptyBytes.Type);
         var empty = emptyBytes.AsBytes();
         Assert.NotNull(empty);
         Assert.Empty(empty);
@@ -781,13 +781,13 @@ public class PaxReaderTests
     [Fact]
     public void ToJson_Bytes_HasCorrectHexFormat()
     {
-        var fixturePath = GetFixturePath("bytes_test.paxb");
+        var fixturePath = GetFixturePath("bytes_test.tlbx");
         if (!File.Exists(fixturePath))
         {
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
         var json = reader.ToJson();
 
         // Parse and verify structure
@@ -808,18 +808,18 @@ public class PaxReaderTests
     [Fact]
     public void Timestamp_FromFixture_ReturnsCorrectData()
     {
-        var fixturePath = GetFixturePath("timestamp_test.paxb");
+        var fixturePath = GetFixturePath("timestamp_test.tlbx");
         if (!File.Exists(fixturePath))
         {
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
 
         // Test specific timestamp
         using var created = reader["created"];
         Assert.NotNull(created);
-        Assert.Equal(PaxType.Timestamp, created.Type);
+        Assert.Equal(TLType.Timestamp, created.Type);
         Assert.Equal(1705315800000, created.AsTimestamp());
 
         var dt = created.AsDateTime();
@@ -837,13 +837,13 @@ public class PaxReaderTests
     [Fact]
     public void ToJson_Timestamp_HasIso8601Format()
     {
-        var fixturePath = GetFixturePath("timestamp_test.paxb");
+        var fixturePath = GetFixturePath("timestamp_test.tlbx");
         if (!File.Exists(fixturePath))
         {
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
         var json = reader.ToJson();
 
         // Parse and verify structure
@@ -870,12 +870,12 @@ public class PaxReaderTests
     // Cross-Language Parity Test
     // ==========================================================================
     // This test ensures .NET produces the same JSON as Rust CLI for all types.
-    // The comprehensive.paxb fixture contains ALL special types.
+    // The comprehensive.tlbx fixture contains ALL special types.
 
     [Fact]
     public void CrossLanguageParity_AllTypes_MatchExpectedJson()
     {
-        var fixturePath = GetFixturePath("comprehensive.paxb");
+        var fixturePath = GetFixturePath("comprehensive.tlbx");
         var expectedPath = GetFixturePath("comprehensive.expected.json");
 
         if (!File.Exists(fixturePath) || !File.Exists(expectedPath))
@@ -885,7 +885,7 @@ public class PaxReaderTests
             return;
         }
 
-        using var reader = PaxReader.Open(fixturePath);
+        using var reader = TLReader.Open(fixturePath);
         var actualJson = reader.ToJson();
 
         // Parse both JSONs for structural comparison

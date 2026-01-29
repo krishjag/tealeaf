@@ -89,7 +89,7 @@ pub struct FormatComparisonConfig {
     /// Enable format comparison mode
     #[serde(default)]
     pub enabled: bool,
-    /// Compare PAX vs JSON formats
+    /// Compare TeaLeaf vs JSON formats
     #[serde(default)]
     pub compare_formats: bool,
 }
@@ -111,7 +111,7 @@ pub struct OutputConfig {
     #[serde(default = "default_true")]
     pub save_responses: bool,
     #[serde(default = "default_true")]
-    pub generate_pax: bool,
+    pub generate_tl: bool,
     #[serde(default = "default_true")]
     pub generate_json: bool,
 }
@@ -121,7 +121,7 @@ impl Default for OutputConfig {
         Self {
             output_dir: default_output_dir(),
             save_responses: true,
-            generate_pax: true,
+            generate_tl: true,
             generate_json: true,
         }
     }
@@ -342,8 +342,8 @@ impl std::error::Error for ConfigError {}
 /// Data format for benchmark tasks
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum DataFormat {
-    /// PAX format (structured, schema-aware)
-    Pax,
+    /// TeaLeaf format (structured, schema-aware)
+    TL,
     /// JSON format (raw)
     Json,
 }
@@ -351,13 +351,13 @@ pub enum DataFormat {
 impl DataFormat {
     pub fn as_str(&self) -> &'static str {
         match self {
-            DataFormat::Pax => "pax",
+            DataFormat::TL => "tl",
             DataFormat::Json => "json",
         }
     }
 
     pub fn all() -> Vec<DataFormat> {
-        vec![DataFormat::Pax, DataFormat::Json]
+        vec![DataFormat::TL, DataFormat::Json]
     }
 }
 

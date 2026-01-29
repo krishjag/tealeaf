@@ -1,6 +1,6 @@
 """
-Generate PAX Workflow Diagram
-Creates a PNG showing JSON → PAX conversion and distribution workflow
+Generate TeaLeaf Workflow Diagram
+Creates a PNG showing JSON → TeaLeaf conversion and distribution workflow
 """
 
 import matplotlib.pyplot as plt
@@ -28,12 +28,12 @@ def format_size(size_kb):
 
 # Read actual file sizes
 JSON_SIZE_KB = get_file_size_kb('retail_orders.json') or 36.8
-PAX_TEXT_SIZE_KB = get_file_size_kb('retail_orders.pax') or 14.6
-PAX_BIN_SIZE_KB = get_file_size_kb('retail_orders.paxb') or 6.9
+TL_TEXT_SIZE_KB = get_file_size_kb('retail_orders.tl') or 14.6
+TL_BIN_SIZE_KB = get_file_size_kb('retail_orders.tlbx') or 6.9
 
 # Calculate percentages
-PAX_TEXT_PERCENT = (PAX_TEXT_SIZE_KB / JSON_SIZE_KB) * 100
-PAX_BIN_PERCENT = (PAX_BIN_SIZE_KB / JSON_SIZE_KB) * 100
+TL_TEXT_PERCENT = (TL_TEXT_SIZE_KB / JSON_SIZE_KB) * 100
+TL_BIN_PERCENT = (TL_BIN_SIZE_KB / JSON_SIZE_KB) * 100
 
 # Set up the figure with higher resolution
 fig, ax = plt.subplots(1, 1, figsize=(20, 12.5))
@@ -44,8 +44,8 @@ ax.axis('off')
 
 # Colors
 COLOR_JSON = '#F5A623'      # Orange for JSON
-COLOR_PAX_TEXT = '#4A90D9'  # Blue for PAX text
-COLOR_PAX_BIN = '#7B68EE'   # Purple for PAX binary
+COLOR_TL_TEXT = '#4A90D9'   # Blue for TeaLeaf text
+COLOR_TL_BIN = '#7B68EE'    # Purple for TeaLeaf binary
 COLOR_LLM = '#50C878'       # Green for LLM
 COLOR_STORAGE = '#FF6B6B'   # Red for Storage
 COLOR_API = '#FFD700'       # Gold for APIs
@@ -104,19 +104,19 @@ def draw_angled_arrow(ax, start, end, color=COLOR_ARROW, angle_first='horizontal
                 arrowprops=dict(arrowstyle='->', color=color, lw=2))
 
 # Title
-ax.text(8, 9.5, 'PAX Format: JSON-Compatible Schema-Aware Serialization',
+ax.text(8, 9.5, 'TeaLeaf Format: JSON-Compatible Schema-Aware Serialization',
         ha='center', va='center', fontsize=24, fontweight='bold', color=COLOR_TEXT)
 # Calculate size reduction: (1 - binary/json) * 100
-size_reduction = (1 - PAX_BIN_SIZE_KB / JSON_SIZE_KB) * 100
+size_reduction = (1 - TL_BIN_SIZE_KB / JSON_SIZE_KB) * 100
 ax.text(8, 9.0, f'Lossless conversion with {size_reduction:.0f}% size reduction (binary)',
         ha='center', va='center', fontsize=20, color=COLOR_TEXT, alpha=0.8)
 
 # === LEFT SIDE: Source Data ===
 draw_box(ax, 2, 6.5, 2.2, 1.2, COLOR_JSON, 'JSON Data', format_size(JSON_SIZE_KB), '{ }')
 
-# === CENTER: PAX Conversion ===
-draw_box(ax, 5.5, 6.5, 2.2, 1.2, COLOR_PAX_TEXT, 'PAX Text', format_size(PAX_TEXT_SIZE_KB), '.pax')
-draw_box(ax, 9, 6.5, 2.2, 1.2, COLOR_PAX_BIN, 'PAX Binary', format_size(PAX_BIN_SIZE_KB), '.paxb')
+# === CENTER: TeaLeaf Conversion ===
+draw_box(ax, 5.5, 6.5, 2.2, 1.2, COLOR_TL_TEXT, 'TeaLeaf Text', format_size(TL_TEXT_SIZE_KB), '.tl')
+draw_box(ax, 9, 6.5, 2.2, 1.2, COLOR_TL_BIN, 'TeaLeaf Binary', format_size(TL_BIN_SIZE_KB), '.tlbx')
 
 # Arrows for conversion flow
 draw_arrow(ax, (3.2, 6.5), (4.3, 6.5), 'white')
@@ -127,8 +127,8 @@ ax.text(3.75, 6.9, 'from-json', ha='center', va='center', fontsize=15, color=COL
 ax.text(7.25, 6.9, 'compile', ha='center', va='center', fontsize=15, color=COLOR_TEXT, style='italic')
 
 # Reverse arrows (below the forward arrows)
-draw_arrow(ax, (4.3, 6.1), (3.2, 6.1), 'white')  # PAX Text -> JSON
-draw_arrow(ax, (7.8, 6.1), (6.7, 6.1), 'white')  # PAX Binary -> PAX Text
+draw_arrow(ax, (4.3, 6.1), (3.2, 6.1), 'white')  # TeaLeaf Text -> JSON
+draw_arrow(ax, (7.8, 6.1), (6.7, 6.1), 'white')  # TeaLeaf Binary -> TeaLeaf Text
 
 # Conversion labels (reverse)
 ax.text(3.75, 5.7, 'to-json', ha='center', va='center', fontsize=15, color=COLOR_TEXT, style='italic')
@@ -145,24 +145,24 @@ draw_box(ax, 12.5, 6.5, 2.4, 1.0, COLOR_STORAGE, 'Storage')
 draw_box(ax, 12.5, 5.2, 2.4, 1.0, COLOR_API, 'REST APIs',)
 
 # Arrows to destinations
-# PAX Text (.pax) -> LLM APIs: from TOP of PAX, to LEFT of LLM
-# PAX Text box: center (5.5, 6.5), height 1.2, so top edge = 6.5 + 0.6 = 7.1
+# TL Text (.tl) -> LLM APIs: from TOP of TL, to LEFT of LLM
+# TL Text box: center (5.5, 6.5), height 1.2, so top edge = 6.5 + 0.6 = 7.1
 draw_angled_arrow(ax, (5.5, 7.15), (11.3, 7.8), 'white', 'vertical')
 
-# PAX Binary (.paxb) -> Storage: straight horizontal
+# TL Binary (.tlbx) -> Storage: straight horizontal
 draw_arrow(ax, (10.1, 6.5), (11.3, 6.5), 'white')
 
-# PAX Binary (.paxb) -> REST APIs: from BOTTOM of PAXB, to LEFT of APIs
-# PAX Binary box: center (9, 6.5), height 1.2, so bottom edge = 6.5 - 0.6 = 5.9
+# TL Binary (.tlbx) -> REST APIs: from BOTTOM of TLBX, to LEFT of APIs
+# TL Binary box: center (9, 6.5), height 1.2, so bottom edge = 6.5 - 0.6 = 5.9
 draw_angled_arrow(ax, (9, 5.85), (11.3, 5.2), 'white', 'vertical')
 
 # === BOTTOM: Size Comparison Bar Chart ===
 bar_y = 3.4
 bar_height = 0.45
 bar_spacing = 0.6  # Vertical spacing between bars
-bar_left = 3.2  # Left edge of bars
-label_x = 1.0   # X position for labels (left-aligned)
-size_x = 3.0    # X position for size labels (right-aligned before bar)
+bar_left = 4.0  # Left edge of bars (moved right for longer labels)
+label_x = 0.8   # X position for labels (left-aligned)
+size_x = 3.8    # X position for size labels (right-aligned before bar)
 
 # JSON bar (full width reference)
 json_width = 4.2
@@ -174,24 +174,24 @@ ax.add_patch(FancyBboxPatch((bar_left, bar_y - bar_height/2), json_width, bar_he
 ax.text(bar_left + json_width/2, bar_y, '100%', ha='center', va='center',
         fontsize=16, fontweight='bold', color=COLOR_TEXT)
 
-# PAX Text bar (width proportional to actual percentage)
-pax_text_width = json_width * (PAX_TEXT_PERCENT / 100)
-ax.text(label_x, bar_y - bar_spacing, 'PAX Text', ha='left', va='center', fontsize=16, fontweight='bold', color=COLOR_PAX_TEXT)
-ax.text(size_x, bar_y - bar_spacing, format_size(PAX_TEXT_SIZE_KB), ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
-ax.add_patch(FancyBboxPatch((bar_left, bar_y - bar_height/2 - bar_spacing), pax_text_width, bar_height,
+# TL Text bar (width proportional to actual percentage)
+tl_text_width = json_width * (TL_TEXT_PERCENT / 100)
+ax.text(label_x, bar_y - bar_spacing, 'TeaLeaf Text', ha='left', va='center', fontsize=16, fontweight='bold', color=COLOR_TL_TEXT)
+ax.text(size_x, bar_y - bar_spacing, format_size(TL_TEXT_SIZE_KB), ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
+ax.add_patch(FancyBboxPatch((bar_left, bar_y - bar_height/2 - bar_spacing), tl_text_width, bar_height,
                             boxstyle="round,pad=0.03,rounding_size=0.1",
-                            facecolor=COLOR_PAX_TEXT, edgecolor='white', linewidth=1, alpha=0.9))
-ax.text(bar_left + pax_text_width/2, bar_y - bar_spacing, f'{PAX_TEXT_PERCENT:.1f}%', ha='center', va='center',
+                            facecolor=COLOR_TL_TEXT, edgecolor='white', linewidth=1, alpha=0.9))
+ax.text(bar_left + tl_text_width/2, bar_y - bar_spacing, f'{TL_TEXT_PERCENT:.1f}%', ha='center', va='center',
         fontsize=16, fontweight='bold', color=COLOR_TEXT)
 
-# PAX Binary bar (width proportional to actual percentage)
-pax_bin_width = json_width * (PAX_BIN_PERCENT / 100)
-ax.text(label_x, bar_y - bar_spacing*2, 'PAX Binary', ha='left', va='center', fontsize=16, fontweight='bold', color=COLOR_PAX_BIN)
-ax.text(size_x, bar_y - bar_spacing*2, format_size(PAX_BIN_SIZE_KB), ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
-ax.add_patch(FancyBboxPatch((bar_left, bar_y - bar_height/2 - bar_spacing*2), pax_bin_width, bar_height,
+# TL Binary bar (width proportional to actual percentage)
+tl_bin_width = json_width * (TL_BIN_PERCENT / 100)
+ax.text(label_x, bar_y - bar_spacing*2, 'TeaLeaf Binary', ha='left', va='center', fontsize=16, fontweight='bold', color=COLOR_TL_BIN)
+ax.text(size_x, bar_y - bar_spacing*2, format_size(TL_BIN_SIZE_KB), ha='right', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT, alpha=0.9)
+ax.add_patch(FancyBboxPatch((bar_left, bar_y - bar_height/2 - bar_spacing*2), tl_bin_width, bar_height,
                             boxstyle="round,pad=0.03,rounding_size=0.1",
-                            facecolor=COLOR_PAX_BIN, edgecolor='white', linewidth=1, alpha=0.9))
-ax.text(bar_left + pax_bin_width/2, bar_y - bar_spacing*2, f'{PAX_BIN_PERCENT:.1f}%', ha='center', va='center',
+                            facecolor=COLOR_TL_BIN, edgecolor='white', linewidth=1, alpha=0.9))
+ax.text(bar_left + tl_bin_width/2, bar_y - bar_spacing*2, f'{TL_BIN_PERCENT:.1f}%', ha='center', va='center',
         fontsize=16, fontweight='bold', color=COLOR_TEXT)
 
 # Size comparison title
@@ -237,18 +237,18 @@ ax.text(3.75, 0.5, 'Schema-first design eliminates repeated field names', ha='ce
         fontsize=18, color=COLOR_TEXT, alpha=0.9)
 
 # Footer
-ax.text(8, 0.05, 'PAX v2.0-beta.1 — Peace between human and machine',
+ax.text(8, 0.05, 'TeaLeaf v2.0-beta.1 — Peace between human and machine',
         ha='center', va='center', fontsize=18, color=COLOR_TEXT, alpha=0.5, style='italic')
 
 # Save with high resolution
 plt.tight_layout()
-plt.savefig('docs/pax_workflow.png', dpi=300, facecolor=COLOR_BG,
+plt.savefig('docs/tealeaf_workflow.png', dpi=300, facecolor=COLOR_BG,
             edgecolor='none', bbox_inches='tight', pad_inches=0.3)
 
 # Print summary
-print("Saved: docs/pax_workflow.png")
+print("Saved: docs/tealeaf_workflow.png")
 print(f"\nFile sizes from examples/retail_orders.*:")
-print(f"  JSON:       {format_size(JSON_SIZE_KB)} (100%)")
-print(f"  PAX Text:   {format_size(PAX_TEXT_SIZE_KB)} ({PAX_TEXT_PERCENT:.1f}%)")
-print(f"  PAX Binary: {format_size(PAX_BIN_SIZE_KB)} ({PAX_BIN_PERCENT:.1f}%)")
+print(f"  JSON:      {format_size(JSON_SIZE_KB)} (100%)")
+print(f"  TL Text:   {format_size(TL_TEXT_SIZE_KB)} ({TL_TEXT_PERCENT:.1f}%)")
+print(f"  TL Binary: {format_size(TL_BIN_SIZE_KB)} ({TL_BIN_PERCENT:.1f}%)")
 print(f"  Size reduction (binary): {size_reduction:.1f}%")

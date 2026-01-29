@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-  "name": "PAX",
-  "scopeName": "source.pax",
+  "name": "TeaLeaf",
+  "scopeName": "source.tealeaf",
   "patterns": [
     { "include": "#comments" },
     { "include": "#directives" },
@@ -12,7 +12,7 @@
     "comments": {
       "patterns": [
         {
-          "name": "comment.line.number-sign.pax",
+          "name": "comment.line.number-sign.tealeaf",
           "match": "#.*$"
         }
       ]
@@ -20,23 +20,23 @@
     "directives": {
       "patterns": [
         {
-          "name": "keyword.control.directive.struct.pax",
+          "name": "keyword.control.directive.struct.tealeaf",
           "match": "@struct"
         },
         {
-          "name": "keyword.control.directive.union.pax",
+          "name": "keyword.control.directive.union.tealeaf",
           "match": "@union"
         },
         {
-          "name": "keyword.control.directive.table.pax",
+          "name": "keyword.control.directive.table.tealeaf",
           "match": "@table"
         },
         {
-          "name": "keyword.control.directive.map.pax",
+          "name": "keyword.control.directive.map.tealeaf",
           "match": "@map"
         },
         {
-          "name": "keyword.control.directive.include.pax",
+          "name": "keyword.control.directive.include.tealeaf",
           "match": "@include"
         }
       ]
@@ -44,10 +44,10 @@
     "keys": {
       "patterns": [
         {
-          "name": "entity.name.tag.pax",
+          "name": "entity.name.tag.tealeaf",
           "match": "^\\s*([a-zA-Z_][a-zA-Z0-9_.\\-]*)\\s*:",
           "captures": {
-            "1": { "name": "entity.name.tag.pax" }
+            "1": { "name": "entity.name.tag.tealeaf" }
           }
         }
       ]
@@ -67,23 +67,23 @@
     "strings": {
       "patterns": [
         {
-          "name": "string.quoted.triple.pax",
+          "name": "string.quoted.triple.tealeaf",
           "begin": "\"\"\"",
           "end": "\"\"\"",
           "patterns": [
             {
-              "name": "constant.character.escape.pax",
+              "name": "constant.character.escape.tealeaf",
               "match": "\\\\."
             }
           ]
         },
         {
-          "name": "string.quoted.double.pax",
+          "name": "string.quoted.double.tealeaf",
           "begin": "\"",
           "end": "\"",
           "patterns": [
             {
-              "name": "constant.character.escape.pax",
+              "name": "constant.character.escape.tealeaf",
               "match": "\\\\."
             }
           ]
@@ -93,19 +93,19 @@
     "numbers": {
       "patterns": [
         {
-          "name": "constant.numeric.hex.pax",
+          "name": "constant.numeric.hex.tealeaf",
           "match": "\\b0x[0-9a-fA-F]+\\b"
         },
         {
-          "name": "constant.numeric.binary.pax",
+          "name": "constant.numeric.binary.tealeaf",
           "match": "\\b0b[01]+\\b"
         },
         {
-          "name": "constant.numeric.float.pax",
+          "name": "constant.numeric.float.tealeaf",
           "match": "-?\\d+\\.\\d+([eE][+-]?\\d+)?"
         },
         {
-          "name": "constant.numeric.integer.pax",
+          "name": "constant.numeric.integer.tealeaf",
           "match": "-?\\d+"
         }
       ]
@@ -113,15 +113,15 @@
     "constants": {
       "patterns": [
         {
-          "name": "constant.language.boolean.true.pax",
+          "name": "constant.language.boolean.true.tealeaf",
           "match": "\\btrue\\b"
         },
         {
-          "name": "constant.language.boolean.false.pax",
+          "name": "constant.language.boolean.false.tealeaf",
           "match": "\\bfalse\\b"
         },
         {
-          "name": "constant.language.null.pax",
+          "name": "constant.language.null.tealeaf",
           "match": "~"
         }
       ]
@@ -129,23 +129,23 @@
     "types": {
       "patterns": [
         {
-          "name": "storage.type.primitive.pax",
+          "name": "storage.type.primitive.tealeaf",
           "match": "\\b(string|int|uint|float|bool|bytes|timestamp|int8|int16|int32|int64|uint8|uint16|uint32|uint64|float32|float64)\\b"
         },
         {
-          "name": "storage.type.array.pax",
+          "name": "storage.type.array.tealeaf",
           "match": "\\[\\]"
         },
         {
-          "name": "storage.modifier.nullable.pax",
+          "name": "storage.modifier.nullable.tealeaf",
           "match": "\\?"
         },
         {
-          "name": "entity.name.type.pax",
+          "name": "entity.name.type.tealeaf",
           "match": "(?<=@struct\\s+|@union\\s+|@table\\s+)[A-Za-z_][A-Za-z0-9_.-]*"
         },
         {
-          "name": "entity.name.type.reference.pax",
+          "name": "entity.name.type.reference.tealeaf",
           "match": "(?<=:\\s*|\\[\\])[A-Za-z_][A-Za-z0-9_.-]*"
         }
       ]
@@ -153,7 +153,7 @@
     "references": {
       "patterns": [
         {
-          "name": "variable.other.reference.pax",
+          "name": "variable.other.reference.tealeaf",
           "match": "![a-zA-Z_][a-zA-Z0-9_.\\-]*"
         }
       ]
@@ -161,7 +161,7 @@
     "tagged": {
       "patterns": [
         {
-          "name": "entity.name.tag.custom.pax",
+          "name": "entity.name.tag.custom.tealeaf",
           "match": ":[a-zA-Z_][a-zA-Z0-9_.\\-]*"
         }
       ]
@@ -169,7 +169,7 @@
     "identifiers": {
       "patterns": [
         {
-          "name": "variable.other.field.pax",
+          "name": "variable.other.field.tealeaf",
           "match": "\\b[A-Za-z_][A-Za-z0-9_.\\-]*(?=\\s*:)"
         }
       ]
@@ -177,7 +177,7 @@
     "timestamps": {
       "patterns": [
         {
-          "name": "constant.other.timestamp.pax",
+          "name": "constant.other.timestamp.tealeaf",
           "match": "\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2}(\\.\\d{1,3})?)?(Z|[+-]\\d{2}:\\d{2})?)?"
         }
       ]

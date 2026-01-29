@@ -1,12 +1,12 @@
-# PAX Accuracy Benchmark Suite
+# TeaLeaf Accuracy Benchmark Suite
 
-A comprehensive benchmark suite for evaluating LLM providers' ability to analyze structured data in PAX format.
+A comprehensive benchmark suite for evaluating LLM providers' ability to analyze structured data in TeaLeaf format.
 
 ## Overview
 
 This benchmark suite:
 1. Takes JSON data from various business domains
-2. Converts it to PAX format using `pax-core`
+2. Converts it to TeaLeaf format using `tealeaf-core`
 3. Sends analysis prompts to multiple LLM providers
 4. Evaluates and compares the responses
 
@@ -21,7 +21,7 @@ This benchmark suite:
 
 ### Pre-built Binaries (Recommended)
 
-Download the latest release for your platform from the [GitHub Releases](https://github.com/krishjag/pax/releases) page:
+Download the latest release for your platform from the [GitHub Releases](https://github.com/krishjag/tealeaf/releases) page:
 
 | Platform | Architecture | File |
 |----------|--------------|------|
@@ -35,12 +35,12 @@ Download the latest release for your platform from the [GitHub Releases](https:/
 
 ```bash
 # Example: Download and install on Linux x64
-curl -LO https://github.com/krishjag/pax/releases/latest/download/accuracy-benchmark-linux-x64.tar.gz
+curl -LO https://github.com/krishjag/tealeaf/releases/latest/download/accuracy-benchmark-linux-x64.tar.gz
 tar -xzf accuracy-benchmark-linux-x64.tar.gz
 sudo mv accuracy-benchmark /usr/local/bin/
 
 # Example: Download and install on macOS Apple Silicon
-curl -LO https://github.com/krishjag/pax/releases/latest/download/accuracy-benchmark-macos-arm64.tar.gz
+curl -LO https://github.com/krishjag/tealeaf/releases/latest/download/accuracy-benchmark-macos-arm64.tar.gz
 tar -xzf accuracy-benchmark-macos-arm64.tar.gz
 sudo mv accuracy-benchmark /usr/local/bin/
 ```
@@ -69,7 +69,7 @@ cargo run -p accuracy-benchmark -- run --providers anthropic,openai
 # Run specific categories only
 cargo run -p accuracy-benchmark -- run --categories finance,retail
 
-# Compare PAX vs JSON format performance
+# Compare TeaLeaf vs JSON format performance
 cargo run -p accuracy-benchmark -- run --compare-formats
 
 # Verbose output
@@ -107,14 +107,14 @@ The suite includes 12 tasks across 10 business domains:
 | RE-001 | Real Estate | Complex | Recommendation |
 | LEG-001 | Legal | Complex | Analysis |
 
-## JSON to PAX Workflow
+## JSON to TeaLeaf Workflow
 
 Each task can specify input data in two ways:
 
 ### Inline JSON Data
 
 ```rust
-BenchmarkTask::new("FIN-001", "finance", "Analyze this data:\n\n{pax_data}")
+BenchmarkTask::new("FIN-001", "finance", "Analyze this data:\n\n{tl_data}")
     .with_json_data(serde_json::json!({
         "revenue": 1000000,
         "expenses": 750000
@@ -124,11 +124,11 @@ BenchmarkTask::new("FIN-001", "finance", "Analyze this data:\n\n{pax_data}")
 ### JSON File Reference
 
 ```rust
-BenchmarkTask::new("LOG-001", "logistics", "Analyze this data:\n\n{pax_data}")
+BenchmarkTask::new("LOG-001", "logistics", "Analyze this data:\n\n{tl_data}")
     .with_json_file("tasks/logistics/data/shipments.json")
 ```
 
-The `{pax_data}` placeholder in the prompt template is replaced with the PAX-formatted data before sending to the LLM.
+The `{tl_data}` placeholder in the prompt template is replaced with the TeaLeaf-formatted data before sending to the LLM.
 
 ## Analysis Framework
 
@@ -182,7 +182,7 @@ For recommendation tasks, these keywords are detected:
 
 ## Example Run
 
-Run with `--compare-formats` to compare PAX vs JSON performance:
+Run with `--compare-formats` to compare TeaLeaf vs JSON performance:
 
 ```bash
 cargo run -p accuracy-benchmark -- run --compare-formats
@@ -190,8 +190,8 @@ cargo run -p accuracy-benchmark -- run --compare-formats
 
 ### Format Comparison Summary
 
-| Provider | PAX Score | JSON Score | Accuracy Diff | PAX Input | JSON Input | Input Savings |
-|----------|-----------|------------|---------------|-----------|------------|---------------|
+| Provider | TL Score | JSON Score | Accuracy Diff | TL Input | JSON Input | Input Savings |
+|----------|----------|------------|---------------|----------|------------|---------------|
 | **anthropic** | 0.970 | 0.983 | -0.013 | 4,939 | 8,251 | **-40.1%** |
 | **openai** | 0.925 | 0.905 | +0.021 | 4,866 | 7,076 | **-31.2%** |
 
@@ -201,18 +201,18 @@ cargo run -p accuracy-benchmark -- run --compare-formats
 
 | Provider | Accuracy | Input Token Efficiency |
 |----------|----------|------------------------|
-| **anthropic** | Comparable | PAX uses 40% fewer input tokens |
-| **openai** | PAX +2.1% better | PAX uses 31% fewer input tokens |
+| **anthropic** | Comparable | TeaLeaf uses 40% fewer input tokens |
+| **openai** | TeaLeaf +2.1% better | TeaLeaf uses 31% fewer input tokens |
 
-**Bottom Line:** PAX format consistently uses **30-40% fewer input tokens** than JSON due to its more compact structure, while maintaining comparable or better accuracy.
+**Bottom Line:** TeaLeaf format consistently uses **30-40% fewer input tokens** than JSON due to its more compact structure, while maintaining comparable or better accuracy.
 
 ## Output Files
 
 Results are saved in two formats:
 
-### PAX Format (`analysis.pax`)
+### TeaLeaf Format (`analysis.tl`)
 
-```pax
+```
 # Accuracy Benchmark Results
 # Generated: 2026-01-27 19:53:08 UTC
 
@@ -309,7 +309,7 @@ summary: {
     "healthcare": { "leader": "anthropic", "margin": 0.0 },
     "manufacturing": { "leader": "openai", "margin": 0.0 }
   },
-  "detailed_results_file": "analysis.pax"
+  "detailed_results_file": "analysis.tl"
 }
 ```
 
@@ -328,7 +328,7 @@ accuracy-benchmark/
 │   ├── tasks/            # Task definitions
 │   │   ├── mod.rs        # BenchmarkTask, DataSource
 │   │   ├── categories.rs # Domain, Complexity, OutputType
-│   │   └── loader.rs     # PAX file loader
+│   │   └── loader.rs     # TeaLeaf file loader
 │   ├── runner/           # Execution engine
 │   │   ├── executor.rs   # Parallel task execution
 │   │   └── rate_limiter.rs
@@ -337,7 +337,7 @@ accuracy-benchmark/
 │   │   ├── scoring.rs    # ScoringRubric
 │   │   └── comparator.rs # Cross-provider comparison
 │   └── reporting/        # Output generation
-│       ├── pax_writer.rs
+│       ├── tl_writer.rs
 │       └── json_export.rs
 ├── tasks/                # Sample data by domain
 │   ├── finance/data/
@@ -367,7 +367,7 @@ accuracy-benchmark/
 BenchmarkTask::new(
     "CUSTOM-001",
     "custom_category",
-    "Analyze this data:\n\n{pax_data}\n\nProvide summary and recommendations."
+    "Analyze this data:\n\n{tl_data}\n\nProvide summary and recommendations."
 )
 .with_json_file("tasks/custom/data/my_data.json")
 .with_complexity(Complexity::Moderate)
@@ -376,15 +376,15 @@ BenchmarkTask::new(
 .expect_with_pattern("metric", "Total value", true, r"\d+")
 ```
 
-### 3. Or Load from PAX File
+### 3. Or Load from TeaLeaf File
 
-Create a `.pax` file with task definitions:
+Create a `.tl` file with task definitions:
 
 ```
 tasks: [
   {
     metadata: {id: CUSTOM-001, category: custom, complexity: moderate}
-    prompt_template: "Analyze: {pax_data}"
+    prompt_template: "Analyze: {tl_data}"
     expected_elements: [
       {element_type: summary, description: "Overview", required: true}
     ]
@@ -394,7 +394,7 @@ tasks: [
 
 Then load:
 ```bash
-cargo run -p accuracy-benchmark -- run --tasks path/to/tasks.pax
+cargo run -p accuracy-benchmark -- run --tasks path/to/tasks.tl
 ```
 
 ## Extending Providers
@@ -418,4 +418,4 @@ impl LLMProvider for NewProviderClient {
 
 ## License
 
-Same as the parent `pax` project.
+Same as the parent `tealeaf` project.

@@ -1,4 +1,4 @@
-//! PAX format output for benchmark results
+//! TeaLeaf format output for benchmark results
 
 use std::collections::HashMap;
 use std::io::Write;
@@ -9,11 +9,11 @@ use chrono::{DateTime, Utc};
 use crate::analysis::{AggregatedResults, AnalysisResult, ComparisonResult};
 use crate::tasks::{TaskResult, TaskStatus};
 
-/// Write benchmark results in PAX format
-pub struct PaxWriter;
+/// Write benchmark results in TeaLeaf format
+pub struct TLWriter;
 
-impl PaxWriter {
-    /// Write run results to a PAX file
+impl TLWriter {
+    /// Write run results to a TeaLeaf file
     pub fn write_run_results(
         path: impl AsRef<Path>,
         run_id: &str,
@@ -64,7 +64,7 @@ impl PaxWriter {
         Ok(())
     }
 
-    /// Write just the summary to a PAX file
+    /// Write just the summary to a TeaLeaf file
     pub fn write_summary(
         path: impl AsRef<Path>,
         aggregated: &AggregatedResults,

@@ -1,6 +1,6 @@
-# Building Pax .NET Bindings
+# Building TeaLeaf .NET Bindings
 
-This document describes how to build the Pax .NET library with its native dependencies.
+This document describes how to build the TeaLeaf .NET library with its native dependencies.
 
 ## Prerequisites
 
@@ -134,14 +134,14 @@ rustup target add aarch64-apple-darwin
 
 ```
 bindings/dotnet/
-├── Pax/                    # Main library project
-│   ├── Pax.csproj
+├── TeaLeaf/                # Main library project
+│   ├── TeaLeaf.csproj
 │   ├── NativeLibrary.cs    # P/Invoke declarations
 │   └── runtimes/           # Native libraries (populated by build)
 │       ├── win-x64/native/
 │       ├── linux-x64/native/
 │       └── ...
-├── Pax.Tests/              # Test project
+├── TeaLeaf.Tests/          # Test project
 ├── build.ps1               # Windows build script
 ├── build.sh                # Unix build script
 └── artifacts/              # Output directory for packages
@@ -164,21 +164,21 @@ You can manually trigger the workflow with the "Publish to NuGet" option from th
 The final NuGet package includes native libraries for all platforms:
 
 ```
-Pax.2.0.0-beta.1.nupkg
+TeaLeaf.2.0.0-beta.1.nupkg
 ├── lib/
 │   ├── net8.0/
-│   │   └── Pax.dll
+│   │   └── TeaLeaf.dll
 │   └── net10.0/
-│       └── Pax.dll
+│       └── TeaLeaf.dll
 └── runtimes/
-    ├── win-x64/native/pax_ffi.dll
-    ├── win-arm64/native/pax_ffi.dll
-    ├── linux-x64/native/libpax_ffi.so
-    ├── linux-arm64/native/libpax_ffi.so
-    ├── linux-musl-x64/native/libpax_ffi.so
-    ├── linux-musl-arm64/native/libpax_ffi.so
-    ├── osx-x64/native/libpax_ffi.dylib
-    └── osx-arm64/native/libpax_ffi.dylib
+    ├── win-x64/native/tealeaf_ffi.dll
+    ├── win-arm64/native/tealeaf_ffi.dll
+    ├── linux-x64/native/libtealeaf_ffi.so
+    ├── linux-arm64/native/libtealeaf_ffi.so
+    ├── linux-musl-x64/native/libtealeaf_ffi.so
+    ├── linux-musl-arm64/native/libtealeaf_ffi.so
+    ├── osx-x64/native/libtealeaf_ffi.dylib
+    └── osx-arm64/native/libtealeaf_ffi.dylib
 ```
 
 ## Troubleshooting
@@ -200,5 +200,5 @@ Install the appropriate cross-compilation toolchain for your target platform. Se
 The build scripts copy the native library to the test output directory. If tests still fail, manually copy the library:
 
 ```bash
-cp Pax/runtimes/{your-rid}/native/libpax_ffi.* Pax.Tests/bin/Release/net8.0/
+cp TeaLeaf/runtimes/{your-rid}/native/libtealeaf_ffi.* TeaLeaf.Tests/bin/Release/net8.0/
 ```

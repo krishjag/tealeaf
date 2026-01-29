@@ -1,5 +1,5 @@
 [package]
-name = "pax-core"
+name = "tealeaf-core"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -10,11 +10,11 @@ keywords = ["serialization", "schema", "binary", "config"]
 categories = ["encoding", "config", "parser-implementations"]
 
 [lib]
-name = "pax"
+name = "tealeaf"
 path = "src/lib.rs"
 
 [[bin]]
-name = "pax"
+name = "tealeaf"
 path = "src/main.rs"
 
 [dependencies]

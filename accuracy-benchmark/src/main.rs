@@ -12,14 +12,14 @@ use accuracy_benchmark::{
     analysis::{ComparisonEngine, AnalysisResult},
     config::{Config, DataFormat},
     providers::{create_all_providers, create_providers, LLMProvider},
-    reporting::{print_console_report, JsonSummary, PaxWriter},
+    reporting::{print_console_report, JsonSummary, TLWriter},
     runner::{Executor, ExecutorConfig},
     tasks::{load_tasks_from_directory, load_tasks_from_file, BenchmarkTask, TaskResult},
 };
 
 #[derive(Parser)]
 #[command(name = "accuracy-benchmark")]
-#[command(about = "Accuracy benchmark suite for PAX format across LLM providers")]
+#[command(about = "Accuracy benchmark suite for TeaLeaf format across LLM providers")]
 #[command(version)]
 struct Cli {
     #[command(subcommand)]
@@ -58,14 +58,14 @@ enum Commands {
         #[arg(short, long)]
         output: Option<PathBuf>,
 
-        /// Compare PAX vs JSON format performance
+        /// Compare TeaLeaf vs JSON format performance
         #[arg(long)]
         compare_formats: bool,
     },
 
     /// Analyze existing results
     Analyze {
-        /// Path to results directory or PAX file
+        /// Path to results directory or TeaLeaf file
         #[arg(short, long)]
         input: PathBuf,
     },
@@ -76,7 +76,7 @@ enum Commands {
         #[arg(short, long)]
         input: PathBuf,
 
-        /// Output format (console, json, pax, html)
+        /// Output format (console, json, tl, html)
         #[arg(short, long, default_value = "console")]
         format: String,
 
@@ -165,7 +165,7 @@ async fn run_benchmark(
     println!("=== Accuracy Benchmark Suite ===");
     println!("Run ID: {}", run_id);
     if compare_formats {
-        println!("Mode: Format Comparison (PAX vs JSON)");
+        println!("Mode: Format Comparison (TeaLeaf vs JSON)");
     }
     println!();
 
@@ -213,17 +213,17 @@ async fn run_benchmark(
     let (task_results, format_comparison_results) = if compare_formats {
         let format_results = executor.execute_tasks_with_formats(&tasks).await;
 
-        // Convert to legacy format for PAX results (for backward compatible reporting)
+        // Convert to legacy format for TeaLeaf results (for backward compatible reporting)
         let mut legacy_results: Vec<HashMap<String, TaskResult>> = Vec::new();
         for task in &tasks {
             let mut task_map: HashMap<String, TaskResult> = HashMap::new();
             for provider in &providers {
-                let pax_key = accuracy_benchmark::tasks::TaskResultKey::new(
+                let tl_key = accuracy_benchmark::tasks::TaskResultKey::new(
                     &task.metadata.id,
                     provider.name(),
-                    DataFormat::Pax,
+                    DataFormat::TL,
                 );
-                if let Some(result) = format_results.get(&pax_key) {
+                if let Some(result) = format_results.get(&tl_key) {
                     task_map.insert(provider.name().to_string(), result.clone());
                 }
             }
@@ -299,7 +299,7 @@ async fn run_benchmark(
 
     // Print results
     if compare_formats {
-        println!("\n=== PAX Format Results ===");
+        println!("\n=== TeaLeaf Format Results ===");
     }
     print_console_report(&aggregated);
 
@@ -326,37 +326,37 @@ async fn run_benchmark(
         println!("\n=== Format Comparison Summary ===");
         println!("{:-<92}", "");
         println!("{:<12} {:>9} {:>9} {:>8} {:>11} {:>11} {:>9} {:>9}",
-            "Provider", "PAX Score", "JSON Scr", "Diff", "PAX Tokens", "JSON Tokens", "Diff", "Diff %");
+            "Provider", "TL Score", "JSON Scr", "Diff", "TL Tokens", "JSON Tokens", "Diff", "Diff %");
         println!("{:-<92}", "");
 
         for provider in &provider_names {
-            let pax_score = aggregated.avg_scores_by_provider.get(provider).copied().unwrap_or(0.0);
+            let tl_score = aggregated.avg_scores_by_provider.get(provider).copied().unwrap_or(0.0);
             let json_score = json_agg.avg_scores_by_provider.get(provider).copied().unwrap_or(0.0);
-            let score_diff = pax_score - json_score;
+            let score_diff = tl_score - json_score;
 
             // Get token counts
-            let (pax_in, pax_out) = token_usage
-                .get(&(provider.clone(), DataFormat::Pax))
+            let (tl_in, tl_out) = token_usage
+                .get(&(provider.clone(), DataFormat::TL))
                 .copied()
                 .unwrap_or((0, 0));
             let (json_in, json_out) = token_usage
                 .get(&(provider.clone(), DataFormat::Json))
                 .copied()
                 .unwrap_or((0, 0));
-            let pax_total = pax_in + pax_out;
+            let tl_total = tl_in + tl_out;
             let json_total = json_in + json_out;
-            let token_diff = pax_total as i64 - json_total as i64;
+            let token_diff = tl_total as i64 - json_total as i64;
 
-            // Calculate token percentage difference (negative = PAX uses fewer tokens)
+            // Calculate token percentage difference (negative = TeaLeaf uses fewer tokens)
             let token_diff_pct = if json_total > 0 {
-                ((pax_total as f64 - json_total as f64) / json_total as f64) * 100.0
+                ((tl_total as f64 - json_total as f64) / json_total as f64) * 100.0
             } else {
                 0.0
             };
 
             println!(
                 "{:<12} {:>9.3} {:>9.3} {:>+8.3} {:>11} {:>11} {:>+9} {:>+8.1}%",
-                provider, pax_score, json_score, score_diff, pax_total, json_total, token_diff, token_diff_pct
+                provider, tl_score, json_score, score_diff, tl_total, json_total, token_diff, token_diff_pct
             );
         }
         println!("{:-<92}", "");
@@ -365,12 +365,12 @@ async fn run_benchmark(
         println!("\nToken Breakdown (Input / Output):");
         println!("{:-<70}", "");
         println!("{:<12} {:>15} {:>15} {:>12} {:>12}",
-            "Provider", "PAX (in/out)", "JSON (in/out)", "In Diff %", "Out Diff %");
+            "Provider", "TL (in/out)", "JSON (in/out)", "In Diff %", "Out Diff %");
         println!("{:-<70}", "");
 
         for provider in &provider_names {
-            let (pax_in, pax_out) = token_usage
-                .get(&(provider.clone(), DataFormat::Pax))
+            let (tl_in, tl_out) = token_usage
+                .get(&(provider.clone(), DataFormat::TL))
                 .copied()
                 .unwrap_or((0, 0));
             let (json_in, json_out) = token_usage
@@ -379,19 +379,19 @@ async fn run_benchmark(
                 .unwrap_or((0, 0));
 
             let in_diff_pct = if json_in > 0 {
-                ((pax_in as f64 - json_in as f64) / json_in as f64) * 100.0
+                ((tl_in as f64 - json_in as f64) / json_in as f64) * 100.0
             } else {
                 0.0
             };
             let out_diff_pct = if json_out > 0 {
-                ((pax_out as f64 - json_out as f64) / json_out as f64) * 100.0
+                ((tl_out as f64 - json_out as f64) / json_out as f64) * 100.0
             } else {
                 0.0
             };
 
             println!(
                 "{:<12} {:>6} / {:<6} {:>6} / {:<6} {:>+11.1}% {:>+11.1}%",
-                provider, pax_in, pax_out, json_in, json_out, in_diff_pct, out_diff_pct
+                provider, tl_in, tl_out, json_in, json_out, in_diff_pct, out_diff_pct
             );
         }
         println!("{:-<70}", "");
@@ -399,35 +399,35 @@ async fn run_benchmark(
         // Print summary interpretation
         println!("\nKey Findings:");
         for provider in &provider_names {
-            let pax_score = aggregated.avg_scores_by_provider.get(provider).copied().unwrap_or(0.0);
+            let tl_score = aggregated.avg_scores_by_provider.get(provider).copied().unwrap_or(0.0);
             let json_score = json_agg.avg_scores_by_provider.get(provider).copied().unwrap_or(0.0);
-            let score_diff = pax_score - json_score;
+            let score_diff = tl_score - json_score;
 
-            let (pax_in, pax_out) = token_usage
-                .get(&(provider.clone(), DataFormat::Pax))
+            let (tl_in, tl_out) = token_usage
+                .get(&(provider.clone(), DataFormat::TL))
                 .copied()
                 .unwrap_or((0, 0));
             let (json_in, json_out) = token_usage
                 .get(&(provider.clone(), DataFormat::Json))
                 .copied()
                 .unwrap_or((0, 0));
-            let pax_total = pax_in + pax_out;
+            let tl_total = tl_in + tl_out;
             let json_total = json_in + json_out;
 
             let total_diff_pct = if json_total > 0 {
-                ((pax_total as f64 - json_total as f64) / json_total as f64) * 100.0
+                ((tl_total as f64 - json_total as f64) / json_total as f64) * 100.0
             } else {
                 0.0
             };
             let input_diff_pct = if json_in > 0 {
-                ((pax_in as f64 - json_in as f64) / json_in as f64) * 100.0
+                ((tl_in as f64 - json_in as f64) / json_in as f64) * 100.0
             } else {
                 0.0
             };
 
             // Accuracy verdict
             let accuracy_verdict = if score_diff > 0.02 {
-                format!("PAX +{:.1}% accuracy", score_diff * 100.0)
+                format!("TL +{:.1}% accuracy", score_diff * 100.0)
             } else if score_diff < -0.02 {
                 format!("JSON +{:.1}% accuracy", -score_diff * 100.0)
             } else {
@@ -436,11 +436,11 @@ async fn run_benchmark(
 
             // Token verdict
             let token_verdict = if total_diff_pct < -3.0 {
-                format!("PAX saves {:.0}% total tokens ({:.0}% on input)", -total_diff_pct, -input_diff_pct)
+                format!("TL saves {:.0}% total tokens ({:.0}% on input)", -total_diff_pct, -input_diff_pct)
             } else if total_diff_pct > 3.0 {
                 format!("JSON saves {:.0}% total tokens", total_diff_pct)
             } else if input_diff_pct < -10.0 {
-                format!("PAX saves {:.0}% on input tokens", -input_diff_pct)
+                format!("TL saves {:.0}% on input tokens", -input_diff_pct)
             } else {
                 "similar token usage".to_string()
             };
@@ -456,10 +456,10 @@ async fn run_benchmark(
     let run_dir = output_base.join(&run_id);
     std::fs::create_dir_all(&run_dir)?;
 
-    // Write PAX results
-    let pax_path = run_dir.join("analysis.pax");
-    PaxWriter::write_run_results(
-        &pax_path,
+    // Write TeaLeaf results
+    let tl_path = run_dir.join("analysis.tl");
+    TLWriter::write_run_results(
+        &tl_path,
         &run_id,
         started_at,
         completed_at,
@@ -469,11 +469,11 @@ async fn run_benchmark(
         &comparisons,
         &aggregated,
     )?;
-    println!("\nPAX results written to: {}", pax_path.display());
+    println!("\nTeaLeaf results written to: {}", tl_path.display());
 
     // Write JSON summary
     let json_path = run_dir.join("summary.json");
-    let summary = JsonSummary::from_aggregated(&run_id, &aggregated, "analysis.pax");
+    let summary = JsonSummary::from_aggregated(&run_id, &aggregated, "analysis.tl");
     summary.write_to_file(&json_path)?;
     println!("JSON summary written to: {}", json_path.display());
 
@@ -649,11 +649,11 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
     });
 
     vec![
-        // Finance tasks - with JSON data converted to PAX
+        // Finance tasks - with JSON data converted to TeaLeaf
         BenchmarkTask::new(
             "FIN-001",
             "finance",
-            "You are a financial analyst. Analyze the following quarterly financial data (provided in PAX format) and extract key metrics:\n\n{pax_data}\n\nProvide:\n1. Total revenue (sum all revenue sources)\n2. Gross profit and margin\n3. Operating income\n4. Net income\n5. Profit margin percentage\n6. Total assets and liabilities\n7. Shareholders' equity"
+            "You are a financial analyst. Analyze the following quarterly financial data (provided in TeaLeaf format) and extract key metrics:\n\n{tl_data}\n\nProvide:\n1. Total revenue (sum all revenue sources)\n2. Gross profit and margin\n3. Operating income\n4. Net income\n5. Profit margin percentage\n6. Total assets and liabilities\n7. Shareholders' equity"
         )
         .with_json_data(financial_json)
         .with_complexity(accuracy_benchmark::tasks::Complexity::Simple)
@@ -665,7 +665,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "FIN-002",
             "finance",
-            "You are an investment analyst. Analyze the following portfolio data (provided in PAX format) and calculate key metrics:\n\n{pax_data}\n\nCalculate:\n1. Total portfolio value (including cash)\n2. Total cost basis\n3. Total unrealized gain/loss\n4. Portfolio return percentage\n5. Allocation percentages for each holding\n6. Weighted average dividend yield"
+            "You are an investment analyst. Analyze the following portfolio data (provided in TeaLeaf format) and calculate key metrics:\n\n{tl_data}\n\nCalculate:\n1. Total portfolio value (including cash)\n2. Total cost basis\n3. Total unrealized gain/loss\n4. Portfolio return percentage\n5. Allocation percentages for each holding\n6. Weighted average dividend yield"
         )
         .with_json_data(portfolio_json)
         .with_complexity(accuracy_benchmark::tasks::Complexity::Moderate)
@@ -678,7 +678,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "RET-001",
             "retail",
-            "You are a retail analyst. Analyze the following weekly sales data (provided in PAX format) and provide key metrics:\n\n{pax_data}\n\nProvide:\n1. Total weekly revenue\n2. Total orders\n3. Average order value\n4. Best and worst performing days\n5. Day-over-day trends and patterns"
+            "You are a retail analyst. Analyze the following weekly sales data (provided in TeaLeaf format) and provide key metrics:\n\n{tl_data}\n\nProvide:\n1. Total weekly revenue\n2. Total orders\n3. Average order value\n4. Best and worst performing days\n5. Day-over-day trends and patterns"
         )
         .with_json_data(sales_json)
         .with_complexity(accuracy_benchmark::tasks::Complexity::Simple)
@@ -690,7 +690,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "RET-002",
             "retail",
-            "You are a customer analytics expert. Analyze the following customer data (provided in PAX format) and perform customer segmentation:\n\n{pax_data}\n\nPerform RFM (Recency, Frequency, Monetary) analysis and:\n1. Calculate RFM scores for each customer\n2. Segment each customer (Champions, Loyal, At-Risk, Lost, etc.)\n3. Identify high-value customers\n4. Recommend retention strategies for each segment"
+            "You are a customer analytics expert. Analyze the following customer data (provided in TeaLeaf format) and perform customer segmentation:\n\n{tl_data}\n\nPerform RFM (Recency, Frequency, Monetary) analysis and:\n1. Calculate RFM scores for each customer\n2. Segment each customer (Champions, Loyal, At-Risk, Lost, etc.)\n3. Identify high-value customers\n4. Recommend retention strategies for each segment"
         )
         .with_json_data(customers_json)
         .with_complexity(accuracy_benchmark::tasks::Complexity::Complex)
@@ -703,7 +703,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "HLT-001",
             "healthcare",
-            "You are a clinical data analyst. Extract and summarize key information from the following patient record (provided in PAX format):\n\n{pax_data}\n\nProvide:\n1. Patient demographics summary\n2. Active conditions count and list\n3. Current medications with potential interactions\n4. Allergy alerts with severity levels\n5. Recent vitals assessment"
+            "You are a clinical data analyst. Extract and summarize key information from the following patient record (provided in TeaLeaf format):\n\n{tl_data}\n\nProvide:\n1. Patient demographics summary\n2. Active conditions count and list\n3. Current medications with potential interactions\n4. Allergy alerts with severity levels\n5. Recent vitals assessment"
         )
         .with_json_data(patient_json)
         .with_complexity(accuracy_benchmark::tasks::Complexity::Simple)
@@ -716,7 +716,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "TEC-001",
             "technology",
-            "You are a DevOps engineer. Analyze the following server metrics (provided in PAX format) and identify issues:\n\n{pax_data}\n\nProvide:\n1. Critical issues requiring immediate action\n2. Warning-level concerns\n3. Resource utilization summary\n4. Performance assessment vs targets\n5. Prioritized recommended actions"
+            "You are a DevOps engineer. Analyze the following server metrics (provided in TeaLeaf format) and identify issues:\n\n{tl_data}\n\nProvide:\n1. Critical issues requiring immediate action\n2. Warning-level concerns\n3. Resource utilization summary\n4. Performance assessment vs targets\n5. Prioritized recommended actions"
         )
         .with_json_data(server_json)
         .with_complexity(accuracy_benchmark::tasks::Complexity::Moderate)
@@ -729,7 +729,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "MKT-001",
             "marketing",
-            "You are a marketing analyst. Analyze the following campaign data (provided in PAX format) and calculate ROI metrics:\n\n{pax_data}\n\nCalculate for each campaign:\n1. CTR (Click-through rate)\n2. Conversion rate\n3. CPA (Cost per acquisition)\n4. ROAS (Return on ad spend)\n5. ROI percentage\n\nThen compare the campaigns and recommend budget allocation."
+            "You are a marketing analyst. Analyze the following campaign data (provided in TeaLeaf format) and calculate ROI metrics:\n\n{tl_data}\n\nCalculate for each campaign:\n1. CTR (Click-through rate)\n2. Conversion rate\n3. CPA (Cost per acquisition)\n4. ROAS (Return on ad spend)\n5. ROI percentage\n\nThen compare the campaigns and recommend budget allocation."
         )
         .with_json_data(campaigns_json)
         .with_complexity(accuracy_benchmark::tasks::Complexity::Moderate)
@@ -742,7 +742,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "LOG-001",
             "logistics",
-            "You are a logistics analyst. Analyze the following shipment data (provided in PAX format) and calculate delivery metrics:\n\n{pax_data}\n\nProvide:\n1. Total shipments and delivery status breakdown\n2. On-time delivery rate percentage\n3. Average shipment cost and cost per kg\n4. Carrier performance comparison\n5. Warehouse utilization summary\n6. Recommendations for improving delivery performance"
+            "You are a logistics analyst. Analyze the following shipment data (provided in TeaLeaf format) and calculate delivery metrics:\n\n{tl_data}\n\nProvide:\n1. Total shipments and delivery status breakdown\n2. On-time delivery rate percentage\n3. Average shipment cost and cost per kg\n4. Carrier performance comparison\n5. Warehouse utilization summary\n6. Recommendations for improving delivery performance"
         )
         .with_json_file("accuracy-benchmark/tasks/logistics/data/shipments.json")
         .with_complexity(accuracy_benchmark::tasks::Complexity::Moderate)
@@ -755,7 +755,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "HR-001",
             "hr",
-            "You are an HR analyst. Analyze the following employee data (provided in PAX format) and provide workforce insights:\n\n{pax_data}\n\nProvide:\n1. Headcount by department\n2. Average salary by department and role level\n3. Performance score distribution\n4. Tenure analysis (average years at company)\n5. Attrition analysis and trends\n6. Cost of benefits per employee"
+            "You are an HR analyst. Analyze the following employee data (provided in TeaLeaf format) and provide workforce insights:\n\n{tl_data}\n\nProvide:\n1. Headcount by department\n2. Average salary by department and role level\n3. Performance score distribution\n4. Tenure analysis (average years at company)\n5. Attrition analysis and trends\n6. Cost of benefits per employee"
         )
         .with_json_file("accuracy-benchmark/tasks/hr/data/employees.json")
         .with_complexity(accuracy_benchmark::tasks::Complexity::Moderate)
@@ -768,7 +768,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "MFG-001",
             "manufacturing",
-            "You are a manufacturing analyst. Analyze the following production data (provided in PAX format) and calculate OEE metrics:\n\n{pax_data}\n\nProvide:\n1. Total production volume (planned vs actual)\n2. Production efficiency percentage\n3. Defect rate by product\n4. Equipment utilization analysis\n5. Downtime analysis and causes\n6. Material stock levels vs reorder points"
+            "You are a manufacturing analyst. Analyze the following production data (provided in TeaLeaf format) and calculate OEE metrics:\n\n{tl_data}\n\nProvide:\n1. Total production volume (planned vs actual)\n2. Production efficiency percentage\n3. Defect rate by product\n4. Equipment utilization analysis\n5. Downtime analysis and causes\n6. Material stock levels vs reorder points"
         )
         .with_json_file("accuracy-benchmark/tasks/manufacturing/data/production.json")
         .with_complexity(accuracy_benchmark::tasks::Complexity::Moderate)
@@ -781,7 +781,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "RE-001",
             "real_estate",
-            "You are a real estate analyst. Analyze the following property and market data (provided in PAX format) and provide market insights:\n\n{pax_data}\n\nProvide:\n1. Active listings summary by property type\n2. Average price per square foot by type\n3. Days on market analysis\n4. Transaction volume and average sale price\n5. Market conditions assessment (buyer's vs seller's market)\n6. Investment recommendations based on the data"
+            "You are a real estate analyst. Analyze the following property and market data (provided in TeaLeaf format) and provide market insights:\n\n{tl_data}\n\nProvide:\n1. Active listings summary by property type\n2. Average price per square foot by type\n3. Days on market analysis\n4. Transaction volume and average sale price\n5. Market conditions assessment (buyer's vs seller's market)\n6. Investment recommendations based on the data"
         )
         .with_json_file("accuracy-benchmark/tasks/real_estate/data/properties.json")
         .with_complexity(accuracy_benchmark::tasks::Complexity::Complex)
@@ -794,7 +794,7 @@ fn create_sample_tasks() -> Vec<BenchmarkTask> {
         BenchmarkTask::new(
             "LEG-001",
             "legal",
-            "You are a legal analyst. Analyze the following contract portfolio (provided in PAX format) and assess compliance and risk:\n\n{pax_data}\n\nProvide:\n1. Contract portfolio summary by type\n2. Total contract value by category\n3. Risk level distribution\n4. Compliance status overview\n5. Upcoming renewals and expirations\n6. Active disputes and financial exposure\n7. Recommendations for risk mitigation"
+            "You are a legal analyst. Analyze the following contract portfolio (provided in TeaLeaf format) and assess compliance and risk:\n\n{tl_data}\n\nProvide:\n1. Contract portfolio summary by type\n2. Total contract value by category\n3. Risk level distribution\n4. Compliance status overview\n5. Upcoming renewals and expirations\n6. Active disputes and financial exposure\n7. Recommendations for risk mitigation"
         )
         .with_json_file("accuracy-benchmark/tasks/legal/data/contracts.json")
         .with_complexity(accuracy_benchmark::tasks::Complexity::Complex)

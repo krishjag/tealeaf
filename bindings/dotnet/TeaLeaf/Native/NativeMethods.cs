@@ -1,24 +1,24 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Pax.Native;
+namespace TeaLeaf.Native;
 
 /// <summary>
-/// P/Invoke declarations for the native Pax FFI library.
+/// P/Invoke declarations for the native TeaLeaf FFI library.
 /// </summary>
 internal static class NativeMethods
 {
-    private const string LibraryName = "pax_ffi";
+    private const string LibraryName = "tealeaf_ffi";
 
     // ==========================================================================
     // Error Handling API
     // ==========================================================================
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_get_last_error();
+    public static extern IntPtr tl_get_last_error();
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void pax_clear_error();
+    public static extern void tl_clear_error();
 
     /// <summary>
     /// Get the last error message from the native library and clear it.
@@ -26,7 +26,7 @@ internal static class NativeMethods
     /// </summary>
     public static string? GetLastError()
     {
-        var ptr = pax_get_last_error();
+        var ptr = tl_get_last_error();
         if (ptr == IntPtr.Zero)
             return null;
 
@@ -36,7 +36,7 @@ internal static class NativeMethods
         }
         finally
         {
-            pax_string_free(ptr);
+            tl_string_free(ptr);
         }
     }
 
@@ -45,32 +45,32 @@ internal static class NativeMethods
     // ==========================================================================
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_parse(
+    public static extern IntPtr tl_parse(
         [MarshalAs(UnmanagedType.LPUTF8Str)] string text);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_parse_file(
+    public static extern IntPtr tl_parse_file(
         [MarshalAs(UnmanagedType.LPUTF8Str)] string path);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void pax_document_free(IntPtr doc);
+    public static extern void tl_document_free(IntPtr doc);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_document_get(
+    public static extern IntPtr tl_document_get(
         IntPtr doc,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string key);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_document_keys(IntPtr doc);
+    public static extern IntPtr tl_document_keys(IntPtr doc);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_document_to_text(IntPtr doc);
+    public static extern IntPtr tl_document_to_text(IntPtr doc);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_document_to_text_data_only(IntPtr doc);
+    public static extern IntPtr tl_document_to_text_data_only(IntPtr doc);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern PaxResult pax_document_compile(
+    public static extern TLResult tl_document_compile(
         IntPtr doc,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string path,
         [MarshalAs(UnmanagedType.I1)] bool compress);
@@ -80,151 +80,151 @@ internal static class NativeMethods
     // ==========================================================================
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_document_from_json(
+    public static extern IntPtr tl_document_from_json(
         [MarshalAs(UnmanagedType.LPUTF8Str)] string json);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_document_to_json(IntPtr doc);
+    public static extern IntPtr tl_document_to_json(IntPtr doc);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_document_to_json_compact(IntPtr doc);
+    public static extern IntPtr tl_document_to_json_compact(IntPtr doc);
 
     // ==========================================================================
     // Value API
     // ==========================================================================
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern PaxValueType pax_value_type(IntPtr value);
+    public static extern TLValueType tl_value_type(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void pax_value_free(IntPtr value);
+    public static extern void tl_value_free(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     [return: MarshalAs(UnmanagedType.I1)]
-    public static extern bool pax_value_as_bool(IntPtr value);
+    public static extern bool tl_value_as_bool(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern long pax_value_as_int(IntPtr value);
+    public static extern long tl_value_as_int(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern ulong pax_value_as_uint(IntPtr value);
+    public static extern ulong tl_value_as_uint(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern double pax_value_as_float(IntPtr value);
+    public static extern double tl_value_as_float(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_as_string(IntPtr value);
+    public static extern IntPtr tl_value_as_string(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern long pax_value_as_timestamp(IntPtr value);
+    public static extern long tl_value_as_timestamp(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nuint pax_value_array_len(IntPtr value);
+    public static extern nuint tl_value_array_len(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_array_get(IntPtr value, nuint index);
+    public static extern IntPtr tl_value_array_get(IntPtr value, nuint index);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_object_get(
+    public static extern IntPtr tl_value_object_get(
         IntPtr value,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string key);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_object_keys(IntPtr value);
+    public static extern IntPtr tl_value_object_keys(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nuint pax_value_bytes_len(IntPtr value);
+    public static extern nuint tl_value_bytes_len(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_bytes_data(IntPtr value);
+    public static extern IntPtr tl_value_bytes_data(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_ref_name(IntPtr value);
+    public static extern IntPtr tl_value_ref_name(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_tag_name(IntPtr value);
+    public static extern IntPtr tl_value_tag_name(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_tag_value(IntPtr value);
+    public static extern IntPtr tl_value_tag_value(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nuint pax_value_map_len(IntPtr value);
+    public static extern nuint tl_value_map_len(IntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_map_get_key(IntPtr value, nuint index);
+    public static extern IntPtr tl_value_map_get_key(IntPtr value, nuint index);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_value_map_get_value(IntPtr value, nuint index);
+    public static extern IntPtr tl_value_map_get_value(IntPtr value, nuint index);
 
     // ==========================================================================
     // Binary Reader API
     // ==========================================================================
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_reader_open(
+    public static extern IntPtr tl_reader_open(
         [MarshalAs(UnmanagedType.LPUTF8Str)] string path);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_reader_open_mmap(
+    public static extern IntPtr tl_reader_open_mmap(
         [MarshalAs(UnmanagedType.LPUTF8Str)] string path);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void pax_reader_free(IntPtr reader);
+    public static extern void tl_reader_free(IntPtr reader);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_reader_get(
+    public static extern IntPtr tl_reader_get(
         IntPtr reader,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string key);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_reader_keys(IntPtr reader);
+    public static extern IntPtr tl_reader_keys(IntPtr reader);
 
     // ==========================================================================
     // Schema API (for dynamic typing support)
     // ==========================================================================
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nuint pax_reader_schema_count(IntPtr reader);
+    public static extern nuint tl_reader_schema_count(IntPtr reader);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_reader_schema_name(IntPtr reader, nuint index);
+    public static extern IntPtr tl_reader_schema_name(IntPtr reader, nuint index);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nuint pax_reader_schema_field_count(IntPtr reader, nuint schemaIndex);
+    public static extern nuint tl_reader_schema_field_count(IntPtr reader, nuint schemaIndex);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_reader_schema_field_name(IntPtr reader, nuint schemaIndex, nuint fieldIndex);
+    public static extern IntPtr tl_reader_schema_field_name(IntPtr reader, nuint schemaIndex, nuint fieldIndex);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_reader_schema_field_type(IntPtr reader, nuint schemaIndex, nuint fieldIndex);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I1)]
-    public static extern bool pax_reader_schema_field_nullable(IntPtr reader, nuint schemaIndex, nuint fieldIndex);
+    public static extern IntPtr tl_reader_schema_field_type(IntPtr reader, nuint schemaIndex, nuint fieldIndex);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     [return: MarshalAs(UnmanagedType.I1)]
-    public static extern bool pax_reader_schema_field_is_array(IntPtr reader, nuint schemaIndex, nuint fieldIndex);
+    public static extern bool tl_reader_schema_field_nullable(IntPtr reader, nuint schemaIndex, nuint fieldIndex);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    public static extern bool tl_reader_schema_field_is_array(IntPtr reader, nuint schemaIndex, nuint fieldIndex);
 
     // ==========================================================================
     // Memory Management
     // ==========================================================================
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void pax_string_free(IntPtr s);
+    public static extern void tl_string_free(IntPtr s);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void pax_string_array_free(IntPtr arr);
+    public static extern void tl_string_array_free(IntPtr arr);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void pax_result_free(ref PaxResult result);
+    public static extern void tl_result_free(ref TLResult result);
 
     // ==========================================================================
     // Version
     // ==========================================================================
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr pax_version();
+    public static extern IntPtr tl_version();
 
     // ==========================================================================
     // Helper methods
@@ -244,7 +244,7 @@ internal static class NativeMethods
         }
         finally
         {
-            pax_string_free(ptr);
+            tl_string_free(ptr);
         }
     }
 
@@ -274,7 +274,7 @@ internal static class NativeMethods
         }
         finally
         {
-            pax_string_array_free(ptr);
+            tl_string_array_free(ptr);
         }
     }
 }
@@ -283,7 +283,7 @@ internal static class NativeMethods
 /// Result type for FFI operations.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-internal struct PaxResult
+internal struct TLResult
 {
     [MarshalAs(UnmanagedType.I1)]
     public bool Success;
@@ -294,8 +294,8 @@ internal struct PaxResult
         if (!Success && ErrorMessage != IntPtr.Zero)
         {
             var message = Marshal.PtrToStringUTF8(ErrorMessage) ?? "Unknown error";
-            NativeMethods.pax_result_free(ref this);
-            throw new PaxException(message);
+            NativeMethods.tl_result_free(ref this);
+            throw new TLException(message);
         }
     }
 }
@@ -303,7 +303,7 @@ internal struct PaxResult
 /// <summary>
 /// Value type enumeration matching the native enum.
 /// </summary>
-internal enum PaxValueType
+internal enum TLValueType
 {
     Null = 0,
     Bool = 1,

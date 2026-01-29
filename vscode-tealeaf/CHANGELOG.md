@@ -1,12 +1,12 @@
 # Change Log
 
-All notable changes to the "PAX Language Support" extension will be documented in this file.
+All notable changes to the "TeaLeaf Language Support" extension will be documented in this file.
 
 ## [0.1.0] - 2024-01-25
 
 ### Added
 - Initial release
-- Syntax highlighting for PAX format
+- Syntax highlighting for TeaLeaf format
   - Directives: `@struct`, `@union`, `@table`, `@map`, `@include`
   - Primitive types: `string`, `int`, `uint`, `float`, `bool`, `bytes`, `timestamp`
   - Sized types: `int8`, `int16`, `int32`, `int64`, `uint8`, etc.

@@ -1,4 +1,4 @@
-# GitHub Actions workflow for building and packaging Pax .NET library
+# GitHub Actions workflow for building and packaging TeaLeaf .NET library
 # with multi-platform native dependencies
 #
 # This workflow:
@@ -12,8 +12,8 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'pax-core/**'
-      - 'pax-ffi/**'
+      - 'tealeaf-core/**'
+      - 'tealeaf-ffi/**'
       - 'bindings/dotnet/**'
       - 'release.json'
       - 'scripts/**'
@@ -21,8 +21,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'pax-core/**'
-      - 'pax-ffi/**'
+      - 'tealeaf-core/**'
+      - 'tealeaf-ffi/**'
       - 'bindings/dotnet/**'
       - 'release.json'
   release:
@@ -70,32 +70,32 @@ jobs:
           - os: windows-latest
             rid: win-x64
             rust-target: x86_64-pc-windows-msvc
-            library: pax_ffi.dll
+            library: tealeaf_ffi.dll
           - os: windows-latest
             rid: win-arm64
             rust-target: aarch64-pc-windows-msvc
-            library: pax_ffi.dll
+            library: tealeaf_ffi.dll
 
           # Linux (glibc)
           - os: ubuntu-latest
             rid: linux-x64
             rust-target: x86_64-unknown-linux-gnu
-            library: libpax_ffi.so
+            library: libtealeaf_ffi.so
           - os: ubuntu-latest
             rid: linux-arm64
             rust-target: aarch64-unknown-linux-gnu
-            library: libpax_ffi.so
+            library: libtealeaf_ffi.so
             cross: true
 
           # macOS
           - os: macos-latest
             rid: osx-x64
             rust-target: x86_64-apple-darwin
-            library: libpax_ffi.dylib
+            library: libtealeaf_ffi.dylib
           - os: macos-latest
             rid: osx-arm64
             rust-target: aarch64-apple-darwin
-            library: libpax_ffi.dylib
+            library: libtealeaf_ffi.dylib
 
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.rid }}
@@ -142,7 +142,7 @@ jobs:
 
       - name: Build native library
         run: |
-          cargo build --release --package pax-ffi --target ${{ matrix.rust-target }}
+          cargo build --release --package tealeaf-ffi --target ${{ matrix.rust-target }}
 
       - name: Upload native library artifact
         uses: actions/upload-artifact@v4
@@ -182,7 +182,7 @@ jobs:
 
       - name: Organize native libraries
         run: |
-          cd bindings/dotnet/Pax
+          cd bindings/dotnet/TeaLeaf
 
           # Create runtimes directory structure
           for rid_dir in ../../../artifacts/native-*; do
@@ -198,17 +198,17 @@ jobs:
           find runtimes -type f -exec ls -la {} \;
 
       - name: Build .NET project
-        run: dotnet build bindings/dotnet/Pax -c Release
+        run: dotnet build bindings/dotnet/TeaLeaf -c Release
 
       - name: Run tests
         run: |
           # Copy a native library for tests
-          cp bindings/dotnet/Pax/runtimes/linux-x64/native/libpax_ffi.so bindings/dotnet/Pax.Tests/bin/Release/net8.0/ || true
+          cp bindings/dotnet/TeaLeaf/runtimes/linux-x64/native/libtealeaf_ffi.so bindings/dotnet/TeaLeaf.Tests/bin/Release/net8.0/ || true
           dotnet test bindings/dotnet -c Release --no-build
 
       - name: Create NuGet package
         run: |
-          dotnet pack bindings/dotnet/Pax -c Release --no-build -o artifacts/packages
+          dotnet pack bindings/dotnet/TeaLeaf -c Release --no-build -o artifacts/packages
 
       - name: Upload NuGet package artifact
         uses: actions/upload-artifact@v4

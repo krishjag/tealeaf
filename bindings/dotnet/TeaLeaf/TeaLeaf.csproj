@@ -8,14 +8,14 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
     <!-- Package metadata -->
-    <PackageId>Pax</PackageId>
+    <PackageId>TeaLeaf</PackageId>
     <Version>2.0.0-beta.1</Version>
-    <Authors>Pax Contributors</Authors>
+    <Authors>TeaLeaf Contributors</Authors>
     <Description>Schema-aware document format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization.</Description>
-    <PackageTags>serialization;schema;binary;config;pax;json;document</PackageTags>
+    <PackageTags>serialization;schema;binary;config;tealeaf;json;document</PackageTags>
     <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/krishjag/pax</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/krishjag/pax</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/krishjag/tealeaf</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/krishjag/tealeaf</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
@@ -44,50 +44,50 @@
 
   <!-- Windows native libraries -->
   <ItemGroup>
-    <None Include="runtimes\win-x64\native\pax_ffi.dll"
+    <None Include="runtimes\win-x64\native\tealeaf_ffi.dll"
           Pack="true"
           PackagePath="runtimes\win-x64\native"
-          Condition="Exists('runtimes\win-x64\native\pax_ffi.dll')" />
-    <None Include="runtimes\win-x86\native\pax_ffi.dll"
+          Condition="Exists('runtimes\win-x64\native\tealeaf_ffi.dll')" />
+    <None Include="runtimes\win-x86\native\tealeaf_ffi.dll"
           Pack="true"
           PackagePath="runtimes\win-x86\native"
-          Condition="Exists('runtimes\win-x86\native\pax_ffi.dll')" />
-    <None Include="runtimes\win-arm64\native\pax_ffi.dll"
+          Condition="Exists('runtimes\win-x86\native\tealeaf_ffi.dll')" />
+    <None Include="runtimes\win-arm64\native\tealeaf_ffi.dll"
           Pack="true"
           PackagePath="runtimes\win-arm64\native"
-          Condition="Exists('runtimes\win-arm64\native\pax_ffi.dll')" />
+          Condition="Exists('runtimes\win-arm64\native\tealeaf_ffi.dll')" />
   </ItemGroup>
 
   <!-- Linux native libraries -->
   <ItemGroup>
-    <None Include="runtimes\linux-x64\native\libpax_ffi.so"
+    <None Include="runtimes\linux-x64\native\libtealeaf_ffi.so"
           Pack="true"
           PackagePath="runtimes\linux-x64\native"
-          Condition="Exists('runtimes\linux-x64\native\libpax_ffi.so')" />
-    <None Include="runtimes\linux-arm64\native\libpax_ffi.so"
+          Condition="Exists('runtimes\linux-x64\native\libtealeaf_ffi.so')" />
+    <None Include="runtimes\linux-arm64\native\libtealeaf_ffi.so"
           Pack="true"
           PackagePath="runtimes\linux-arm64\native"
-          Condition="Exists('runtimes\linux-arm64\native\libpax_ffi.so')" />
-    <None Include="runtimes\linux-musl-x64\native\libpax_ffi.so"
+          Condition="Exists('runtimes\linux-arm64\native\libtealeaf_ffi.so')" />
+    <None Include="runtimes\linux-musl-x64\native\libtealeaf_ffi.so"
           Pack="true"
           PackagePath="runtimes\linux-musl-x64\native"
-          Condition="Exists('runtimes\linux-musl-x64\native\libpax_ffi.so')" />
-    <None Include="runtimes\linux-musl-arm64\native\libpax_ffi.so"
+          Condition="Exists('runtimes\linux-musl-x64\native\libtealeaf_ffi.so')" />
+    <None Include="runtimes\linux-musl-arm64\native\libtealeaf_ffi.so"
           Pack="true"
           PackagePath="runtimes\linux-musl-arm64\native"
-          Condition="Exists('runtimes\linux-musl-arm64\native\libpax_ffi.so')" />
+          Condition="Exists('runtimes\linux-musl-arm64\native\libtealeaf_ffi.so')" />
   </ItemGroup>
 
   <!-- macOS native libraries -->
   <ItemGroup>
-    <None Include="runtimes\osx-x64\native\libpax_ffi.dylib"
+    <None Include="runtimes\osx-x64\native\libtealeaf_ffi.dylib"
           Pack="true"
           PackagePath="runtimes\osx-x64\native"
-          Condition="Exists('runtimes\osx-x64\native\libpax_ffi.dylib')" />
-    <None Include="runtimes\osx-arm64\native\libpax_ffi.dylib"
+          Condition="Exists('runtimes\osx-x64\native\libtealeaf_ffi.dylib')" />
+    <None Include="runtimes\osx-arm64\native\libtealeaf_ffi.dylib"
           Pack="true"
           PackagePath="runtimes\osx-arm64\native"
-          Condition="Exists('runtimes\osx-arm64\native\libpax_ffi.dylib')" />
+          Condition="Exists('runtimes\osx-arm64\native\libtealeaf_ffi.dylib')" />
   </ItemGroup>
 
 </Project>

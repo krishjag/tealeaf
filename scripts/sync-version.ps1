@@ -5,9 +5,9 @@
 .DESCRIPTION
     Reads release.json and updates:
     - Cargo.toml (workspace metadata)
-    - bindings/dotnet/Pax/Pax.csproj (.NET package metadata)
+    - bindings/dotnet/TeaLeaf/TeaLeaf.csproj (.NET package metadata)
     - README.md (footer version)
-    - spec/PAX_SPEC.md (title version)
+    - spec/TEALEAF_SPEC.md (title version)
 
 .PARAMETER DryRun
     Show what would be changed without making changes.
@@ -88,9 +88,9 @@ Update-File -Path $CargoPath -Description "Cargo.toml (workspace)" -Transform {
 }
 
 # Update .NET csproj
-$CsprojPath = Join-Path $RepoRoot "bindings/dotnet/Pax/Pax.csproj"
+$CsprojPath = Join-Path $RepoRoot "bindings/dotnet/TeaLeaf/TeaLeaf.csproj"
 $DotnetPackage = $Release.packages.dotnet
-Update-File -Path $CsprojPath -Description "Pax.csproj (.NET)" -Transform {
+Update-File -Path $CsprojPath -Description "TeaLeaf.csproj (.NET)" -Transform {
     param($content)
     $content = $content -replace '(<Version>)[^<]*(</Version>)', "`${1}$Version`${2}"
     $content = $content -replace '(<Authors>)[^<]*(</Authors>)', "`${1}$Authors`${2}"
@@ -108,15 +108,15 @@ Update-File -Path $CsprojPath -Description "Pax.csproj (.NET)" -Transform {
 $ReadmePath = Join-Path $RepoRoot "README.md"
 Update-File -Path $ReadmePath -Description "README.md (footer)" -Transform {
     param($content)
-    $content = $content -replace '(\*PAX v)[^\s]+(\ —)', "`${1}$Version`${2}"
+    $content = $content -replace '(\*TeaLeaf v)[^\s]+(\ —)', "`${1}$Version`${2}"
     return $content
 }
 
-# Update PAX_SPEC.md title version
-$SpecPath = Join-Path $RepoRoot "spec/PAX_SPEC.md"
-Update-File -Path $SpecPath -Description "spec/PAX_SPEC.md (title)" -Transform {
+# Update TEALEAF_SPEC.md title version
+$SpecPath = Join-Path $RepoRoot "spec/TEALEAF_SPEC.md"
+Update-File -Path $SpecPath -Description "spec/TEALEAF_SPEC.md (title)" -Transform {
     param($content)
-    $content = $content -replace '(# PAX Format Specification v)[^\s]+', "`${1}$Version"
+    $content = $content -replace '(# TeaLeaf Format Specification v)[^\s]+', "`${1}$Version"
     return $content
 }
 

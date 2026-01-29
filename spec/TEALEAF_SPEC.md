@@ -1,10 +1,10 @@
-# PAX Format Specification v2.0.0-beta.1
+# TeaLeaf Format Specification v2.0.0-beta.1
 
 > **Status: Beta / Request for Comments**
 >
 > This specification is in beta stage. Feedback is welcome via GitHub issues.
 
-This document defines the normative technical specification for the PAX format.
+This document defines the normative technical specification for the TeaLeaf format.
 
 For an introduction, usage guide, API reference, and comparison with other formats, see the [README](../README.md).
 
@@ -52,8 +52,8 @@ For an introduction, usage guide, API reference, and comparison with other forma
    - [4.9 Compression](#49-compression)
 5. [Grammar](#5-grammar)
 6. [JSON Interoperability](#6-json-interoperability)
-   - [6.1 JSON to Pax](#61-json-to-pax)
-   - [6.2 Pax to JSON](#62-pax-to-json)
+   - [6.1 JSON to TeaLeaf](#61-json-to-tealeaf)
+   - [6.2 TeaLeaf to JSON](#62-tealeaf-to-json)
    - [6.3 Schema Inference](#63-schema-inference)
 7. [CLI Commands](#7-cli-commands)
 8. [Error Types](#8-error-types)
@@ -64,7 +64,7 @@ For an introduction, usage guide, API reference, and comparison with other forma
 
 ### 1.1 Comments
 
-```pax
+```tl
 # This is a line comment
 name: alice  # inline comment
 ```
@@ -74,13 +74,13 @@ Comments begin with `#` and extend to end of line.
 ### 1.2 Strings
 
 **Simple strings** (unquoted, no whitespace or special characters):
-```pax
+```tl
 name: alice
 host: localhost
 ```
 
 **Quoted strings** (with escape sequences):
-```pax
+```tl
 greeting: "hello world"
 path: "C:\\Users\\name"
 message: "line1\nline2"
@@ -89,7 +89,7 @@ message: "line1\nline2"
 Escape sequences: `\\`, `\"`, `\n`, `\t`, `\r`
 
 **Multiline strings** (triple-quoted, auto-dedented):
-```pax
+```tl
 description: """
   This is a multiline string.
   Leading whitespace is trimmed.
@@ -100,32 +100,32 @@ description: """
 ### 1.3 Numbers
 
 **Integers**:
-```pax
+```tl
 count: 42
 negative: -17
 ```
 
 **Floats**:
-```pax
+```tl
 price: 3.14
 scientific: 6.022e23
 ```
 
 **Hexadecimal**:
-```pax
+```tl
 color: 0xFF5500
 mask: 0x00A1
 ```
 
 **Binary**:
-```pax
+```tl
 flags: 0b1010
 byte: 0b11110000
 ```
 
 ### 1.4 Boolean and Null
 
-```pax
+```tl
 enabled: true
 disabled: false
 missing: ~
@@ -137,7 +137,7 @@ The tilde (`~`) represents null.
 
 ISO 8601 formatted timestamps:
 
-```pax
+```tl
 # Date only
 created: 2024-01-15
 
@@ -159,7 +159,7 @@ Timestamps are stored internally as Unix milliseconds (i64).
 
 ### 1.6 Objects
 
-```pax
+```tl
 point: {x: 10, y: 20}
 
 config: {
@@ -173,7 +173,7 @@ Trailing commas are allowed.
 
 ### 1.7 Arrays
 
-```pax
+```tl
 numbers: [1, 2, 3, 4, 5]
 mixed: [1, "hello", true, ~]
 nested: [[1, 2], [3, 4]]
@@ -183,7 +183,7 @@ nested: [[1, 2], [3, 4]]
 
 Define a schema with `@struct` and use `@table` for schema-bound data:
 
-```pax
+```tl
 @struct point (x: int, y: int)
 
 # Use @table for schema-bound tuples
@@ -195,21 +195,21 @@ points: @table point [
 
 **Important:** Standalone tuples (without `@table`) are parsed as plain arrays:
 
-```pax
+```tl
 # This is an array [0, 0], NOT a point struct
 origin: (0, 0)
 ```
 
 **Optional type annotations:** Field types can be omitted and default to `string`:
 
-```pax
+```tl
 @struct config (host, port: int, debug: bool)
 # host defaults to string type
 ```
 
 With types and nullable fields:
 
-```pax
+```tl
 @struct user (
   id: int,
   name: string,
@@ -228,7 +228,7 @@ users: @table user [
 
 Structs can reference other structs. Nested tuples get schema binding from their parent field type:
 
-```pax
+```tl
 @struct address (street: string, city: string, zip: string)
 
 @struct person (
@@ -251,7 +251,7 @@ people: @table person [
 
 Tabular data with `@table`:
 
-```pax
+```tl
 @struct user (id: int, name: string, email: string)
 
 users: @table user [
@@ -265,7 +265,7 @@ Tables provide optimal binary encoding with null bitmaps and positional storage.
 
 ### 1.11 Deep Nesting
 
-```pax
+```tl
 @struct method (type: string, last_four: string)
 @struct payment (amount: float, method: method)
 @struct order (id: int, customer: string, payment: payment)
@@ -280,7 +280,7 @@ orders: @table order [
 
 Dynamic key-value maps with the `@map` directive:
 
-```pax
+```tl
 # String keys
 headers: @map {
   "Content-Type": "application/json",
@@ -308,7 +308,7 @@ Maps preserve insertion order and support heterogeneous key types.
 
 For graphs and deduplication:
 
-```pax
+```tl
 # Define references
 !node_a: {label: "Start", value: 1}
 !node_b: {label: "End", value: 2}
@@ -327,7 +327,7 @@ nodes: [!node_a, !node_b]
 
 For discriminated unions:
 
-```pax
+```tl
 events: [
   :click {x: 100, y: 200},
   :scroll {delta: -50},
@@ -339,7 +339,7 @@ events: [
 
 Discriminated unions with the `@union` directive:
 
-```pax
+```tl
 @union shape {
   circle (radius: float),
   rectangle (width: float, height: float),
@@ -359,14 +359,14 @@ Union variants can have zero or more fields.
 
 ### 1.16 File Includes
 
-Import other Pax files with `@include`:
+Import other TeaLeaf files with `@include`:
 
-```pax
+```tl
 # Include schemas from another file
-@include "schemas/common.pax"
+@include "schemas/common.tl"
 
 # Include shared configuration
-@include "./shared/config.pax"
+@include "./shared/config.tl"
 
 # Use included schemas
 users: @table user [
@@ -400,7 +400,7 @@ Paths are resolved relative to the including file.
 | `timestamp` | Unix milliseconds | 8 bytes |
 
 **Note on bytes:** There is no dedicated bytes literal syntax in text format. The lexer parses `0x...` as integers, not bytes. When bytes are serialized to text (e.g., via decompile), they are written as `0x...` hex strings, but these will be parsed back as integers—**bytes do not round-trip through text format**. For bytes data:
-- Use binary format (`.paxb`) for lossless round-trips
+- Use binary format (`.tlbx`) for lossless round-trips
 - Construct `Value::Bytes` programmatically via the API
 - JSON export encodes bytes as `"0xdeadbeef"` strings; JSON import does not auto-convert these back to bytes
 
@@ -408,7 +408,7 @@ Paths are resolved relative to the including file.
 
 ### 2.2 Type Modifiers
 
-```pax
+```tl
 field: string          # required string
 field: string?         # nullable string (can be ~)
 field: []string        # required array of strings
@@ -454,7 +454,7 @@ This "best effort" approach prioritizes successful compilation over strict valid
 
 ### 3.1 Design Philosophy
 
-PAX prioritizes simplicity over automatic schema evolution:
+TeaLeaf prioritizes simplicity over automatic schema evolution:
 
 - **No migration machinery** — When schemas change, recompile the file
 - **No version negotiation** — The embedded schema is the source of truth
@@ -481,10 +481,10 @@ PAX prioritizes simplicity over automatic schema evolution:
 When schemas change:
 
 ```bash
-pax compile data.pax -o data.paxb
+tealeaf compile data.tl -o data.tlbx
 ```
 
-The source `.pax` file is the master; regenerate binary as needed.
+The source `.tl` file is the master; regenerate binary as needed.
 
 ---
 
@@ -494,7 +494,7 @@ The source `.pax` file is the master; regenerate binary as needed.
 
 | Constant | Value |
 |----------|-------|
-| Magic | `PAX\0` (4 bytes) |
+| Magic | `TLBX` (4 bytes) |
 | Version Major | 2 |
 | Version Minor | 0 |
 | Header Size | 64 bytes |
@@ -519,7 +519,7 @@ The source `.pax` file is the master; regenerate binary as needed.
 
 | Offset | Size | Field | Description |
 |--------|------|-------|-------------|
-| 0 | 4 | Magic | `PAX\0` |
+| 0 | 4 | Magic | `TLBX` |
 | 4 | 2 | Version Major | 2 |
 | 6 | 2 | Version Minor | 0 |
 | 8 | 4 | Flags | bit 0: compressed |
@@ -573,7 +573,7 @@ Schema:
 
   Field (repeated):
     name_idx: u32    (string table index)
-    type: u8         (PaxType code)
+    type: u8         (TLType code)
     flags: u8        (bit 0: nullable, bit 1: is_array)
     extra: u16       (for struct-typed fields: type name string index; 0xFFFF = none)
 ```
@@ -613,7 +613,7 @@ Entry (32 bytes):
   size: u32              (compressed size)
   uncompressed_size: u32 (original size)
   schema_idx: u16        (0xFFFF if none)
-  type: u8               (PaxType code)
+  type: u8               (TLType code)
   flags: u8              (bit 0: compressed, bit 1: is_array)
   item_count: u32        (count for arrays/maps)
   reserved: u32
@@ -667,7 +667,7 @@ This applies to `[]int`, `[]float`, `[]bool`, `[]user`, etc. within `@struct` de
 Field Count: u16
 Fields: [
   key_idx: u32    (string table index)
-  type: u8        (PaxType code)
+  type: u8        (TLType code)
   data: [type-specific]
 ]
 ```
@@ -707,7 +707,7 @@ name_idx: u32    (string table index for reference name)
 **Tagged Values:**
 ```
 tag_idx: u32     (string table index for tag name)
-value_type: u8   (PaxType code)
+value_type: u8   (TLType code)
 value_data: [type-specific]
 ```
 
@@ -782,21 +782,21 @@ comment      = "#" { any } newline ;
 
 ## 6. JSON Interoperability
 
-### 6.1 JSON to Pax
+### 6.1 JSON to TeaLeaf
 
 ```rust
 // Rust API
-let doc = Pax::from_json(json_string)?;
+let doc = TeaLeaf::from_json(json_string)?;
 ```
 
 ```csharp
 // .NET API
-var doc = PaxDocument.FromJson(jsonString);
+var doc = TLDocument.FromJson(jsonString);
 ```
 
 Type mappings:
-| JSON Type | Pax Type |
-|-----------|----------|
+| JSON Type | TeaLeaf Type |
+|-----------|--------------|
 | null | Null |
 | boolean | Bool |
 | number (integer) | Int (or UInt if > i64::MAX) |
@@ -805,15 +805,15 @@ Type mappings:
 | array | Array |
 | object | Object |
 
-**Limitation:** JSON import is "plain JSON only" — it does not recognize the special JSON forms used for Pax export:
+**Limitation:** JSON import is "plain JSON only" — it does not recognize the special JSON forms used for TeaLeaf export:
 - `{"$ref": "name"}` becomes a plain Object, not a Ref
 - `{"$tag": "...", "$value": ...}` becomes a plain Object, not a Tagged
 - `[[key, value], ...]` becomes a plain Array, not a Map
 - ISO 8601 strings become plain Strings, not Timestamps
 
-For full round-trip fidelity with these types, use binary format (`.paxb`) or reconstruct programmatically.
+For full round-trip fidelity with these types, use binary format (`.tlbx`) or reconstruct programmatically.
 
-### 6.2 Pax to JSON
+### 6.2 TeaLeaf to JSON
 
 ```rust
 // Rust API
@@ -828,8 +828,8 @@ string json = doc.ToJsonCompact(); // minified
 ```
 
 Type mappings:
-| Pax Type | JSON Type |
-|----------|-----------|
+| TeaLeaf Type | JSON Type |
+|--------------|-----------|
 | Null | null |
 | Bool | boolean |
 | Int, UInt | number |
@@ -845,12 +845,12 @@ Type mappings:
 
 ### 6.3 Schema Inference
 
-PAX can automatically infer schemas from JSON arrays of uniform objects:
+TeaLeaf can automatically infer schemas from JSON arrays of uniform objects:
 
 ```rust
 // Rust API - with automatic schema inference
-let doc = Pax::from_json_with_schemas(json_string)?;
-let pax_text = doc.to_pax_with_schemas();
+let doc = TeaLeaf::from_json_with_schemas(json_string)?;
+let tl_text = doc.to_tl_with_schemas();
 ```
 
 **How It Works:**
@@ -881,8 +881,8 @@ Input JSON:
 }
 ```
 
-Inferred PAX output:
-```pax
+Inferred TeaLeaf output:
+```tl
 @struct billing_address (city: string, street: string)
 @struct customer (billing_address: billing_address, id: int, name: string)
 
@@ -894,7 +894,7 @@ customers: @table customer [
 
 **Nested Schema Inference:**
 
-When array elements contain nested objects, PAX creates schemas for those nested objects if they have uniform structure across all array items:
+When array elements contain nested objects, TeaLeaf creates schemas for those nested objects if they have uniform structure across all array items:
 
 - Nested objects become their own `@struct` definitions
 - Parent schemas reference nested schemas by name (not `object` type)
@@ -905,19 +905,19 @@ When array elements contain nested objects, PAX creates schemas for those nested
 ## 7. CLI Commands
 
 ```
-pax <command> [options]
+tealeaf <command> [options]
 
 Commands:
-  compile <input.pax> -o <output.paxb>      Compile text to binary
-  decompile <input.paxb> -o <output.pax>    Decompile binary to text
-  info <file.pax|file.paxb>                 Show file info (auto-detects format)
-  validate <file.pax>                       Validate text format
+  compile <input.tl> -o <output.tlbx>       Compile text to binary
+  decompile <input.tlbx> -o <output.tl>     Decompile binary to text
+  info <file.tl|file.tlbx>                  Show file info (auto-detects format)
+  validate <file.tl>                        Validate text format
 
 JSON Conversion:
-  to-json <input.pax> [-o <output.json>]    Convert Pax text to JSON
-  from-json <input.json> -o <output.pax>    Convert JSON to Pax text (with schema inference)
-  paxb-to-json <input.paxb> [-o <out.json>] Convert Pax binary to JSON
-  json-to-paxb <input.json> -o <out.paxb>   Convert JSON to Pax binary
+  to-json <input.tl> [-o <output.json>]     Convert TeaLeaf text to JSON
+  from-json <input.json> -o <output.tl>     Convert JSON to TeaLeaf text (with schema inference)
+  tlbx-to-json <input.tlbx> [-o <out.json>] Convert TeaLeaf binary to JSON
+  json-to-tlbx <input.json> -o <out.tlbx>   Convert JSON to TeaLeaf binary
 
   help                                      Show help
 ```
@@ -946,4 +946,4 @@ JSON Conversion:
 
 ---
 
-*PAX Format Specification v2.0-beta.1*
+*TeaLeaf Format Specification v2.0-beta.1*

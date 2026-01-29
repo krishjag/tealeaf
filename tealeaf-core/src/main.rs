@@ -1,9 +1,9 @@
-//! Pax CLI
+//! TeaLeaf CLI
 
 use std::env;
 use std::process;
 
-use pax::{Pax, Reader};
+use tealeaf::{TeaLeaf, Reader};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -20,8 +20,8 @@ fn main() {
         "validate" => cmd_validate(&args[2..]),
         "to-json" => cmd_to_json(&args[2..]),
         "from-json" => cmd_from_json(&args[2..]),
-        "paxb-to-json" => cmd_paxb_to_json(&args[2..]),
-        "json-to-paxb" => cmd_json_to_paxb(&args[2..]),
+        "tlbx-to-json" => cmd_tlbx_to_json(&args[2..]),
+        "json-to-tlbx" => cmd_json_to_tlbx(&args[2..]),
         "help" | "--help" | "-h" => { print_usage(); Ok(()) }
         _ => {
             eprintln!("Unknown command: {}", args[1]);
@@ -37,28 +37,28 @@ fn main() {
 }
 
 fn print_usage() {
-    println!("Pax v2.0 - Schema-aware document format");
+    println!("TeaLeaf v2.0 - Schema-aware document format");
     println!();
-    println!("Usage: pax <command> [options]");
+    println!("Usage: tealeaf <command> [options]");
     println!();
     println!("Commands:");
-    println!("  compile <input.pax> -o <output.paxb>      Compile text to binary");
-    println!("  decompile <input.paxb> -o <output.pax>    Decompile binary to text");
-    println!("  info <file.pax|file.paxb>                 Show file info (auto-detects format)");
-    println!("  validate <file.pax>                       Validate text format");
+    println!("  compile <input.tl> -o <output.tlbx>       Compile text to binary");
+    println!("  decompile <input.tlbx> -o <output.tl>     Decompile binary to text");
+    println!("  info <file.tl|file.tlbx>                  Show file info (auto-detects format)");
+    println!("  validate <file.tl>                        Validate text format");
     println!();
     println!("JSON Conversion:");
-    println!("  to-json <input.pax> [-o <output.json>]    Convert Pax text to JSON");
-    println!("  from-json <input.json> -o <output.pax>    Convert JSON to Pax text");
-    println!("  paxb-to-json <input.paxb> [-o <out.json>] Convert Pax binary to JSON");
-    println!("  json-to-paxb <input.json> -o <out.paxb>   Convert JSON to Pax binary");
+    println!("  to-json <input.tl> [-o <output.json>]     Convert TeaLeaf text to JSON");
+    println!("  from-json <input.json> -o <output.tl>     Convert JSON to TeaLeaf text");
+    println!("  tlbx-to-json <input.tlbx> [-o <out.json>] Convert TeaLeaf binary to JSON");
+    println!("  json-to-tlbx <input.json> -o <out.tlbx>   Convert JSON to TeaLeaf binary");
     println!();
     println!("  help                                      Show this help");
 }
 
 fn cmd_compile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: pax compile <input.pax> -o <output.paxb>");
+        eprintln!("Usage: tealeaf compile <input.tl> -o <output.tlbx>");
         process::exit(1);
     }
 
@@ -66,8 +66,8 @@ fn cmd_compile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     let output = &args[2];
 
     println!("Compiling {} -> {}", input, output);
-    
-    let doc = Pax::load(input)?;
+
+    let doc = TeaLeaf::load(input)?;
     doc.compile(output, true)?;
     
     let in_size = std::fs::metadata(input)?.len();
@@ -80,7 +80,7 @@ fn cmd_compile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
 fn cmd_decompile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: pax decompile <input.paxb> -o <output.pax>");
+        eprintln!("Usage: tealeaf decompile <input.tlbx> -o <output.tl>");
         process::exit(1);
     }
 
@@ -123,7 +123,7 @@ fn cmd_decompile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
 fn cmd_info(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.is_empty() {
-        eprintln!("Usage: pax info <file.pax|file.paxb>");
+        eprintln!("Usage: tealeaf info <file.tl|file.tlbx>");
         process::exit(1);
     }
 
@@ -136,7 +136,7 @@ fn cmd_info(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
         let mut magic = [0u8; 4];
         use std::io::Read;
         if file.read_exact(&mut magic).is_ok() {
-            &magic == b"PAX\0"
+            &magic == b"TLBX"
         } else {
             false
         }
@@ -146,7 +146,7 @@ fn cmd_info(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     println!("Size: {} bytes", file_size);
 
     if is_binary {
-        println!("Format: Binary (.paxb)");
+        println!("Format: Binary (.tlbx)");
         println!();
 
         let reader = Reader::open(input)?;
@@ -161,10 +161,10 @@ fn cmd_info(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
             println!("  {}", key);
         }
     } else {
-        println!("Format: Text (.pax)");
+        println!("Format: Text (.tl)");
         println!();
 
-        match Pax::load(input) {
+        match TeaLeaf::load(input) {
             Ok(doc) => {
                 println!("Schemas: {}", doc.schemas.len());
                 for (name, schema) in &doc.schemas {
@@ -188,13 +188,13 @@ fn cmd_info(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
 fn cmd_validate(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.is_empty() {
-        eprintln!("Usage: pax validate <file.pax>");
+        eprintln!("Usage: tealeaf validate <file.tl>");
         process::exit(1);
     }
 
     let input = &args[0];
 
-    match Pax::load(input) {
+    match TeaLeaf::load(input) {
         Ok(doc) => {
             println!("✓ Valid");
             println!("  Schemas: {}", doc.schemas.len());
@@ -211,7 +211,7 @@ fn cmd_validate(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
 fn cmd_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.is_empty() {
-        eprintln!("Usage: pax to-json <input.pax> [-o <output.json>]");
+        eprintln!("Usage: tealeaf to-json <input.tl> [-o <output.json>]");
         process::exit(1);
     }
 
@@ -222,7 +222,7 @@ fn cmd_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
         None
     };
 
-    let doc = Pax::load(input)?;
+    let doc = TeaLeaf::load(input)?;
     let json = doc.to_json()?;
 
     match output {
@@ -240,7 +240,7 @@ fn cmd_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
 fn cmd_from_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: pax from-json <input.json> -o <output.pax>");
+        eprintln!("Usage: tealeaf from-json <input.json> -o <output.tl>");
         process::exit(1);
     }
 
@@ -251,24 +251,24 @@ fn cmd_from_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
     let json_content = std::fs::read_to_string(input)?;
 
-    let doc = Pax::from_json_with_schemas(&json_content)?;
+    let doc = TeaLeaf::from_json_with_schemas(&json_content)?;
     if !doc.schemas.is_empty() {
         println!("Inferred {} schema(s):", doc.schemas.len());
         for (name, schema) in &doc.schemas {
             println!("  @struct {} ({} fields)", name, schema.fields.len());
         }
     }
-    let pax_text = doc.to_pax_with_schemas();
+    let tl_text = doc.to_tl_with_schemas();
 
-    std::fs::write(output, pax_text)?;
+    std::fs::write(output, tl_text)?;
     println!("Done");
 
     Ok(())
 }
 
-fn cmd_paxb_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
+fn cmd_tlbx_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.is_empty() {
-        eprintln!("Usage: pax paxb-to-json <input.paxb> [-o <output.json>]");
+        eprintln!("Usage: tealeaf tlbx-to-json <input.tlbx> [-o <output.json>]");
         process::exit(1);
     }
 
@@ -303,9 +303,9 @@ fn cmd_paxb_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn cmd_json_to_paxb(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
+fn cmd_json_to_tlbx(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: pax json-to-paxb <input.json> -o <output.paxb>");
+        eprintln!("Usage: tealeaf json-to-tlbx <input.json> -o <output.tlbx>");
         process::exit(1);
     }
 
@@ -315,7 +315,7 @@ fn cmd_json_to_paxb(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     println!("Converting {} -> {}", input, output);
 
     let json_content = std::fs::read_to_string(input)?;
-    let doc = Pax::from_json(&json_content)?;
+    let doc = TeaLeaf::from_json(&json_content)?;
     doc.compile(output, true)?;
 
     let in_size = std::fs::metadata(input)?.len();
@@ -326,9 +326,9 @@ fn cmd_json_to_paxb(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// Convert Pax Value to serde_json::Value
-fn value_to_json(value: &pax::Value) -> serde_json::Value {
-    use pax::Value;
+/// Convert TeaLeaf Value to serde_json::Value
+fn value_to_json(value: &tealeaf::Value) -> serde_json::Value {
+    use tealeaf::Value;
 
     match value {
         Value::Null => serde_json::Value::Null,
@@ -418,8 +418,8 @@ fn days_to_ymd(days: i32) -> (i32, u32, u32) {
     (y, m, d)
 }
 
-fn write_value(out: &mut String, value: &pax::Value, indent: usize) {
-    use pax::Value;
+fn write_value(out: &mut String, value: &tealeaf::Value, indent: usize) {
+    use tealeaf::Value;
     
     match value {
         Value::Null => out.push('~'),

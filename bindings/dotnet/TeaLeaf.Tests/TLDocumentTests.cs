@@ -1,13 +1,13 @@
 using Xunit;
 
-namespace Pax.Tests;
+namespace TeaLeaf.Tests;
 
-public class PaxDocumentTests
+public class TLDocumentTests
 {
     [Fact]
     public void Parse_SimpleValues_ReturnsDocument()
     {
-        using var doc = PaxDocument.Parse(@"
+        using var doc = TLDocument.Parse(@"
             name: alice
             age: 30
             active: true
@@ -22,33 +22,33 @@ public class PaxDocumentTests
     [Fact]
     public void Parse_String_ReturnsCorrectValue()
     {
-        using var doc = PaxDocument.Parse("name: alice");
+        using var doc = TLDocument.Parse("name: alice");
         using var value = doc["name"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.String, value.Type);
+        Assert.Equal(TLType.String, value.Type);
         Assert.Equal("alice", value.AsString());
     }
 
     [Fact]
     public void Parse_Integer_ReturnsCorrectValue()
     {
-        using var doc = PaxDocument.Parse("count: 42");
+        using var doc = TLDocument.Parse("count: 42");
         using var value = doc["count"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.Int, value.Type);
+        Assert.Equal(TLType.Int, value.Type);
         Assert.Equal(42, value.AsInt());
     }
 
     [Fact]
     public void Parse_Float_ReturnsCorrectValue()
     {
-        using var doc = PaxDocument.Parse("price: 19.99");
+        using var doc = TLDocument.Parse("price: 19.99");
         using var value = doc["price"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.Float, value.Type);
+        Assert.Equal(TLType.Float, value.Type);
         var floatVal = value.AsFloat();
         Assert.NotNull(floatVal);
         Assert.True(Math.Abs(19.99 - floatVal.Value) < 0.01);
@@ -57,7 +57,7 @@ public class PaxDocumentTests
     [Fact]
     public void Parse_Boolean_ReturnsCorrectValue()
     {
-        using var doc = PaxDocument.Parse(@"
+        using var doc = TLDocument.Parse(@"
             enabled: true
             disabled: false
         ");
@@ -72,11 +72,11 @@ public class PaxDocumentTests
     [Fact]
     public void Parse_Array_ReturnsCorrectValues()
     {
-        using var doc = PaxDocument.Parse("items: [1, 2, 3]");
+        using var doc = TLDocument.Parse("items: [1, 2, 3]");
         using var value = doc["items"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.Array, value.Type);
+        Assert.Equal(TLType.Array, value.Type);
         Assert.Equal(3, value.ArrayLength);
 
         using var first = value[0];
@@ -86,11 +86,11 @@ public class PaxDocumentTests
     [Fact]
     public void Parse_Object_ReturnsCorrectValues()
     {
-        using var doc = PaxDocument.Parse("user: {name: bob, age: 25}");
+        using var doc = TLDocument.Parse("user: {name: bob, age: 25}");
         using var value = doc["user"];
 
         Assert.NotNull(value);
-        Assert.Equal(PaxType.Object, value.Type);
+        Assert.Equal(TLType.Object, value.Type);
 
         using var name = value["name"];
         Assert.Equal("bob", name?.AsString());
@@ -99,13 +99,13 @@ public class PaxDocumentTests
     [Fact]
     public void Parse_InvalidSyntax_ThrowsException()
     {
-        Assert.Throws<PaxException>(() => PaxDocument.Parse("invalid: [unclosed"));
+        Assert.Throws<TLException>(() => TLDocument.Parse("invalid: [unclosed"));
     }
 
     [Fact]
     public void Parse_InvalidSyntax_ExceptionHasDetailedMessage()
     {
-        var ex = Assert.Throws<PaxException>(() => PaxDocument.Parse("invalid: [unclosed"));
+        var ex = Assert.Throws<TLException>(() => TLDocument.Parse("invalid: [unclosed"));
 
         // Error message should contain "Parse error" and describe the issue
         Assert.Contains("Parse error", ex.Message);
@@ -114,7 +114,7 @@ public class PaxDocumentTests
     [Fact]
     public void FromJson_InvalidJson_ExceptionHasDetailedMessage()
     {
-        var ex = Assert.Throws<PaxException>(() => PaxDocument.FromJson("not valid json"));
+        var ex = Assert.Throws<TLException>(() => TLDocument.FromJson("not valid json"));
 
         // Error message should mention JSON and the problem
         Assert.Contains("JSON", ex.Message);
@@ -123,7 +123,7 @@ public class PaxDocumentTests
     [Fact]
     public void TryParse_ValidInput_ReturnsTrue()
     {
-        var success = PaxDocument.TryParse("value: 123", out var doc);
+        var success = TLDocument.TryParse("value: 123", out var doc);
 
         Assert.True(success);
         Assert.NotNull(doc);
@@ -133,7 +133,7 @@ public class PaxDocumentTests
     [Fact]
     public void TryParse_InvalidInput_ReturnsFalse()
     {
-        var success = PaxDocument.TryParse("invalid: [", out var doc);
+        var success = TLDocument.TryParse("invalid: [", out var doc);
 
         Assert.False(success);
         Assert.Null(doc);
@@ -142,7 +142,7 @@ public class PaxDocumentTests
     [Fact]
     public void Get_NonExistentKey_ReturnsNull()
     {
-        using var doc = PaxDocument.Parse("key: value");
+        using var doc = TLDocument.Parse("key: value");
         var value = doc["nonexistent"];
 
         Assert.Null(value);
@@ -151,16 +151,16 @@ public class PaxDocumentTests
     [Fact]
     public void ContainsKey_ExistingKey_ReturnsTrue()
     {
-        using var doc = PaxDocument.Parse("key: value");
+        using var doc = TLDocument.Parse("key: value");
 
         Assert.True(doc.ContainsKey("key"));
         Assert.False(doc.ContainsKey("other"));
     }
 
     [Fact]
-    public void ToText_ReturnsValidPaxFormat()
+    public void ToText_ReturnsValidTeaLeafFormat()
     {
-        using var doc = PaxDocument.Parse("greeting: hello");
+        using var doc = TLDocument.Parse("greeting: hello");
         var text = doc.ToText();
 
         Assert.NotNull(text);
@@ -175,7 +175,7 @@ public class PaxDocumentTests
     [Fact]
     public void FromJson_SimpleObject_ReturnsDocument()
     {
-        using var doc = PaxDocument.FromJson(@"{""name"": ""alice"", ""age"": 30}");
+        using var doc = TLDocument.FromJson(@"{""name"": ""alice"", ""age"": 30}");
 
         Assert.NotNull(doc);
         Assert.Contains("name", doc.Keys);
@@ -191,11 +191,11 @@ public class PaxDocumentTests
     [Fact]
     public void FromJson_NestedObject_ReturnsDocument()
     {
-        using var doc = PaxDocument.FromJson(@"{""user"": {""name"": ""bob"", ""active"": true}}");
+        using var doc = TLDocument.FromJson(@"{""user"": {""name"": ""bob"", ""active"": true}}");
 
         using var user = doc["user"];
         Assert.NotNull(user);
-        Assert.Equal(PaxType.Object, user.Type);
+        Assert.Equal(TLType.Object, user.Type);
 
         using var name = user["name"];
         Assert.Equal("bob", name?.AsString());
@@ -207,11 +207,11 @@ public class PaxDocumentTests
     [Fact]
     public void FromJson_Array_ReturnsDocument()
     {
-        using var doc = PaxDocument.FromJson(@"{""items"": [1, 2, 3, 4, 5]}");
+        using var doc = TLDocument.FromJson(@"{""items"": [1, 2, 3, 4, 5]}");
 
         using var items = doc["items"];
         Assert.NotNull(items);
-        Assert.Equal(PaxType.Array, items.Type);
+        Assert.Equal(TLType.Array, items.Type);
         Assert.Equal(5, items.ArrayLength);
 
         using var first = items[0];
@@ -221,13 +221,13 @@ public class PaxDocumentTests
     [Fact]
     public void FromJson_InvalidJson_ThrowsException()
     {
-        Assert.Throws<PaxException>(() => PaxDocument.FromJson("not valid json"));
+        Assert.Throws<TLException>(() => TLDocument.FromJson("not valid json"));
     }
 
     [Fact]
     public void TryFromJson_ValidInput_ReturnsTrue()
     {
-        var success = PaxDocument.TryFromJson(@"{""key"": ""value""}", out var doc);
+        var success = TLDocument.TryFromJson(@"{""key"": ""value""}", out var doc);
 
         Assert.True(success);
         Assert.NotNull(doc);
@@ -237,7 +237,7 @@ public class PaxDocumentTests
     [Fact]
     public void TryFromJson_InvalidInput_ReturnsFalse()
     {
-        var success = PaxDocument.TryFromJson("{invalid", out var doc);
+        var success = TLDocument.TryFromJson("{invalid", out var doc);
 
         Assert.False(success);
         Assert.Null(doc);
@@ -246,7 +246,7 @@ public class PaxDocumentTests
     [Fact]
     public void ToJson_SimpleDocument_ReturnsValidJson()
     {
-        using var doc = PaxDocument.Parse(@"
+        using var doc = TLDocument.Parse(@"
             name: alice
             age: 30
         ");
@@ -263,7 +263,7 @@ public class PaxDocumentTests
     [Fact]
     public void ToJsonCompact_ReturnsMinifiedJson()
     {
-        using var doc = PaxDocument.Parse("name: alice");
+        using var doc = TLDocument.Parse("name: alice");
 
         var json = doc.ToJsonCompact();
 
@@ -276,14 +276,14 @@ public class PaxDocumentTests
     [Fact]
     public void JsonRoundTrip_PreservesData()
     {
-        using var original = PaxDocument.Parse(@"
+        using var original = TLDocument.Parse(@"
             title: test
             count: 42
             items: [a, b, c]
         ");
 
         var json = original.ToJson();
-        using var restored = PaxDocument.FromJson(json);
+        using var restored = TLDocument.FromJson(json);
 
         using var title = restored["title"];
         Assert.Equal("test", title?.AsString());
@@ -372,22 +372,22 @@ public class PaxDocumentTests
             ""matrix"": [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
         }";
 
-        // Parse JSON to Pax
-        using var fromJson = PaxDocument.FromJson(complexJson);
+        // Parse JSON to TeaLeaf
+        using var fromJson = TLDocument.FromJson(complexJson);
         Assert.NotNull(fromJson);
 
-        // JSON -> JSON round trip (skip Pax text for now)
+        // JSON -> JSON round trip (skip TeaLeaf text for now)
         var roundTripJson = fromJson.ToJson();
         Assert.NotNull(roundTripJson);
 
         // Parse the round-tripped JSON
-        using var final = PaxDocument.FromJson(roundTripJson);
+        using var final = TLDocument.FromJson(roundTripJson);
         Assert.NotNull(final);
 
         // Validate deeply nested values
         using var company = final["company"];
         Assert.NotNull(company);
-        Assert.Equal(PaxType.Object, company.Type);
+        Assert.Equal(TLType.Object, company.Type);
 
         using var companyName = company["name"];
         Assert.Equal("Acme Corporation", companyName?.AsString());
@@ -505,7 +505,7 @@ public class PaxDocumentTests
     {
         // When JSON has uniform object arrays, schema inference should work
         const string json = @"{""users"": [{""name"": ""alice"", ""age"": 30}, {""name"": ""bob"", ""age"": 25}]}";
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
 
         // Data should be accessible
         using var users = doc["users"];
@@ -531,7 +531,7 @@ public class PaxDocumentTests
                 {""id"": 2, ""items"": [{""sku"": ""C"", ""qty"": 3}]}
             ]
         }";
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
 
         // Access nested data
         using var orders = doc["orders"];
@@ -559,32 +559,32 @@ public class PaxDocumentTests
     public void FromJson_ToText_IncludesSchemaDefinitions()
     {
         const string json = @"{""products"": [{""name"": ""Widget"", ""price"": 9.99}, {""name"": ""Gadget"", ""price"": 19.99}]}";
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
 
-        var paxText = doc.ToText();
-        Assert.NotNull(paxText);
+        var tlText = doc.ToText();
+        Assert.NotNull(tlText);
 
         // Should contain struct definition
-        Assert.Contains("@struct product", paxText);
-        Assert.Contains("name:", paxText);
-        Assert.Contains("price:", paxText);
+        Assert.Contains("@struct product", tlText);
+        Assert.Contains("name:", tlText);
+        Assert.Contains("price:", tlText);
 
         // Should contain @table directive
-        Assert.Contains("@table product", paxText);
+        Assert.Contains("@table product", tlText);
     }
 
     [Fact]
     public void FromJson_Roundtrip_PreservesSchemaInference()
     {
         const string json = @"{""items"": [{""id"": 1, ""name"": ""A""}, {""id"": 2, ""name"": ""B""}]}";
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
 
-        // Convert to PAX text with schemas
-        var paxText = doc.ToText();
-        Assert.NotNull(paxText);
+        // Convert to TL text with schemas
+        var tlText = doc.ToText();
+        Assert.NotNull(tlText);
 
-        // Parse the PAX text back
-        using var parsed = PaxDocument.Parse(paxText);
+        // Parse the TL text back
+        using var parsed = TLDocument.Parse(tlText);
         Assert.NotNull(parsed);
 
         // Data should be preserved
@@ -606,7 +606,7 @@ public class PaxDocumentTests
     public void FromJson_NullableFields_HandledCorrectly()
     {
         const string json = @"{""users"": [{""name"": ""alice"", ""email"": ""a@test.com""}, {""name"": ""bob"", ""email"": null}]}";
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
 
         using var users = doc["users"];
         Assert.NotNull(users);
@@ -620,7 +620,7 @@ public class PaxDocumentTests
         using var secondUser = users[1];
         using var email2 = secondUser?["email"];
         Assert.NotNull(email2);
-        Assert.Equal(PaxType.Null, email2.Type);
+        Assert.Equal(TLType.Null, email2.Type);
     }
 
     [Fact]
@@ -630,13 +630,13 @@ public class PaxDocumentTests
         const string json = @"{""items"": [
             {""category"": ""Electronics/Audio"", ""email"": ""test@example.com"", ""path"": ""a.b.c""}
         ]}";
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
 
-        var paxText = doc.ToText();
-        Assert.NotNull(paxText);
+        var tlText = doc.ToText();
+        Assert.NotNull(tlText);
 
         // Parse back
-        using var parsed = PaxDocument.Parse(paxText);
+        using var parsed = TLDocument.Parse(tlText);
         using var items = parsed["items"];
         using var item = items?[0];
 
@@ -660,7 +660,7 @@ public class PaxDocumentTests
                 {""type"": ""product"", ""price"": 9.99}
             ]
         }";
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
 
         using var data = doc["data"];
         Assert.NotNull(data);

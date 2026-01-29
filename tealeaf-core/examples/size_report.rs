@@ -2,7 +2,7 @@
 //!
 //! Run with: cargo run --example size_report
 //!
-//! Compares serialized sizes of PAX against JSON, MessagePack, CBOR, Bincode, and Protobuf.
+//! Compares serialized sizes of TeaLeaf against JSON, MessagePack, CBOR, Bincode, and Protobuf.
 
 use prost::Message;
 use serde::{Deserialize, Serialize};
@@ -133,7 +133,7 @@ fn report_small_object() {
         threshold: 0.85,
     };
 
-    let pax_text = r#"config: {
+    let tl_text = r#"config: {
     name: "my-service",
     version: 42,
     enabled: true,
@@ -150,16 +150,16 @@ fn report_small_object() {
     let bincode_size = bincode::serialize(&serde_data).unwrap().len();
     let protobuf_size = proto_data.encode_to_vec().len();
 
-    let pax_doc = pax::Pax::parse(pax_text).unwrap();
-    let pax_tmp = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp.path(), false).unwrap();
-    let pax_size = std::fs::metadata(pax_tmp.path()).unwrap().len() as usize;
+    let tl_doc = tealeaf::TeaLeaf::parse(tl_text).unwrap();
+    let tl_tmp = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp.path(), false).unwrap();
+    let tl_size = std::fs::metadata(tl_tmp.path()).unwrap().len() as usize;
 
-    let pax_tmp_compressed = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp_compressed.path(), true).unwrap();
-    let pax_compressed_size = std::fs::metadata(pax_tmp_compressed.path()).unwrap().len() as usize;
+    let tl_tmp_compressed = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp_compressed.path(), true).unwrap();
+    let tl_compressed_size = std::fs::metadata(tl_tmp_compressed.path()).unwrap().len() as usize;
 
-    let pax_text_size = pax_text.len();
+    let tl_text_size = tl_text.len();
 
     print_header();
     print_row("JSON", json_size, json_size);
@@ -167,9 +167,9 @@ fn report_small_object() {
     print_row("CBOR", cbor_size, json_size);
     print_row("Bincode", bincode_size, json_size);
     print_row("Protobuf", protobuf_size, json_size);
-    print_row("Pax Text", pax_text_size, json_size);
-    print_row("Pax Binary", pax_size, json_size);
-    print_row("Pax Compressed", pax_compressed_size, json_size);
+    print_row("TL Text", tl_text_size, json_size);
+    print_row("TL Binary", tl_size, json_size);
+    print_row("TL Compressed", tl_compressed_size, json_size);
 }
 
 fn report_large_array(count: usize) {
@@ -193,17 +193,17 @@ fn report_large_array(count: usize) {
             .collect(),
     };
 
-    let mut pax_text =
+    let mut tl_text =
         String::from("@struct point (x: float, y: float, z: float)\npoints: @table point [\n");
     for i in 0..count {
-        pax_text.push_str(&format!(
+        tl_text.push_str(&format!(
             "    ({}, {}, {}),\n",
             i as f64 * 0.1,
             i as f64 * 0.2,
             i as f64 * 0.3
         ));
     }
-    pax_text.push_str("]\n");
+    tl_text.push_str("]\n");
 
     let json_size = serde_json::to_vec(&serde_data).unwrap().len();
     let msgpack_size = rmp_serde::to_vec(&serde_data).unwrap().len();
@@ -215,16 +215,16 @@ fn report_large_array(count: usize) {
     let bincode_size = bincode::serialize(&serde_data).unwrap().len();
     let protobuf_size = proto_data.encode_to_vec().len();
 
-    let pax_doc = pax::Pax::parse(&pax_text).unwrap();
-    let pax_tmp = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp.path(), false).unwrap();
-    let pax_size = std::fs::metadata(pax_tmp.path()).unwrap().len() as usize;
+    let tl_doc = tealeaf::TeaLeaf::parse(&tl_text).unwrap();
+    let tl_tmp = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp.path(), false).unwrap();
+    let tl_size = std::fs::metadata(tl_tmp.path()).unwrap().len() as usize;
 
-    let pax_tmp_compressed = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp_compressed.path(), true).unwrap();
-    let pax_compressed_size = std::fs::metadata(pax_tmp_compressed.path()).unwrap().len() as usize;
+    let tl_tmp_compressed = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp_compressed.path(), true).unwrap();
+    let tl_compressed_size = std::fs::metadata(tl_tmp_compressed.path()).unwrap().len() as usize;
 
-    let pax_text_size = pax_text.len();
+    let tl_text_size = tl_text.len();
 
     print_header();
     print_row("JSON", json_size, json_size);
@@ -232,9 +232,9 @@ fn report_large_array(count: usize) {
     print_row("CBOR", cbor_size, json_size);
     print_row("Bincode", bincode_size, json_size);
     print_row("Protobuf", protobuf_size, json_size);
-    print_row("Pax Text", pax_text_size, json_size);
-    print_row("Pax Binary", pax_size, json_size);
-    print_row("Pax Compressed", pax_compressed_size, json_size);
+    print_row("TL Text", tl_text_size, json_size);
+    print_row("TL Binary", tl_size, json_size);
+    print_row("TL Compressed", tl_compressed_size, json_size);
 }
 
 fn report_nested_structs() {
@@ -312,7 +312,7 @@ fn report_nested_structs() {
         ],
     };
 
-    let pax_text = r#"@struct address (street: string, city: string, zip: string, country: string)
+    let tl_text = r#"@struct address (street: string, city: string, zip: string, country: string)
 @struct company (name: string, address: address, employee_count: int)
 @struct person (id: int64, name: string, email: string, age: int, employer: company)
 
@@ -331,16 +331,16 @@ people: @table person [
     let bincode_size = bincode::serialize(&serde_data).unwrap().len();
     let protobuf_size = proto_data.encode_to_vec().len();
 
-    let pax_doc = pax::Pax::parse(pax_text).unwrap();
-    let pax_tmp = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp.path(), false).unwrap();
-    let pax_size = std::fs::metadata(pax_tmp.path()).unwrap().len() as usize;
+    let tl_doc = tealeaf::TeaLeaf::parse(tl_text).unwrap();
+    let tl_tmp = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp.path(), false).unwrap();
+    let tl_size = std::fs::metadata(tl_tmp.path()).unwrap().len() as usize;
 
-    let pax_tmp_compressed = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp_compressed.path(), true).unwrap();
-    let pax_compressed_size = std::fs::metadata(pax_tmp_compressed.path()).unwrap().len() as usize;
+    let tl_tmp_compressed = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp_compressed.path(), true).unwrap();
+    let tl_compressed_size = std::fs::metadata(tl_tmp_compressed.path()).unwrap().len() as usize;
 
-    let pax_text_size = pax_text.len();
+    let tl_text_size = tl_text.len();
 
     print_header();
     print_row("JSON", json_size, json_size);
@@ -348,9 +348,9 @@ people: @table person [
     print_row("CBOR", cbor_size, json_size);
     print_row("Bincode", bincode_size, json_size);
     print_row("Protobuf", protobuf_size, json_size);
-    print_row("Pax Text", pax_text_size, json_size);
-    print_row("Pax Binary", pax_size, json_size);
-    print_row("Pax Compressed", pax_compressed_size, json_size);
+    print_row("TL Text", tl_text_size, json_size);
+    print_row("TL Binary", tl_size, json_size);
+    print_row("TL Compressed", tl_compressed_size, json_size);
 }
 
 fn report_mixed_types() {
@@ -381,7 +381,7 @@ fn report_mixed_types() {
         raw_bytes: vec![0xDE, 0xAD, 0xBE, 0xEF],
     };
 
-    let pax_text = r#"record: {
+    let tl_text = r#"record: {
     id: 12345678901234,
     name: "Test Record",
     tags: ["alpha", "beta", "gamma"],
@@ -405,16 +405,16 @@ fn report_mixed_types() {
     let bincode_size = bincode::serialize(&serde_data).unwrap().len();
     let protobuf_size = proto_data.encode_to_vec().len();
 
-    let pax_doc = pax::Pax::parse(pax_text).unwrap();
-    let pax_tmp = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp.path(), false).unwrap();
-    let pax_size = std::fs::metadata(pax_tmp.path()).unwrap().len() as usize;
+    let tl_doc = tealeaf::TeaLeaf::parse(tl_text).unwrap();
+    let tl_tmp = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp.path(), false).unwrap();
+    let tl_size = std::fs::metadata(tl_tmp.path()).unwrap().len() as usize;
 
-    let pax_tmp_compressed = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp_compressed.path(), true).unwrap();
-    let pax_compressed_size = std::fs::metadata(pax_tmp_compressed.path()).unwrap().len() as usize;
+    let tl_tmp_compressed = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp_compressed.path(), true).unwrap();
+    let tl_compressed_size = std::fs::metadata(tl_tmp_compressed.path()).unwrap().len() as usize;
 
-    let pax_text_size = pax_text.len();
+    let tl_text_size = tl_text.len();
 
     print_header();
     print_row("JSON", json_size, json_size);
@@ -422,9 +422,9 @@ fn report_mixed_types() {
     print_row("CBOR", cbor_size, json_size);
     print_row("Bincode", bincode_size, json_size);
     print_row("Protobuf", protobuf_size, json_size);
-    print_row("Pax Text", pax_text_size, json_size);
-    print_row("Pax Binary", pax_size, json_size);
-    print_row("Pax Compressed", pax_compressed_size, json_size);
+    print_row("TL Text", tl_text_size, json_size);
+    print_row("TL Binary", tl_size, json_size);
+    print_row("TL Compressed", tl_compressed_size, json_size);
 }
 
 fn report_tabular_users(count: usize) {
@@ -452,13 +452,13 @@ fn report_tabular_users(count: usize) {
             .collect(),
     };
 
-    let mut pax_text = String::from(
+    let mut tl_text = String::from(
         "@struct user (id: int64, username: string, email: string, created_at: int64, is_admin: bool)\n\
          users: @table user [\n",
     );
     for i in 0..count {
         let admin = if i % 20 == 0 { "true" } else { "false" };
-        pax_text.push_str(&format!(
+        tl_text.push_str(&format!(
             "    ({}, \"user_{}\", \"user_{}@example.com\", {}, {}),\n",
             i,
             i,
@@ -467,7 +467,7 @@ fn report_tabular_users(count: usize) {
             admin
         ));
     }
-    pax_text.push_str("]\n");
+    tl_text.push_str("]\n");
 
     let json_size = serde_json::to_vec(&serde_data).unwrap().len();
     let msgpack_size = rmp_serde::to_vec(&serde_data).unwrap().len();
@@ -479,16 +479,16 @@ fn report_tabular_users(count: usize) {
     let bincode_size = bincode::serialize(&serde_data).unwrap().len();
     let protobuf_size = proto_data.encode_to_vec().len();
 
-    let pax_doc = pax::Pax::parse(&pax_text).unwrap();
-    let pax_tmp = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp.path(), false).unwrap();
-    let pax_size = std::fs::metadata(pax_tmp.path()).unwrap().len() as usize;
+    let tl_doc = tealeaf::TeaLeaf::parse(&tl_text).unwrap();
+    let tl_tmp = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp.path(), false).unwrap();
+    let tl_size = std::fs::metadata(tl_tmp.path()).unwrap().len() as usize;
 
-    let pax_tmp_compressed = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp_compressed.path(), true).unwrap();
-    let pax_compressed_size = std::fs::metadata(pax_tmp_compressed.path()).unwrap().len() as usize;
+    let tl_tmp_compressed = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp_compressed.path(), true).unwrap();
+    let tl_compressed_size = std::fs::metadata(tl_tmp_compressed.path()).unwrap().len() as usize;
 
-    let pax_text_size = pax_text.len();
+    let tl_text_size = tl_text.len();
 
     print_header();
     print_row("JSON", json_size, json_size);
@@ -496,7 +496,7 @@ fn report_tabular_users(count: usize) {
     print_row("CBOR", cbor_size, json_size);
     print_row("Bincode", bincode_size, json_size);
     print_row("Protobuf", protobuf_size, json_size);
-    print_row("Pax Text", pax_text_size, json_size);
-    print_row("Pax Binary", pax_size, json_size);
-    print_row("Pax Compressed", pax_compressed_size, json_size);
+    print_row("TL Text", tl_text_size, json_size);
+    print_row("TL Binary", tl_size, json_size);
+    print_row("TL Compressed", tl_compressed_size, json_size);
 }

@@ -1,4 +1,4 @@
-//! Parser for Pax text format
+//! Parser for TeaLeaf text format
 
 use std::collections::HashMap;
 use std::path::Path;

@@ -1,13 +1,13 @@
-//! Pax v2.0 - Schema-aware document format
+//! TeaLeaf - Schema-aware document format
 //!
 //! Peace between human and machine.
 //!
 //! # Example
 //!
 //! ```rust
-//! use pax::{Pax, Value};
+//! use tealeaf::{TeaLeaf, Value};
 //!
-//! let doc = Pax::parse(r#"
+//! let doc = TeaLeaf::parse(r#"
 //!     @struct user (id: int, name: string)
 //!     users: @table user [
 //!         (1, alice),
@@ -24,7 +24,7 @@ mod parser;
 mod writer;
 mod reader;
 
-pub use types::{Error, Result, PaxType, FieldType, Field, Schema, Union, Variant, Value, MAGIC, VERSION, VERSION_MAJOR, VERSION_MINOR, HEADER_SIZE};
+pub use types::{Error, Result, TLType, FieldType, Field, Schema, Union, Variant, Value, MAGIC, VERSION, VERSION_MAJOR, VERSION_MINOR, HEADER_SIZE};
 pub use lexer::{Lexer, Token, TokenKind};
 pub use parser::Parser;
 pub use writer::Writer;
@@ -33,14 +33,14 @@ pub use reader::Reader;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
-/// A parsed Pax document
-pub struct Pax {
+/// A parsed TeaLeaf document
+pub struct TeaLeaf {
     pub schemas: HashMap<String, Schema>,
     pub data: HashMap<String, Value>,
 }
 
-impl Pax {
-    /// Parse Pax text format
+impl TeaLeaf {
+    /// Parse TeaLeaf text format
     pub fn parse(input: &str) -> Result<Self> {
         let tokens = Lexer::new(input).tokenize()?;
         let mut parser = Parser::new(tokens);
@@ -120,7 +120,7 @@ impl Pax {
     /// - `"2024-01-15T10:30:00Z"` stays as a String, NOT a Timestamp
     /// - `[[1, "one"], [2, "two"]]` stays as an Array, NOT a Map
     ///
-    /// To create special PAX types, use the text format or binary API directly.
+    /// To create special TeaLeaf types, use the text format or binary API directly.
     ///
     /// # Number Type Inference
     ///
@@ -134,12 +134,12 @@ impl Pax {
         let data = match json_value {
             serde_json::Value::Object(obj) => {
                 obj.into_iter()
-                    .map(|(k, v)| (k, json_to_pax_value(v)))
+                    .map(|(k, v)| (k, json_to_tealeaf_value(v)))
                     .collect()
             }
             _ => {
                 let mut map = HashMap::new();
-                map.insert("root".to_string(), json_to_pax_value(json_value));
+                map.insert("root".to_string(), json_to_tealeaf_value(json_value));
                 map
             }
         };
@@ -158,7 +158,7 @@ impl Pax {
     /// - Generates `@struct` definitions for uniform arrays
     /// - Enables `@table` format output when serialized
     ///
-    /// Use `to_pax_with_schemas()` to serialize with the inferred schemas.
+    /// Use `to_tl_with_schemas()` to serialize with the inferred schemas.
     pub fn from_json_with_schemas(json: &str) -> Result<Self> {
         let doc = Self::from_json(json)?;
 
@@ -172,11 +172,11 @@ impl Pax {
         })
     }
 
-    /// Serialize to PAX text format with schemas.
+    /// Serialize to TeaLeaf text format with schemas.
     ///
     /// If schemas are present (either from parsing or inference), outputs
     /// `@struct` definitions and uses `@table` format for matching arrays.
-    pub fn to_pax_with_schemas(&self) -> String {
+    pub fn to_tl_with_schemas(&self) -> String {
         if self.schemas.is_empty() {
             return dumps(&self.data);
         }
@@ -190,11 +190,11 @@ impl Pax {
 
     /// Convert to JSON string (pretty-printed).
     ///
-    /// # Stability Policy - PAX→JSON Fixed Representations
+    /// # Stability Policy - TeaLeaf→JSON Fixed Representations
     ///
-    /// Special PAX types serialize to JSON with these **stable formats**:
+    /// Special TeaLeaf types serialize to JSON with these **stable formats**:
     ///
-    /// | PAX Type   | JSON Format                                    |
+    /// | TeaLeaf Type | JSON Format                                    |
     /// |------------|------------------------------------------------|
     /// | Bytes      | `"0xdeadbeef"` (lowercase hex with 0x prefix) |
     /// | Timestamp  | `"2024-01-15T10:30:00.123Z"` (ISO 8601 UTC)   |
@@ -208,7 +208,7 @@ impl Pax {
     pub fn to_json(&self) -> Result<String> {
         let json_obj: serde_json::Map<String, serde_json::Value> = self.data
             .iter()
-            .map(|(k, v)| (k.clone(), pax_to_json_value(v)))
+            .map(|(k, v)| (k.clone(), tealeaf_to_json_value(v)))
             .collect();
 
         serde_json::to_string_pretty(&serde_json::Value::Object(json_obj))
@@ -219,7 +219,7 @@ impl Pax {
     pub fn to_json_compact(&self) -> Result<String> {
         let json_obj: serde_json::Map<String, serde_json::Value> = self.data
             .iter()
-            .map(|(k, v)| (k.clone(), pax_to_json_value(v)))
+            .map(|(k, v)| (k.clone(), tealeaf_to_json_value(v)))
             .collect();
 
         serde_json::to_string(&serde_json::Value::Object(json_obj))
@@ -227,8 +227,8 @@ impl Pax {
     }
 }
 
-/// Convert JSON value to Pax value (best-effort)
-fn json_to_pax_value(json: serde_json::Value) -> Value {
+/// Convert JSON value to TeaLeaf value (best-effort)
+fn json_to_tealeaf_value(json: serde_json::Value) -> Value {
     match json {
         serde_json::Value::Null => Value::Null,
         serde_json::Value::Bool(b) => Value::Bool(b),
@@ -249,19 +249,19 @@ fn json_to_pax_value(json: serde_json::Value) -> Value {
         }
         serde_json::Value::String(s) => Value::String(s),
         serde_json::Value::Array(arr) => {
-            Value::Array(arr.into_iter().map(json_to_pax_value).collect())
+            Value::Array(arr.into_iter().map(json_to_tealeaf_value).collect())
         }
         serde_json::Value::Object(obj) => {
             Value::Object(
                 obj.into_iter()
-                    .map(|(k, v)| (k, json_to_pax_value(v)))
+                    .map(|(k, v)| (k, json_to_tealeaf_value(v)))
                     .collect()
             )
         }
     }
 }
 
-/// Convert Pax value to JSON value
+/// Convert TeaLeaf value to JSON value
 ///
 /// Type preservation:
 /// - Value::Int → JSON integer (e.g., 42)
@@ -269,8 +269,8 @@ fn json_to_pax_value(json: serde_json::Value) -> Value {
 ///
 /// Since we preserve the original JSON type during parsing (is_f64 check),
 /// we output the same type when converting back to JSON.
-fn pax_to_json_value(pax: &Value) -> serde_json::Value {
-    match pax {
+fn tealeaf_to_json_value(tl: &Value) -> serde_json::Value {
+    match tl {
         Value::Null => serde_json::Value::Null,
         Value::Bool(b) => serde_json::Value::Bool(*b),
         Value::Int(i) => serde_json::Value::Number((*i).into()),
@@ -288,12 +288,12 @@ fn pax_to_json_value(pax: &Value) -> serde_json::Value {
             serde_json::Value::String(format!("0x{}", hex))
         }
         Value::Array(arr) => {
-            serde_json::Value::Array(arr.iter().map(pax_to_json_value).collect())
+            serde_json::Value::Array(arr.iter().map(tealeaf_to_json_value).collect())
         }
         Value::Object(obj) => {
             let map: serde_json::Map<String, serde_json::Value> = obj
                 .iter()
-                .map(|(k, v)| (k.clone(), pax_to_json_value(v)))
+                .map(|(k, v)| (k.clone(), tealeaf_to_json_value(v)))
                 .collect();
             serde_json::Value::Object(map)
         }
@@ -303,8 +303,8 @@ fn pax_to_json_value(pax: &Value) -> serde_json::Value {
                 .iter()
                 .map(|(k, v)| {
                     serde_json::Value::Array(vec![
-                        pax_to_json_value(k),
-                        pax_to_json_value(v),
+                        tealeaf_to_json_value(k),
+                        tealeaf_to_json_value(v),
                     ])
                 })
                 .collect();
@@ -320,7 +320,7 @@ fn pax_to_json_value(pax: &Value) -> serde_json::Value {
             // Encode tagged value as object
             let mut obj = serde_json::Map::new();
             obj.insert("$tag".to_string(), serde_json::Value::String(tag.clone()));
-            obj.insert("$value".to_string(), pax_to_json_value(inner));
+            obj.insert("$value".to_string(), tealeaf_to_json_value(inner));
             serde_json::Value::Object(obj)
         }
         Value::Timestamp(ts) => {
@@ -346,23 +346,23 @@ fn pax_to_json_value(pax: &Value) -> serde_json::Value {
     }
 }
 
-/// Read a binary Pax file
+/// Read a binary TeaLeaf file
 pub fn open<P: AsRef<Path>>(path: P) -> Result<Reader> {
     Reader::open(path)
 }
 
-/// Parse Pax text
-pub fn parse(input: &str) -> Result<Pax> {
-    Pax::parse(input)
+/// Parse TeaLeaf text
+pub fn parse(input: &str) -> Result<TeaLeaf> {
+    TeaLeaf::parse(input)
 }
 
 /// Convenience: load and get data
 pub fn loads(input: &str) -> Result<HashMap<String, Value>> {
-    Ok(Pax::parse(input)?.data)
+    Ok(TeaLeaf::parse(input)?.data)
 }
 
-/// Convenience: serialize to Pax text
-/// Check if a string needs quoting when serialized to PAX format.
+/// Convenience: serialize to TeaLeaf text
+/// Check if a string needs quoting when serialized to TeaLeaf format.
 /// Returns true if the string could be misinterpreted as another type.
 fn needs_quoting(s: &str) -> bool {
     if s.is_empty() {
@@ -386,7 +386,7 @@ fn needs_quoting(s: &str) -> bool {
         return true;
     }
 
-    // Starts with special PAX syntax characters
+    // Starts with special TeaLeaf syntax characters
     let first = s.chars().next().unwrap();
     if matches!(first, '!' | '@' | '#') {
         return true;
@@ -981,7 +981,7 @@ impl Default for SchemaInferrer {
     }
 }
 
-/// Serialize data to PAX text format with schemas
+/// Serialize data to TeaLeaf text format with schemas
 pub fn dumps_with_schemas(
     data: &HashMap<String, Value>,
     schemas: &HashMap<String, Schema>,
@@ -1273,7 +1273,7 @@ mod tests {
 
     #[test]
     fn test_parse_simple() {
-        let doc = Pax::parse(r#"
+        let doc = TeaLeaf::parse(r#"
             name: alice
             age: 30
             active: true
@@ -1286,7 +1286,7 @@ mod tests {
 
     #[test]
     fn test_parse_struct() {
-        let doc = Pax::parse(r#"
+        let doc = TeaLeaf::parse(r#"
             @struct user (id: int, name: string, email: string?)
             users: @table user [
                 (1, alice, "alice@test.com"),
@@ -1304,7 +1304,7 @@ mod tests {
 
     #[test]
     fn test_nested_struct() {
-        let doc = Pax::parse(r#"
+        let doc = TeaLeaf::parse(r#"
             @struct address (city: string, zip: string)
             @struct user (id: int, name: string, home: address)
             users: @table user [
@@ -1321,7 +1321,7 @@ mod tests {
 
     #[test]
     fn test_three_level_nesting() {
-        let doc = Pax::parse(r#"
+        let doc = TeaLeaf::parse(r#"
             @struct method (type: string, last4: string)
             @struct payment (amount: float, method: method)
             @struct order (id: int, payment: payment)
@@ -1340,7 +1340,7 @@ mod tests {
     #[test]
     fn test_json_roundtrip_basic() {
         let json = r#"{"name":"alice","age":30,"active":true,"score":95.5}"#;
-        let doc = Pax::from_json(json).unwrap();
+        let doc = TeaLeaf::from_json(json).unwrap();
 
         assert_eq!(doc.get("name").unwrap().as_str(), Some("alice"));
         assert_eq!(doc.get("age").unwrap().as_int(), Some(30));
@@ -1357,7 +1357,7 @@ mod tests {
         // Create a document with bytes programmatically
         let mut entries = std::collections::HashMap::new();
         entries.insert("data".to_string(), Value::Bytes(vec![0xde, 0xad, 0xbe, 0xef]));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let json = doc.to_json().unwrap();
         assert!(json.contains("0xdeadbeef"), "Bytes should export as hex string: {}", json);
@@ -1367,7 +1367,7 @@ mod tests {
     fn test_json_export_ref() {
         let mut entries = std::collections::HashMap::new();
         entries.insert("config".to_string(), Value::Ref("base_config".to_string()));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let json = doc.to_json().unwrap();
         assert!(json.contains("\"$ref\""), "Ref should export with $ref key: {}", json);
@@ -1378,7 +1378,7 @@ mod tests {
     fn test_json_export_tagged() {
         let mut entries = std::collections::HashMap::new();
         entries.insert("status".to_string(), Value::Tagged("ok".to_string(), Box::new(Value::Int(200))));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let json = doc.to_json().unwrap();
         assert!(json.contains("\"$tag\""), "Tagged should export with $tag key: {}", json);
@@ -1393,7 +1393,7 @@ mod tests {
             (Value::Int(1), Value::String("one".to_string())),
             (Value::Int(2), Value::String("two".to_string())),
         ]));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let json = doc.to_json().unwrap();
         // Map exports as array of [key, value] pairs
@@ -1412,7 +1412,7 @@ mod tests {
         // 2024-01-15T10:30:00Z = 1705315800000 ms, but let's verify with a known value
         // Use 0 = 1970-01-01T00:00:00Z for simplicity
         entries.insert("created".to_string(), Value::Timestamp(0));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let json = doc.to_json().unwrap();
         assert!(json.contains("1970-01-01"), "Timestamp should export as ISO 8601 date: {}", json);
@@ -1423,7 +1423,7 @@ mod tests {
     fn test_json_import_limitation_ref_becomes_object() {
         // JSON with $ref pattern should become a plain object, NOT a Ref value
         let json = r#"{"config":{"$ref":"base_config"}}"#;
-        let doc = Pax::from_json(json).unwrap();
+        let doc = TeaLeaf::from_json(json).unwrap();
 
         let config = doc.get("config").unwrap();
         // This should be an Object, not a Ref
@@ -1435,7 +1435,7 @@ mod tests {
     fn test_json_import_limitation_tagged_becomes_object() {
         // JSON with $tag/$value pattern should become a plain object, NOT a Tagged value
         let json = r#"{"status":{"$tag":"ok","$value":200}}"#;
-        let doc = Pax::from_json(json).unwrap();
+        let doc = TeaLeaf::from_json(json).unwrap();
 
         let status = doc.get("status").unwrap();
         // This should be an Object, not a Tagged
@@ -1447,7 +1447,7 @@ mod tests {
     fn test_json_import_limitation_timestamp_becomes_string() {
         // ISO 8601 strings in JSON should remain strings, NOT become Timestamp
         let json = r#"{"created":"2024-01-15T10:30:00Z"}"#;
-        let doc = Pax::from_json(json).unwrap();
+        let doc = TeaLeaf::from_json(json).unwrap();
 
         let created = doc.get("created").unwrap();
         // This should be a String, not a Timestamp
@@ -1464,7 +1464,7 @@ mod tests {
         use tempfile::NamedTempFile;
 
         let json = r#"{"name":"alice","age":30,"score":95.5,"active":true,"nothing":null}"#;
-        let doc = Pax::from_json(json).unwrap();
+        let doc = TeaLeaf::from_json(json).unwrap();
 
         // Compile to binary
         let temp = NamedTempFile::new().unwrap();
@@ -1485,7 +1485,7 @@ mod tests {
         use tempfile::NamedTempFile;
 
         let json = r#"{"numbers":[1,2,3,4,5],"names":["alice","bob","charlie"]}"#;
-        let doc = Pax::from_json(json).unwrap();
+        let doc = TeaLeaf::from_json(json).unwrap();
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1509,7 +1509,7 @@ mod tests {
         use tempfile::NamedTempFile;
 
         let json = r#"{"user":{"name":"alice","profile":{"bio":"dev","settings":{"theme":"dark"}}}}"#;
-        let doc = Pax::from_json(json).unwrap();
+        let doc = TeaLeaf::from_json(json).unwrap();
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1534,7 +1534,7 @@ mod tests {
         let mut entries = std::collections::HashMap::new();
         entries.insert("data".to_string(), Value::String("a".repeat(1000)));
         entries.insert("count".to_string(), Value::Int(12345));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), true).unwrap(); // compressed
@@ -1545,7 +1545,7 @@ mod tests {
     }
 
     #[test]
-    fn test_pax_to_binary_preserves_ref() {
+    fn test_tl_to_binary_preserves_ref() {
         use tempfile::NamedTempFile;
 
         let mut entries = std::collections::HashMap::new();
@@ -1553,7 +1553,7 @@ mod tests {
             ("host".to_string(), Value::String("localhost".to_string())),
         ].into_iter().collect()));
         entries.insert("config".to_string(), Value::Ref("base".to_string()));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1564,12 +1564,12 @@ mod tests {
     }
 
     #[test]
-    fn test_pax_to_binary_preserves_tagged() {
+    fn test_tl_to_binary_preserves_tagged() {
         use tempfile::NamedTempFile;
 
         let mut entries = std::collections::HashMap::new();
         entries.insert("status".to_string(), Value::Tagged("ok".to_string(), Box::new(Value::Int(200))));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1582,7 +1582,7 @@ mod tests {
     }
 
     #[test]
-    fn test_pax_to_binary_preserves_map() {
+    fn test_tl_to_binary_preserves_map() {
         use tempfile::NamedTempFile;
 
         let mut entries = std::collections::HashMap::new();
@@ -1590,7 +1590,7 @@ mod tests {
             (Value::Int(1), Value::String("one".to_string())),
             (Value::Int(2), Value::String("two".to_string())),
         ]));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1604,12 +1604,12 @@ mod tests {
     }
 
     #[test]
-    fn test_pax_to_binary_preserves_bytes() {
+    fn test_tl_to_binary_preserves_bytes() {
         use tempfile::NamedTempFile;
 
         let mut entries = std::collections::HashMap::new();
         entries.insert("data".to_string(), Value::Bytes(vec![0xde, 0xad, 0xbe, 0xef]));
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1620,12 +1620,12 @@ mod tests {
     }
 
     #[test]
-    fn test_pax_to_binary_preserves_timestamp() {
+    fn test_tl_to_binary_preserves_timestamp() {
         use tempfile::NamedTempFile;
 
         let mut entries = std::collections::HashMap::new();
         entries.insert("created".to_string(), Value::Timestamp(1705315800000)); // 2024-01-15T10:30:00Z
-        let doc = Pax { data: entries, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data: entries, schemas: std::collections::HashMap::new() };
 
         let temp = NamedTempFile::new().unwrap();
         doc.compile(temp.path(), false).unwrap();
@@ -1639,7 +1639,7 @@ mod tests {
     fn test_json_import_limitation_hex_string_remains_string() {
         // Hex strings in JSON should remain strings, NOT become Bytes
         let json = r#"{"data":"0xdeadbeef"}"#;
-        let doc = Pax::from_json(json).unwrap();
+        let doc = TeaLeaf::from_json(json).unwrap();
 
         let data = doc.get("data").unwrap();
         // This should be a String, not Bytes
@@ -1652,7 +1652,7 @@ mod tests {
     fn test_json_import_limitation_array_pairs_remain_array() {
         // JSON arrays that look like map pairs should remain arrays, NOT become Maps
         let json = r#"{"lookup":[[1,"one"],[2,"two"]]}"#;
-        let doc = Pax::from_json(json).unwrap();
+        let doc = TeaLeaf::from_json(json).unwrap();
 
         let lookup = doc.get("lookup").unwrap();
         // This should be an Array, not a Map
@@ -1697,7 +1697,7 @@ mod tests {
             (Value::Int(1), Value::String("one".to_string())),
         ]));
 
-        let doc = Pax { data, schemas: std::collections::HashMap::new() };
+        let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
         // Compile to binary and read back
         let temp = NamedTempFile::new().unwrap();
@@ -1755,11 +1755,11 @@ mod tests {
     // =========================================================================
     // JSON Conversion Contract Tests
     // =========================================================================
-    // These tests lock down the exact JSON↔PAX conversion behavior.
+    // These tests lock down the exact JSON↔TeaLeaf conversion behavior.
     // STABILITY POLICY:
     // - Plain JSON roundtrip: MUST be lossless for primitives, arrays, objects
-    // - PAX→JSON: Special types have FIXED representations that MUST NOT change
-    // - JSON→PAX: No magic parsing; $ref/$tag/hex/ISO8601 stay as plain JSON
+    // - TeaLeaf→JSON: Special types have FIXED representations that MUST NOT change
+    // - JSON→TeaLeaf: No magic parsing; $ref/$tag/hex/ISO8601 stay as plain JSON
 
     mod conversion_contracts {
         use super::*;
@@ -1768,13 +1768,13 @@ mod tests {
 
         #[test]
         fn contract_null_roundtrip() {
-            let doc = Pax::from_json("null").unwrap();
+            let doc = TeaLeaf::from_json("null").unwrap();
             assert!(matches!(doc.get("root").unwrap(), Value::Null));
         }
 
         #[test]
         fn contract_bool_roundtrip() {
-            let doc = Pax::from_json(r#"{"t": true, "f": false}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"t": true, "f": false}"#).unwrap();
             assert_eq!(doc.get("t").unwrap().as_bool(), Some(true));
             assert_eq!(doc.get("f").unwrap().as_bool(), Some(false));
 
@@ -1785,7 +1785,7 @@ mod tests {
 
         #[test]
         fn contract_integer_roundtrip() {
-            let doc = Pax::from_json(r#"{"zero": 0, "pos": 42, "neg": -123}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"zero": 0, "pos": 42, "neg": -123}"#).unwrap();
             assert_eq!(doc.get("zero").unwrap().as_int(), Some(0));
             assert_eq!(doc.get("pos").unwrap().as_int(), Some(42));
             assert_eq!(doc.get("neg").unwrap().as_int(), Some(-123));
@@ -1793,14 +1793,14 @@ mod tests {
 
         #[test]
         fn contract_float_roundtrip() {
-            let doc = Pax::from_json(r#"{"pi": 3.14159}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"pi": 3.14159}"#).unwrap();
             let pi = doc.get("pi").unwrap().as_float().unwrap();
             assert!((pi - 3.14159).abs() < 0.00001);
         }
 
         #[test]
         fn contract_string_roundtrip() {
-            let doc = Pax::from_json(r#"{"s": "hello world", "u": "日本語", "e": ""}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"s": "hello world", "u": "日本語", "e": ""}"#).unwrap();
             assert_eq!(doc.get("s").unwrap().as_str(), Some("hello world"));
             assert_eq!(doc.get("u").unwrap().as_str(), Some("日本語"));
             assert_eq!(doc.get("e").unwrap().as_str(), Some(""));
@@ -1808,7 +1808,7 @@ mod tests {
 
         #[test]
         fn contract_array_roundtrip() {
-            let doc = Pax::from_json(r#"{"arr": [1, "two", true, null]}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"arr": [1, "two", true, null]}"#).unwrap();
             let arr = doc.get("arr").unwrap().as_array().unwrap();
             assert_eq!(arr.len(), 4);
             assert_eq!(arr[0].as_int(), Some(1));
@@ -1819,7 +1819,7 @@ mod tests {
 
         #[test]
         fn contract_nested_array_roundtrip() {
-            let doc = Pax::from_json(r#"{"matrix": [[1, 2], [3, 4]]}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"matrix": [[1, 2], [3, 4]]}"#).unwrap();
             let matrix = doc.get("matrix").unwrap().as_array().unwrap();
             assert_eq!(matrix.len(), 2);
             let row0 = matrix[0].as_array().unwrap();
@@ -1829,19 +1829,19 @@ mod tests {
 
         #[test]
         fn contract_object_roundtrip() {
-            let doc = Pax::from_json(r#"{"user": {"name": "alice", "age": 30}}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"user": {"name": "alice", "age": 30}}"#).unwrap();
             let user = doc.get("user").unwrap().as_object().unwrap();
             assert_eq!(user.get("name").unwrap().as_str(), Some("alice"));
             assert_eq!(user.get("age").unwrap().as_int(), Some(30));
         }
 
-        // --- PAX→JSON Fixed Representations (STABLE) ---
+        // --- TeaLeaf→JSON Fixed Representations (STABLE) ---
 
         #[test]
         fn contract_bytes_to_json_hex() {
             let mut data = std::collections::HashMap::new();
             data.insert("b".to_string(), Value::Bytes(vec![0xca, 0xfe, 0xba, 0xbe]));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Bytes serialize as lowercase hex with 0x prefix
@@ -1852,7 +1852,7 @@ mod tests {
         fn contract_bytes_empty_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("b".to_string(), Value::Bytes(vec![]));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Empty bytes serialize as "0x"
@@ -1864,7 +1864,7 @@ mod tests {
             let mut data = std::collections::HashMap::new();
             // 2024-01-15T10:50:00.123Z (verified milliseconds since epoch)
             data.insert("ts".to_string(), Value::Timestamp(1705315800123));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Timestamp serializes as ISO 8601 with milliseconds
@@ -1876,7 +1876,7 @@ mod tests {
         fn contract_timestamp_epoch_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("ts".to_string(), Value::Timestamp(0));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Unix epoch is 1970-01-01T00:00:00Z (no ms for whole seconds)
@@ -1888,7 +1888,7 @@ mod tests {
         fn contract_ref_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("r".to_string(), Value::Ref("target_key".to_string()));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Ref serializes as {"$ref": "name"}
@@ -1900,7 +1900,7 @@ mod tests {
         fn contract_tagged_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("t".to_string(), Value::Tagged("ok".to_string(), Box::new(Value::Int(200))));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Tagged serializes with $tag and $value keys
@@ -1914,7 +1914,7 @@ mod tests {
         fn contract_tagged_null_value_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("t".to_string(), Value::Tagged("none".to_string(), Box::new(Value::Null)));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Tagged with null inner still has $value: null
@@ -1929,7 +1929,7 @@ mod tests {
                 (Value::Int(1), Value::String("one".to_string())),
                 (Value::Int(2), Value::String("two".to_string())),
             ]));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Map serializes as array of [key, value] pairs
@@ -1942,7 +1942,7 @@ mod tests {
         fn contract_map_empty_to_json() {
             let mut data = std::collections::HashMap::new();
             data.insert("m".to_string(), Value::Map(vec![]));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Empty map serializes as empty array
@@ -1950,11 +1950,11 @@ mod tests {
                 "Empty map must be []: {}", json);
         }
 
-        // --- JSON→PAX No Magic (STABLE) ---
+        // --- JSON→TeaLeaf No Magic (STABLE) ---
 
         #[test]
         fn contract_json_dollar_ref_stays_object() {
-            let doc = Pax::from_json(r#"{"x": {"$ref": "some_key"}}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"x": {"$ref": "some_key"}}"#).unwrap();
             let x = doc.get("x").unwrap();
             // CONTRACT: JSON {"$ref": ...} MUST remain Object, NOT become Ref
             assert!(x.as_object().is_some(), "$ref in JSON must stay Object, not become Ref");
@@ -1963,7 +1963,7 @@ mod tests {
 
         #[test]
         fn contract_json_dollar_tag_stays_object() {
-            let doc = Pax::from_json(r#"{"x": {"$tag": "ok", "$value": 200}}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"x": {"$tag": "ok", "$value": 200}}"#).unwrap();
             let x = doc.get("x").unwrap();
             // CONTRACT: JSON {"$tag": ..., "$value": ...} MUST remain Object
             assert!(x.as_object().is_some(), "$tag in JSON must stay Object, not become Tagged");
@@ -1972,7 +1972,7 @@ mod tests {
 
         #[test]
         fn contract_json_hex_string_stays_string() {
-            let doc = Pax::from_json(r#"{"x": "0xdeadbeef"}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"x": "0xdeadbeef"}"#).unwrap();
             let x = doc.get("x").unwrap();
             // CONTRACT: Hex strings MUST remain String, NOT become Bytes
             assert_eq!(x.as_str(), Some("0xdeadbeef"));
@@ -1981,7 +1981,7 @@ mod tests {
 
         #[test]
         fn contract_json_iso_timestamp_stays_string() {
-            let doc = Pax::from_json(r#"{"x": "2024-01-15T10:30:00.000Z"}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"x": "2024-01-15T10:30:00.000Z"}"#).unwrap();
             let x = doc.get("x").unwrap();
             // CONTRACT: ISO 8601 strings MUST remain String, NOT become Timestamp
             assert_eq!(x.as_str(), Some("2024-01-15T10:30:00.000Z"));
@@ -1990,7 +1990,7 @@ mod tests {
 
         #[test]
         fn contract_json_array_pairs_stays_array() {
-            let doc = Pax::from_json(r#"{"x": [[1, "one"], [2, "two"]]}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"x": [[1, "one"], [2, "two"]]}"#).unwrap();
             let x = doc.get("x").unwrap();
             // CONTRACT: Array of pairs MUST remain Array, NOT become Map
             assert!(x.as_array().is_some(), "Array of pairs must stay Array, not become Map");
@@ -2001,7 +2001,7 @@ mod tests {
 
         #[test]
         fn contract_number_integer_to_int() {
-            let doc = Pax::from_json(r#"{"n": 42}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"n": 42}"#).unwrap();
             // CONTRACT: Integers that fit i64 become Int
             assert!(doc.get("n").unwrap().as_int().is_some());
         }
@@ -2009,14 +2009,14 @@ mod tests {
         #[test]
         fn contract_number_large_to_uint() {
             // Max u64 = 18446744073709551615, which doesn't fit i64
-            let doc = Pax::from_json(r#"{"n": 18446744073709551615}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"n": 18446744073709551615}"#).unwrap();
             // CONTRACT: Large positive integers that fit u64 become UInt
             assert!(doc.get("n").unwrap().as_uint().is_some());
         }
 
         #[test]
         fn contract_number_decimal_to_float() {
-            let doc = Pax::from_json(r#"{"n": 3.14}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"n": 3.14}"#).unwrap();
             // CONTRACT: Numbers with decimals become Float
             assert!(doc.get("n").unwrap().as_float().is_some());
         }
@@ -2027,7 +2027,7 @@ mod tests {
         fn contract_float_nan_to_null() {
             let mut data = std::collections::HashMap::new();
             data.insert("f".to_string(), Value::Float(f64::NAN));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: NaN serializes as null (JSON has no NaN)
@@ -2038,7 +2038,7 @@ mod tests {
         fn contract_float_infinity_to_null() {
             let mut data = std::collections::HashMap::new();
             data.insert("f".to_string(), Value::Float(f64::INFINITY));
-            let doc = Pax { data, schemas: std::collections::HashMap::new() };
+            let doc = TeaLeaf { data, schemas: std::collections::HashMap::new() };
 
             let json = doc.to_json_compact().unwrap();
             // CONTRACT: Infinity serializes as null (JSON has no Infinity)
@@ -2047,7 +2047,7 @@ mod tests {
 
         #[test]
         fn contract_deep_nesting_preserved() {
-            let doc = Pax::from_json(r#"{"a":{"b":{"c":{"d":{"e":5}}}}}"#).unwrap();
+            let doc = TeaLeaf::from_json(r#"{"a":{"b":{"c":{"d":{"e":5}}}}}"#).unwrap();
             let a = doc.get("a").unwrap().as_object().unwrap();
             let b = a.get("b").unwrap().as_object().unwrap();
             let c = b.get("c").unwrap().as_object().unwrap();
@@ -2063,7 +2063,7 @@ mod tests {
     #[test]
     fn test_schema_inference_simple_array() {
         let json = r#"{"users": [{"name": "alice", "age": 30}, {"name": "bob", "age": 25}]}"#;
-        let doc = Pax::from_json_with_schemas(json).unwrap();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
 
         // Should have inferred a "user" schema
         let schema = doc.schema("user");
@@ -2090,7 +2090,7 @@ mod tests {
                 {"id": 2, "items": [{"sku": "C", "qty": 3}]}
             ]
         }"#;
-        let doc = Pax::from_json_with_schemas(json).unwrap();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
 
         // Should infer both "order" and "item" schemas
         assert!(doc.schema("order").is_some(), "Should infer 'order' schema");
@@ -2108,34 +2108,34 @@ mod tests {
     }
 
     #[test]
-    fn test_schema_inference_to_pax_text() {
+    fn test_schema_inference_to_tl_text() {
         let json = r#"{"products": [{"name": "Widget", "price": 9.99}, {"name": "Gadget", "price": 19.99}]}"#;
-        let doc = Pax::from_json_with_schemas(json).unwrap();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
 
-        let pax_text = doc.to_pax_with_schemas();
+        let tl_text = doc.to_tl_with_schemas();
 
         // Should contain struct definition
-        assert!(pax_text.contains("@struct product"), "PAX text should contain struct definition");
-        assert!(pax_text.contains("name: string"), "Struct should have name field");
-        assert!(pax_text.contains("price: float"), "Struct should have price field");
+        assert!(tl_text.contains("@struct product"), "TeaLeaf text should contain struct definition");
+        assert!(tl_text.contains("name: string"), "Struct should have name field");
+        assert!(tl_text.contains("price: float"), "Struct should have price field");
 
         // Should contain @table directive
-        assert!(pax_text.contains("@table product"), "PAX text should use @table for data");
+        assert!(tl_text.contains("@table product"), "TeaLeaf text should use @table for data");
 
         // Should contain tuple format data
-        assert!(pax_text.contains("Widget") || pax_text.contains("\"Widget\""), "Data should be present");
+        assert!(tl_text.contains("Widget") || tl_text.contains("\"Widget\""), "Data should be present");
     }
 
     #[test]
     fn test_schema_inference_roundtrip() {
         let json = r#"{"items": [{"id": 1, "name": "A"}, {"id": 2, "name": "B"}]}"#;
-        let doc = Pax::from_json_with_schemas(json).unwrap();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
 
-        // Convert to PAX text with schemas
-        let pax_text = doc.to_pax_with_schemas();
+        // Convert to TeaLeaf text with schemas
+        let tl_text = doc.to_tl_with_schemas();
 
-        // Parse the PAX text back
-        let parsed = Pax::parse(&pax_text).unwrap();
+        // Parse the TeaLeaf text back
+        let parsed = TeaLeaf::parse(&tl_text).unwrap();
 
         // Should have the same data
         let items = parsed.get("items").unwrap().as_array().unwrap();
@@ -2150,7 +2150,7 @@ mod tests {
     #[test]
     fn test_schema_inference_nullable_fields() {
         let json = r#"{"users": [{"name": "alice", "email": "a@test.com"}, {"name": "bob", "email": null}]}"#;
-        let doc = Pax::from_json_with_schemas(json).unwrap();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
 
         let schema = doc.schema("user").unwrap();
         let email_field = schema.fields.iter().find(|f| f.name == "email").unwrap();
@@ -2166,18 +2166,18 @@ mod tests {
                 {"id": 1, "items": [{"sku": "A", "qty": 2}]}
             ]
         }"#;
-        let doc = Pax::from_json_with_schemas(json).unwrap();
-        let pax_text = doc.to_pax_with_schemas();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
 
         // Count occurrences of @table - should only appear at top level for each schema-typed array
-        let _table_count = pax_text.matches("@table").count();
+        let _table_count = tl_text.matches("@table").count();
 
         // Should have @table for orders, but NOT redundant @table for nested items
         // The nested items array should just be [...] with tuples inside
-        assert!(pax_text.contains("@table order"), "Should have @table for orders");
+        assert!(tl_text.contains("@table order"), "Should have @table for orders");
 
         // Parse and verify the structure is correct
-        let parsed = Pax::parse(&pax_text).unwrap();
+        let parsed = TeaLeaf::parse(&tl_text).unwrap();
         let orders = parsed.get("orders").unwrap().as_array().unwrap();
         let first_order = orders[0].as_object().unwrap();
         let items = first_order.get("items").unwrap().as_array().unwrap();
@@ -2191,7 +2191,7 @@ mod tests {
             "users": [{"id": "U1", "name": "Alice"}],
             "products": [{"id": "P1", "price": 9.99}]
         }"#;
-        let doc = Pax::from_json_with_schemas(json).unwrap();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
 
         // Should have separate schemas
         assert!(doc.schema("user").is_some());
@@ -2212,16 +2212,16 @@ mod tests {
         let json = r#"{"items": [
             {"category": "Electronics/Audio", "email": "test@example.com", "path": "a.b.c"}
         ]}"#;
-        let doc = Pax::from_json_with_schemas(json).unwrap();
-        let pax_text = doc.to_pax_with_schemas();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
 
         // These should be quoted in output since they contain special characters
-        assert!(pax_text.contains("\"Electronics/Audio\""), "Slash should be quoted: {}", pax_text);
-        assert!(pax_text.contains("\"test@example.com\""), "@ should be quoted: {}", pax_text);
-        assert!(pax_text.contains("\"a.b.c\""), "Dots should be quoted: {}", pax_text);
+        assert!(tl_text.contains("\"Electronics/Audio\""), "Slash should be quoted: {}", tl_text);
+        assert!(tl_text.contains("\"test@example.com\""), "@ should be quoted: {}", tl_text);
+        assert!(tl_text.contains("\"a.b.c\""), "Dots should be quoted: {}", tl_text);
 
         // Should parse back correctly
-        let parsed = Pax::parse(&pax_text).unwrap();
+        let parsed = TeaLeaf::parse(&tl_text).unwrap();
         let items = parsed.get("items").unwrap().as_array().unwrap();
         let item = items[0].as_object().unwrap();
         assert_eq!(item.get("category").unwrap().as_str(), Some("Electronics/Audio"));
@@ -2272,7 +2272,7 @@ mod tests {
             ]
         }"#;
 
-        let doc = Pax::from_json_with_schemas(json).unwrap();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
 
         // Should have schemas for nested objects
         assert!(doc.schema("billing_address").is_some(), "Should create billing_address schema");
@@ -2297,11 +2297,11 @@ mod tests {
         assert_eq!(shipping_field.field_type.base, "shipping_address", "customer.shipping_address should reference shipping_address schema");
 
         // Serialize and verify output
-        let pax_text = doc.to_pax_with_schemas();
-        assert!(pax_text.contains("@struct billing_address"), "Output should contain billing_address struct");
-        assert!(pax_text.contains("@struct shipping_address"), "Output should contain shipping_address struct");
-        assert!(pax_text.contains("billing_address: billing_address"), "customer should have billing_address field with billing_address type");
-        assert!(pax_text.contains("shipping_address: shipping_address"), "customer should have shipping_address field with shipping_address type");
+        let tl_text = doc.to_tl_with_schemas();
+        assert!(tl_text.contains("@struct billing_address"), "Output should contain billing_address struct");
+        assert!(tl_text.contains("@struct shipping_address"), "Output should contain shipping_address struct");
+        assert!(tl_text.contains("billing_address: billing_address"), "customer should have billing_address field with billing_address type");
+        assert!(tl_text.contains("shipping_address: shipping_address"), "customer should have shipping_address field with shipping_address type");
     }
 
     #[test]
@@ -2326,7 +2326,7 @@ mod tests {
             ]
         }"#;
 
-        let doc = Pax::from_json_with_schemas(json).unwrap();
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
 
         // Customer schema should exist with nullable phone
         let customer_schema = doc.schema("customer").unwrap();

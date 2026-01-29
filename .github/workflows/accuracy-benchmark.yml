@@ -12,7 +12,7 @@ on:
     branches: [main, develop]
     paths:
       - 'accuracy-benchmark/**'
-      - 'pax-core/**'
+      - 'tealeaf-core/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'release.json'
@@ -22,7 +22,7 @@ on:
     branches: [main]
     paths:
       - 'accuracy-benchmark/**'
-      - 'pax-core/**'
+      - 'tealeaf-core/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'release.json'

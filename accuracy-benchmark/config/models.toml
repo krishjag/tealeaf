@@ -85,7 +85,7 @@ timeout_ms = 120000
 
 # Format comparison settings
 [benchmark.format_comparison]
-# Enable comparing JSON vs PAX format performance
+# Enable comparing JSON vs TeaLeaf format performance
 enabled = true
 # Run each task in both formats
 compare_formats = true

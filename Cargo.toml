@@ -1,16 +1,16 @@
 [workspace]
-members = ["pax-core", "pax-ffi", "accuracy-benchmark"]
+members = ["tealeaf-core", "tealeaf-ffi", "accuracy-benchmark"]
 resolver = "2"
 
 [workspace.package]
 version = "2.0.0-beta.1"
 edition = "2021"
-authors = ["Pax Contributors"]
+authors = ["TeaLeaf Contributors"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/krishjag/pax"
+repository = "https://github.com/krishjag/tealeaf"
 
 [workspace.dependencies]
-pax-core = { path = "pax-core" }
+tealeaf-core = { path = "tealeaf-core" }
 thiserror = "1.0"
 memmap2 = "0.9"
 crc32fast = "1.3"

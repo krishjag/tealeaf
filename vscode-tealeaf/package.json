@@ -1,13 +1,13 @@
 {
-  "name": "pax-lang",
-  "displayName": "PAX Language Support",
-  "description": "Syntax highlighting and language support for PAX format (.pax files)",
+  "name": "tealeaf-lang",
+  "displayName": "TeaLeaf Language Support",
+  "description": "Syntax highlighting and language support for TeaLeaf format (.tl files)",
   "version": "0.1.0",
-  "publisher": "pax-format",
+  "publisher": "tealeaf-format",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/krishjag/pax"
+    "url": "https://github.com/krishjag/tealeaf"
   },
   "engines": {
     "vscode": "^1.75.0"
@@ -16,32 +16,33 @@
     "Programming Languages"
   ],
   "keywords": [
-    "pax",
+    "tealeaf",
     "schema",
     "serialization",
     "config",
     "data format"
   ],
-  "icon": "images/pax-icon.png",
+  "icon": "images/tealeaf-icon.png",
   "contributes": {
     "languages": [
       {
-        "id": "pax",
+        "id": "tealeaf",
         "aliases": [
-          "PAX",
-          "pax"
+          "TeaLeaf",
+          "tealeaf",
+          "tl"
         ],
         "extensions": [
-          ".pax"
+          ".tl"
         ],
         "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
       {
-        "language": "pax",
-        "scopeName": "source.pax",
-        "path": "./syntaxes/pax.tmLanguage.json"
+        "language": "tealeaf",
+        "scopeName": "source.tealeaf",
+        "path": "./syntaxes/tealeaf.tmLanguage.json"
       }
     ]
   }

@@ -5,7 +5,7 @@
 *.rs text eol=lf
 *.toml text eol=lf
 *.json text eol=lf
-*.pax text eol=lf
+*.tl text eol=lf
 *.md text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf
@@ -13,7 +13,7 @@
 *.ps1 text eol=lf
 
 # Binary files
-*.paxb binary
+*.tlbx binary
 *.png binary
 *.ico binary
 *.dll binary

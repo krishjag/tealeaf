@@ -1,111 +1,111 @@
 using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Pax.Native;
+using TeaLeaf.Native;
 
-namespace Pax;
+namespace TeaLeaf;
 
 /// <summary>
-/// Reader for binary Pax files (.paxb).
+/// Reader for binary TeaLeaf files (.tlbx).
 /// </summary>
-public sealed class PaxReader : IDisposable
+public sealed class TLReader : IDisposable
 {
     private IntPtr _handle;
     private bool _disposed;
-    private PaxSchema[]? _schemas;
-    private Dictionary<string, PaxSchema>? _schemaMap;
+    private TLSchema[]? _schemas;
+    private Dictionary<string, TLSchema>? _schemaMap;
 
-    private PaxReader(IntPtr handle)
+    private TLReader(IntPtr handle)
     {
         _handle = handle;
     }
 
     /// <summary>
-    /// Open a binary Pax file for reading.
+    /// Open a binary TeaLeaf file for reading.
     /// </summary>
-    /// <param name="path">Path to the .paxb file.</param>
+    /// <param name="path">Path to the .tlbx file.</param>
     /// <returns>A reader for the file.</returns>
-    /// <exception cref="PaxException">Thrown if the file cannot be opened.</exception>
-    public static PaxReader Open(string path)
+    /// <exception cref="TLException">Thrown if the file cannot be opened.</exception>
+    public static TLReader Open(string path)
     {
-        var handle = NativeMethods.pax_reader_open(path);
+        var handle = NativeMethods.tl_reader_open(path);
         if (handle == IntPtr.Zero)
         {
-            var error = NativeMethods.GetLastError() ?? $"Failed to open binary Pax file: {path}";
-            throw new PaxException(error);
+            var error = NativeMethods.GetLastError() ?? $"Failed to open binary TeaLeaf file: {path}";
+            throw new TLException(error);
         }
-        return new PaxReader(handle);
+        return new TLReader(handle);
     }
 
     /// <summary>
-    /// Try to open a binary Pax file.
+    /// Try to open a binary TeaLeaf file.
     /// </summary>
-    public static bool TryOpen(string path, out PaxReader? reader)
+    public static bool TryOpen(string path, out TLReader? reader)
     {
-        var handle = NativeMethods.pax_reader_open(path);
+        var handle = NativeMethods.tl_reader_open(path);
         if (handle == IntPtr.Zero)
         {
             reader = null;
             return false;
         }
-        reader = new PaxReader(handle);
+        reader = new TLReader(handle);
         return true;
     }
 
     /// <summary>
-    /// Open a binary Pax file with memory mapping (zero-copy access).
+    /// Open a binary TeaLeaf file with memory mapping (zero-copy access).
     /// This is more efficient for large files as the OS handles paging.
     /// </summary>
-    /// <param name="path">Path to the .paxb file.</param>
+    /// <param name="path">Path to the .tlbx file.</param>
     /// <returns>A reader for the file.</returns>
-    /// <exception cref="PaxException">Thrown if the file cannot be opened.</exception>
+    /// <exception cref="TLException">Thrown if the file cannot be opened.</exception>
     /// <remarks>
     /// The file must not be modified while the reader is open.
     /// </remarks>
-    public static PaxReader OpenMmap(string path)
+    public static TLReader OpenMmap(string path)
     {
-        var handle = NativeMethods.pax_reader_open_mmap(path);
+        var handle = NativeMethods.tl_reader_open_mmap(path);
         if (handle == IntPtr.Zero)
         {
-            var error = NativeMethods.GetLastError() ?? $"Failed to memory-map binary Pax file: {path}";
-            throw new PaxException(error);
+            var error = NativeMethods.GetLastError() ?? $"Failed to memory-map binary TeaLeaf file: {path}";
+            throw new TLException(error);
         }
-        return new PaxReader(handle);
+        return new TLReader(handle);
     }
 
     /// <summary>
-    /// Try to open a binary Pax file with memory mapping.
+    /// Try to open a binary TeaLeaf file with memory mapping.
     /// </summary>
-    public static bool TryOpenMmap(string path, out PaxReader? reader)
+    public static bool TryOpenMmap(string path, out TLReader? reader)
     {
-        var handle = NativeMethods.pax_reader_open_mmap(path);
+        var handle = NativeMethods.tl_reader_open_mmap(path);
         if (handle == IntPtr.Zero)
         {
             reader = null;
             return false;
         }
-        reader = new PaxReader(handle);
+        reader = new TLReader(handle);
         return true;
     }
 
     /// <summary>
-    /// Create a binary Pax file (.paxb) from a JSON string.
+    /// Create a binary TeaLeaf file (.tlbx) from a JSON string.
     /// </summary>
     /// <param name="json">The JSON string to convert.</param>
-    /// <param name="outputPath">Path for the output .paxb file.</param>
+    /// <param name="outputPath">Path for the output .tlbx file.</param>
     /// <param name="compress">Whether to compress the output.</param>
-    /// <exception cref="PaxException">Thrown if conversion fails.</exception>
+    /// <exception cref="TLException">Thrown if conversion fails.</exception>
     public static void CreateFromJson(string json, string outputPath, bool compress = true)
     {
-        using var doc = PaxDocument.FromJson(json);
+        using var doc = TLDocument.FromJson(json);
         doc.Compile(outputPath, compress);
     }
 
     /// <summary>
-    /// Try to create a binary Pax file from a JSON string.
+    /// Try to create a binary TeaLeaf file from a JSON string.
     /// </summary>
     /// <param name="json">The JSON string to convert.</param>
-    /// <param name="outputPath">Path for the output .paxb file.</param>
+    /// <param name="outputPath">Path for the output .tlbx file.</param>
     /// <param name="compress">Whether to compress the output.</param>
     /// <returns>True if conversion succeeded.</returns>
     public static bool TryCreateFromJson(string json, string outputPath, bool compress = true)
@@ -126,11 +126,11 @@ public sealed class PaxReader : IDisposable
     /// </summary>
     /// <param name="key">The key to look up.</param>
     /// <returns>The value, or null if not found.</returns>
-    public PaxValue? Get(string key)
+    public TLValue? Get(string key)
     {
         ThrowIfDisposed();
-        var ptr = NativeMethods.pax_reader_get(_handle, key);
-        return ptr == IntPtr.Zero ? null : new PaxValue(ptr);
+        var ptr = NativeMethods.tl_reader_get(_handle, key);
+        return ptr == IntPtr.Zero ? null : new TLValue(ptr);
     }
 
     /// <summary>
@@ -157,7 +157,7 @@ public sealed class PaxReader : IDisposable
         get
         {
             ThrowIfDisposed();
-            var ptr = NativeMethods.pax_reader_keys(_handle);
+            var ptr = NativeMethods.tl_reader_keys(_handle);
             return NativeMethods.PtrToStringArrayAndFree(ptr);
         }
     }
@@ -165,7 +165,7 @@ public sealed class PaxReader : IDisposable
     /// <summary>
     /// Get all schemas defined in the file.
     /// </summary>
-    public IReadOnlyList<PaxSchema> Schemas
+    public IReadOnlyList<TLSchema> Schemas
     {
         get
         {
@@ -178,7 +178,7 @@ public sealed class PaxReader : IDisposable
     /// <summary>
     /// Get a schema by name.
     /// </summary>
-    public PaxSchema? GetSchema(string name)
+    public TLSchema? GetSchema(string name)
     {
         ThrowIfDisposed();
         LoadSchemas();
@@ -188,7 +188,7 @@ public sealed class PaxReader : IDisposable
     /// <summary>
     /// Indexer for key-based access.
     /// </summary>
-    public PaxValue? this[string key] => Get(key);
+    public TLValue? this[string key] => Get(key);
 
     /// <summary>
     /// Check if the file contains a key.
@@ -249,28 +249,28 @@ public sealed class PaxReader : IDisposable
         return jsonObj;
     }
 
-    private JsonNode? ValueToJsonNode(PaxValue value)
+    private JsonNode? ValueToJsonNode(TLValue value)
     {
         return value.Type switch
         {
-            PaxType.Null => null,
-            PaxType.Bool => JsonValue.Create(value.AsBool()),
-            PaxType.Int => JsonValue.Create(value.AsInt()),
-            PaxType.UInt => JsonValue.Create(value.AsUInt()),
-            PaxType.Float => JsonValue.Create(value.AsFloat()),
-            PaxType.String => JsonValue.Create(value.AsString()),
-            PaxType.Bytes => JsonValue.Create(BytesToHexString(value)),
-            PaxType.Timestamp => JsonValue.Create(TimestampToIso8601(value.AsTimestamp())),
-            PaxType.Array => ArrayToJsonArray(value),
-            PaxType.Object => ObjectToJsonObject(value),
-            PaxType.Map => MapToJsonArray(value),
-            PaxType.Ref => RefToJsonObject(value),
-            PaxType.Tagged => TaggedToJsonObject(value),
+            TLType.Null => null,
+            TLType.Bool => JsonValue.Create(value.AsBool()),
+            TLType.Int => JsonValue.Create(value.AsInt()),
+            TLType.UInt => JsonValue.Create(value.AsUInt()),
+            TLType.Float => JsonValue.Create(value.AsFloat()),
+            TLType.String => JsonValue.Create(value.AsString()),
+            TLType.Bytes => JsonValue.Create(BytesToHexString(value)),
+            TLType.Timestamp => JsonValue.Create(TimestampToIso8601(value.AsTimestamp())),
+            TLType.Array => ArrayToJsonArray(value),
+            TLType.Object => ObjectToJsonObject(value),
+            TLType.Map => MapToJsonArray(value),
+            TLType.Ref => RefToJsonObject(value),
+            TLType.Tagged => TaggedToJsonObject(value),
             _ => null
         };
     }
 
-    private static string? BytesToHexString(PaxValue value)
+    private static string? BytesToHexString(TLValue value)
     {
         var bytes = value.AsBytes();
         if (bytes == null || bytes.Length == 0) return "0x";
@@ -284,7 +284,7 @@ public sealed class PaxReader : IDisposable
         return dt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
     }
 
-    private JsonArray ArrayToJsonArray(PaxValue value)
+    private JsonArray ArrayToJsonArray(TLValue value)
     {
         var arr = new JsonArray();
         var length = value.ArrayLength;
@@ -296,7 +296,7 @@ public sealed class PaxReader : IDisposable
         return arr;
     }
 
-    private JsonObject ObjectToJsonObject(PaxValue value)
+    private JsonObject ObjectToJsonObject(TLValue value)
     {
         var obj = new JsonObject();
         var keys = value.GetObjectKeys();
@@ -308,7 +308,7 @@ public sealed class PaxReader : IDisposable
         return obj;
     }
 
-    private JsonArray MapToJsonArray(PaxValue value)
+    private JsonArray MapToJsonArray(TLValue value)
     {
         // Maps are represented as array of [key, value] pairs
         var arr = new JsonArray();
@@ -326,14 +326,14 @@ public sealed class PaxReader : IDisposable
         return arr;
     }
 
-    private static JsonObject RefToJsonObject(PaxValue value)
+    private static JsonObject RefToJsonObject(TLValue value)
     {
         var obj = new JsonObject();
         obj["$ref"] = JsonValue.Create(value.AsRefName());
         return obj;
     }
 
-    private JsonObject TaggedToJsonObject(PaxValue value)
+    private JsonObject TaggedToJsonObject(TLValue value)
     {
         var obj = new JsonObject();
         obj["$tag"] = JsonValue.Create(value.AsTagName());
@@ -347,60 +347,60 @@ public sealed class PaxReader : IDisposable
         if (_schemas != null)
             return;
 
-        var count = (int)NativeMethods.pax_reader_schema_count(_handle);
-        _schemas = new PaxSchema[count];
-        _schemaMap = new Dictionary<string, PaxSchema>(count);
+        var count = (int)NativeMethods.tl_reader_schema_count(_handle);
+        _schemas = new TLSchema[count];
+        _schemaMap = new Dictionary<string, TLSchema>(count);
 
         for (int i = 0; i < count; i++)
         {
-            var namePtr = NativeMethods.pax_reader_schema_name(_handle, (nuint)i);
+            var namePtr = NativeMethods.tl_reader_schema_name(_handle, (nuint)i);
             var name = NativeMethods.PtrToStringAndFree(namePtr) ?? $"schema_{i}";
 
-            var fieldCount = (int)NativeMethods.pax_reader_schema_field_count(_handle, (nuint)i);
-            var fields = new PaxField[fieldCount];
+            var fieldCount = (int)NativeMethods.tl_reader_schema_field_count(_handle, (nuint)i);
+            var fields = new TLField[fieldCount];
 
             for (int j = 0; j < fieldCount; j++)
             {
-                var fieldNamePtr = NativeMethods.pax_reader_schema_field_name(_handle, (nuint)i, (nuint)j);
+                var fieldNamePtr = NativeMethods.tl_reader_schema_field_name(_handle, (nuint)i, (nuint)j);
                 var fieldName = NativeMethods.PtrToStringAndFree(fieldNamePtr) ?? $"field_{j}";
 
-                var fieldTypePtr = NativeMethods.pax_reader_schema_field_type(_handle, (nuint)i, (nuint)j);
+                var fieldTypePtr = NativeMethods.tl_reader_schema_field_type(_handle, (nuint)i, (nuint)j);
                 var fieldType = NativeMethods.PtrToStringAndFree(fieldTypePtr) ?? "unknown";
 
-                var nullable = NativeMethods.pax_reader_schema_field_nullable(_handle, (nuint)i, (nuint)j);
-                var isArray = NativeMethods.pax_reader_schema_field_is_array(_handle, (nuint)i, (nuint)j);
+                var nullable = NativeMethods.tl_reader_schema_field_nullable(_handle, (nuint)i, (nuint)j);
+                var isArray = NativeMethods.tl_reader_schema_field_is_array(_handle, (nuint)i, (nuint)j);
 
-                fields[j] = new PaxField(fieldName, fieldType, nullable, isArray);
+                fields[j] = new TLField(fieldName, fieldType, nullable, isArray);
             }
 
-            var schema = new PaxSchema(name, fields);
+            var schema = new TLSchema(name, fields);
             _schemas[i] = schema;
             _schemaMap[name] = schema;
         }
     }
 
-    private dynamic? ConvertToDynamic(PaxValue value)
+    private dynamic? ConvertToDynamic(TLValue value)
     {
         return value.Type switch
         {
-            PaxType.Null => null,
-            PaxType.Bool => value.AsBool(),
-            PaxType.Int => value.AsInt(),
-            PaxType.UInt => value.AsUInt(),
-            PaxType.Float => value.AsFloat(),
-            PaxType.String => value.AsString(),
-            PaxType.Bytes => value.AsBytes(),
-            PaxType.Timestamp => value.AsDateTime(),
-            PaxType.Array => ConvertArrayToDynamic(value),
-            PaxType.Object => ConvertObjectToDynamic(value),
-            PaxType.Map => ConvertMapToDynamic(value),
-            PaxType.Ref => value.AsRefName(),
-            PaxType.Tagged => ConvertTaggedToDynamic(value),
+            TLType.Null => null,
+            TLType.Bool => value.AsBool(),
+            TLType.Int => value.AsInt(),
+            TLType.UInt => value.AsUInt(),
+            TLType.Float => value.AsFloat(),
+            TLType.String => value.AsString(),
+            TLType.Bytes => value.AsBytes(),
+            TLType.Timestamp => value.AsDateTime(),
+            TLType.Array => ConvertArrayToDynamic(value),
+            TLType.Object => ConvertObjectToDynamic(value),
+            TLType.Map => ConvertMapToDynamic(value),
+            TLType.Ref => value.AsRefName(),
+            TLType.Tagged => ConvertTaggedToDynamic(value),
             _ => null
         };
     }
 
-    private dynamic?[] ConvertArrayToDynamic(PaxValue value)
+    private dynamic?[] ConvertArrayToDynamic(TLValue value)
     {
         var length = value.ArrayLength;
         var result = new dynamic?[length];
@@ -414,7 +414,7 @@ public sealed class PaxReader : IDisposable
         return result;
     }
 
-    private ExpandoObject ConvertObjectToDynamic(PaxValue value)
+    private ExpandoObject ConvertObjectToDynamic(TLValue value)
     {
         var expando = new ExpandoObject();
         var dict = (IDictionary<string, object?>)expando;
@@ -429,7 +429,7 @@ public sealed class PaxReader : IDisposable
         return expando;
     }
 
-    private KeyValuePair<dynamic?, dynamic?>[] ConvertMapToDynamic(PaxValue value)
+    private KeyValuePair<dynamic?, dynamic?>[] ConvertMapToDynamic(TLValue value)
     {
         var length = value.MapLength;
         var result = new KeyValuePair<dynamic?, dynamic?>[length];
@@ -447,7 +447,7 @@ public sealed class PaxReader : IDisposable
         return result;
     }
 
-    private ExpandoObject ConvertTaggedToDynamic(PaxValue value)
+    private ExpandoObject ConvertTaggedToDynamic(TLValue value)
     {
         var expando = new ExpandoObject();
         var dict = (IDictionary<string, object?>)expando;
@@ -460,14 +460,14 @@ public sealed class PaxReader : IDisposable
     private void ThrowIfDisposed()
     {
         if (_disposed)
-            throw new ObjectDisposedException(nameof(PaxReader));
+            throw new ObjectDisposedException(nameof(TLReader));
     }
 
     public void Dispose()
     {
         if (!_disposed && _handle != IntPtr.Zero)
         {
-            NativeMethods.pax_reader_free(_handle);
+            NativeMethods.tl_reader_free(_handle);
             _handle = IntPtr.Zero;
             _disposed = true;
         }

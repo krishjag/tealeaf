@@ -23,7 +23,7 @@ pub struct ExecutorConfig {
     pub max_retry_delay_ms: u64,
     /// Request timeout in milliseconds
     pub timeout_ms: u64,
-    /// Enable format comparison (run tasks in both PAX and JSON formats)
+    /// Enable format comparison (run tasks in both TeaLeaf and JSON formats)
     pub compare_formats: bool,
 }
 
@@ -61,7 +61,7 @@ impl Executor {
         }
     }
 
-    /// Execute a single task against all providers (PAX format only, legacy interface)
+    /// Execute a single task against all providers (TeaLeaf format only, legacy interface)
     pub async fn execute_task(
         &self,
         task: &BenchmarkTask,
@@ -69,10 +69,10 @@ impl Executor {
         // Convert to the new format-aware results
         let format_results = self.execute_task_with_formats(task).await;
 
-        // Extract only PAX results for backward compatibility
+        // Extract only TeaLeaf results for backward compatibility
         let mut results = HashMap::new();
         for (key, result) in format_results {
-            if key.format == DataFormat::Pax {
+            if key.format == DataFormat::TL {
                 results.insert(key.provider, result);
             }
         }
@@ -90,7 +90,7 @@ impl Executor {
         let formats = if self.config.compare_formats && task.has_data() {
             DataFormat::all()
         } else {
-            vec![DataFormat::Pax]
+            vec![DataFormat::TL]
         };
 
         for format in formats {
@@ -127,14 +127,14 @@ impl Executor {
         results
     }
 
-    /// Execute a task for a specific provider (legacy, PAX format)
+    /// Execute a task for a specific provider (legacy, TeaLeaf format)
     #[allow(dead_code)]
     async fn execute_task_for_provider(
         &self,
         task: &BenchmarkTask,
         provider: Arc<dyn LLMProvider + Send + Sync>,
     ) -> TaskResult {
-        self.execute_task_for_provider_with_format(task, provider, DataFormat::Pax).await
+        self.execute_task_for_provider_with_format(task, provider, DataFormat::TL).await
     }
 
     /// Execute a task for a specific provider with a specific format

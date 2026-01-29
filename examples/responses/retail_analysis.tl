@@ -1,6 +1,6 @@
 # Claude's Retail Order Analysis
 # Generated: 2026-01-27T01:34:09Z
-# Source: examples/retail_orders.pax
+# Source: examples/retail_orders.tl
 
 analysis: {
   model: claude-sonnet-4-20250514,

@@ -1,9 +1,9 @@
-namespace Pax;
+namespace TeaLeaf;
 
 /// <summary>
-/// Represents a field in a Pax schema.
+/// Represents a field in a TeaLeaf schema.
 /// </summary>
-public sealed class PaxField
+public sealed class TLField
 {
     /// <summary>
     /// The name of the field.
@@ -25,7 +25,7 @@ public sealed class PaxField
     /// </summary>
     public bool IsArray { get; }
 
-    internal PaxField(string name, string type, bool nullable, bool isArray)
+    internal TLField(string name, string type, bool nullable, bool isArray)
     {
         Name = name;
         Type = type;
@@ -38,9 +38,9 @@ public sealed class PaxField
 }
 
 /// <summary>
-/// Represents a schema definition from a Pax file.
+/// Represents a schema definition from a TeaLeaf file.
 /// </summary>
-public sealed class PaxSchema
+public sealed class TLSchema
 {
     /// <summary>
     /// The name of the schema (struct type).
@@ -50,9 +50,9 @@ public sealed class PaxSchema
     /// <summary>
     /// The fields defined in this schema.
     /// </summary>
-    public IReadOnlyList<PaxField> Fields { get; }
+    public IReadOnlyList<TLField> Fields { get; }
 
-    internal PaxSchema(string name, IReadOnlyList<PaxField> fields)
+    internal TLSchema(string name, IReadOnlyList<TLField> fields)
     {
         Name = name;
         Fields = fields;
@@ -61,7 +61,7 @@ public sealed class PaxSchema
     /// <summary>
     /// Get a field by name.
     /// </summary>
-    public PaxField? GetField(string name) =>
+    public TLField? GetField(string name) =>
         Fields.FirstOrDefault(f => f.Name == name);
 
     /// <summary>

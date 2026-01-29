@@ -10,10 +10,10 @@ use crate::proto::benchmark as pb;
 pub fn bench_encode(group: &mut BenchmarkGroup<WallTime>, size: usize) {
     group.throughput(Throughput::Elements(size as u64));
 
-    let pax_text = if size <= 2 {
-        data::nested_struct_pax_text().to_string()
+    let tl_text = if size <= 2 {
+        data::nested_struct_tl_text().to_string()
     } else {
-        data::nested_struct_pax_text_scaled(size)
+        data::nested_struct_tl_text_scaled(size)
     };
     let serde_data = if size <= 2 {
         data::nested_struct_list()
@@ -21,17 +21,17 @@ pub fn bench_encode(group: &mut BenchmarkGroup<WallTime>, size: usize) {
         data::nested_struct_list_scaled(size)
     };
 
-    // Pax: Text Parse
-    group.bench_function(BenchmarkId::new("encode", "pax_parse"), |b| {
-        b.iter(|| pax::Pax::parse(black_box(&pax_text)).unwrap());
+    // TeaLeaf: Text Parse
+    group.bench_function(BenchmarkId::new("encode", "tl_parse"), |b| {
+        b.iter(|| tealeaf::TeaLeaf::parse(black_box(&tl_text)).unwrap());
     });
 
-    // Pax: Binary Encode (from pre-parsed)
-    let pax_doc = pax::Pax::parse(&pax_text).unwrap();
-    group.bench_function(BenchmarkId::new("encode", "pax_binary"), |b| {
+    // TeaLeaf: Binary Encode (from pre-parsed)
+    let tl_doc = tealeaf::TeaLeaf::parse(&tl_text).unwrap();
+    group.bench_function(BenchmarkId::new("encode", "tl_binary"), |b| {
         b.iter(|| {
             let tmp = NamedTempFile::new().unwrap();
-            pax_doc.compile(tmp.path(), false).unwrap();
+            tl_doc.compile(tmp.path(), false).unwrap();
         });
     });
 
@@ -80,21 +80,21 @@ pub fn bench_decode(group: &mut BenchmarkGroup<WallTime>, size: usize) {
     let mut cbor_bytes = Vec::new();
     ciborium::into_writer(&serde_data, &mut cbor_bytes).unwrap();
 
-    // Create Pax binary file
-    let pax_text = if size <= 2 {
-        data::nested_struct_pax_text().to_string()
+    // Create TeaLeaf binary file
+    let tl_text = if size <= 2 {
+        data::nested_struct_tl_text().to_string()
     } else {
-        data::nested_struct_pax_text_scaled(size)
+        data::nested_struct_tl_text_scaled(size)
     };
-    let pax_doc = pax::Pax::parse(&pax_text).unwrap();
-    let pax_tmp = NamedTempFile::new().unwrap();
-    pax_doc.compile(pax_tmp.path(), false).unwrap();
-    let pax_bytes = std::fs::read(pax_tmp.path()).unwrap();
+    let tl_doc = tealeaf::TeaLeaf::parse(&tl_text).unwrap();
+    let tl_tmp = NamedTempFile::new().unwrap();
+    tl_doc.compile(tl_tmp.path(), false).unwrap();
+    let tl_bytes = std::fs::read(tl_tmp.path()).unwrap();
 
-    // Pax Binary Decode
-    group.bench_function(BenchmarkId::new("decode", "pax_binary"), |b| {
+    // TeaLeaf Binary Decode
+    group.bench_function(BenchmarkId::new("decode", "tl_binary"), |b| {
         b.iter(|| {
-            let reader = pax::Reader::from_bytes(black_box(pax_bytes.clone())).unwrap();
+            let reader = tealeaf::Reader::from_bytes(black_box(tl_bytes.clone())).unwrap();
             reader.get("people").unwrap()
         });
     });

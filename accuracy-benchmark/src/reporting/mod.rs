@@ -1,8 +1,8 @@
 //! Results reporting
 
-pub mod pax_writer;
+pub mod tl_writer;
 
-pub use pax_writer::PaxWriter;
+pub use tl_writer::TLWriter;
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

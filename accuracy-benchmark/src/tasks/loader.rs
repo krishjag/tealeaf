@@ -1,4 +1,4 @@
-//! Task loading from PAX files
+//! Task loading from TeaLeaf files
 
 use std::path::Path;
 
@@ -18,22 +18,22 @@ pub enum LoadError {
     MissingField(String),
 }
 
-/// Load tasks from a PAX file
+/// Load tasks from a TeaLeaf file
 pub fn load_tasks_from_file(path: impl AsRef<Path>) -> Result<Vec<BenchmarkTask>, LoadError> {
     let content = std::fs::read_to_string(path)?;
     load_tasks_from_string(&content)
 }
 
-/// Load tasks from a PAX string
+/// Load tasks from a TeaLeaf string
 pub fn load_tasks_from_string(content: &str) -> Result<Vec<BenchmarkTask>, LoadError> {
-    // Parse using pax-core
-    let pax = pax::Pax::parse(content)
+    // Parse using tealeaf-core
+    let tl = tealeaf::TeaLeaf::parse(content)
         .map_err(|e| LoadError::Parse(e.to_string()))?;
 
     let mut tasks = Vec::new();
 
     // Look for "tasks" key containing a table
-    if let Some(tasks_value) = pax.data.get("tasks") {
+    if let Some(tasks_value) = tl.data.get("tasks") {
         if let Some(arr) = tasks_value.as_array() {
             for (idx, row) in arr.iter().enumerate() {
                 let task = parse_task_from_value(row, idx)
@@ -46,12 +46,12 @@ pub fn load_tasks_from_string(content: &str) -> Result<Vec<BenchmarkTask>, LoadE
     Ok(tasks)
 }
 
-/// Parse a single task from a PAX value
-fn parse_task_from_value(value: &pax::Value, _index: usize) -> Result<BenchmarkTask, String> {
+/// Parse a single task from a TeaLeaf value
+fn parse_task_from_value(value: &tealeaf::Value, _index: usize) -> Result<BenchmarkTask, String> {
     // Handle both object and tuple formats
     let obj = match value {
-        pax::Value::Object(o) => o.clone(),
-        pax::Value::Array(arr) if arr.len() >= 5 => {
+        tealeaf::Value::Object(o) => o.clone(),
+        tealeaf::Value::Array(arr) if arr.len() >= 5 => {
             // Tuple format: (metadata, prompt, data_refs, expected_elements, grading_rubric, max_tokens, temperature?)
             return parse_task_from_tuple(arr);
         }
@@ -94,7 +94,7 @@ fn parse_task_from_value(value: &pax::Value, _index: usize) -> Result<BenchmarkT
 }
 
 /// Parse task from tuple format
-fn parse_task_from_tuple(arr: &[pax::Value]) -> Result<BenchmarkTask, String> {
+fn parse_task_from_tuple(arr: &[tealeaf::Value]) -> Result<BenchmarkTask, String> {
     // Format: (metadata_tuple, prompt, data_refs, expected_elements, grading_rubric?, max_tokens, temperature?)
     let metadata = parse_metadata_from_tuple(arr.first().ok_or("Missing metadata")?)?;
 
@@ -104,7 +104,7 @@ fn parse_task_from_tuple(arr: &[pax::Value]) -> Result<BenchmarkTask, String> {
         .ok_or("Missing prompt")?
         .to_string();
 
-    let expected_elements = if let Some(pax::Value::Array(elems)) = arr.get(3) {
+    let expected_elements = if let Some(tealeaf::Value::Array(elems)) = arr.get(3) {
         elems
             .iter()
             .filter_map(|e| parse_expected_element(e).ok())
@@ -137,7 +137,7 @@ fn parse_task_from_tuple(arr: &[pax::Value]) -> Result<BenchmarkTask, String> {
 }
 
 /// Parse metadata from object
-fn parse_metadata(obj: &std::collections::HashMap<String, pax::Value>) -> Result<TaskMetadata, String> {
+fn parse_metadata(obj: &std::collections::HashMap<String, tealeaf::Value>) -> Result<TaskMetadata, String> {
     let metadata_obj = obj
         .get("metadata")
         .and_then(|v| v.as_object())
@@ -182,7 +182,7 @@ fn parse_metadata(obj: &std::collections::HashMap<String, pax::Value>) -> Result
 }
 
 /// Parse metadata from tuple format
-fn parse_metadata_from_tuple(value: &pax::Value) -> Result<TaskMetadata, String> {
+fn parse_metadata_from_tuple(value: &tealeaf::Value) -> Result<TaskMetadata, String> {
     let arr = value.as_array().ok_or("Metadata must be tuple/array")?;
 
     let id = arr.first().and_then(|v| v.as_str()).ok_or("Missing id")?.to_string();
@@ -213,9 +213,9 @@ fn parse_metadata_from_tuple(value: &pax::Value) -> Result<TaskMetadata, String>
 }
 
 /// Parse expected elements from object
-fn parse_expected_elements(obj: &std::collections::HashMap<String, pax::Value>) -> Result<Vec<ExpectedElement>, String> {
+fn parse_expected_elements(obj: &std::collections::HashMap<String, tealeaf::Value>) -> Result<Vec<ExpectedElement>, String> {
     let elements = match obj.get("expected_elements") {
-        Some(pax::Value::Array(arr)) => arr,
+        Some(tealeaf::Value::Array(arr)) => arr,
         _ => return Ok(Vec::new()),
     };
 
@@ -226,9 +226,9 @@ fn parse_expected_elements(obj: &std::collections::HashMap<String, pax::Value>) 
 }
 
 /// Parse a single expected element
-fn parse_expected_element(value: &pax::Value) -> Result<ExpectedElement, String> {
+fn parse_expected_element(value: &tealeaf::Value) -> Result<ExpectedElement, String> {
     match value {
-        pax::Value::Object(obj) => {
+        tealeaf::Value::Object(obj) => {
             let element_type = obj
                 .get("element_type")
                 .or_else(|| obj.get("type"))
@@ -259,7 +259,7 @@ fn parse_expected_element(value: &pax::Value) -> Result<ExpectedElement, String>
                 validation_pattern,
             })
         }
-        pax::Value::Array(arr) if arr.len() >= 3 => {
+        tealeaf::Value::Array(arr) if arr.len() >= 3 => {
             // Tuple format: (type, description, required, pattern?)
             let element_type = arr[0].as_str().ok_or("Missing element_type")?.to_string();
             let description = arr[1].as_str().ok_or("Missing description")?.to_string();
@@ -285,7 +285,7 @@ pub fn load_tasks_from_directory(dir: impl AsRef<Path>) -> Result<Vec<BenchmarkT
         let entry = entry?;
         let path = entry.path();
 
-        if path.extension().map(|e| e == "pax").unwrap_or(false) {
+        if path.extension().map(|e| e == "tl").unwrap_or(false) {
             match load_tasks_from_file(&path) {
                 Ok(tasks) => all_tasks.extend(tasks),
                 Err(e) => {

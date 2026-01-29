@@ -1,10 +1,10 @@
-# Pax
+# TeaLeaf
 
 Schema-aware document format with human-readable text and compact binary representation.
 
 ## Features
 
-- **Dual formats**: Human-readable text (`.pax`) and compact binary (`.paxb`)
+- **Dual formats**: Human-readable text (`.tl`) and compact binary (`.tlbx`)
 - **Schema-aware**: Automatic struct inference for uniform object arrays
 - **Type-preserving**: Full JSON type fidelity including number types
 - **High-performance**: Native Rust core with zero-copy parsing
@@ -13,26 +13,26 @@ Schema-aware document format with human-readable text and compact binary represe
 ## Installation
 
 ```bash
-dotnet add package Pax
+dotnet add package TeaLeaf
 ```
 
 ## Quick Start
 
 ```csharp
-using Pax;
+using TeaLeaf;
 
-// Convert JSON to PAX text format
+// Convert JSON to TeaLeaf text format
 string json = """{"name": "Alice", "age": 30}""";
-string pax = PaxConverter.JsonToPax(json);
+string tl = TeaLeafConverter.JsonToTL(json);
 
-// Convert PAX back to JSON
-string roundTrip = PaxConverter.PaxToJson(pax);
+// Convert TeaLeaf back to JSON
+string roundTrip = TeaLeafConverter.TLToJson(tl);
 
 // Convert to binary format for compact storage
-byte[] binary = PaxConverter.JsonToPaxBinary(json);
+byte[] binary = TeaLeafConverter.JsonToTLBX(json);
 
 // Convert binary back to JSON
-string fromBinary = PaxConverter.PaxBinaryToJson(binary);
+string fromBinary = TeaLeafConverter.TLBXToJson(binary);
 ```
 
 ## Supported Platforms
@@ -46,20 +46,20 @@ string fromBinary = PaxConverter.PaxBinaryToJson(binary);
 
 ## API Reference
 
-### PaxConverter
+### TeaLeafConverter
 
 Static class for format conversions:
 
 | Method | Description |
 |--------|-------------|
-| `JsonToPax(string json)` | Convert JSON to PAX text format |
-| `PaxToJson(string pax)` | Convert PAX text to JSON |
-| `JsonToPaxBinary(string json)` | Convert JSON to PAX binary format |
-| `PaxBinaryToJson(byte[] binary)` | Convert PAX binary to JSON |
-| `PaxToPaxBinary(string pax)` | Convert PAX text to binary |
-| `PaxBinaryToPax(byte[] binary)` | Convert PAX binary to text |
+| `JsonToTL(string json)` | Convert JSON to TeaLeaf text format |
+| `TLToJson(string tl)` | Convert TeaLeaf text to JSON |
+| `JsonToTLBX(string json)` | Convert JSON to TeaLeaf binary format |
+| `TLBXToJson(byte[] binary)` | Convert TeaLeaf binary to JSON |
+| `TLToTLBX(string tl)` | Convert TeaLeaf text to binary |
+| `TLBXToTL(byte[] binary)` | Convert TeaLeaf binary to text |
 
-## PAX Format Example
+## TeaLeaf Format Example
 
 JSON input:
 ```json
@@ -71,8 +71,8 @@ JSON input:
 }
 ```
 
-PAX text output:
-```pax
+TeaLeaf text output:
+```
 @struct User { name age }
 {
   users: [User]
@@ -87,5 +87,5 @@ MIT OR Apache-2.0
 
 ## Links
 
-- [GitHub Repository](https://github.com/krishjag/pax)
-- [Documentation](https://github.com/krishjag/pax#readme)
+- [GitHub Repository](https://github.com/krishjag/tealeaf)
+- [Documentation](https://github.com/krishjag/tealeaf#readme)
