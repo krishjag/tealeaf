@@ -14,5 +14,9 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 tealeaf-core.workspace = true
 
+[dev-dependencies]
+tempfile = "3.0"
+serde_json = "1.0"
+
 [build-dependencies]
 cbindgen = "0.27"

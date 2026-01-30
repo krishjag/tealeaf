@@ -931,3 +931,1340 @@ pub extern "C" fn tl_version() -> *const c_char {
     static VERSION: &[u8] = b"2.0.0-beta.1\0";
     VERSION.as_ptr() as *const c_char
 }
+
+// =============================================================================
+// Tests
+// =============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::ffi::{CStr, CString};
+    use std::ptr;
+
+    // =========================================================================
+    // Test Fixtures
+    // =========================================================================
+
+    const SIMPLE_FIXTURE: &str = "name: alice\nage: 30\n";
+
+    const ALL_TYPES_FIXTURE: &str = r#"
+null_val: ~
+bool_true: true
+bool_false: false
+int_val: 42
+int_neg: -123
+float_val: 3.14
+string_val: "hello world"
+string_empty: ""
+timestamp_val: 2024-01-15T10:30:00Z
+array_val: [1, 2, 3]
+empty_array: []
+object_val: {name: alice, age: 30}
+empty_object: {}
+tagged_val: :ok 200
+"#;
+
+    const SCHEMA_FIXTURE: &str = r#"
+@struct Person (name: string, age: int)
+people: @table Person [
+  ("Alice", 30),
+  ("Bob", 25),
+]
+"#;
+
+    const MAP_FIXTURE: &str = r#"
+headers: @map {"Content-Type": "application/json", "Accept": "*/*"}
+"#;
+
+    // =========================================================================
+    // Helpers
+    // =========================================================================
+
+    unsafe fn read_and_free_string(ptr: *mut c_char) -> String {
+        assert!(!ptr.is_null(), "Expected non-null string pointer");
+        let s = CStr::from_ptr(ptr).to_string_lossy().into_owned();
+        tl_string_free(ptr);
+        s
+    }
+
+
+    unsafe fn collect_and_free_string_array(arr: *mut *mut c_char) -> Vec<String> {
+        assert!(!arr.is_null(), "Expected non-null string array");
+        let mut result = Vec::new();
+        let mut i = 0;
+        loop {
+            let ptr = *arr.add(i);
+            if ptr.is_null() {
+                break;
+            }
+            result.push(CStr::from_ptr(ptr).to_string_lossy().into_owned());
+            i += 1;
+        }
+        tl_string_array_free(arr);
+        result
+    }
+
+    unsafe fn parse_doc(text: &str) -> *mut TLDocument {
+        let text_c = CString::new(text).unwrap();
+        let doc = tl_parse(text_c.as_ptr());
+        assert!(!doc.is_null(), "Failed to parse test document");
+        doc
+    }
+
+    unsafe fn doc_get(doc: *const TLDocument, key: &str) -> *mut TLValue {
+        let key_c = CString::new(key).unwrap();
+        let val = tl_document_get(doc, key_c.as_ptr());
+        assert!(!val.is_null(), "Expected non-null value for key '{}'", key);
+        val
+    }
+
+    unsafe fn assert_last_error_contains(substring: &str) {
+        let err = tl_get_last_error();
+        assert!(!err.is_null(), "Expected error to be set, but was null");
+        let msg = CStr::from_ptr(err).to_string_lossy().into_owned();
+        tl_string_free(err);
+        assert!(
+            msg.contains(substring),
+            "Expected error containing '{}', got: '{}'",
+            substring, msg
+        );
+    }
+
+    unsafe fn assert_no_error() {
+        let err = tl_get_last_error();
+        if !err.is_null() {
+            let msg = CStr::from_ptr(err).to_string_lossy().into_owned();
+            tl_string_free(err);
+            panic!("Expected no error, but found: '{}'", msg);
+        }
+    }
+
+    // =========================================================================
+    // Group 1: Null Pointer Safety — Document API
+    // =========================================================================
+
+    #[test]
+    fn null_tl_parse() {
+        unsafe {
+            tl_clear_error();
+            let result = tl_parse(ptr::null());
+            assert!(result.is_null());
+            assert_last_error_contains("Null pointer");
+        }
+    }
+
+    #[test]
+    fn null_tl_parse_file() {
+        unsafe {
+            tl_clear_error();
+            let result = tl_parse_file(ptr::null());
+            assert!(result.is_null());
+            assert_last_error_contains("Null pointer");
+        }
+    }
+
+    #[test]
+    fn null_tl_document_free() {
+        unsafe {
+            tl_document_free(ptr::null_mut()); // Should not crash
+        }
+    }
+
+    #[test]
+    fn null_tl_document_get_null_doc() {
+        unsafe {
+            let key = CString::new("key").unwrap();
+            let result = tl_document_get(ptr::null(), key.as_ptr());
+            assert!(result.is_null());
+        }
+    }
+
+    #[test]
+    fn null_tl_document_get_null_key() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let result = tl_document_get(doc, ptr::null());
+            assert!(result.is_null());
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn null_tl_document_keys() {
+        unsafe {
+            let result = tl_document_keys(ptr::null());
+            assert!(result.is_null());
+        }
+    }
+
+    #[test]
+    fn null_tl_document_to_text() {
+        unsafe {
+            let result = tl_document_to_text(ptr::null());
+            assert!(result.is_null());
+        }
+    }
+
+    #[test]
+    fn null_tl_document_to_text_data_only() {
+        unsafe {
+            let result = tl_document_to_text_data_only(ptr::null());
+            assert!(result.is_null());
+        }
+    }
+
+    #[test]
+    fn null_tl_document_compile() {
+        unsafe {
+            let path = CString::new("test.tlbx").unwrap();
+            let result = tl_document_compile(ptr::null(), path.as_ptr(), false);
+            assert!(!result.success);
+            if !result.error_message.is_null() {
+                tl_string_free(result.error_message);
+            }
+        }
+    }
+
+    #[test]
+    fn null_tl_document_from_json() {
+        unsafe {
+            tl_clear_error();
+            let result = tl_document_from_json(ptr::null());
+            assert!(result.is_null());
+            assert_last_error_contains("Null pointer");
+        }
+    }
+
+    #[test]
+    fn null_tl_document_to_json() {
+        unsafe {
+            tl_clear_error();
+            let result = tl_document_to_json(ptr::null());
+            assert!(result.is_null());
+            assert_last_error_contains("Null pointer");
+        }
+    }
+
+    #[test]
+    fn null_tl_document_to_json_compact() {
+        unsafe {
+            tl_clear_error();
+            let result = tl_document_to_json_compact(ptr::null());
+            assert!(result.is_null());
+            assert_last_error_contains("Null pointer");
+        }
+    }
+
+    // =========================================================================
+    // Group 1: Null Pointer Safety — Value API
+    // =========================================================================
+
+    #[test]
+    fn null_tl_value_free() {
+        unsafe {
+            tl_value_free(ptr::null_mut()); // Should not crash
+        }
+    }
+
+    #[test]
+    fn null_tl_value_type() {
+        unsafe {
+            let t = tl_value_type(ptr::null());
+            assert!(matches!(t, TLValueType::Null));
+        }
+    }
+
+    #[test]
+    fn null_value_scalar_accessors() {
+        unsafe {
+            assert_eq!(tl_value_as_bool(ptr::null()), false);
+            assert_eq!(tl_value_as_int(ptr::null()), 0);
+            assert_eq!(tl_value_as_uint(ptr::null()), 0);
+            assert_eq!(tl_value_as_float(ptr::null()), 0.0);
+            assert!(tl_value_as_string(ptr::null()).is_null());
+            assert_eq!(tl_value_as_timestamp(ptr::null()), 0);
+            assert_eq!(tl_value_bytes_len(ptr::null()), 0);
+            assert!(tl_value_bytes_data(ptr::null()).is_null());
+            assert!(tl_value_ref_name(ptr::null()).is_null());
+            assert!(tl_value_tag_name(ptr::null()).is_null());
+            assert!(tl_value_tag_value(ptr::null()).is_null());
+        }
+    }
+
+    #[test]
+    fn null_value_collection_accessors() {
+        unsafe {
+            assert_eq!(tl_value_array_len(ptr::null()), 0);
+            assert!(tl_value_array_get(ptr::null(), 0).is_null());
+            assert_eq!(tl_value_map_len(ptr::null()), 0);
+            assert!(tl_value_map_get_key(ptr::null(), 0).is_null());
+            assert!(tl_value_map_get_value(ptr::null(), 0).is_null());
+            assert!(tl_value_object_get(ptr::null(), CString::new("k").unwrap().as_ptr()).is_null());
+            assert!(tl_value_object_keys(ptr::null()).is_null());
+        }
+    }
+
+    #[test]
+    fn null_value_object_get_null_key() {
+        unsafe {
+            let doc = parse_doc("obj: {a: 1}");
+            let val = doc_get(doc, "obj");
+            let result = tl_value_object_get(val, ptr::null());
+            assert!(result.is_null());
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Group 1: Null Pointer Safety — Reader API
+    // =========================================================================
+
+    #[test]
+    fn null_reader_open() {
+        unsafe {
+            tl_clear_error();
+            let result = tl_reader_open(ptr::null());
+            assert!(result.is_null());
+            assert_last_error_contains("Null pointer");
+        }
+    }
+
+    #[test]
+    fn null_reader_open_mmap() {
+        unsafe {
+            tl_clear_error();
+            let result = tl_reader_open_mmap(ptr::null());
+            assert!(result.is_null());
+            assert_last_error_contains("Null pointer");
+        }
+    }
+
+    #[test]
+    fn null_reader_free() {
+        unsafe {
+            tl_reader_free(ptr::null_mut()); // Should not crash
+        }
+    }
+
+    #[test]
+    fn null_reader_get() {
+        unsafe {
+            let key = CString::new("key").unwrap();
+            let result = tl_reader_get(ptr::null(), key.as_ptr());
+            assert!(result.is_null());
+        }
+    }
+
+    #[test]
+    fn null_reader_keys() {
+        unsafe {
+            let result = tl_reader_keys(ptr::null());
+            assert!(result.is_null());
+        }
+    }
+
+    #[test]
+    fn null_reader_schema_functions() {
+        unsafe {
+            assert_eq!(tl_reader_schema_count(ptr::null()), 0);
+            assert!(tl_reader_schema_name(ptr::null(), 0).is_null());
+            assert_eq!(tl_reader_schema_field_count(ptr::null(), 0), 0);
+            assert!(tl_reader_schema_field_name(ptr::null(), 0, 0).is_null());
+            assert!(tl_reader_schema_field_type(ptr::null(), 0, 0).is_null());
+            assert_eq!(tl_reader_schema_field_nullable(ptr::null(), 0, 0), false);
+            assert_eq!(tl_reader_schema_field_is_array(ptr::null(), 0, 0), false);
+        }
+    }
+
+    // =========================================================================
+    // Group 1: Null Pointer Safety — Memory Management
+    // =========================================================================
+
+    #[test]
+    fn null_string_free() {
+        unsafe {
+            tl_string_free(ptr::null_mut()); // Should not crash
+        }
+    }
+
+    #[test]
+    fn null_string_array_free() {
+        unsafe {
+            tl_string_array_free(ptr::null_mut()); // Should not crash
+        }
+    }
+
+    #[test]
+    fn null_result_free() {
+        unsafe {
+            tl_result_free(ptr::null_mut()); // Should not crash
+        }
+    }
+
+    // =========================================================================
+    // Group 2: Error Handling Lifecycle
+    // =========================================================================
+
+    #[test]
+    fn error_initially_null() {
+        tl_clear_error();
+        let err = tl_get_last_error();
+        assert!(err.is_null(), "Error should be null initially");
+    }
+
+    #[test]
+    fn error_set_on_parse_failure() {
+        unsafe {
+            tl_clear_error();
+            let bad = CString::new("key: \"unterminated").unwrap();
+            let doc = tl_parse(bad.as_ptr());
+            assert!(doc.is_null(), "Unterminated string should fail to parse");
+            let err = tl_get_last_error();
+            assert!(!err.is_null(), "Error should be set after parse failure");
+            tl_string_free(err);
+        }
+    }
+
+    #[test]
+    fn error_clear_works() {
+        unsafe {
+            // Set an error
+            let bad = CString::new("key: \"unterminated").unwrap();
+            let _ = tl_parse(bad.as_ptr());
+            // Clear it
+            tl_clear_error();
+            assert_no_error();
+        }
+    }
+
+    #[test]
+    fn error_overwritten_by_successful_call() {
+        unsafe {
+            // Trigger an error
+            let bad = CString::new("key: \"unterminated").unwrap();
+            let _ = tl_parse(bad.as_ptr());
+            // Successful call should clear the error
+            let good = CString::new(SIMPLE_FIXTURE).unwrap();
+            let doc = tl_parse(good.as_ptr());
+            assert!(!doc.is_null());
+            assert_no_error();
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn error_sticky_across_non_error_calls() {
+        unsafe {
+            // Trigger an error
+            let bad = CString::new("key: \"unterminated").unwrap();
+            let _ = tl_parse(bad.as_ptr());
+            // Non-error-setting calls should NOT clear the error
+            let _ = tl_value_as_int(ptr::null());
+            let _ = tl_value_type(ptr::null());
+            // Error should still be there
+            let err = tl_get_last_error();
+            assert!(!err.is_null(), "Error should persist across non-error-setting calls");
+            tl_string_free(err);
+            tl_clear_error();
+        }
+    }
+
+    // =========================================================================
+    // Group 3: Memory Lifecycle
+    // =========================================================================
+
+    #[test]
+    fn lifecycle_document() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            // Use it
+            let keys = tl_document_keys(doc);
+            assert!(!keys.is_null());
+            let key_list = collect_and_free_string_array(keys);
+            assert!(key_list.len() >= 2);
+            // Free it
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn lifecycle_value() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let val = doc_get(doc, "name");
+            // Read it
+            let s = tl_value_as_string(val);
+            let name = read_and_free_string(s);
+            assert_eq!(name, "alice");
+            // Free value first, then document
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn lifecycle_string() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let val = doc_get(doc, "name");
+            let s = tl_value_as_string(val);
+            assert!(!s.is_null());
+            let name = read_and_free_string(s);
+            assert_eq!(name, "alice");
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn lifecycle_string_array() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let keys = tl_document_keys(doc);
+            assert!(!keys.is_null());
+            let key_list = collect_and_free_string_array(keys);
+            assert!(key_list.contains(&"name".to_string()));
+            assert!(key_list.contains(&"age".to_string()));
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn lifecycle_result() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let bad_path = CString::new("nonexistent_dir/sub/out.tlbx").unwrap();
+            let mut result = tl_document_compile(doc, bad_path.as_ptr(), false);
+            assert!(!result.success, "Compile to bad path should fail");
+            tl_result_free(&mut result as *mut TLResult);
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Group 4: Value Type Access
+    // =========================================================================
+
+    #[test]
+    fn value_type_null() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "null_val");
+            assert!(matches!(tl_value_type(val), TLValueType::Null));
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_bool_true() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "bool_true");
+            assert!(matches!(tl_value_type(val), TLValueType::Bool));
+            assert_eq!(tl_value_as_bool(val), true);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_bool_false() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "bool_false");
+            assert!(matches!(tl_value_type(val), TLValueType::Bool));
+            assert_eq!(tl_value_as_bool(val), false);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_int() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "int_val");
+            assert!(matches!(tl_value_type(val), TLValueType::Int));
+            assert_eq!(tl_value_as_int(val), 42);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_int_negative() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "int_neg");
+            assert!(matches!(tl_value_type(val), TLValueType::Int));
+            assert_eq!(tl_value_as_int(val), -123);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_float() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "float_val");
+            assert!(matches!(tl_value_type(val), TLValueType::Float));
+            let f = tl_value_as_float(val);
+            assert!((f - 3.14).abs() < 0.001, "Expected ~3.14, got {}", f);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_string() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "string_val");
+            assert!(matches!(tl_value_type(val), TLValueType::String));
+            let s = tl_value_as_string(val);
+            let name = read_and_free_string(s);
+            assert_eq!(name, "hello world");
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_string_empty() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "string_empty");
+            assert!(matches!(tl_value_type(val), TLValueType::String));
+            let s = tl_value_as_string(val);
+            let name = read_and_free_string(s);
+            assert_eq!(name, "");
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_timestamp() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "timestamp_val");
+            assert!(matches!(tl_value_type(val), TLValueType::Timestamp));
+            let ts = tl_value_as_timestamp(val);
+            assert!(ts > 0, "Timestamp should be positive, got {}", ts);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_array() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "array_val");
+            assert!(matches!(tl_value_type(val), TLValueType::Array));
+            assert_eq!(tl_value_array_len(val), 3);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_object() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "object_val");
+            assert!(matches!(tl_value_type(val), TLValueType::Object));
+            let keys = tl_value_object_keys(val);
+            let key_list = collect_and_free_string_array(keys);
+            assert!(key_list.contains(&"name".to_string()));
+            assert!(key_list.contains(&"age".to_string()));
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_tagged() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "tagged_val");
+            assert!(matches!(tl_value_type(val), TLValueType::Tagged));
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_type_map() {
+        unsafe {
+            let doc = parse_doc(MAP_FIXTURE);
+            let val = doc_get(doc, "headers");
+            assert!(matches!(tl_value_type(val), TLValueType::Map));
+            assert_eq!(tl_value_map_len(val), 2);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Group 5: Wrong-Type Access
+    // =========================================================================
+
+    #[test]
+    fn wrong_type_int_on_string() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "string_val");
+            assert_eq!(tl_value_as_int(val), 0);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn wrong_type_string_on_int() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "int_val");
+            let s = tl_value_as_string(val);
+            assert!(s.is_null());
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn wrong_type_bool_on_int() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "int_val");
+            assert_eq!(tl_value_as_bool(val), false);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn wrong_type_float_on_string() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "string_val");
+            assert_eq!(tl_value_as_float(val), 0.0);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn wrong_type_array_len_on_object() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "object_val");
+            assert_eq!(tl_value_array_len(val), 0);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn wrong_type_map_len_on_array() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "array_val");
+            assert_eq!(tl_value_map_len(val), 0);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn wrong_type_ref_name_on_string() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "string_val");
+            let r = tl_value_ref_name(val);
+            assert!(r.is_null());
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Group 6: Collection Bounds Access
+    // =========================================================================
+
+    #[test]
+    fn array_in_bounds() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "array_val");
+            for i in 0..3 {
+                let elem = tl_value_array_get(val, i);
+                assert!(!elem.is_null(), "Element {} should not be null", i);
+                tl_value_free(elem);
+            }
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn array_out_of_bounds() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "array_val");
+            assert!(tl_value_array_get(val, 3).is_null());
+            assert!(tl_value_array_get(val, usize::MAX).is_null());
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn array_empty() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "empty_array");
+            assert_eq!(tl_value_array_len(val), 0);
+            assert!(tl_value_array_get(val, 0).is_null());
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn map_in_bounds() {
+        unsafe {
+            let doc = parse_doc(MAP_FIXTURE);
+            let val = doc_get(doc, "headers");
+            let len = tl_value_map_len(val);
+            assert_eq!(len, 2);
+            for i in 0..len {
+                let k = tl_value_map_get_key(val, i);
+                assert!(!k.is_null(), "Map key {} should not be null", i);
+                let v = tl_value_map_get_value(val, i);
+                assert!(!v.is_null(), "Map value {} should not be null", i);
+                tl_value_free(k);
+                tl_value_free(v);
+            }
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn map_out_of_bounds() {
+        unsafe {
+            let doc = parse_doc(MAP_FIXTURE);
+            let val = doc_get(doc, "headers");
+            assert!(tl_value_map_get_key(val, 99).is_null());
+            assert!(tl_value_map_get_value(val, 99).is_null());
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn object_get_existing_key() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "object_val");
+            let key = CString::new("name").unwrap();
+            let inner = tl_value_object_get(val, key.as_ptr());
+            assert!(!inner.is_null());
+            let s = tl_value_as_string(inner);
+            let name = read_and_free_string(s);
+            assert_eq!(name, "alice");
+            tl_value_free(inner);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn object_get_missing_key() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "object_val");
+            let key = CString::new("nonexistent").unwrap();
+            let inner = tl_value_object_get(val, key.as_ptr());
+            assert!(inner.is_null());
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn object_keys_correct() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "object_val");
+            let keys = tl_value_object_keys(val);
+            let key_list = collect_and_free_string_array(keys);
+            assert_eq!(key_list.len(), 2);
+            assert!(key_list.contains(&"name".to_string()));
+            assert!(key_list.contains(&"age".to_string()));
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Group 7: Tagged Values
+    // =========================================================================
+
+    #[test]
+    fn tagged_value_name_and_inner() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "tagged_val");
+            assert!(matches!(tl_value_type(val), TLValueType::Tagged));
+
+            let tag = tl_value_tag_name(val);
+            let tag_str = read_and_free_string(tag);
+            assert_eq!(tag_str, "ok");
+
+            let inner = tl_value_tag_value(val);
+            assert!(!inner.is_null());
+            assert_eq!(tl_value_as_int(inner), 200);
+            tl_value_free(inner);
+
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn tag_accessors_on_non_tagged_value() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "int_val");
+            assert!(tl_value_tag_name(val).is_null());
+            assert!(tl_value_tag_value(val).is_null());
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Group 8: Schema Introspection via Reader
+    // =========================================================================
+
+    #[test]
+    fn schema_introspection() {
+        unsafe {
+            let doc = parse_doc(SCHEMA_FIXTURE);
+            let temp = tempfile::NamedTempFile::new().expect("temp file");
+            let path_str = temp.path().to_str().expect("path");
+            let path_c = CString::new(path_str).unwrap();
+
+            let result = tl_document_compile(doc, path_c.as_ptr(), false);
+            assert!(result.success, "Compile should succeed");
+
+            let reader = tl_reader_open(path_c.as_ptr());
+            assert!(!reader.is_null(), "Reader should open compiled file");
+
+            // Schema count
+            let count = tl_reader_schema_count(reader);
+            assert!(count >= 1, "Should have at least 1 schema, got {}", count);
+
+            // Schema name
+            let name = tl_reader_schema_name(reader, 0);
+            let name_str = read_and_free_string(name);
+            assert_eq!(name_str, "Person");
+
+            // Field count
+            let field_count = tl_reader_schema_field_count(reader, 0);
+            assert_eq!(field_count, 2);
+
+            // Field names
+            let f0_name = read_and_free_string(tl_reader_schema_field_name(reader, 0, 0));
+            let f1_name = read_and_free_string(tl_reader_schema_field_name(reader, 0, 1));
+            assert_eq!(f0_name, "name");
+            assert_eq!(f1_name, "age");
+
+            // Field types
+            let f0_type = read_and_free_string(tl_reader_schema_field_type(reader, 0, 0));
+            let f1_type = read_and_free_string(tl_reader_schema_field_type(reader, 0, 1));
+            assert_eq!(f0_type, "string");
+            assert_eq!(f1_type, "int");
+
+            tl_reader_free(reader);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn schema_out_of_bounds() {
+        unsafe {
+            let doc = parse_doc(SCHEMA_FIXTURE);
+            let temp = tempfile::NamedTempFile::new().expect("temp file");
+            let path_str = temp.path().to_str().expect("path");
+            let path_c = CString::new(path_str).unwrap();
+
+            let result = tl_document_compile(doc, path_c.as_ptr(), false);
+            assert!(result.success);
+
+            let reader = tl_reader_open(path_c.as_ptr());
+            assert!(!reader.is_null());
+
+            let count = tl_reader_schema_count(reader);
+            // Out of bounds schema
+            assert!(tl_reader_schema_name(reader, count).is_null());
+            assert_eq!(tl_reader_schema_field_count(reader, count), 0);
+
+            // Out of bounds field
+            let fc = tl_reader_schema_field_count(reader, 0);
+            assert!(tl_reader_schema_field_name(reader, 0, fc).is_null());
+            assert!(tl_reader_schema_field_type(reader, 0, fc).is_null());
+            assert_eq!(tl_reader_schema_field_nullable(reader, 0, fc), false);
+            assert_eq!(tl_reader_schema_field_is_array(reader, 0, fc), false);
+
+            tl_reader_free(reader);
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Group 9: Reader Operations
+    // =========================================================================
+
+    #[test]
+    fn reader_open_valid_file() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let temp = tempfile::NamedTempFile::new().expect("temp file");
+            let path_str = temp.path().to_str().expect("path");
+            let path_c = CString::new(path_str).unwrap();
+
+            let result = tl_document_compile(doc, path_c.as_ptr(), false);
+            assert!(result.success);
+
+            let reader = tl_reader_open(path_c.as_ptr());
+            assert!(!reader.is_null());
+
+            tl_reader_free(reader);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn reader_open_nonexistent_file() {
+        unsafe {
+            tl_clear_error();
+            let path = CString::new("totally_nonexistent_file.tlbx").unwrap();
+            let reader = tl_reader_open(path.as_ptr());
+            assert!(reader.is_null());
+            let err = tl_get_last_error();
+            assert!(!err.is_null(), "Error should be set for nonexistent file");
+            tl_string_free(err);
+        }
+    }
+
+    #[test]
+    fn reader_keys_and_get() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let temp = tempfile::NamedTempFile::new().expect("temp file");
+            let path_str = temp.path().to_str().expect("path");
+            let path_c = CString::new(path_str).unwrap();
+
+            let result = tl_document_compile(doc, path_c.as_ptr(), false);
+            assert!(result.success);
+
+            let reader = tl_reader_open(path_c.as_ptr());
+            assert!(!reader.is_null());
+
+            // Keys
+            let keys = tl_reader_keys(reader);
+            let key_list = collect_and_free_string_array(keys);
+            assert!(key_list.contains(&"name".to_string()));
+            assert!(key_list.contains(&"age".to_string()));
+
+            // Get existing key
+            let key_c = CString::new("name").unwrap();
+            let val = tl_reader_get(reader, key_c.as_ptr());
+            assert!(!val.is_null());
+            let s = tl_value_as_string(val);
+            let name = read_and_free_string(s);
+            assert_eq!(name, "alice");
+            tl_value_free(val);
+
+            // Get missing key
+            let bad_key = CString::new("nonexistent").unwrap();
+            let val = tl_reader_get(reader, bad_key.as_ptr());
+            assert!(val.is_null());
+
+            tl_reader_free(reader);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn reader_get_null_key() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let temp = tempfile::NamedTempFile::new().expect("temp file");
+            let path_str = temp.path().to_str().expect("path");
+            let path_c = CString::new(path_str).unwrap();
+
+            let result = tl_document_compile(doc, path_c.as_ptr(), false);
+            assert!(result.success);
+
+            let reader = tl_reader_open(path_c.as_ptr());
+            assert!(!reader.is_null());
+
+            let val = tl_reader_get(reader, ptr::null());
+            assert!(val.is_null());
+
+            tl_reader_free(reader);
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Group 10: JSON Roundtrip Through FFI
+    // =========================================================================
+
+    #[test]
+    fn json_roundtrip() {
+        unsafe {
+            tl_clear_error();
+            // Parse text -> to_json
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let json_ptr = tl_document_to_json(doc);
+            let json_str = read_and_free_string(json_ptr);
+            tl_document_free(doc);
+
+            // from_json -> to_json again
+            let json_c = CString::new(json_str.as_str()).unwrap();
+            let doc2 = tl_document_from_json(json_c.as_ptr());
+            assert!(!doc2.is_null(), "from_json should succeed");
+            let json_ptr2 = tl_document_to_json(doc2);
+            let json_str2 = read_and_free_string(json_ptr2);
+            tl_document_free(doc2);
+
+            // Parse both as serde_json values and compare
+            let val1: serde_json::Value = serde_json::from_str(&json_str).unwrap();
+            let val2: serde_json::Value = serde_json::from_str(&json_str2).unwrap();
+            assert_eq!(val1, val2, "JSON roundtrip should be stable");
+        }
+    }
+
+    #[test]
+    fn json_compact_vs_pretty() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+
+            let pretty_ptr = tl_document_to_json(doc);
+            let pretty = read_and_free_string(pretty_ptr);
+
+            let compact_ptr = tl_document_to_json_compact(doc);
+            let compact = read_and_free_string(compact_ptr);
+
+            tl_document_free(doc);
+
+            let val_pretty: serde_json::Value = serde_json::from_str(&pretty).unwrap();
+            let val_compact: serde_json::Value = serde_json::from_str(&compact).unwrap();
+            assert_eq!(val_pretty, val_compact, "Pretty and compact JSON should parse to same value");
+        }
+    }
+
+    #[test]
+    fn json_from_invalid() {
+        unsafe {
+            tl_clear_error();
+            let bad = CString::new("{invalid json}").unwrap();
+            let doc = tl_document_from_json(bad.as_ptr());
+            assert!(doc.is_null());
+            let err = tl_get_last_error();
+            assert!(!err.is_null(), "Error should be set for invalid JSON");
+            tl_string_free(err);
+        }
+    }
+
+    // =========================================================================
+    // Group 11: Compile Through FFI
+    // =========================================================================
+
+    #[test]
+    fn compile_and_read_back() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let temp = tempfile::NamedTempFile::new().expect("temp file");
+            let path_str = temp.path().to_str().expect("path");
+            let path_c = CString::new(path_str).unwrap();
+
+            let result = tl_document_compile(doc, path_c.as_ptr(), false);
+            assert!(result.success, "Compile should succeed");
+
+            let reader = tl_reader_open(path_c.as_ptr());
+            assert!(!reader.is_null());
+
+            let key_c = CString::new("name").unwrap();
+            let val = tl_reader_get(reader, key_c.as_ptr());
+            assert!(!val.is_null());
+            let s = tl_value_as_string(val);
+            let name = read_and_free_string(s);
+            assert_eq!(name, "alice");
+
+            let key_c2 = CString::new("age").unwrap();
+            let val2 = tl_reader_get(reader, key_c2.as_ptr());
+            assert!(!val2.is_null());
+            assert_eq!(tl_value_as_int(val2), 30);
+
+            tl_value_free(val);
+            tl_value_free(val2);
+            tl_reader_free(reader);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn compile_null_path() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let result = tl_document_compile(doc, ptr::null(), false);
+            assert!(!result.success);
+            if !result.error_message.is_null() {
+                tl_string_free(result.error_message);
+            }
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn compile_invalid_path() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            let bad_path = CString::new("nonexistent_dir/sub/deep/out.tlbx").unwrap();
+            let mut result = tl_document_compile(doc, bad_path.as_ptr(), false);
+            assert!(!result.success);
+            tl_result_free(&mut result as *mut TLResult);
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Group 12: Version API
+    // =========================================================================
+
+    #[test]
+    fn version_returns_expected() {
+        let v = tl_version();
+        assert!(!v.is_null());
+        let version = unsafe { CStr::from_ptr(v) }.to_str().unwrap();
+        assert_eq!(version, "2.0.0-beta.1");
+        // Note: do NOT free this - it's a static string
+    }
+
+    // =========================================================================
+    // Group 13: Edge Cases
+    // =========================================================================
+
+    #[test]
+    fn parse_empty_string() {
+        unsafe {
+            let empty = CString::new("").unwrap();
+            let doc = tl_parse(empty.as_ptr());
+            assert!(!doc.is_null(), "Empty string should parse successfully");
+            let keys = tl_document_keys(doc);
+            let key_list = collect_and_free_string_array(keys);
+            assert_eq!(key_list.len(), 0, "Empty doc should have 0 keys");
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn parse_whitespace_only() {
+        unsafe {
+            let ws = CString::new("  \n\n  ").unwrap();
+            let doc = tl_parse(ws.as_ptr());
+            assert!(!doc.is_null(), "Whitespace-only should parse successfully");
+            let keys = tl_document_keys(doc);
+            let key_list = collect_and_free_string_array(keys);
+            assert_eq!(key_list.len(), 0);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn document_to_text_roundtrip() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+
+            // to_json for baseline comparison
+            let json_ptr = tl_document_to_json(doc);
+            let json1 = read_and_free_string(json_ptr);
+
+            // to_text
+            let text_ptr = tl_document_to_text(doc);
+            let text = read_and_free_string(text_ptr);
+            tl_document_free(doc);
+
+            // parse the text back
+            let text_c = CString::new(text.as_str()).unwrap();
+            let doc2 = tl_parse(text_c.as_ptr());
+            assert!(!doc2.is_null(), "Re-parsing text output should succeed");
+
+            // to_json from re-parsed document
+            let json_ptr2 = tl_document_to_json(doc2);
+            let json2 = read_and_free_string(json_ptr2);
+            tl_document_free(doc2);
+
+            // Compare as parsed JSON (order-independent)
+            let val1: serde_json::Value = serde_json::from_str(&json1).unwrap();
+            let val2: serde_json::Value = serde_json::from_str(&json2).unwrap();
+            assert_eq!(val1, val2, "text -> parse -> text roundtrip should preserve content");
+        }
+    }
+
+    #[test]
+    fn parse_invalid_syntax() {
+        unsafe {
+            tl_clear_error();
+            let bad = CString::new("key: \"unterminated string").unwrap();
+            let doc = tl_parse(bad.as_ptr());
+            assert!(doc.is_null(), "Unterminated string should fail to parse");
+            let err = tl_get_last_error();
+            assert!(!err.is_null(), "Error should be set for invalid syntax");
+            tl_string_free(err);
+        }
+    }
+
+    #[test]
+    fn long_string_value() {
+        unsafe {
+            let long_str = "x".repeat(10_000);
+            let input = format!("long: \"{}\"", long_str);
+            let doc = parse_doc(&input);
+            let val = doc_get(doc, "long");
+            let s = tl_value_as_string(val);
+            let extracted = read_and_free_string(s);
+            assert_eq!(extracted.len(), 10_000, "Long string should preserve length");
+            assert_eq!(extracted, long_str);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn document_to_text_data_only_vs_with_schemas() {
+        unsafe {
+            let doc = parse_doc(SCHEMA_FIXTURE);
+
+            let with_schemas = read_and_free_string(tl_document_to_text(doc));
+            let data_only = read_and_free_string(tl_document_to_text_data_only(doc));
+
+            // with_schemas should contain @struct, data_only should not
+            assert!(with_schemas.contains("@struct"), "to_text should include schemas");
+            assert!(!data_only.contains("@struct"), "to_text_data_only should not include schemas");
+
+            tl_document_free(doc);
+        }
+    }
+}
