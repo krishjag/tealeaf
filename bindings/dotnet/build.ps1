@@ -86,11 +86,27 @@ if ($TargetRids -contains "all") {
 } else {
     # Default: build only native platform on local builds
     $Arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-    switch ($Arch) {
-        "X64"   { $RidsToBuild = @("win-x64") }
-        "X86"   { $RidsToBuild = @("win-x86") }
-        "Arm64" { $RidsToBuild = @("win-arm64") }
-        default { $RidsToBuild = @("win-x64") }
+    if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+        switch ($Arch) {
+            "X64"   { $RidsToBuild = @("win-x64") }
+            "X86"   { $RidsToBuild = @("win-x86") }
+            "Arm64" { $RidsToBuild = @("win-arm64") }
+            default { $RidsToBuild = @("win-x64") }
+        }
+    } elseif ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)) {
+        switch ($Arch) {
+            "X64"   { $RidsToBuild = @("linux-x64") }
+            "Arm64" { $RidsToBuild = @("linux-arm64") }
+            default { $RidsToBuild = @("linux-x64") }
+        }
+    } elseif ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)) {
+        switch ($Arch) {
+            "X64"   { $RidsToBuild = @("osx-x64") }
+            "Arm64" { $RidsToBuild = @("osx-arm64") }
+            default { $RidsToBuild = @("osx-x64") }
+        }
+    } else {
+        $RidsToBuild = @("win-x64")
     }
 }
 

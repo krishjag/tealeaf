@@ -289,11 +289,10 @@ fn json_to_tealeaf_value(json: serde_json::Value) -> Value {
         serde_json::Value::Null => Value::Null,
         serde_json::Value::Bool(b) => Value::Bool(b),
         serde_json::Value::Number(n) => {
-            // Preserve the original number type from JSON
-            // If it was written as a float (e.g., 4254.0), keep it as float
-            if n.is_f64() {
-                Value::Float(n.as_f64().unwrap_or(0.0))
-            } else if let Some(i) = n.as_i64() {
+            // Try exact integer representations first to avoid silent
+            // precision loss from f64 fallback (e.g., u64::MAX + 1 would
+            // otherwise silently become a float).
+            if let Some(i) = n.as_i64() {
                 Value::Int(i)
             } else if let Some(u) = n.as_u64() {
                 Value::UInt(u)
@@ -321,10 +320,11 @@ fn json_to_tealeaf_value(json: serde_json::Value) -> Value {
 ///
 /// Type preservation:
 /// - Value::Int → JSON integer (e.g., 42)
+/// - Value::UInt → JSON integer (e.g., 18446744073709551615)
 /// - Value::Float → JSON float (e.g., 42.0)
 ///
-/// Since we preserve the original JSON type during parsing (is_f64 check),
-/// we output the same type when converting back to JSON.
+/// Integer types are tried first during JSON import (i64, then u64) so that
+/// values within 64-bit range stay exact. Only true floats fall through to f64.
 fn tealeaf_to_json_value(tl: &Value) -> serde_json::Value {
     match tl {
         Value::Null => serde_json::Value::Null,
@@ -483,6 +483,31 @@ pub fn dumps(data: &HashMap<String, Value>) -> String {
     out
 }
 
+/// Escape a string for TeaLeaf text output.
+/// Handles: \\ \" \n \t \r \b \f and \uXXXX for other control characters.
+fn escape_string(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '\\' => out.push_str("\\\\"),
+            '"' => out.push_str("\\\""),
+            '\n' => out.push_str("\\n"),
+            '\t' => out.push_str("\\t"),
+            '\r' => out.push_str("\\r"),
+            '\u{0008}' => out.push_str("\\b"),
+            '\u{000C}' => out.push_str("\\f"),
+            c if c.is_control() => {
+                // Other control characters use \uXXXX
+                for unit in c.encode_utf16(&mut [0u16; 2]) {
+                    out.push_str(&format!("\\u{:04x}", unit));
+                }
+            }
+            _ => out.push(c),
+        }
+    }
+    out
+}
+
 /// Format a float ensuring it always has a decimal point (e.g., 42.0 not 42)
 fn format_float(f: f64) -> String {
     let s = f.to_string();
@@ -505,7 +530,7 @@ fn write_value(out: &mut String, value: &Value, indent: usize) {
         Value::String(s) => {
             if needs_quoting(s) {
                 out.push('"');
-                out.push_str(&s.replace('\\', "\\\\").replace('"', "\\\""));
+                out.push_str(&escape_string(s));
                 out.push('"');
             } else {
                 out.push_str(s);
@@ -1094,7 +1119,7 @@ fn write_value_with_schemas(
         Value::String(s) => {
             if needs_quoting(s) {
                 out.push('"');
-                out.push_str(&s.replace('\\', "\\\\").replace('"', "\\\""));
+                out.push_str(&escape_string(s));
                 out.push('"');
             } else {
                 out.push_str(s);

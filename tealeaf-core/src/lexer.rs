@@ -236,16 +236,47 @@ impl<'a> Lexer<'a> {
             } else if c == '\\' {
                 self.advance();
                 if let Some(escaped) = self.current_char() {
-                    let c = match escaped {
-                        'n' => '\n',
-                        't' => '\t',
-                        'r' => '\r',
-                        '"' => '"',
-                        '\\' => '\\',
-                        _ => escaped,
-                    };
-                    value.push(c);
-                    self.advance();
+                    match escaped {
+                        'n' => { value.push('\n'); self.advance(); }
+                        't' => { value.push('\t'); self.advance(); }
+                        'r' => { value.push('\r'); self.advance(); }
+                        'b' => { value.push('\u{0008}'); self.advance(); }
+                        'f' => { value.push('\u{000C}'); self.advance(); }
+                        '"' => { value.push('"'); self.advance(); }
+                        '\\' => { value.push('\\'); self.advance(); }
+                        'u' => {
+                            self.advance(); // skip 'u'
+                            let start = self.pos;
+                            let mut count = 0;
+                            while count < 4 {
+                                match self.current_char() {
+                                    Some(c) if c.is_ascii_hexdigit() => {
+                                        self.advance();
+                                        count += 1;
+                                    }
+                                    _ => break,
+                                }
+                            }
+                            if count != 4 {
+                                return Err(Error::ParseError(
+                                    "Invalid unicode escape: expected 4 hex digits after \\u".to_string()
+                                ));
+                            }
+                            let hex = &self.input[start..self.pos];
+                            let code = u32::from_str_radix(hex, 16).map_err(|_| {
+                                Error::ParseError(format!("Invalid unicode escape: \\u{}", hex))
+                            })?;
+                            let ch = char::from_u32(code).ok_or_else(|| {
+                                Error::ParseError(format!("Invalid unicode codepoint: U+{:04X}", code))
+                            })?;
+                            value.push(ch);
+                        }
+                        _ => {
+                            return Err(Error::ParseError(
+                                format!("Invalid escape sequence: \\{}", escaped)
+                            ));
+                        }
+                    }
                 }
             } else {
                 value.push(c);

@@ -46,3 +46,9 @@ results/
 !examples/*.tlbx
 !canonical/binary/*.tlbx
 !canonical/errors/*.tlbx
+
+# Adversarial test files
+adversarial-tests/**/bin/
+adversarial-tests/**/obj/
+adversarial-tests/**/results/
+adversarial-tests/**/target/
