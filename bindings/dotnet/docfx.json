@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "TeaLeaf/TeaLeaf.csproj",
+            "TeaLeaf.Annotations/TeaLeaf.Annotations.csproj"
+          ],
+          "src": "."
+        }
+      ],
+      "dest": "api",
+      "properties": {
+        "TargetFramework": "net8.0"
+      },
+      "includePrivateMembers": false,
+      "disableGitFeatures": false
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": ["api/**.yml", "api/index.md"]
+      },
+      {
+        "files": ["toc.yml", "*.md"]
+      }
+    ],
+    "resource": [
+      {
+        "files": ["images/**"]
+      }
+    ],
+    "output": "_site",
+    "template": ["default", "modern"],
+    "globalMetadata": {
+      "_appTitle": "TeaLeaf .NET API",
+      "_appName": "TeaLeaf",
+      "_appFooter": "TeaLeaf v2.0.0-beta.1 — .NET API Reference",
+      "_enableSearch": true,
+      "_gitContribute": {
+        "repo": "https://github.com/krishjag/tealeaf",
+        "branch": "main",
+        "apiSpecFolder": "bindings/dotnet/api"
+      }
+    }
+  }
+}

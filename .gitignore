@@ -41,6 +41,11 @@ results/
 *.temp
 *.log
 
+# Temp directories
+temp/
+tmp/
+throwaway/
+
 # Binary TeaLeaf files (keep examples and canonical test fixtures, ignore generated)
 *.tlbx
 !examples/*.tlbx

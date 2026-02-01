@@ -309,6 +309,12 @@ impl Reader {
         let _si = cursor.read_u16();
         let bitmap_size = cursor.read_u16() as usize;
 
+        if schema_idx >= self.schemas.len() {
+            return Err(Error::ParseError(format!(
+                "struct array schema index {} out of bounds ({} schemas available)",
+                schema_idx, self.schemas.len()
+            )));
+        }
         let schema = &self.schemas[schema_idx];
         let mut result = Vec::with_capacity(count as usize);
 
@@ -373,6 +379,12 @@ impl Reader {
 
     fn decode_struct(&self, cursor: &mut Cursor) -> Result<Value> {
         let schema_idx = cursor.read_u16() as usize;
+        if schema_idx >= self.schemas.len() {
+            return Err(Error::ParseError(format!(
+                "struct schema index {} out of bounds ({} schemas available)",
+                schema_idx, self.schemas.len()
+            )));
+        }
         let schema = &self.schemas[schema_idx];
         let bitmap_size = (schema.fields.len() + 7) / 8;
 

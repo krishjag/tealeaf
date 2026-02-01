@@ -28,6 +28,11 @@
     <None Include="README.md" Pack="true" PackagePath="" Condition="Exists('README.md')" />
   </ItemGroup>
 
+  <!-- Project references -->
+  <ItemGroup>
+    <ProjectReference Include="..\TeaLeaf.Annotations\TeaLeaf.Annotations.csproj" />
+  </ItemGroup>
+
   <!--
     Native library references for NuGet package
 

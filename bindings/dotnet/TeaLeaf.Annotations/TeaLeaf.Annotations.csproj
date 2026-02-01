@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0;net10.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Package metadata -->
+    <PackageId>TeaLeaf.Annotations</PackageId>
+    <Version>2.0.0-beta.1</Version>
+    <Authors>TeaLeaf Contributors</Authors>
+    <Description>Attribute definitions for TeaLeaf source generator. Use [TeaLeaf] on classes/records to enable DTO-to-TeaLeaf conversion.</Description>
+    <PackageTags>serialization;schema;tealeaf;sourcegen;attributes</PackageTags>
+    <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/krishjag/tealeaf</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/krishjag/tealeaf</RepositoryUrl>
+  </PropertyGroup>
+</Project>

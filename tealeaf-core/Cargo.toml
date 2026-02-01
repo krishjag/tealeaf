@@ -17,14 +17,20 @@ path = "src/lib.rs"
 name = "tealeaf"
 path = "src/main.rs"
 
+[features]
+default = []
+derive = ["dep:tealeaf-derive"]
+
 [dependencies]
 thiserror.workspace = true
 memmap2.workspace = true
 crc32fast.workspace = true
 flate2.workspace = true
 serde_json = "1.0"
+tealeaf-derive = { workspace = true, optional = true }
 
 [dev-dependencies]
+tealeaf-derive = { workspace = true }
 tempfile = "3.0"
 criterion = "0.5"
 serde = { version = "1.0", features = ["derive"] }

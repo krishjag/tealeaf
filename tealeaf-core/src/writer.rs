@@ -404,6 +404,10 @@ impl Writer {
                     }
                     buf
                 } else {
+                    #[cfg(debug_assertions)]
+                    if nested_schema.is_none() {
+                        eprintln!("tealeaf: warning: missing schema for struct-typed field, data will be dropped");
+                    }
                     vec![]
                 }
             }

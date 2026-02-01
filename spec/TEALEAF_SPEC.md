@@ -29,6 +29,7 @@ For an introduction, usage guide, API reference, and comparison with other forma
    - [1.14 Tagged Values](#114-tagged-values)
    - [1.15 Unions](#115-unions)
    - [1.16 File Includes](#116-file-includes)
+   - [1.17 Root Array](#117-root-array)
 2. [Type System](#2-type-system)
    - [2.1 Primitive Types](#21-primitive-types)
    - [2.2 Type Modifiers](#22-type-modifiers)
@@ -376,6 +377,21 @@ users: @table user [
 
 Paths are resolved relative to the including file.
 
+### 1.17 Root Array
+
+The `@root-array` directive marks the document as representing a root-level JSON array rather than a JSON object. This is used for JSON round-trip fidelity.
+
+```tl
+@root-array
+
+0: {id: 1, name: alice}
+1: {id: 2, name: bob}
+```
+
+When present, JSON export (`to-json`, `tlbx-to-json`) produces a top-level JSON array `[{...}, {...}]` instead of a JSON object `{"0": {...}, "1": {...}}`.
+
+The directive takes no arguments. It is emitted automatically by `from-json` and `json-to-tlbx` when the input JSON is a root-level array. In the binary format, the root-array flag is stored as bit 1 of the header flags field.
+
 ---
 
 ## 2. Type System
@@ -522,7 +538,7 @@ The source `.tl` file is the master; regenerate binary as needed.
 | 0 | 4 | Magic | `TLBX` |
 | 4 | 2 | Version Major | 2 |
 | 6 | 2 | Version Minor | 0 |
-| 8 | 4 | Flags | bit 0: compressed |
+| 8 | 4 | Flags | bit 0: compressed, bit 1: root_array |
 | 12 | 4 | Reserved | (unused) |
 | 16 | 8 | String Table Offset | u64 LE |
 | 24 | 8 | Schema Table Offset | u64 LE |
@@ -729,10 +745,11 @@ Tuples in text format (`(a, b, c)`) are parsed as arrays. In binary format, they
 ```ebnf
 document     = { directive | pair | ref_def } ;
 
-directive    = struct_def | union_def | include ;
+directive    = struct_def | union_def | include | root_array ;
 struct_def   = "@struct" name "(" fields ")" ;
 union_def    = "@union" name "{" variants "}" ;
 include      = "@include" string ;
+root_array   = "@root-array" ;
 
 variants     = variant { "," variant } ;
 variant      = name "(" [ fields ] ")" ;

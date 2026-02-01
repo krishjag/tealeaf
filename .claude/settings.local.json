@@ -55,7 +55,8 @@
       "Bash(git mv:*)",
       "Bash(git add:*)",
       "Bash(pushd:*)",
-      "Bash(popd:*)"
+      "Bash(popd:*)",
+      "Bash(dotnet script:*)"
     ]
   }
 }

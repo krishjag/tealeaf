@@ -23,12 +23,20 @@ mod lexer;
 mod parser;
 mod writer;
 mod reader;
+pub mod convert;
+pub mod builder;
 
 pub use types::{Error, Result, TLType, FieldType, Field, Schema, Union, Variant, Value, MAGIC, VERSION, VERSION_MAJOR, VERSION_MINOR, HEADER_SIZE};
 pub use lexer::{Lexer, Token, TokenKind};
 pub use parser::Parser;
 pub use writer::Writer;
 pub use reader::Reader;
+pub use convert::{ToTeaLeaf, FromTeaLeaf, ConvertError, ToTeaLeafExt};
+pub use builder::TeaLeafBuilder;
+
+// Re-export derive macros when the "derive" feature is enabled
+#[cfg(feature = "derive")]
+pub use tealeaf_derive::{ToTeaLeaf, FromTeaLeaf};
 
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
@@ -280,6 +288,55 @@ impl TeaLeaf {
 
         serde_json::to_string(&serde_json::Value::Object(json_obj))
             .map_err(|e| Error::ParseError(format!("JSON serialization failed: {}", e)))
+    }
+
+    /// Set whether the document represents a root-level array.
+    pub fn set_root_array(&mut self, is_root_array: bool) {
+        self.is_root_array = is_root_array;
+    }
+
+    /// Create a TeaLeaf document from a single DTO.
+    ///
+    /// The DTO is placed under the given `key` in the document data map.
+    /// Schemas are automatically collected from the DTO type.
+    pub fn from_dto<T: convert::ToTeaLeaf>(key: &str, dto: &T) -> Self {
+        let schemas = T::collect_schemas();
+        let mut data = HashMap::new();
+        data.insert(key.to_string(), dto.to_tealeaf_value());
+        Self::new(schemas, data)
+    }
+
+    /// Create a TeaLeaf document from a slice of DTOs.
+    ///
+    /// The array is placed under the given `key` and schemas are
+    /// collected from the element type.
+    pub fn from_dto_array<T: convert::ToTeaLeaf>(key: &str, items: &[T]) -> Self {
+        let schemas = T::collect_schemas();
+        let mut data = HashMap::new();
+        let arr = Value::Array(items.iter().map(|i| i.to_tealeaf_value()).collect());
+        data.insert(key.to_string(), arr);
+        Self::new(schemas, data)
+    }
+
+    /// Extract a DTO from this document by key.
+    pub fn to_dto<T: convert::FromTeaLeaf>(&self, key: &str) -> Result<T> {
+        let value = self
+            .get(key)
+            .ok_or_else(|| Error::MissingField(key.to_string()))?;
+        T::from_tealeaf_value(value).map_err(|e| e.into())
+    }
+
+    /// Extract all values under a key as `Vec<T>`.
+    pub fn to_dto_vec<T: convert::FromTeaLeaf>(&self, key: &str) -> Result<Vec<T>> {
+        let value = self
+            .get(key)
+            .ok_or_else(|| Error::MissingField(key.to_string()))?;
+        let arr = value
+            .as_array()
+            .ok_or_else(|| Error::ParseError("Expected array".into()))?;
+        arr.iter()
+            .map(|v| T::from_tealeaf_value(v).map_err(|e| e.into()))
+            .collect()
     }
 }
 
