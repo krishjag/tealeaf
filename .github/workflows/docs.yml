@@ -34,6 +34,14 @@ jobs:
         with:
           mdbook-version: 'latest'
 
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Build documentation
         run: mdbook build docs-site
 

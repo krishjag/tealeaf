@@ -17,6 +17,7 @@ bindings/dotnet/TeaLeaf/runtimes/
 .idea/
 .vscode/
 .claude/
+.claude/settings.local.json
 *.swp
 *.swo
 *~
