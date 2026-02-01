@@ -195,5 +195,5 @@ In TeaLeaf text: `("Alice", active)`
 
 ## See Also
 
-- [Attributes Reference](./attributes.md) — all annotation options
-- [Diagnostics](./diagnostics.md) — compiler warnings (TL001-TL006)
+- [Attributes Reference](./attributes.md) -- all annotation options
+- [Diagnostics](./diagnostics.md) -- compiler warnings (TL001-TL006)

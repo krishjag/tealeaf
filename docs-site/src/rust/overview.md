@@ -134,7 +134,7 @@ pub trait FromTeaLeaf: Sized {
 }
 ```
 
-These are typically derived via `#[derive(ToTeaLeaf, FromTeaLeaf)]` — see [Derive Macros](./derive-macros.md).
+These are typically derived via `#[derive(ToTeaLeaf, FromTeaLeaf)]` -- see [Derive Macros](./derive-macros.md).
 
 ## Extension Trait
 
@@ -162,8 +162,8 @@ let json = user.to_tealeaf_json("user")?;
 
 ## Next Steps
 
-- [Derive Macros](./derive-macros.md) — `#[derive(ToTeaLeaf, FromTeaLeaf)]`
-- [Attributes Reference](./attributes.md) — all `#[tealeaf(...)]` attributes
-- [Builder API](./builder.md) — programmatic document construction
-- [Schemas & Types](./schemas.md) — working with schemas in Rust
-- [Error Handling](./errors.md) — error types and patterns
+- [Derive Macros](./derive-macros.md) -- `#[derive(ToTeaLeaf, FromTeaLeaf)]`
+- [Attributes Reference](./attributes.md) -- all `#[tealeaf(...)]` attributes
+- [Builder API](./builder.md) -- programmatic document construction
+- [Schemas & Types](./schemas.md) -- working with schemas in Rust
+- [Error Handling](./errors.md) -- error types and patterns

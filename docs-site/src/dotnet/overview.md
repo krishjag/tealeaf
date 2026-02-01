@@ -26,9 +26,9 @@ dotnet add package TeaLeaf
 ```
 
 The NuGet package includes:
-- `TeaLeaf.Annotations` — attributes (`[TeaLeaf]`, `[TLSkip]`, etc.)
-- `TeaLeaf.Generators` — C# incremental source generator
-- `TeaLeaf` — managed wrapper types and reflection serializer
+- `TeaLeaf.Annotations` -- attributes (`[TeaLeaf]`, `[TLSkip]`, etc.)
+- `TeaLeaf.Generators` -- C# incremental source generator
+- `TeaLeaf` -- managed wrapper types and reflection serializer
 - Native libraries for all supported platforms
 
 ## Two Serialization Approaches
@@ -147,9 +147,9 @@ string name = reader.GetSchemaName(0);
 
 ## Next Steps
 
-- [Source Generator](./source-generator.md) — compile-time code generation in detail
-- [Attributes Reference](./attributes.md) — all available annotations
-- [Reflection Serializer](./serializer.md) — runtime serialization
-- [Native Types](./native-types.md) — `TLDocument`, `TLValue`, `TLReader` API
-- [Diagnostics](./diagnostics.md) — compiler warnings and errors
-- [Platform Support](./platforms.md) — supported runtimes and architectures
+- [Source Generator](./source-generator.md) -- compile-time code generation in detail
+- [Attributes Reference](./attributes.md) -- all available annotations
+- [Reflection Serializer](./serializer.md) -- runtime serialization
+- [Native Types](./native-types.md) -- `TLDocument`, `TLValue`, `TLReader` API
+- [Diagnostics](./diagnostics.md) -- compiler warnings and errors
+- [Platform Support](./platforms.md) -- supported runtimes and architectures

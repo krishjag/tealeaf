@@ -48,7 +48,7 @@ The `[TLType]` attribute was given an unrecognized type name.
 [TeaLeaf]
 public partial class Event
 {
-    [TLType("datetime")]   // ERROR: TL003 — "datetime" is not a valid type
+    [TLType("datetime")]   // ERROR: TL003 -- "datetime" is not a valid type
     public long Created { get; set; }
 
     [TLType("timestamp")]  // CORRECT
@@ -103,10 +103,10 @@ Use concrete types instead. For generic scenarios, use the [Reflection Serialize
 ## Viewing Diagnostics
 
 Diagnostics appear in:
-- **Visual Studio** — Error List window
-- **VS Code** — Problems panel (with C# extension)
-- **dotnet build** — terminal output
-- **MSBuild** — build log
+- **Visual Studio** -- Error List window
+- **VS Code** -- Problems panel (with C# extension)
+- **dotnet build** -- terminal output
+- **MSBuild** -- build log
 
 Example compiler output:
 ```

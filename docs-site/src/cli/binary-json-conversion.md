@@ -35,7 +35,7 @@ tealeaf tlbx-to-json data.tlbx | jq '.config'
 ### Notes
 
 - Produces the same JSON output as `to-json` on the equivalent text file
-- Reads the binary directly — no intermediate text conversion
+- Reads the binary directly -- no intermediate text conversion
 
 ---
 
@@ -70,7 +70,7 @@ tealeaf tlbx-to-json compact.tlbx -o verify.json
 ### Notes
 
 - Performs schema inference (same as `from-json`)
-- Compiles directly to binary — no intermediate `.tl` file
+- Compiles directly to binary -- no intermediate `.tl` file
 - Compression is enabled by default
 
 ## Workflow Comparison
@@ -88,5 +88,5 @@ Both approaches produce equivalent binary output.
 
 ## See Also
 
-- [`to-json` / `from-json`](./json-conversion.md) — text format JSON conversion
-- [JSON Interoperability](../format/json-interop.md) — type mappings and limitations
+- [`to-json` / `from-json`](./json-conversion.md) -- text format JSON conversion
+- [JSON Interoperability](../format/json-interop.md) -- type mappings and limitations

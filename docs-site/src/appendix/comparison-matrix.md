@@ -12,7 +12,7 @@ How TeaLeaf compares to other data formats.
 | Schema in binary | No | No | No | Yes | No | No | Yes |
 | No codegen required | Yes | Yes | No | Partial | Yes | Yes | Yes |
 | Comments | No | Yes | N/A | N/A | No | No | Yes |
-| Built-in JSON conversion | — | — | No | No | No | No | Yes |
+| Built-in JSON conversion | -- | -- | No | No | No | No | Yes |
 | String deduplication | No | No | No | No | No | No | Yes |
 | Per-section compression | No | No | No | Yes | No | No | Yes |
 | Null bitmaps | No | No | No | Yes | No | No | Yes |
@@ -98,4 +98,4 @@ How TeaLeaf compares to other data formats.
 | Specification maturity | RFC 8259 | Stable (proto3) | Apache spec | Beta |
 | IDE support | Universal | Plugins | Plugins | Planned |
 
-TeaLeaf is a young format (v2.0.0-beta.1). It fills a specific niche that existing formats don't serve well — but it doesn't aim to replace established formats in their core use cases.
+TeaLeaf is a young format (v2.0.0-beta.1). It fills a specific niche that existing formats don't serve well -- but it doesn't aim to replace established formats in their core use cases.

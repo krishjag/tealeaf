@@ -15,7 +15,7 @@ TeaLeaf has two representations of the same data:
 | **Size** | Larger (field names in data) | Compact (positional, deduplicated) |
 | **Speed** | Slower to parse | Fast random-access via memory mapping |
 
-The `.tl` file is the **source of truth**. Binary files are compiled artifacts — regenerate them when the source changes.
+The `.tl` file is the **source of truth**. Binary files are compiled artifacts -- regenerate them when the source changes.
 
 ## Schemas
 
@@ -28,10 +28,10 @@ Schemas define the structure of your data using `@struct`:
 
 Key properties:
 
-- **Inline** — schemas live in the same file as data
-- **Positional** — binary encoding uses field order, not names
-- **Nestable** — structs can reference other structs
-- **Nullable** — fields marked with `?` accept null (`~`)
+- **Inline** -- schemas live in the same file as data
+- **Positional** -- binary encoding uses field order, not names
+- **Nestable** -- structs can reference other structs
+- **Nullable** -- fields marked with `?` accept null (`~`)
 
 Schemas enable `@table` for compact tabular data:
 
@@ -46,7 +46,7 @@ points: @table point [
 Without schemas, the same data would require repeating field names:
 
 ```tl
-# Without schemas — verbose
+# Without schemas -- verbose
 points: [
   {x: 0, y: 0},
   {x: 100, y: 200},
@@ -180,6 +180,6 @@ Paths are resolved relative to the including file.
 
 ## Next Steps
 
-- [Text Format](../format/text-format.md) — complete syntax reference
-- [Type System](../format/type-system.md) — all types and modifiers in detail
-- [Schemas](../format/schemas.md) — schema definitions, tables, and nesting
+- [Text Format](../format/text-format.md) -- complete syntax reference
+- [Type System](../format/type-system.md) -- all types and modifiers in detail
+- [Schemas](../format/schemas.md) -- schema definitions, tables, and nesting

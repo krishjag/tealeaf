@@ -111,8 +111,8 @@ To create bindings for a new language:
 1. **Generate or write FFI declarations** matching the C header
 2. **Load the dynamic library** (or link statically)
 3. **Wrap opaque pointers** in your language's resource management (destructors, `Dispose`, `__del__`, etc.)
-4. **Map the error model** — check for NULL returns and call `tl_get_last_error`
-5. **Handle string ownership** — copy strings to your language's string type, then free the C string
+4. **Map the error model** -- check for NULL returns and call `tl_get_last_error`
+5. **Handle string ownership** -- copy strings to your language's string type, then free the C string
 
 ### Example: Python (ctypes)
 

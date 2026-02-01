@@ -59,11 +59,11 @@ tealeaf from-json <input.json> -o <output.tl>
 
 `from-json` automatically infers schemas from JSON arrays of uniform objects:
 
-1. **Array Detection** — identifies arrays where all elements are objects with identical keys
-2. **Name Inference** — singularizes the parent key name (`"users"` → `user` schema)
-3. **Type Inference** — determines field types across all items
-4. **Nullable Detection** — fields with any `null` become nullable (`string?`)
-5. **Nested Schemas** — creates schemas for nested uniform objects
+1. **Array Detection** -- identifies arrays where all elements are objects with identical keys
+2. **Name Inference** -- singularizes the parent key name (`"users"` → `user` schema)
+3. **Type Inference** -- determines field types across all items
+4. **Nullable Detection** -- fields with any `null` become nullable (`string?`)
+5. **Nested Schemas** -- creates schemas for nested uniform objects
 
 ### Examples
 
@@ -100,5 +100,5 @@ employees: @table employee [
 
 ## See Also
 
-- [`tlbx-to-json` / `json-to-tlbx`](./binary-json-conversion.md) — binary format JSON conversion
-- [JSON Interoperability](../format/json-interop.md) — type mappings and round-trip details
+- [`tlbx-to-json` / `json-to-tlbx`](./binary-json-conversion.md) -- binary format JSON conversion
+- [JSON Interoperability](../format/json-interop.md) -- type mappings and round-trip details

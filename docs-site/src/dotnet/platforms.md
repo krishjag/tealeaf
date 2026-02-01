@@ -43,9 +43,9 @@ The .NET runtime automatically selects the correct native library based on the h
 
 The managed layer uses `[DllImport("tealeaf_ffi")]` for P/Invoke. The .NET runtime resolves the native library through:
 
-1. **NuGet runtimes folder** — automatic for published apps
-2. **Application directory** — for self-contained deployments
-3. **System library path** — `PATH` (Windows), `LD_LIBRARY_PATH` (Linux), `DYLD_LIBRARY_PATH` (macOS)
+1. **NuGet runtimes folder** -- automatic for published apps
+2. **Application directory** -- for self-contained deployments
+3. **System library path** -- `PATH` (Windows), `LD_LIBRARY_PATH` (Linux), `DYLD_LIBRARY_PATH` (macOS)
 
 ## Deployment
 

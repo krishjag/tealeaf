@@ -41,9 +41,9 @@ TeaLeaf's dynamic key-based access is ~2-5x slower than Protobuf's generated cod
 
 ### Why TeaLeaf Is Slower Than Protobuf
 
-1. **Dynamic dispatch** — TeaLeaf resolves fields by name at runtime; Protobuf uses generated code with known offsets
-2. **String table lookup** — each string access requires a table lookup
-3. **Schema resolution** — schema structure is parsed from binary at load time
+1. **Dynamic dispatch** -- TeaLeaf resolves fields by name at runtime; Protobuf uses generated code with known offsets
+2. **String table lookup** -- each string access requires a table lookup
+3. **Schema resolution** -- schema structure is parsed from binary at load time
 
 ### When This Matters
 
@@ -66,9 +66,9 @@ using var reader = TLReader.OpenMmap("large_file.tlbx");
 ```
 
 Benefits:
-- **No upfront allocation** — data loaded on demand by the OS
-- **Shared pages** — multiple processes can read the same file
-- **Lazy loading** — only accessed sections are read from disk
+- **No upfront allocation** -- data loaded on demand by the OS
+- **Shared pages** -- multiple processes can read the same file
+- **Lazy loading** -- only accessed sections are read from disk
 
 ## Compilation Performance
 

@@ -13,7 +13,7 @@ The main error enum:
 | `InvalidVersion` | Unsupported binary format version |
 | `InvalidType` | Unknown type code in binary data |
 | `InvalidUtf8` | String encoding error |
-| `UnexpectedToken` | Parse error — expected one token, got another |
+| `UnexpectedToken` | Parse error -- expected one token, got another |
 | `UnexpectedEof` | Premature end of input |
 | `UnknownStruct` | `@table` references a struct that hasn't been defined |
 | `MissingField` | Required field not provided in data |

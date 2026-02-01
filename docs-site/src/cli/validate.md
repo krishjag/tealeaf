@@ -46,5 +46,5 @@ Error details are written to stderr with line/column information when available.
 
 ## See Also
 
-- [`info`](./info.md) — inspect file contents
-- [`compile`](./compile.md) — compile (implies validation)
+- [`info`](./info.md) -- inspect file contents
+- [`compile`](./compile.md) -- compile (implies validation)

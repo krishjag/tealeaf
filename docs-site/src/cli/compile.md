@@ -58,6 +58,6 @@ On success, prints compilation details including:
 
 ## See Also
 
-- [`decompile`](./decompile.md) — reverse operation
-- [`validate`](./validate.md) — check syntax without compiling
-- [Binary Format](../format/binary-format.md) — binary layout details
+- [`decompile`](./decompile.md) -- reverse operation
+- [`validate`](./validate.md) -- check syntax without compiling
+- [Binary Format](../format/binary-format.md) -- binary layout details

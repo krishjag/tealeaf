@@ -16,7 +16,7 @@ Initial public beta release.
 
 ### CLI
 - 8 commands: `compile`, `decompile`, `info`, `validate`, `to-json`, `from-json`, `tlbx-to-json`, `json-to-tlbx`
-- Pre-built binaries for 7 platforms (Windows, Linux, macOS — x64 and ARM64)
+- Pre-built binaries for 7 platforms (Windows, Linux, macOS -- x64 and ARM64)
 
 ### Rust
 - `tealeaf-core` crate with full parser, compiler, and reader
@@ -49,4 +49,4 @@ Initial public beta release.
 
 ---
 
-*TeaLeaf v2.0.0-beta.1 — Peace between human and machine.*
+*TeaLeaf v2.0.0-beta.1 -- Peace between human and machine.*

@@ -83,9 +83,9 @@ The `canonical/` directory contains 14 sample files that test every feature:
 | `strings` | Quoted, unquoted, multiline strings |
 
 Each sample has:
-- `canonical/samples/{name}.tl` — the text source
-- `canonical/expected/{name}.json` — expected JSON output
-- `canonical/binary/{name}.tlbx` — pre-compiled binary
+- `canonical/samples/{name}.tl` -- the text source
+- `canonical/expected/{name}.json` -- expected JSON output
+- `canonical/binary/{name}.tlbx` -- pre-compiled binary
 
 ### Canonical Test Pattern
 
@@ -163,8 +163,8 @@ The .NET test suite covers:
 
 ## Test Philosophy
 
-1. **Canonical fixtures** — shared across Rust and .NET, ensuring format consistency
-2. **Round-trip testing** — text → binary → text verifies no data loss
-3. **JSON equivalence** — text → JSON and binary → JSON produce identical output
-4. **Error coverage** — every error path has at least one test
-5. **Cross-language** — same fixtures tested in Rust, .NET, and via FFI
+1. **Canonical fixtures** -- shared across Rust and .NET, ensuring format consistency
+2. **Round-trip testing** -- text → binary → text verifies no data loss
+3. **JSON equivalence** -- text → JSON and binary → JSON produce identical output
+4. **Error coverage** -- every error path has at least one test
+5. **Cross-language** -- same fixtures tested in Rust, .NET, and via FFI

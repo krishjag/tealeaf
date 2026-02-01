@@ -62,9 +62,9 @@ comment      = "#" { any } newline ;
 ### Document Structure
 
 A document is a sequence of:
-- **Directives** — `@struct`, `@union`, `@include`, `@root-array` (processed before data)
-- **Pairs** — `key: value` (the actual data)
-- **Reference definitions** — `!name: value` (reusable named values)
+- **Directives** -- `@struct`, `@union`, `@include`, `@root-array` (processed before data)
+- **Pairs** -- `key: value` (the actual data)
+- **Reference definitions** -- `!name: value` (reusable named values)
 
 ### Key Rules
 
@@ -97,7 +97,7 @@ points: @table point [(0, 0), (1, 1)]
 
 ### Root Array Directive
 
-The `@root-array` directive marks the document as representing a root-level JSON array rather than a JSON object. This is used for JSON round-trip fidelity — when a JSON array is imported via `from-json`, the directive is emitted so that `to-json` produces an array at the top level instead of an object:
+The `@root-array` directive marks the document as representing a root-level JSON array rather than a JSON object. This is used for JSON round-trip fidelity -- when a JSON array is imported via `from-json`, the directive is emitted so that `to-json` produces an array at the top level instead of an object:
 
 ```tl
 @root-array
@@ -115,7 +115,7 @@ Map keys are restricted to hashable types: strings, names, and integers. Complex
 ### Reference Scoping
 
 References can be defined at:
-- **Top level** — `!name: value` alongside pairs
-- **Inside objects** — `{!ref: value, field: !ref}`
+- **Top level** -- `!name: value` alongside pairs
+- **Inside objects** -- `{!ref: value, field: !ref}`
 
 References are resolved within the document scope.

@@ -11,7 +11,7 @@ Schema inference is triggered by:
 
 It is **not** triggered by:
 - `TeaLeaf::from_json()` (plain import, no schemas)
-- `TLDocument.FromJson()` (.NET API — plain import)
+- `TLDocument.FromJson()` (.NET API -- plain import)
 
 ## Algorithm
 
@@ -92,7 +92,7 @@ Inferred schemas:
 @struct user (address: address, name: string)
 ```
 
-This is recursive — nested objects can have their own nested schemas.
+This is recursive -- nested objects can have their own nested schemas.
 
 ## Output
 
@@ -125,12 +125,12 @@ products: @table product [
 
 ## Limitations
 
-1. **Field order** — JSON objects have no guaranteed order. Fields are sorted alphabetically in the inferred schema.
+1. **Field order** -- JSON objects have no guaranteed order. Fields are sorted alphabetically in the inferred schema.
 
-2. **Type ambiguity** — JSON numbers don't distinguish int from float. If any element has a decimal, the field becomes `float`.
+2. **Type ambiguity** -- JSON numbers don't distinguish int from float. If any element has a decimal, the field becomes `float`.
 
-3. **Non-uniform arrays** — arrays where objects have different key sets are not schema-inferred. They remain as plain arrays of objects.
+3. **Non-uniform arrays** -- arrays where objects have different key sets are not schema-inferred. They remain as plain arrays of objects.
 
-4. **Deeply nested arrays** — only the first level of array → schema inference is applied. Nested arrays within objects are not auto-inferred.
+4. **Deeply nested arrays** -- only the first level of array → schema inference is applied. Nested arrays within objects are not auto-inferred.
 
-5. **No timestamp detection** — ISO 8601 strings in JSON remain as strings, not timestamps.
+5. **No timestamp detection** -- ISO 8601 strings in JSON remain as strings, not timestamps.

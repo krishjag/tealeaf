@@ -20,14 +20,14 @@ The `tealeaf-ffi` crate exposes a C-compatible API for integrating TeaLeaf into 
 ```
 
 The FFI layer provides:
-- **Document parsing** — parse text, files, and JSON
-- **Value access** — type-safe accessors for all value types
-- **Binary reader** — read `.tlbx` files with optional memory mapping
-- **Schema introspection** — query schema structure at runtime
-- **JSON conversion** — to/from JSON
-- **Binary compilation** — compile documents to `.tlbx`
-- **Error handling** — thread-local last-error pattern
-- **Memory management** — explicit free functions for all allocated resources
+- **Document parsing** -- parse text, files, and JSON
+- **Value access** -- type-safe accessors for all value types
+- **Binary reader** -- read `.tlbx` files with optional memory mapping
+- **Schema introspection** -- query schema structure at runtime
+- **JSON conversion** -- to/from JSON
+- **Binary compilation** -- compile documents to `.tlbx`
+- **Error handling** -- thread-local last-error pattern
+- **Memory management** -- explicit free functions for all allocated resources
 
 ## Output Libraries
 
@@ -105,6 +105,6 @@ All FFI functions that accept pointers are null-safe:
 
 ## Next Steps
 
-- [API Reference](./api-reference.md) — complete function listing
-- [Memory Management](./memory-management.md) — ownership and freeing rules
-- [Building from Source](./building.md) — compilation instructions
+- [API Reference](./api-reference.md) -- complete function listing
+- [Memory Management](./memory-management.md) -- ownership and freeing rules
+- [Building from Source](./building.md) -- compilation instructions

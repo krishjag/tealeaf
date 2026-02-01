@@ -4,10 +4,10 @@ TeaLeaf takes a deliberately simple approach to schema evolution: when schemas c
 
 ## Design Philosophy
 
-- **No migration machinery** — no schema versioning or compatibility negotiation
-- **Source file is master** — the `.tl` file defines the current schema
-- **Explicit over implicit** — tuples require values for all fields
-- **Binary is a compiled artifact** — regenerate it like you would a compiled binary
+- **No migration machinery** -- no schema versioning or compatibility negotiation
+- **Source file is master** -- the `.tl` file defines the current schema
+- **Explicit over implicit** -- tuples require values for all fields
+- **Binary is a compiled artifact** -- regenerate it like you would a compiled binary
 
 ## Compatible Changes
 
@@ -21,7 +21,7 @@ Field data is stored positionally. Names are documentation only:
 # Before
 @struct user (name: string, email: string)
 
-# After — binary still works
+# After -- binary still works
 @struct user (full_name: string, email_address: string)
 ```
 
@@ -33,7 +33,7 @@ Automatic safe widening when reading:
 # Before: field was int8
 @struct sensor (id: int8, reading: float32)
 
-# After: widened to int32 — readers auto-widen
+# After: widened to int32 -- readers auto-widen
 @struct sensor (id: int, reading: float)
 ```
 
@@ -49,7 +49,7 @@ These changes **require recompilation** from the `.tl` source:
 # Before
 @struct user (id: int, name: string)
 
-# After — added email field
+# After -- added email field
 @struct user (id: int, name: string, email: string?)
 ```
 
@@ -65,7 +65,7 @@ tealeaf compile users.tl -o users.tlbx
 # Before
 @struct user (id: int, name: string, legacy_field: string)
 
-# After — removed legacy_field
+# After -- removed legacy_field
 @struct user (id: int, name: string)
 ```
 
@@ -77,7 +77,7 @@ Binary data is positional. Changing field order changes the meaning of stored da
 # Before
 @struct point (x: int, y: int)
 
-# After — DON'T DO THIS without recompiling
+# After -- DON'T DO THIS without recompiling
 @struct point (y: int, x: int)
 ```
 
@@ -89,7 +89,7 @@ Narrowing (e.g., `int64` → `int8`) can lose data:
 # Before
 @struct data (value: int64)
 
-# After — potential data loss
+# After -- potential data loss
 @struct data (value: int8)
 ```
 

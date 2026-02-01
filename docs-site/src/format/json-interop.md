@@ -43,7 +43,7 @@ using var doc = TLDocument.FromJson(jsonString);
 
 ### Limitations
 
-JSON import is "plain JSON only" — it does not recognize the special JSON forms used for TeaLeaf export:
+JSON import is "plain JSON only" -- it does not recognize the special JSON forms used for TeaLeaf export:
 
 | JSON Form | Result |
 |---|---|
@@ -105,11 +105,11 @@ When converting JSON to TeaLeaf, the `from-json` command (and `from_json_with_sc
 
 ### How It Works
 
-1. **Array Detection** — identifies arrays of objects with identical field sets
-2. **Name Inference** — singularizes parent key names (`"products"` → `product` schema)
-3. **Type Inference** — determines field types across all array items
-4. **Nullable Detection** — fields with any `null` values become nullable (`string?`)
-5. **Nested Schemas** — creates separate schemas for nested objects within array elements
+1. **Array Detection** -- identifies arrays of objects with identical field sets
+2. **Name Inference** -- singularizes parent key names (`"products"` → `product` schema)
+3. **Type Inference** -- determines field types across all array items
+4. **Nullable Detection** -- fields with any `null` values become nullable (`string?`)
+5. **Nested Schemas** -- creates separate schemas for nested objects within array elements
 
 ### Example
 
@@ -156,7 +156,7 @@ When array elements contain nested objects, TeaLeaf creates schemas for those ne
 
 | Path | Fidelity |
 |------|----------|
-| `.tl` → `.json` → `.tl` | Lossy — schemas, comments, refs, tags, timestamps, maps are simplified |
+| `.tl` → `.json` → `.tl` | Lossy -- schemas, comments, refs, tags, timestamps, maps are simplified |
 | `.tl` → `.tlbx` → `.tl` | Lossless for data (comments stripped) |
 | `.tl` → `.tlbx` → `.json` | Same as `.tl` → `.json` |
 | `.json` → `.tl` → `.json` | Generally lossless for JSON-native types |

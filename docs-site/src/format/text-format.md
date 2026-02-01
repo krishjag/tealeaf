@@ -280,6 +280,6 @@ Paths are resolved relative to the including file. Included schemas are availabl
 ## Formatting Rules
 
 - **Trailing commas** are allowed in objects, arrays, tuples, and maps
-- **Whitespace** is flexible — indent as you like
+- **Whitespace** is flexible -- indent as you like
 - **Key names** follow identifier rules: start with letter or `_`, then letters, digits, `_`, `-`, `.`
 - **Quoted keys** are supported for names with special characters: `"Content-Type": "application/json"`

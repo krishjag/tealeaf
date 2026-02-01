@@ -94,7 +94,7 @@ This "best effort" approach prioritizes successful compilation over strict valid
 
 There is no dedicated bytes literal syntax in text format. The lexer parses `0x...` as integers, not bytes.
 
-When bytes are serialized to text (via decompile), they are written as `0x...` hex strings, but these will parse back as integers — **bytes do not round-trip through text format**.
+When bytes are serialized to text (via decompile), they are written as `0x...` hex strings, but these will parse back as integers -- **bytes do not round-trip through text format**.
 
 For bytes data:
 - Use binary format (`.tlbx`) for lossless round-trips

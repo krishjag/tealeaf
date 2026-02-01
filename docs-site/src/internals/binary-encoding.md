@@ -85,7 +85,7 @@ Each non-null field is encoded according to its schema type:
 ```
 Count: u32
 Element Type: 0x04 (Int32)
-Elements: [i32 × Count]  — packed, no type tags
+Elements: [i32 × Count]  -- packed, no type tags
 ```
 
 ### String Arrays
@@ -93,7 +93,7 @@ Elements: [i32 × Count]  — packed, no type tags
 ```
 Count: u32
 Element Type: 0x10 (String)
-Elements: [u32 × Count]  — string table indices
+Elements: [u32 × Count]  -- string table indices
 ```
 
 ### Schema-Typed Field Arrays
@@ -178,7 +178,7 @@ Bit layout:
   Result: 44 + (2 << 7) = 44 + 256 = 300
 ```
 
-- Continuation bit: `0x80` — if set, more bytes follow
+- Continuation bit: `0x80` -- if set, more bytes follow
 - 7 value bits per byte
 - Least-significant group first
 

@@ -144,9 +144,9 @@ if let Some(Value::Array(insights)) = response.get("analysis") {
 
 ## Best Practices
 
-1. **Define schemas for all structured context** — tool definitions, messages, profiles
-2. **Use `@table` for arrays of uniform objects** — conversation history, search results
+1. **Define schemas for all structured context** -- tool definitions, messages, profiles
+2. **Use `@table` for arrays of uniform objects** -- conversation history, search results
 3. **Cache compiled binary** for frequently-used context segments
-4. **Use text format for LLM input** — models understand the schema notation
+4. **Use text format for LLM input** -- models understand the schema notation
 5. **String deduplication** helps when context has repetitive strings (roles, tool names)
-6. **Separate static and dynamic context** — compile static context once, merge at runtime
+6. **Separate static and dynamic context** -- compile static context once, merge at runtime

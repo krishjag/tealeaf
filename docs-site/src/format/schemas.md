@@ -23,7 +23,7 @@ With multiple fields and types:
 
 ### Optional Type Annotations
 
-Field types can be omitted — they default to `string`:
+Field types can be omitted -- they default to `string`:
 
 ```tl
 @struct config (host, port: int, debug: bool)
@@ -123,10 +123,10 @@ users: @table user [
 
 Schemas enable significant binary compression:
 
-1. **Positional storage** — field names stored once in the schema table, not per row
-2. **Null bitmaps** — one bit per nullable field per row, instead of full null markers
-3. **Type-homogeneous arrays** — packed encoding when all elements match a schema
-4. **String deduplication** — repeated values like city names stored once in the string table
+1. **Positional storage** -- field names stored once in the schema table, not per row
+2. **Null bitmaps** -- one bit per nullable field per row, instead of full null markers
+3. **Type-homogeneous arrays** -- packed encoding when all elements match a schema
+4. **String deduplication** -- repeated values like city names stored once in the string table
 
 ### Example Size Savings
 
@@ -165,6 +165,6 @@ tealeaf compile data.tl -o data.tlbx
 ```
 
 TeaLeaf prioritizes simplicity over automatic schema evolution:
-- **No migration machinery** — recompile when schemas change
-- **No version negotiation** — the embedded schema is the source of truth
-- **Explicit over implicit** — tuples require values for all fields
+- **No migration machinery** -- recompile when schemas change
+- **No version negotiation** -- the embedded schema is the source of truth
+- **Explicit over implicit** -- tuples require values for all fields

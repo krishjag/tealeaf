@@ -4,12 +4,12 @@ Contributions to TeaLeaf are welcome. This guide covers the process.
 
 ## Ways to Contribute
 
-- **Bug reports** — file issues on GitHub with reproduction steps
-- **Feature requests** — open an issue describing the use case
-- **Code contributions** — submit pull requests
-- **Documentation** — fix typos, improve explanations, add examples
-- **Language bindings** — create bindings for Python, Java, Go, etc.
-- **Test cases** — add canonical test fixtures or edge case tests
+- **Bug reports** -- file issues on GitHub with reproduction steps
+- **Feature requests** -- open an issue describing the use case
+- **Code contributions** -- submit pull requests
+- **Documentation** -- fix typos, improve explanations, add examples
+- **Language bindings** -- create bindings for Python, Java, Go, etc.
+- **Test cases** -- add canonical test fixtures or edge case tests
 
 ## Repository
 

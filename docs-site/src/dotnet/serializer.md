@@ -95,12 +95,12 @@ The reflection serializer uses `TeaLeafTextHelper.GetTLTypeName()` for type reso
 
 The reflection serializer respects the same attributes as the source generator:
 
-- `[TeaLeaf]` / `[TeaLeaf("name")]` — struct name
-- `[TLKey("key")]` — document key
-- `[TLSkip]` — skip property
-- `[TLOptional]` — nullable field
-- `[TLRename("name")]` — rename field
-- `[TLType("type")]` — override type
+- `[TeaLeaf]` / `[TeaLeaf("name")]` -- struct name
+- `[TLKey("key")]` -- document key
+- `[TLSkip]` -- skip property
+- `[TLOptional]` -- nullable field
+- `[TLRename("name")]` -- rename field
+- `[TLType("type")]` -- override type
 
 ## Text Helpers
 
@@ -125,4 +125,4 @@ TeaLeafTextHelper.AppendValue(sb, null, typeof(string)); // "~"
 
 The reflection serializer uses `System.Reflection` at runtime, which is slower than the source generator approach. For hot paths or high-throughput scenarios, prefer the source generator.
 
-However, the actual binary compilation and native operations are identical — both approaches use the same native Rust library under the hood. The performance difference is only in the C# serialization/deserialization layer.
+However, the actual binary compilation and native operations are identical -- both approaches use the same native Rust library under the hood. The performance difference is only in the C# serialization/deserialization layer.

@@ -22,7 +22,7 @@ Every function that returns a heap-allocated pointer transfers ownership to the 
 Functions that take `const T*` parameters borrow the pointer. The FFI layer does **not** take ownership or free inputs:
 
 ```c
-// doc is borrowed — you still own it and must free it later
+// doc is borrowed -- you still own it and must free it later
 TLValue* val = tl_document_get(doc, "key");
 // ... use val ...
 tl_value_free(val);  // free the returned value

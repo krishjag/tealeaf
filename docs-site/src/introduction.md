@@ -10,17 +10,73 @@
 
 ## What is TeaLeaf?
 
-TeaLeaf is a data format that bridges the gap between human-readable configuration and machine-efficient binary storage. A single `.tl` source file can be read and edited by humans, compiled to a compact `.tlbx` binary, and converted to/from JSON — all with schemas inline.
+TeaLeaf is a data format that bridges the gap between human-readable configuration and machine-efficient binary storage. A single `.tl` source file can be read and edited by humans, compiled to a compact `.tlbx` binary, and converted to/from JSON -- all with schemas inline.
+
+**TeaLeaf** -- schemas with nested structures, compact positional data:
 
 ```tl
-# Define structure once
-@struct user (id: int, name: string, email: string?, active: bool)
+# Schema: define structure once
+@struct Location (city, country)
+@struct Department (name, location: Location)
+@struct Employee (
+  id: int,
+  name,
+  role,
+  department: Department,
+  skills: []string,
+)
 
-# Use it — field names aren't repeated per row
-users: @table user [
-  (1, "Alice", "alice@example.com", true),
-  (2, "Bob", ~, false),
+# Data: field names not repeated
+employees: @table Employee [
+  (1, "Alice", "Engineer",
+    ("Platform", ("Seattle", "USA")),
+    ["rust", "python"])
+  (2, "Bob", "Designer",
+    ("Product", ("Austin", "USA")),
+    ["figma", "css"])
+  (3, "Carol", "Manager",
+    ("Platform", ("Seattle", "USA")),
+    ["leadership", "agile"])
 ]
+```
+
+**JSON** -- no schema, names repeated:
+
+```json
+{
+  "employees": [
+    {
+      "id": 1,
+      "name": "Alice",
+      "role": "Engineer",
+      "department": {
+        "name": "Platform",
+        "location": { "city": "Seattle", "country": "USA" }
+      },
+      "skills": ["rust", "python"]
+    },
+    {
+      "id": 2,
+      "name": "Bob",
+      "role": "Designer",
+      "department": {
+        "name": "Product",
+        "location": { "city": "Austin", "country": "USA" }
+      },
+      "skills": ["figma", "css"]
+    },
+    {
+      "id": 3,
+      "name": "Carol",
+      "role": "Manager",
+      "department": {
+        "name": "Platform",
+        "location": { "city": "Seattle", "country": "USA" }
+      },
+      "skills": ["leadership", "agile"]
+    }
+  ]
+}
 ```
 
 ## Key Features
@@ -28,7 +84,7 @@ users: @table user [
 | Feature | Description |
 |---------|-------------|
 | **Dual format** | Human-readable text (`.tl`) and compact binary (`.tlbx`) |
-| **Inline schemas** | `@struct` definitions live alongside data — no external `.proto` files |
+| **Inline schemas** | `@struct` definitions live alongside data -- no external `.proto` files |
 | **JSON interop** | Bidirectional conversion with automatic schema inference |
 | **String deduplication** | Binary format stores each unique string once |
 | **Compression** | Per-section ZLIB compression with null bitmaps |
@@ -52,14 +108,14 @@ The existing data format landscape presents trade-offs that don't always align w
 TeaLeaf unifies these concerns:
 
 - **Human-readable** text format with explicit types and comments
-- **Compact binary** with embedded schemas — no external schema files needed
-- **Schema-first** design — field names defined once, not repeated per record
-- **No codegen required** — schemas discovered at runtime
+- **Compact binary** with embedded schemas -- no external schema files needed
+- **Schema-first** design -- field names defined once, not repeated per record
+- **No codegen required** -- schemas discovered at runtime
 - **Built-in JSON conversion** for easy integration with existing tools
 
 ## Primary Use Case: Context Engineering
 
-TeaLeaf was designed for **context engineering** in LLM applications — structured prompts, tool definitions, conversation history — where schema-first layout reduces token count while keeping data human-readable for authoring.
+TeaLeaf was designed for **context engineering** in LLM applications -- structured prompts, tool definitions, conversation history -- where schema-first layout reduces token count while keeping data human-readable for authoring.
 
 ```tl
 @struct Message (role: string, content: string, tokens: int?)

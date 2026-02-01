@@ -17,7 +17,7 @@ Create `example.tl`:
   active: bool,
 )
 
-# Data uses schemas — field names defined once, not repeated
+# Data uses schemas -- field names defined once, not repeated
 users: @table user [
   (1, "Alice", "alice@example.com", ("123 Main St", "Seattle", "98101"), true),
   (2, "Bob", ~, ("456 Oak Ave", "Austin", "78701"), false),
@@ -203,7 +203,7 @@ var loaded = TeaLeafSerializer.Deserialize<User>(doc2);
 
 ## Next Steps
 
-- [Core Concepts](./concepts.md) — understand schemas, types, and the text format
-- [CLI Reference](../cli/overview.md) — all available commands
-- [Rust Guide](../rust/overview.md) — Rust API in depth
-- [.NET Guide](../dotnet/overview.md) — .NET bindings in depth
+- [Core Concepts](./concepts.md) -- understand schemas, types, and the text format
+- [CLI Reference](../cli/overview.md) -- all available commands
+- [Rust Guide](../rust/overview.md) -- Rust API in depth
+- [.NET Guide](../dotnet/overview.md) -- .NET bindings in depth

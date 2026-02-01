@@ -72,7 +72,7 @@ For 10,000 rows with 10 fields, field names alone would consume:
 | TeaLeaf (string table) | 10 × avg(8 bytes) + 100,000 × 4 bytes = ~400 KB |
 | TeaLeaf with schema | 10 × avg(8 bytes) = ~80 bytes (field names in schema only!) |
 
-With schema-typed data, field names appear only in the schema table — the string table contains only the actual string values.
+With schema-typed data, field names appear only in the schema table -- the string table contains only the actual string values.
 
 ## What Gets Deduplicated
 

@@ -28,10 +28,10 @@ The `decompile` command:
 
 ## Notes
 
-- **Comments are not preserved** — comments from the original `.tl` are stripped during compilation
-- **Formatting may differ** — the decompiled output uses the default formatting, which may differ from the original source
-- **Data is lossless** — all values, schemas, and structure are preserved
-- **Bytes round-trip issue** — bytes values are written as hex integers, which will parse as integers if re-compiled (see [Type System](../format/type-system.md))
+- **Comments are not preserved** -- comments from the original `.tl` are stripped during compilation
+- **Formatting may differ** -- the decompiled output uses the default formatting, which may differ from the original source
+- **Data is lossless** -- all values, schemas, and structure are preserved
+- **Bytes round-trip issue** -- bytes values are written as hex integers, which will parse as integers if re-compiled (see [Type System](../format/type-system.md))
 
 ## Examples
 
@@ -48,5 +48,5 @@ tealeaf compile roundtrip.tl -o roundtrip.tlbx
 
 ## See Also
 
-- [`compile`](./compile.md) — reverse operation
-- [`info`](./info.md) — inspect without decompiling
+- [`compile`](./compile.md) -- reverse operation
+- [`info`](./info.md) -- inspect without decompiling

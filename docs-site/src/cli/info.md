@@ -46,5 +46,5 @@ tealeaf info data.tlbx
 
 ## See Also
 
-- [`validate`](./validate.md) — check syntax validity
-- [`compile`](./compile.md) — compile to binary
+- [`validate`](./validate.md) -- check syntax validity
+- [`compile`](./compile.md) -- compile to binary

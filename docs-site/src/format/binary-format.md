@@ -64,9 +64,9 @@ All unique strings are deduplicated and stored once:
 ```
 
 Strings are referenced by 32-bit index throughout the file. This provides:
-- **Deduplication** — `"Seattle"` stored once, even if used 1,000 times
-- **Fast lookup** — O(1) index-based access
-- **Compact references** — 4 bytes per reference instead of the full string
+- **Deduplication** -- `"Seattle"` stored once, even if used 1,000 times
+- **Fast lookup** -- O(1) index-based access
+- **Compact references** -- 4 bytes per reference instead of the full string
 
 ## Schema Table
 

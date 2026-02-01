@@ -12,7 +12,7 @@ Represents a parsed TeaLeaf document.
 // Parse text
 using var doc = TLDocument.Parse("name: alice\nage: 30");
 
-// Parse from file (text or binary — auto-detected)
+// Parse from file (text or binary -- auto-detected)
 using var doc = TLDocument.ParseFile("data.tl");
 using var doc = TLDocument.ParseFile("data.tlbx");
 
@@ -102,7 +102,7 @@ using var elem = value[0];                 // Indexer shorthand
 
 foreach (var item in value.AsArray())
 {
-    // item is a TLValue — caller must dispose
+    // item is a TLValue -- caller must dispose
     using (item)
     {
         Console.WriteLine(item.AsString());

@@ -161,5 +161,5 @@ struct Team {
 
 ## See Also
 
-- [Attributes Reference](./attributes.md) — all `#[tealeaf(...)]` attributes
-- [Builder API](./builder.md) — manual document construction
+- [Attributes Reference](./attributes.md) -- all `#[tealeaf(...)]` attributes
+- [Builder API](./builder.md) -- manual document construction
