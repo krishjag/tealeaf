@@ -92,10 +92,10 @@ employees: @table Employee [
 
 ## Why TeaLeaf?
 
-The existing data format landscape presents trade-offs that don't always align well with modern workflows:
+The existing data format landscape presents trade-offs that TeaLeaf attempts to bridge. TeaLeaf does not attempt to replace any of the formats listed below, but rather presents a different perspective that users can objectively compare to identify if it fits their specific use cases.
 
-| Format | Limitation |
-|--------|------------|
+| Format | Observation |
+|--------|-------------|
 | JSON | Verbose, no comments, no schema |
 | YAML | Indentation-sensitive, error-prone at scale |
 | Protobuf | Schema external, binary-only, requires codegen |
@@ -172,6 +172,6 @@ tealeaf/
 
 ## License
 
-TeaLeaf is dual-licensed under [MIT](https://opensource.org/licenses/MIT) or [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0), at your option.
+TeaLeaf is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 Source code: [github.com/krishjag/tealeaf](https://github.com/krishjag/tealeaf)

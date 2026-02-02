@@ -11,7 +11,7 @@
     <Authors>TeaLeaf Contributors</Authors>
     <Description>Attribute definitions for TeaLeaf source generator. Use [TeaLeaf] on classes/records to enable DTO-to-TeaLeaf conversion.</Description>
     <PackageTags>serialization;schema;tealeaf;sourcegen;attributes</PackageTags>
-    <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/krishjag/tealeaf</PackageProjectUrl>
     <RepositoryUrl>https://github.com/krishjag/tealeaf</RepositoryUrl>
   </PropertyGroup>

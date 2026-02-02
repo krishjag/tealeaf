@@ -13,7 +13,7 @@
     <Authors>TeaLeaf Contributors</Authors>
     <Description>C# source generator for TeaLeaf format. Generates compile-time serialization/deserialization code for DTOs annotated with [TeaLeaf].</Description>
     <PackageTags>serialization;schema;tealeaf;sourcegen;codegen</PackageTags>
-    <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <DevelopmentDependency>true</DevelopmentDependency>
 
     <!-- Source generator packaging -->

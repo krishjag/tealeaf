@@ -83,6 +83,9 @@
 - [String Table](./internals/string-table.md)
 - [Schema Inference](./internals/schema-inference.md)
 - [Testing](./internals/testing.md)
+- [Benchmarks](./internals/benchmarks.md)
+- [Accuracy Benchmark](./internals/accuracy-benchmark.md)
+- [Adversarial Tests](./internals/adversarial-tests.md)
 
 ---
 

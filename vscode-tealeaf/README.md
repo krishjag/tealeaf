@@ -89,4 +89,4 @@ Learn more: [TeaLeaf Specification](../spec/TEALEAF_SPEC.md)
 
 ## License
 
-MIT OR Apache-2.0
+MIT

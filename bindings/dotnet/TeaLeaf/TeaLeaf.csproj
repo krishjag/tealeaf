@@ -13,7 +13,7 @@
     <Authors>TeaLeaf Contributors</Authors>
     <Description>Schema-aware document format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization.</Description>
     <PackageTags>serialization;schema;binary;config;tealeaf;json;document</PackageTags>
-    <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/krishjag/tealeaf</PackageProjectUrl>
     <RepositoryUrl>https://github.com/krishjag/tealeaf</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

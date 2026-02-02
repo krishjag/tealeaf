@@ -220,12 +220,12 @@ jobs:
           path: artifacts/packages/*.nupkg
           if-no-files-found: error
 
-  # Publish to NuGet.org (DISABLED - enable when ready to publish)
+  # Publish to NuGet.org
   publish:
     needs: package
     runs-on: ubuntu-latest
     name: Publish to NuGet
-    if: false  # DISABLED: was - always() && needs.package.result == 'success' && (github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_nuget))
+    if: always() && needs.package.result == 'success' && (github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_nuget))
 
     steps:
       - name: Download NuGet package
