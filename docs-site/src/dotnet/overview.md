@@ -8,8 +8,8 @@ TeaLeaf provides .NET bindings through a NuGet package that includes a C# source
 ┌─────────────────────────────────────────────┐
 │  Your .NET Application                      │
 ├─────────────────────┬───────────────────────┤
-│  Source Generator    │  Reflection Serializer│
-│  (compile-time)      │  (runtime)            │
+│  Source Generator   │  Reflection Serializer│
+│  (compile-time)     │  (runtime)            │
 ├─────────────────────┴───────────────────────┤
 │  TeaLeaf Managed Layer (TLDocument, TLValue)│
 ├─────────────────────────────────────────────┤

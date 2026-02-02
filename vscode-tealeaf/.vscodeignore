@@ -6,3 +6,7 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 node_modules/**
+images/tealeaf-icon.png
+images/tealeaf-icon-darkbg.png
+images/tealeaf-icon-resized.png
+images/tealeaf-icon-darkbg-resized.png

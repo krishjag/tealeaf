@@ -1,7 +1,5 @@
 //! TeaLeaf - Schema-aware document format
 //!
-//! Peace between human and machine.
-//!
 //! # Example
 //!
 //! ```rust

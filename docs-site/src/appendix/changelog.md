@@ -49,4 +49,3 @@ Initial public beta release.
 
 ---
 
-*TeaLeaf v2.0.0-beta.1 -- Peace between human and machine.*

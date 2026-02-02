@@ -1,8 +1,6 @@
-# TeaLeaf
+# TeaLeaf Data Format
 
 **A schema-aware document format with human-readable text and compact binary representation.**
-
-*Peace between human and machine.*
 
 <span class="version-badge">v2.0.0-beta.1</span>
 

@@ -22,7 +22,7 @@
     "config",
     "data format"
   ],
-  "icon": "images/tealeaf-icon.png",
+  "icon": "images/tealeaf-icon-128.png",
   "contributes": {
     "languages": [
       {

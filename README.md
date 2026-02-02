@@ -1,12 +1,10 @@
-# TeaLeaf
+# TeaLeaf Data Format
 
 **A schema-aware document format with human-readable text and compact binary representation.**
 
-*Peace between human and machine.*
 
 
-
-![TeaLeaf Workflow](docs/tealeaf_workflow.png)
+![TeaLeaf Workflow](assets/tealeaf_workflow.png)
 
 ---
 
@@ -62,10 +60,39 @@ The same data — TeaLeaf uses **schemas** so field names are defined once, not 
 
 <table>
 <tr>
-<th>JSON (no schema, names repeated)</th>
 <th>TeaLeaf (schema-first, compact data)</th>
+<th>JSON (no schema, names repeated)</th>
 </tr>
 <tr>
+<td valign="top">
+
+```tl
+# Schema: define structure once
+@struct Location (city: string, country: string)
+@struct Department (name: string, location: Location)
+@struct Employee (
+  id: int,
+  name: string,
+  role: string,
+  department: Department,
+  skills: []string,
+)
+
+# Data: field names not repeated
+employees: @table Employee [
+  (1, "Alice", "Engineer",
+    ("Platform", ("Seattle", "USA")),
+    ["rust", "python"])
+  (2, "Bob", "Designer",
+    ("Product", ("Austin", "USA")),
+    ["figma", "css"])
+  (3, "Carol", "Manager",
+    ("Platform", ("Seattle", "USA")),
+    ["leadership", "agile"])
+]
+```
+
+</td>
 <td valign="top">
 
 ```json
@@ -112,35 +139,6 @@ The same data — TeaLeaf uses **schemas** so field names are defined once, not 
     }
   ]
 }
-```
-
-</td>
-<td valign="top">
-
-```tl
-# Schema: define structure once
-@struct Location (city: string, country: string)
-@struct Department (name: string, location: Location)
-@struct Employee (
-  id: int,
-  name: string,
-  role: string,
-  department: Department,
-  skills: []string,
-)
-
-# Data: field names not repeated
-employees: @table Employee [
-  (1, "Alice", "Engineer",
-    ("Platform", ("Seattle", "USA")),
-    ["rust", "python"])
-  (2, "Bob", "Designer",
-    ("Product", ("Austin", "USA")),
-    ["figma", "css"])
-  (3, "Carol", "Manager",
-    ("Platform", ("Seattle", "USA")),
-    ["leadership", "agile"])
-]
 ```
 
 </td>
@@ -405,4 +403,3 @@ For the complete technical specification including text format syntax, type syst
 
 ---
 
-*TeaLeaf v2.0.0-beta.1 — Peace between human and machine.*

@@ -10,6 +10,12 @@ import matplotlib.image as mpimg
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import numpy as np
 import os
+import json
+
+# Read version from release.json
+RELEASE_JSON = os.path.join(os.path.dirname(__file__), '..', 'release.json')
+with open(RELEASE_JSON) as f:
+    VERSION = json.load(f)['version']
 
 # Get actual file sizes from examples directory
 EXAMPLES_DIR = os.path.join(os.path.dirname(__file__), '..', 'examples')
@@ -60,10 +66,10 @@ fig.patch.set_facecolor(COLOR_BG)
 ax.set_facecolor(COLOR_BG)
 
 # Add TeaLeaf icon to top left
-icon_path = os.path.join(os.path.dirname(__file__), '..', 'vscode-tealeaf', 'images', 'tealeaf-icon-darkbg.png')
+icon_path = os.path.join(os.path.dirname(__file__), 'tealeaf-icon-darkbg-128.png')
 if os.path.exists(icon_path):
     icon_img = mpimg.imread(icon_path)
-    imagebox = OffsetImage(icon_img, zoom=0.1)  # ~100px visible size
+    imagebox = OffsetImage(icon_img, zoom=1.0)  # ~100px visible size
     ab = AnnotationBbox(imagebox, (0.5, 9.5), frameon=False, box_alignment=(0, 0.5))
     ax.add_artist(ab)
 
@@ -231,9 +237,9 @@ features = [
 
 for i, (icon, title, desc) in enumerate(features):
     y_pos = 3.1 - i * 0.5
-    ax.text(8.85, y_pos, icon, ha='center', va='center', fontsize=20, fontweight='bold', color=COLOR_LLM)
-    ax.text(9.2, y_pos, title, ha='left', va='center', fontsize=18, fontweight='bold', color=COLOR_TEXT)
-    ax.text(11.4, y_pos, f'— {desc}', ha='left', va='center', fontsize=18, color=COLOR_TEXT, alpha=0.8)
+    ax.text(8.85, y_pos, icon, ha='center', va='center', fontsize=18, fontweight='bold', color=COLOR_LLM)
+    ax.text(9.2, y_pos, title, ha='left', va='center', fontsize=16, fontweight='bold', color=COLOR_TEXT)
+    ax.text(12.5, y_pos, desc, ha='left', va='center', fontsize=16, color=COLOR_TEXT, alpha=0.8)
 
 # === BOTTOM: Token savings callout ===
 token_box = FancyBboxPatch((1, 0.35), 5.5, 1.0,
@@ -247,16 +253,16 @@ ax.text(3.75, 0.5, 'Schema-first design eliminates repeated field names', ha='ce
         fontsize=18, color=COLOR_TEXT, alpha=0.9)
 
 # Footer
-ax.text(8, 0.05, 'TeaLeaf v2.0-beta.1 — Peace between human and machine',
+ax.text(8, 0.05, f'TeaLeaf v{VERSION}',
         ha='center', va='center', fontsize=18, color=COLOR_TEXT, alpha=0.5, style='italic')
 
 # Save with high resolution
 plt.tight_layout()
-plt.savefig('docs/tealeaf_workflow.png', dpi=300, facecolor=COLOR_BG,
+plt.savefig('assets/tealeaf_workflow.png', dpi=300, facecolor=COLOR_BG,
             edgecolor='none', bbox_inches='tight', pad_inches=0.3)
 
 # Print summary
-print("Saved: docs/tealeaf_workflow.png")
+print("Saved: assets/tealeaf_workflow.png")
 print(f"\nFile sizes from examples/retail_orders.*:")
 print(f"  JSON:      {format_size(JSON_SIZE_KB)} (100%)")
 print(f"  TL Text:   {format_size(TL_TEXT_SIZE_KB)} ({TL_TEXT_PERCENT:.1f}%)")
