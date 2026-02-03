@@ -226,7 +226,6 @@ impl LLMProvider for AnthropicClient {
         let status = response.status();
 
         if status == 429 {
-            // Rate limited
             let retry_after = response
                 .headers()
                 .get("retry-after")
@@ -240,10 +239,24 @@ impl LLMProvider for AnthropicClient {
         }
 
         if !status.is_success() {
-            let error: AnthropicError = response.json().await.map_err(|e| ProviderError::Parse(e.to_string()))?;
+            let body = response.text().await.unwrap_or_default();
+            let message = match serde_json::from_str::<AnthropicError>(&body) {
+                Ok(error) => error.error.message,
+                Err(_) => format!("HTTP {}: {}", status.as_u16(), body),
+            };
+
+            // 401/403 are auth errors — don't waste retries
+            if status == 401 || status == 403 {
+                return Err(ProviderError::Config(format!(
+                    "Anthropic auth error ({}): {}",
+                    status.as_u16(),
+                    message
+                )));
+            }
+
             return Err(ProviderError::Api {
                 status: status.as_u16(),
-                message: error.error.message,
+                message,
             });
         }
 

@@ -4,7 +4,7 @@
 
 **A schema-aware data format with human-readable text and compact binary representation.**
 
-
+**30-40% fewer tokens than JSON for LLM applications, with near zero accuracy loss.**
 
 ![TeaLeaf Workflow](assets/tealeaf_workflow.png)
 
@@ -14,18 +14,16 @@
 
 - [Overview](#overview)
   - [Motivation](#motivation)
-  - [File Extensions](#file-extensions)
   - [Quick Compare: JSON vs TeaLeaf](#quick-compare-json-vs-tealeaf)
   - [Workflow Real Example](#workflow-real-example)
 - [Installation](#installation)
 - [CLI](#cli)
 - [Language Bindings](#language-bindings)
 - [Design Rationale](#design-rationale)
-- [Comparison](#comparison)
-  - [When to Use TeaLeaf](#when-to-use-tealeaf)
-  - [When NOT to Use TeaLeaf](#when-not-to-use-tealeaf)
   - [Size Comparison](#size-comparison)
 - [Use Cases](#use-cases)
+  - [Context Engineering (LLM/AI)](#context-engineering-llmai)
+  - [Other Use Cases](#other-use-cases)
 - [Specification](#specification)
 
 ---
@@ -41,20 +39,20 @@ TeaLeaf is a data format that combines:
 
 ### Motivation
 
-TeaLeaf emerged from practical experience with large-scale data and systems engineering. The existing landscape presented trade-offs that didn't align well with modern workflows:
+The existing data format landscape presents trade-offs that TeaLeaf attempts to bridge. TeaLeaf does not attempt to replace any of the formats listed below, but rather presents a different perspective that users can objectively compare to identify if it fits their specific use cases.
 
-| Format | Limitation |
-|--------|------------|
+| Format | Observation |
+|--------|-------------|
 | JSON | Verbose, no comments, no schema |
 | YAML | Indentation-sensitive, error-prone at scale |
 | Protobuf | Schema external, binary-only, requires codegen |
 | Avro | Schema embedded but not human-readable |
-| CSV/TSV | Too simple for nested or typed data |
+| CSV/TSV/TOON | Too simple for nested or typed data |
 | MessagePack/CBOR | Compact but schemaless |
 
 Converting some formats to binary yielded marginal benefits. Schema information was almost always external, requiring coordination between files.
 
-TeaLeaf was designed to unify these concerns: a single file that humans can read and edit, that compiles to an efficient binary, with schemas inline rather than external. The primary use case is **context engineering** for LLM applications—structured prompts, tool definitions, conversation history—but the format is general-purpose.
+TeaLeaf was designed to unify these concerns: a single file that humans can read and edit, that compiles to an efficient binary, with schemas inline rather than external. Though the format is general-purpose, LLM-Context Engineering uses cases can take advantage of significant token efficiency compared to JSON.
 
 ### Quick Compare: JSON vs TeaLeaf
 
@@ -62,7 +60,7 @@ The same data — TeaLeaf uses **schemas** so field names are defined once, not 
 
 <table>
 <tr>
-<th>TeaLeaf (schema-first, compact data)</th>
+<th>TeaLeaf (schemas with nested structures)</th>
 <th>JSON (no schema, names repeated)</th>
 </tr>
 <tr>
@@ -155,6 +153,7 @@ employees: @table Employee [
 | Types | Implicit, inferred at runtime | Explicit in schema, structural checks at parse |
 | Binary size | Large (names + values) | Compact (positional data only) |
 | 1000 records | ~80KB+ | ~15KB (schema + values) |
+| LLM tokens | 9,829 tokens (retail example shown below) | 5,632 tokens (**43% fewer**) |
 | Validation | External tools needed | Field count validation via schema |
 
 The schema approach means:
@@ -172,10 +171,11 @@ A complete retail orders dataset demonstrating the full TeaLeaf workflow:
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │   retail_orders.json ──────► retail_orders.tl ───────► retail_orders.tlbx   │
-│        36.8 KB       from-json     19.6 KB     compile       6.9 KB         │
+│        36.8 KB       from-json     14.5 KB     compile       6.9 KB         │
+│      9,829 tokens                5,632 tokens (43% fewer)                   │
 │                                                                             │
 │   • 10 orders            • 11 schemas defined      • 81% size reduction     │
-│   • 4 products           • Human-readable          • Ready for storage      │
+│   • 4 products           • Human-readable          • 43% fewer LLM tokens   │
 │   • 3 customers          • Comments & formatting   • Fast transmission      │
 │                                                                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
@@ -185,7 +185,7 @@ A complete retail orders dataset demonstrating the full TeaLeaf workflow:
 │   test_retail_analysis.ps1                                                  │
 │         │                                                                   │
 │         ▼                                                                   │
-│   Claude API (retail_orders.tl) ───────► responses/retail_analysis.tl       │
+│   Anthropic API (retail_orders.tl) ──────► responses/retail_analysis.tl     │
 │                                                                             │
 │   • Sends TeaLeaf-formatted order data  • Business intelligence insights    │
 │   • Schema-first = fewer tokens         • Revenue analysis                  │
@@ -198,13 +198,15 @@ A complete retail orders dataset demonstrating the full TeaLeaf workflow:
 
 | File | Description |
 |------|-------------|
-| [`examples/retail_orders.json`](examples/retail_orders.json) | Original JSON (36.8 KB) |
-| [`examples/retail_orders.tl`](examples/retail_orders.tl) | TeaLeaf text format (19.6 KB) |
+| [`examples/retail_orders.json`](examples/retail_orders.json) | Original JSON (36.8 KB, 9,829 tokens) |
+| [`examples/retail_orders.tl`](examples/retail_orders.tl) | TeaLeaf text format (14.5 KB, 5,632 tokens) |
 | [`examples/retail_orders.tlbx`](examples/retail_orders.tlbx) | TeaLeaf binary (6.9 KB) |
-| [`examples/test_retail_analysis.ps1`](examples/test_retail_analysis.ps1) | Send to Claude API |
-| [`examples/responses/retail_analysis.tl`](examples/responses/retail_analysis.tl) | Claude's analysis |
+| [`examples/test_retail_analysis.ps1`](examples/test_retail_analysis.ps1) | Send to Anthropic API |
+| [`examples/responses/retail_analysis.tl`](examples/responses/retail_analysis.tl) | Anthropics's analysis |
 
 ---
+
+![Token Comparison](assets/tealeaf-json-token-comparison.png)
 
 ## Installation
 
@@ -319,27 +321,6 @@ The binary format (`.tlbx`) embeds schemas, enabling readers to decode files wit
 
 ---
 
-## Comparison
-
-### When to Use TeaLeaf
-
-| Use Case | Why TeaLeaf |
-|----------|-------------|
-| Config files (human-edited + machine-efficient) | Text format with comments, compiles to compact binary |
-| Large numeric arrays | 6-7x smaller than JSON with compression |
-| LLM context serialization | Schema eliminates repeated field names |
-| Game save files, asset manifests | Self-describing, no external schema files |
-
-### When NOT to Use TeaLeaf
-
-| Requirement | Use Instead |
-|-------------|-------------|
-| Streaming / append-only | JSON Lines, Protobuf + gRPC |
-| Schema evolution at scale | Protobuf (field numbers), Avro |
-| Maximum decode speed | Bincode, Protobuf, FlatBuffers |
-| Tiny payloads (< 100 bytes) | MessagePack, CBOR |
-| Database features (queries, indexes, ACID) | A database |
-
 ### Size Comparison
 
 *Data from `cargo run --example size_report` on tealeaf-core.*
@@ -380,17 +361,22 @@ history: @table Message [
 ```
 
 **Why TeaLeaf for LLM context:**
-- Schema eliminates repeated field names → fewer tokens
+- **30-40% fewer input tokens** — verified across Claude Opus 4.5 and GPT-5.2 (12 tasks, 10 domains)
+- **Zero accuracy loss** — <a href="accuracy-benchmark/README.md" target="_blank">benchmark scores</a> within noise (0.978 vs 0.977 Anthropic, 0.903 vs 0.903 OpenAI)
 - Binary format for fast cached context retrieval
 - String deduplication (roles, tool names stored once)
 - Human-readable text for prompt authoring
 
-**Example: 50 messages + 10 tools** — JSON ~15KB vs TeaLeaf Binary ~4KB
+**Token savings example (retail orders dataset):**
+
+| Format | Characters | Tokens (GPT-5.x) | Savings |
+|--------|-----------|-------------------|---------|
+| JSON | 36,791 | 9,829 | — |
+| TeaLeaf | 14,542 | 5,632 | **43% fewer tokens** |
 
 ### Other Use Cases
 
 - **Configuration files** — Human-editable text, compile to binary for deployment
-- **Game save data** — Compact binary with nested structs
 - **API data exchange** — Bidirectional JSON conversion
 - **Scientific/tabular data** — Null bitmap optimization for sparse data
 - **Embedded/IoT** — Memory-mapped reads, no parsing allocations

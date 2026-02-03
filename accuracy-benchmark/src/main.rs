@@ -308,33 +308,77 @@ async fn run_benchmark(
         println!("\n=== JSON Format Results ===");
         print_console_report(json_agg);
 
-        // Calculate token usage by provider and format
+        // Calculate token usage by provider and format.
+        // Only count tasks where BOTH formats succeeded for a given
+        // (task_id, provider) pair — otherwise the totals are not comparable.
         let mut token_usage: HashMap<(String, DataFormat), (u32, u32)> = HashMap::new();
         if let Some(ref format_results) = format_comparison_results {
+            // Collect successful results indexed by (task_id, provider, format)
+            let successful: HashMap<_, _> = format_results
+                .iter()
+                .filter(|(_, r)| r.response.is_some())
+                .map(|(k, r)| ((k.task_id.clone(), k.provider.clone(), k.format), r))
+                .collect();
+
             for (key, result) in format_results {
                 if let Some(ref response) = result.response {
-                    let entry = token_usage
-                        .entry((key.provider.clone(), key.format))
-                        .or_insert((0, 0));
-                    entry.0 += response.input_tokens;
-                    entry.1 += response.output_tokens;
+                    // Find the counterpart format
+                    let other_format = if key.format == DataFormat::TL {
+                        DataFormat::Json
+                    } else {
+                        DataFormat::TL
+                    };
+
+                    // Only include if the other format also succeeded for this task+provider
+                    if successful.contains_key(&(key.task_id.clone(), key.provider.clone(), other_format)) {
+                        let entry = token_usage
+                            .entry((key.provider.clone(), key.format))
+                            .or_insert((0, 0));
+                        entry.0 += response.input_tokens;
+                        entry.1 += response.output_tokens;
+                    }
                 }
+            }
+        }
+
+        // Count paired tasks per provider (where both formats succeeded)
+        let mut paired_task_counts: HashMap<String, usize> = HashMap::new();
+        if let Some(ref format_results) = format_comparison_results {
+            let successful: std::collections::HashSet<_> = format_results
+                .iter()
+                .filter(|(_, r)| r.response.is_some())
+                .map(|(&ref k, _)| (k.task_id.clone(), k.provider.clone(), k.format))
+                .collect();
+
+            for provider in &provider_names {
+                let count = format_results
+                    .keys()
+                    .filter(|k| {
+                        k.provider == *provider
+                            && k.format == DataFormat::TL
+                            && successful.contains(&(k.task_id.clone(), k.provider.clone(), DataFormat::TL))
+                            && successful.contains(&(k.task_id.clone(), k.provider.clone(), DataFormat::Json))
+                    })
+                    .count();
+                paired_task_counts.insert(provider.clone(), count);
             }
         }
 
         // Print format comparison summary
         println!("\n=== Format Comparison Summary ===");
-        println!("{:-<100}", "");
-        println!("{:<12} {:>13} {:>11} {:>8} {:>15} {:>13} {:>9} {:>9}",
-            "Provider", "TeaLeaf Score", "JSON Score", "Diff", "TeaLeaf Tokens", "JSON Tokens", "Diff", "Diff %");
-        println!("{:-<100}", "");
+        println!("(Token comparison uses only tasks where both formats succeeded)");
+        println!("{:-<108}", "");
+        println!("{:<12} {:>6} {:>13} {:>11} {:>8} {:>15} {:>13} {:>9} {:>9}",
+            "Provider", "Pairs", "TeaLeaf Score", "JSON Score", "Diff", "TeaLeaf Tokens", "JSON Tokens", "Diff", "Diff %");
+        println!("{:-<108}", "");
 
         for provider in &provider_names {
             let tl_score = aggregated.avg_scores_by_provider.get(provider).copied().unwrap_or(0.0);
             let json_score = json_agg.avg_scores_by_provider.get(provider).copied().unwrap_or(0.0);
             let score_diff = tl_score - json_score;
+            let pairs = paired_task_counts.get(provider).copied().unwrap_or(0);
 
-            // Get token counts
+            // Get token counts (already filtered to paired tasks only)
             let (tl_in, tl_out) = token_usage
                 .get(&(provider.clone(), DataFormat::TL))
                 .copied()
@@ -355,11 +399,11 @@ async fn run_benchmark(
             };
 
             println!(
-                "{:<12} {:>13.3} {:>11.3} {:>+8.3} {:>15} {:>13} {:>+9} {:>+8.1}%",
-                provider, tl_score, json_score, score_diff, tl_total, json_total, token_diff, token_diff_pct
+                "{:<12} {:>6} {:>13.3} {:>11.3} {:>+8.3} {:>15} {:>13} {:>+9} {:>+8.1}%",
+                provider, format!("{}/12", pairs), tl_score, json_score, score_diff, tl_total, json_total, token_diff, token_diff_pct
             );
         }
-        println!("{:-<100}", "");
+        println!("{:-<108}", "");
 
         // Print token breakdown (input vs output)
         println!("\nToken Breakdown (Input / Output):");

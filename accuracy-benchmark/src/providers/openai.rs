@@ -228,16 +228,46 @@ impl LLMProvider for OpenAIClient {
                 .and_then(|s| s.parse::<u64>().ok())
                 .unwrap_or(60)
                 * 1000;
+
+            // Parse the response body to distinguish rate_limit_error from
+            // insufficient_quota. OpenAI returns 429 for both, but only the
+            // former is worth retrying.
+            let body = response.text().await.unwrap_or_default();
+            if let Ok(error) = serde_json::from_str::<OpenAIError>(&body) {
+                let error_type = error.error.error_type.as_deref().unwrap_or("");
+                if error_type == "insufficient_quota" || error.error.message.contains("exceeded your current quota") {
+                    return Err(ProviderError::Config(format!(
+                        "OpenAI quota exceeded: {}",
+                        error.error.message
+                    )));
+                }
+                tracing::debug!("Rate limited (type={}): {}", error_type, error.error.message);
+            }
+
             return Err(ProviderError::RateLimited {
                 retry_after_ms: retry_after,
             });
         }
 
         if !status.is_success() {
-            let error: OpenAIError = response.json().await.map_err(|e| ProviderError::Parse(e.to_string()))?;
+            let body = response.text().await.unwrap_or_default();
+            let message = match serde_json::from_str::<OpenAIError>(&body) {
+                Ok(error) => error.error.message,
+                Err(_) => format!("HTTP {}: {}", status.as_u16(), body),
+            };
+
+            // 401/403 are auth errors — don't waste retries
+            if status == 401 || status == 403 {
+                return Err(ProviderError::Config(format!(
+                    "OpenAI auth error ({}): {}",
+                    status.as_u16(),
+                    message
+                )));
+            }
+
             return Err(ProviderError::Api {
                 status: status.as_u16(),
-                message: error.error.message,
+                message,
             });
         }
 

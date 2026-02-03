@@ -2,6 +2,8 @@
 
 Schema-aware data format with human-readable text and compact binary representation.
 
+Optimized for LLM context engineering -- schemas eliminate repeated field names, reducing input tokens by 30-40% compared to JSON with no accuracy loss.
+
 ## Features
 
 - **Dual formats**: Human-readable text (`.tl`) and compact binary (`.tlbx`)

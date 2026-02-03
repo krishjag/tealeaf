@@ -115,7 +115,16 @@ For a typical LLM context with 50 messages, 10 tools, and a user profile:
 | TeaLeaf Binary | ~4 KB |
 | TeaLeaf Binary (compressed) | ~3 KB |
 
-The token savings are proportional to size savings in text mode.
+Token savings are significant but less than byte savings. BPE tokenizers partially compress repeated JSON field names, so byte savings overstate token savings by 5-18 percentage points depending on data repetitiveness. For typical structured data, expect **30-40% fewer input tokens**.
+
+### Token Comparison (verified via OpenAI tokenizer)
+
+| Dataset | JSON tokens | TeaLeaf tokens | Savings |
+|---------|------------|----------------|---------|
+| Healthcare records | 903 | 572 | 37% |
+| Retail orders | 9,829 | 5,632 | 43% |
+
+At the API level, prompt instructions are identical for both formats, diluting data-only savings to ~30% of total input tokens.
 
 ## Structured Outputs
 
@@ -150,3 +159,11 @@ if let Some(Value::Array(insights)) = response.get("analysis") {
 4. **Use text format for LLM input** -- models understand the schema notation
 5. **String deduplication** helps when context has repetitive strings (roles, tool names)
 6. **Separate static and dynamic context** -- compile static context once, merge at runtime
+
+## Benchmark Results
+
+The [accuracy-benchmark](../internals/accuracy-benchmark.md) suite tests 12 tasks across 10 business domains on Claude Opus 4.5 and GPT-5.2:
+
+- **30-40% fewer input tokens** compared to JSON
+- **No accuracy loss** -- scores within noise across all providers
+- See the [benchmark README](https://github.com/krishjag/tealeaf/tree/main/accuracy-benchmark) for full methodology and results.

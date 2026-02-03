@@ -30,7 +30,7 @@ pub struct ExecutorConfig {
 impl Default for ExecutorConfig {
     fn default() -> Self {
         Self {
-            parallel_requests: 3,
+            parallel_requests: 2,
             retry_count: 3,
             retry_delay_ms: 1000,
             max_retry_delay_ms: 60_000,
@@ -44,7 +44,9 @@ impl Default for ExecutorConfig {
 pub struct Executor {
     config: ExecutorConfig,
     providers: Vec<Arc<dyn LLMProvider + Send + Sync>>,
-    semaphore: Arc<Semaphore>,
+    /// Per-provider semaphores keyed by provider name, ensuring
+    /// `parallel_requests` is enforced independently for each provider.
+    provider_semaphores: Arc<HashMap<String, Arc<Semaphore>>>,
 }
 
 impl Executor {
@@ -53,11 +55,14 @@ impl Executor {
         providers: Vec<Arc<dyn LLMProvider + Send + Sync>>,
         config: ExecutorConfig,
     ) -> Self {
-        let semaphore = Arc::new(Semaphore::new(config.parallel_requests * providers.len()));
+        let provider_semaphores: HashMap<String, Arc<Semaphore>> = providers
+            .iter()
+            .map(|p| (p.name().to_string(), Arc::new(Semaphore::new(config.parallel_requests))))
+            .collect();
         Self {
             config,
             providers,
-            semaphore,
+            provider_semaphores: Arc::new(provider_semaphores),
         }
     }
 
@@ -144,8 +149,6 @@ impl Executor {
         provider: Arc<dyn LLMProvider + Send + Sync>,
         format: DataFormat,
     ) -> TaskResult {
-        let _permit = self.semaphore.acquire().await.unwrap();
-
         let mut last_error = None;
         let mut delay = self.config.retry_delay_ms;
 
@@ -162,7 +165,16 @@ impl Executor {
                 delay = (delay * 2).min(self.config.max_retry_delay_ms);
             }
 
-            match self.try_execute(task, &provider).await {
+            // Only hold the per-provider semaphore permit during the actual
+            // API call, not during retry backoff or rate-limit sleeps.
+            let semaphore = self.provider_semaphores
+                .get(provider.name())
+                .expect("provider semaphore must exist");
+            let permit = semaphore.acquire().await.unwrap();
+            let result = self.try_execute(task, &provider).await;
+            drop(permit);
+
+            match result {
                 Ok(response) => {
                     return TaskResult::success_with_format(
                         task.metadata.id.clone(),
@@ -180,6 +192,19 @@ impl Executor {
                     );
                     sleep(Duration::from_millis(retry_after_ms)).await;
                     last_error = Some(ProviderError::RateLimited { retry_after_ms });
+                }
+                Err(e @ ProviderError::Config(_)) => {
+                    // Config errors (invalid key, quota exceeded) are permanent —
+                    // retrying won't help.
+                    tracing::error!(
+                        "Non-retryable error on {} for task {} ({}): {}",
+                        provider.name(),
+                        task.metadata.id,
+                        format,
+                        e
+                    );
+                    last_error = Some(e);
+                    break;
                 }
                 Err(e) => {
                     tracing::error!(
@@ -294,7 +319,7 @@ impl Executor {
         Self {
             config: self.config.clone(),
             providers: self.providers.clone(),
-            semaphore: self.semaphore.clone(),
+            provider_semaphores: self.provider_semaphores.clone(),
         }
     }
 }

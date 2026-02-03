@@ -2,6 +2,8 @@
 
 **A schema-aware data format with human-readable text and compact binary representation.**
 
+**30-40% fewer tokens than JSON for LLM applications, with zero accuracy loss.**
+
 <span class="version-badge">v2.0.0-beta.1</span>
 
 ---
@@ -131,7 +133,16 @@ history: @table Message [
 ]
 ```
 
-**50 messages + 10 tools:** JSON ~15KB vs TeaLeaf Binary ~4KB
+**Verified token savings** (accuracy-benchmark, 12 tasks across 10 domains):
+- **30-40% fewer input tokens** vs JSON -- consistent across Claude Opus 4.5 and GPT-5.2
+- **No accuracy loss** -- scores within noise
+
+Token savings come from eliminating repeated field names. The larger and more repetitive the data, the greater the savings:
+
+| Dataset | JSON tokens | TeaLeaf tokens | Token savings |
+|---------|------------|----------------|---------------|
+| Healthcare (8 patients) | 903 | 572 | 37% |
+| Retail orders (10 orders) | 9,829 | 5,632 | 43% |
 
 ## Size Comparison
 
