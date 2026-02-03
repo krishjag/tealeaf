@@ -2,7 +2,7 @@
 
 **A schema-aware data format with human-readable text and compact binary representation.**
 
-**30-40% fewer tokens than JSON for LLM applications, with zero accuracy loss.**
+**30-40% fewer tokens than JSON for LLM applications, with near zero accuracy loss.**
 
 <span class="version-badge">v2.0.0-beta.1</span>
 

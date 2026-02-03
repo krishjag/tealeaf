@@ -387,7 +387,6 @@ history: @table Message [
 
 For the complete technical specification including text format syntax, type system, binary format details, and grammar, see:
 
-**[spec/TEALEAF_SPEC.md](spec/TEALEAF_SPEC.md)**
-
+<a href="spec/TEALEAF_SPEC.md" target="_blank">TeaLeaf Spec</a>
 ---
 

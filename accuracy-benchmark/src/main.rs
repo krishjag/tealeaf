@@ -11,7 +11,7 @@ use tracing_subscriber::EnvFilter;
 use accuracy_benchmark::{
     analysis::{ComparisonEngine, AnalysisResult},
     config::{Config, DataFormat},
-    providers::{create_all_providers, create_providers, LLMProvider},
+    providers::{create_all_providers_with_config, create_providers_with_config, LLMProvider},
     reporting::{print_console_report, JsonSummary, TLWriter},
     runner::{Executor, ExecutorConfig},
     tasks::{load_tasks_from_directory, load_tasks_from_file, BenchmarkTask, TaskResult},
@@ -98,6 +98,17 @@ enum Commands {
         #[arg(short, long, default_value = "config/models.toml")]
         output: PathBuf,
     },
+
+    /// Dump all task prompts (both TL and JSON formats) to text files for review
+    DumpPrompts {
+        /// Output directory for prompt files
+        #[arg(short, long, default_value = "results/prompts")]
+        output: PathBuf,
+
+        /// Path to task definitions (file or directory)
+        #[arg(short, long)]
+        tasks: Option<PathBuf>,
+    },
 }
 
 #[tokio::main]
@@ -146,6 +157,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::InitConfig { output } => {
             init_config(output)?;
         }
+
+        Commands::DumpPrompts { output, tasks } => {
+            dump_prompts(output, tasks)?;
+        }
     }
 
     Ok(())
@@ -169,12 +184,15 @@ async fn run_benchmark(
     }
     println!();
 
-    // Create providers
+    // Load model/provider configuration
+    let model_config = Config::load_or_default();
+
+    // Create providers (config applies RPM/TPM limits, model, thinking settings)
     let providers: Vec<Arc<dyn LLMProvider + Send + Sync>> = if let Some(names) = providers_arg {
         let names: Vec<&str> = names.split(',').map(|s| s.trim()).collect();
-        create_providers(&names)?
+        create_providers_with_config(&names, &model_config)?
     } else {
-        create_all_providers()
+        create_all_providers_with_config(&model_config)
     };
 
     if providers.is_empty() {
@@ -896,5 +914,88 @@ fn init_config(output: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
 
     config.save_toml(&output)?;
     println!("Configuration written to: {}", output.display());
+    Ok(())
+}
+
+fn dump_prompts(
+    output_dir: PathBuf,
+    tasks_path: Option<PathBuf>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let tasks = load_tasks(tasks_path, None)?;
+
+    if tasks.is_empty() {
+        eprintln!("Error: No tasks to dump");
+        std::process::exit(1);
+    }
+
+    std::fs::create_dir_all(&output_dir)?;
+
+    println!("=== Dumping API Request Prompts ===");
+    println!("Tasks: {}", tasks.len());
+    println!("Output: {}", output_dir.display());
+    println!();
+
+    for task in &tasks {
+        for format in DataFormat::all() {
+            let mut task_clone = task.clone();
+            match task_clone.prepare_prompt_with_format(format) {
+                Ok(()) => {
+                    let filename = format!(
+                        "{}-{}.txt",
+                        task.metadata.id.to_lowercase(),
+                        format.as_str()
+                    );
+                    let filepath = output_dir.join(&filename);
+
+                    // Build the full request content with metadata header
+                    let content = format!(
+                        "=== API Request: {} ({} format) ===\n\
+                         Task ID:     {}\n\
+                         Category:    {}\n\
+                         Complexity:  {:?}\n\
+                         Output Type: {:?}\n\
+                         Format:      {}\n\
+                         Max Tokens:  {}\n\
+                         Temperature: {}\n\
+                         {}\n\
+                         === PROMPT ===\n\n\
+                         {}",
+                        task.metadata.id,
+                        format.as_str().to_uppercase(),
+                        task.metadata.id,
+                        task.metadata.category,
+                        task.metadata.complexity,
+                        task.metadata.output_type,
+                        format.as_str().to_uppercase(),
+                        task.max_tokens,
+                        task.temperature
+                            .map(|t| format!("{}", t))
+                            .unwrap_or_else(|| "none".to_string()),
+                        "=".repeat(50),
+                        task_clone.prompt,
+                    );
+
+                    std::fs::write(&filepath, &content)?;
+                    println!(
+                        "  [{}] {} ({}) -> {}",
+                        format.as_str().to_uppercase(),
+                        task.metadata.id,
+                        task.metadata.category,
+                        filename
+                    );
+                }
+                Err(e) => {
+                    eprintln!(
+                        "  [ERROR] {} ({} format): {}",
+                        task.metadata.id,
+                        format.as_str(),
+                        e
+                    );
+                }
+            }
+        }
+    }
+
+    println!("\nDone. {} files written to {}", tasks.len() * 2, output_dir.display());
     Ok(())
 }

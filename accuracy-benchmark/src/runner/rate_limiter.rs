@@ -1,17 +1,16 @@
-//! Rate limiter implementation using token bucket and sliding window
+//! Rate limiter implementation using sliding window for both RPM and TPM
 
 use std::collections::VecDeque;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tokio::sync::{Mutex, Semaphore, SemaphorePermit};
+use tokio::sync::Mutex;
 
-/// Rate limiter using a combination of token bucket and sliding window
+const WINDOW_SECS: u64 = 60;
+
+/// Rate limiter using sliding window for both requests-per-minute and tokens-per-minute
 pub struct RateLimiter {
     requests_per_minute: u32,
     tokens_per_minute: u32,
-    /// Reserved for future use with semaphore-based limiting
-    #[allow(dead_code)]
-    request_semaphore: Arc<Semaphore>,
     last_requests: Arc<Mutex<VecDeque<Instant>>>,
     token_usage: Arc<Mutex<VecDeque<(Instant, u32)>>>,
 }
@@ -22,39 +21,58 @@ impl RateLimiter {
         Self {
             requests_per_minute,
             tokens_per_minute,
-            request_semaphore: Arc::new(Semaphore::new(requests_per_minute as usize)),
             last_requests: Arc::new(Mutex::new(VecDeque::new())),
             token_usage: Arc::new(Mutex::new(VecDeque::new())),
         }
     }
 
-    /// Acquire permission to make a request
+    /// Acquire permission to make a request (no token estimate — RPM only).
     pub async fn acquire(&self) -> RateLimitGuard {
+        self.acquire_with_tokens(0).await
+    }
+
+    /// Acquire permission to make a request, enforcing both RPM and TPM.
+    ///
+    /// `estimated_tokens` is a conservative guess of how many tokens the
+    /// upcoming request will consume (input + output). Pass 0 to skip the
+    /// TPM check.
+    pub async fn acquire_with_tokens(&self, estimated_tokens: u32) -> RateLimitGuard {
         loop {
-            // First check if we can make a request based on sliding window
-            let wait_time = self.check_request_limit().await;
-            if let Some(wait) = wait_time {
+            // --- RPM check ---
+            if let Some(wait) = self.check_request_limit().await {
+                tracing::debug!("RPM limit reached, waiting {:.1}s", wait.as_secs_f64());
                 tokio::time::sleep(wait).await;
                 continue;
             }
 
-            // Record the request
+            // --- TPM check ---
+            if estimated_tokens > 0 {
+                if let Some(wait) = self.check_token_limit(estimated_tokens).await {
+                    tracing::debug!(
+                        "TPM limit reached (est {} tokens), waiting {:.1}s",
+                        estimated_tokens,
+                        wait.as_secs_f64()
+                    );
+                    tokio::time::sleep(wait).await;
+                    continue;
+                }
+            }
+
+            // Record the request timestamp
             let mut last = self.last_requests.lock().await;
             last.push_back(Instant::now());
 
-            return RateLimitGuard {
-                _permit: None,
-            };
+            return RateLimitGuard { _private: () };
         }
     }
 
-    /// Check if we can make a request, returns wait time if we need to wait
+    /// Check RPM sliding window. Returns wait duration if at capacity.
     async fn check_request_limit(&self) -> Option<Duration> {
         let mut last = self.last_requests.lock().await;
         let now = Instant::now();
-        let window = Duration::from_secs(60);
+        let window = Duration::from_secs(WINDOW_SECS);
 
-        // Remove requests older than 1 minute
+        // Evict entries older than the window
         while let Some(&front) = last.front() {
             if now.duration_since(front) > window {
                 last.pop_front();
@@ -63,13 +81,11 @@ impl RateLimiter {
             }
         }
 
-        // Check if we're at the limit
         if last.len() >= self.requests_per_minute as usize {
-            // Calculate how long to wait
             if let Some(&oldest) = last.front() {
                 let elapsed = now.duration_since(oldest);
                 if elapsed < window {
-                    return Some(window - elapsed + Duration::from_millis(10));
+                    return Some(window - elapsed + Duration::from_millis(100));
                 }
             }
         }
@@ -77,13 +93,55 @@ impl RateLimiter {
         None
     }
 
-    /// Record token usage for rate limiting
+    /// Check TPM sliding window. Returns wait duration if adding
+    /// `estimated_tokens` would exceed the budget.
+    async fn check_token_limit(&self, estimated_tokens: u32) -> Option<Duration> {
+        let mut usage = self.token_usage.lock().await;
+        let now = Instant::now();
+        let window = Duration::from_secs(WINDOW_SECS);
+
+        // Evict entries older than the window
+        while let Some(&(time, _)) = usage.front() {
+            if now.duration_since(time) > window {
+                usage.pop_front();
+            } else {
+                break;
+            }
+        }
+
+        let current: u32 = usage.iter().map(|(_, t)| t).sum();
+
+        if current + estimated_tokens <= self.tokens_per_minute {
+            return None; // Enough capacity
+        }
+
+        // Calculate how long to wait: walk entries oldest-first until
+        // enough tokens would expire to make room.
+        let excess = (current + estimated_tokens).saturating_sub(self.tokens_per_minute);
+        let mut freed = 0u32;
+        for &(time, tokens) in usage.iter() {
+            freed += tokens;
+            if freed >= excess {
+                let expiry = time + window;
+                return if expiry > now {
+                    Some(expiry - now + Duration::from_millis(100))
+                } else {
+                    Some(Duration::from_millis(100))
+                };
+            }
+        }
+
+        // Need to wait for the full window to rotate
+        Some(Duration::from_secs(WINDOW_SECS + 1))
+    }
+
+    /// Record actual token usage after a response is received.
     pub async fn record_tokens(&self, tokens: u32) {
         let mut usage = self.token_usage.lock().await;
         let now = Instant::now();
-        let window = Duration::from_secs(60);
+        let window = Duration::from_secs(WINDOW_SECS);
 
-        // Remove old entries
+        // Evict old entries
         while let Some(&(time, _)) = usage.front() {
             if now.duration_since(time) > window {
                 usage.pop_front();
@@ -99,9 +157,8 @@ impl RateLimiter {
     pub async fn current_token_usage(&self) -> u32 {
         let mut usage = self.token_usage.lock().await;
         let now = Instant::now();
-        let window = Duration::from_secs(60);
+        let window = Duration::from_secs(WINDOW_SECS);
 
-        // Remove old entries
         while let Some(&(time, _)) = usage.front() {
             if now.duration_since(time) > window {
                 usage.pop_front();
@@ -112,24 +169,11 @@ impl RateLimiter {
 
         usage.iter().map(|(_, t)| t).sum()
     }
-
-    /// Check if we have token capacity
-    pub async fn has_token_capacity(&self, needed: u32) -> bool {
-        let current = self.current_token_usage().await;
-        current + needed <= self.tokens_per_minute
-    }
-
-    /// Wait for token capacity
-    pub async fn wait_for_token_capacity(&self, needed: u32) {
-        while !self.has_token_capacity(needed).await {
-            tokio::time::sleep(Duration::from_millis(100)).await;
-        }
-    }
 }
 
 /// Guard returned when rate limit permission is acquired
 pub struct RateLimitGuard {
-    _permit: Option<SemaphorePermit<'static>>,
+    _private: (),
 }
 
 #[cfg(test)]
@@ -138,7 +182,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_rate_limiter_basic() {
-        let limiter = RateLimiter::new(5, 1000);
+        let limiter = RateLimiter::new(5, 100_000);
 
         // Should be able to make 5 requests immediately
         for _ in 0..5 {
@@ -155,5 +199,28 @@ mod tests {
 
         let usage = limiter.current_token_usage().await;
         assert_eq!(usage, 300);
+    }
+
+    #[tokio::test]
+    async fn test_tpm_blocks_when_over_budget() {
+        let limiter = RateLimiter::new(60, 500);
+
+        // Record 400 tokens of recent usage
+        limiter.record_tokens(400).await;
+
+        // Requesting 200 more should exceed the 500 TPM budget
+        let wait = limiter.check_token_limit(200).await;
+        assert!(wait.is_some(), "should have been asked to wait");
+    }
+
+    #[tokio::test]
+    async fn test_tpm_allows_when_under_budget() {
+        let limiter = RateLimiter::new(60, 500);
+
+        limiter.record_tokens(100).await;
+
+        // 100 used + 200 estimated = 300 < 500
+        let wait = limiter.check_token_limit(200).await;
+        assert!(wait.is_none(), "should have capacity");
     }
 }

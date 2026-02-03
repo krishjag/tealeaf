@@ -11,7 +11,7 @@ use super::traits::{
 };
 use crate::runner::rate_limiter::RateLimiter;
 
-const DEFAULT_MODEL: &str = "claude-opus-4-5-20251101";
+const DEFAULT_MODEL: &str = "claude-sonnet-4-5-20250929";
 const API_VERSION: &str = "2023-06-01";
 const DEFAULT_THINKING_BUDGET: u32 = 10000;
 
@@ -35,7 +35,7 @@ impl AnthropicClient {
             api_key,
             base_url: "https://api.anthropic.com/v1".to_string(),
             http_client: Client::new(),
-            rate_limiter: Arc::new(RateLimiter::new(60, 100_000)),
+            rate_limiter: Arc::new(RateLimiter::new(1_000, 450_000)),
             default_model: DEFAULT_MODEL.to_string(),
             enable_thinking: true,
             thinking_budget: DEFAULT_THINKING_BUDGET,
@@ -165,8 +165,19 @@ impl LLMProvider for AnthropicClient {
     }
 
     async fn complete(&self, request: &CompletionRequest) -> ProviderResult<CompletionResponse> {
-        // Acquire rate limit permission
-        let _guard = self.rate_limiter.acquire().await;
+        // Estimate token usage: input (chars / 4) + thinking budget + max output
+        let estimated_input = (request.messages.iter()
+            .map(|m| m.content.len())
+            .sum::<usize>() / 4) as u32;
+        let estimated_output = if self.enable_thinking {
+            self.thinking_budget + request.max_tokens
+        } else {
+            request.max_tokens
+        };
+        let estimated_tokens = estimated_input + estimated_output;
+
+        // Acquire rate limit permission (enforces both RPM and TPM)
+        let _guard = self.rate_limiter.acquire_with_tokens(estimated_tokens).await;
 
         let start = Instant::now();
 
@@ -262,9 +273,17 @@ impl LLMProvider for AnthropicClient {
 
         let api_response: AnthropicResponse = response.json().await?;
 
-        // Record token usage
+        // Record token usage.
+        // When extended thinking is enabled, the API usage counts may not
+        // include thinking tokens, so add the thinking budget to give the
+        // TPM tracker a realistic picture of what Anthropic actually consumed.
+        let thinking_overhead = if self.enable_thinking { self.thinking_budget } else { 0 };
         self.rate_limiter
-            .record_tokens(api_response.usage.input_tokens + api_response.usage.output_tokens)
+            .record_tokens(
+                api_response.usage.input_tokens
+                + api_response.usage.output_tokens
+                + thinking_overhead,
+            )
             .await;
 
         // Extract text content

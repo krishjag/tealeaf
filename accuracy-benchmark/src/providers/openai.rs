@@ -152,8 +152,14 @@ impl LLMProvider for OpenAIClient {
     }
 
     async fn complete(&self, request: &CompletionRequest) -> ProviderResult<CompletionResponse> {
-        // Acquire rate limit permission
-        let _guard = self.rate_limiter.acquire().await;
+        // Estimate token usage: input (chars / 4) + max output
+        let estimated_input = (request.messages.iter()
+            .map(|m| m.content.len())
+            .sum::<usize>() / 4) as u32;
+        let estimated_tokens = estimated_input + request.max_tokens;
+
+        // Acquire rate limit permission (enforces both RPM and TPM)
+        let _guard = self.rate_limiter.acquire_with_tokens(estimated_tokens).await;
 
         let start = Instant::now();
 

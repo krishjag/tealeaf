@@ -61,7 +61,9 @@ pub mod prelude {
     };
     pub use crate::config::{Config, DataFormat};
     pub use crate::providers::{
-        create_all_providers, create_providers, CompletionRequest, CompletionResponse,
+        create_all_providers, create_all_providers_with_config,
+        create_providers, create_providers_with_config,
+        CompletionRequest, CompletionResponse,
         LLMProvider, Message, ProviderError, ProviderResult,
     };
     pub use crate::reporting::{print_console_report, JsonSummary, TLWriter};

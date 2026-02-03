@@ -4,13 +4,20 @@
 [providers.anthropic]
 name = "anthropic"
 enabled = true
-default_model = "claude-opus-4-5-20251101"
-# Rate limits
-rpm = 60           # Requests per minute
-tpm = 100000       # Tokens per minute
+default_model = "claude-sonnet-4-5-20250929"
+# Rate limits (Anthropic Tier 2 for Sonnet/Opus)
+# Actual limits: 1K RPM, 450K input TPM, 90K output TPM
+rpm = 1000         # Requests per minute
+tpm = 450000       # Input tokens per minute (Tier 2 limit)
 # Extended thinking configuration
 enable_thinking = true
 thinking_budget = 10000
+
+[providers.anthropic.models.sonnet-4-5]
+id = "claude-sonnet-4-5-20250929"
+display_name = "Claude Sonnet 4.5"
+max_output_tokens = 8192
+supports_thinking = true
 
 [providers.anthropic.models.opus-4-5]
 id = "claude-opus-4-5-20251101"

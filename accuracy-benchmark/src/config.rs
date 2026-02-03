@@ -229,6 +229,15 @@ impl Default for Config {
 
         // Default Anthropic config
         let mut anthropic_models = HashMap::new();
+        anthropic_models.insert("sonnet-4-5".to_string(), ModelConfig {
+            id: "claude-sonnet-4-5-20250929".to_string(),
+            display_name: "Claude Sonnet 4.5".to_string(),
+            max_output_tokens: 8192,
+            uses_completion_tokens: false,
+            supports_temperature: true,
+            supports_thinking: true,
+            is_reasoning_model: false,
+        });
         anthropic_models.insert("opus-4-5".to_string(), ModelConfig {
             id: "claude-opus-4-5-20251101".to_string(),
             display_name: "Claude Opus 4.5".to_string(),
@@ -251,9 +260,9 @@ impl Default for Config {
         providers.insert("anthropic".to_string(), ProviderConfig {
             name: "anthropic".to_string(),
             enabled: true,
-            default_model: "claude-opus-4-5-20251101".to_string(),
-            rpm: 60,
-            tpm: 100_000,
+            default_model: "claude-sonnet-4-5-20250929".to_string(),
+            rpm: 1_000,
+            tpm: 450_000,
             models: anthropic_models,
             enable_thinking: true,
             thinking_budget: 10_000,
