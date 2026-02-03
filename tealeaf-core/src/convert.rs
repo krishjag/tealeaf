@@ -763,6 +763,94 @@ mod tests {
     }
 
     #[test]
+    fn test_box_collect_schemas() {
+        let schemas = Box::<i64>::collect_schemas();
+        assert!(schemas.is_empty());
+    }
+
+    #[test]
+    fn test_box_field_type() {
+        assert_eq!(Box::<i64>::tealeaf_field_type(), FieldType::new("int64"));
+        assert_eq!(Box::<String>::tealeaf_field_type(), FieldType::new("string"));
+    }
+
+    #[test]
+    fn test_f64_field_type() {
+        assert_eq!(f64::tealeaf_field_type(), FieldType::new("float"));
+    }
+
+    #[test]
+    fn test_i8_from_wrong_type() {
+        let err = i8::from_tealeaf_value(&Value::String("nope".into())).unwrap_err();
+        assert!(matches!(err, ConvertError::TypeMismatch { .. }));
+    }
+
+    #[test]
+    fn test_i16_from_wrong_type() {
+        let err = i16::from_tealeaf_value(&Value::Bool(true)).unwrap_err();
+        assert!(matches!(err, ConvertError::TypeMismatch { .. }));
+    }
+
+    #[test]
+    fn test_i32_from_wrong_type() {
+        let err = i32::from_tealeaf_value(&Value::String("nope".into())).unwrap_err();
+        assert!(matches!(err, ConvertError::TypeMismatch { .. }));
+    }
+
+    #[test]
+    fn test_u8_from_wrong_type() {
+        let err = u8::from_tealeaf_value(&Value::String("nope".into())).unwrap_err();
+        assert!(matches!(err, ConvertError::TypeMismatch { .. }));
+    }
+
+    #[test]
+    fn test_u16_from_wrong_type() {
+        let err = u16::from_tealeaf_value(&Value::Bool(false)).unwrap_err();
+        assert!(matches!(err, ConvertError::TypeMismatch { .. }));
+    }
+
+    #[test]
+    fn test_u32_from_wrong_type() {
+        let err = u32::from_tealeaf_value(&Value::String("nope".into())).unwrap_err();
+        assert!(matches!(err, ConvertError::TypeMismatch { .. }));
+    }
+
+    #[test]
+    fn test_u64_from_wrong_type() {
+        let err = u64::from_tealeaf_value(&Value::String("nope".into())).unwrap_err();
+        assert!(matches!(err, ConvertError::TypeMismatch { .. }));
+    }
+
+    #[test]
+    fn test_f32_from_wrong_type() {
+        let err = f32::from_tealeaf_value(&Value::String("nope".into())).unwrap_err();
+        assert!(matches!(err, ConvertError::TypeMismatch { .. }));
+    }
+
+    #[test]
+    fn test_f64_from_wrong_type() {
+        let err = f64::from_tealeaf_value(&Value::String("nope".into())).unwrap_err();
+        assert!(matches!(err, ConvertError::TypeMismatch { .. }));
+    }
+
+    #[test]
+    fn test_to_tlbx_convenience() {
+        let val = 42i64;
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_convert_to_tlbx.tlbx");
+        val.to_tlbx("num", &path, false).unwrap();
+        assert!(path.exists());
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_to_tealeaf_json_convenience() {
+        let val = 42i64;
+        let json = val.to_tealeaf_json("num").unwrap();
+        assert!(json.contains("42"));
+    }
+
+    #[test]
     fn test_tuple_roundtrip() {
         let t = (1i64, "hello".to_string());
         let val = t.to_tealeaf_value();

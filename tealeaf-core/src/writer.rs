@@ -459,3 +459,368 @@ fn compress_data(data: &[u8]) -> Vec<u8> {
     e.write_all(data).unwrap();
     e.finish().unwrap()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::reader::Reader;
+
+    #[test]
+    fn test_writer_default() {
+        let w = Writer::default();
+        assert_eq!(w.strings.len(), 0);
+        assert_eq!(w.schemas.len(), 0);
+    }
+
+    #[test]
+    fn test_encode_uint_ranges() {
+        // encode_uint for small values (u8 range)
+        let (data, tl_type, _, _) = encode_uint(42);
+        assert_eq!(tl_type, TLType::UInt8);
+        assert_eq!(data, vec![42u8]);
+
+        // encode_uint for u16 range
+        let (data, tl_type, _, _) = encode_uint(300);
+        assert_eq!(tl_type, TLType::UInt16);
+        assert_eq!(data, 300u16.to_le_bytes().to_vec());
+
+        // encode_uint for u32 range
+        let (data, tl_type, _, _) = encode_uint(100_000);
+        assert_eq!(tl_type, TLType::UInt32);
+        assert_eq!(data, 100_000u32.to_le_bytes().to_vec());
+
+        // encode_uint for u64 range
+        let (data, tl_type, _, _) = encode_uint(5_000_000_000);
+        assert_eq!(tl_type, TLType::UInt64);
+        assert_eq!(data, 5_000_000_000u64.to_le_bytes().to_vec());
+    }
+
+    #[test]
+    fn test_uint_value_roundtrip() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_uint_roundtrip.tlbx");
+
+        let mut w = Writer::new();
+        w.add_section("small", &Value::UInt(42), None);
+        w.add_section("medium", &Value::UInt(300), None);
+        w.add_section("large", &Value::UInt(100_000), None);
+        w.add_section("huge", &Value::UInt(5_000_000_000), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        assert_eq!(r.get("small").unwrap().as_uint(), Some(42));
+        assert_eq!(r.get("medium").unwrap().as_uint(), Some(300));
+        assert_eq!(r.get("large").unwrap().as_uint(), Some(100_000));
+        assert_eq!(r.get("huge").unwrap().as_uint(), Some(5_000_000_000));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_typed_schema_roundtrip() {
+        // Build a schema with various typed fields to exercise encode_typed_value
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_typed_schema.tlbx");
+
+        let mut schema = Schema::new("TypedRecord");
+        schema.add_field("flag", FieldType::new("bool"));
+        schema.add_field("small_int", FieldType::new("int8"));
+        schema.add_field("med_int", FieldType::new("int16"));
+        schema.add_field("int32_val", FieldType::new("int"));
+        schema.add_field("int64_val", FieldType::new("int64"));
+        schema.add_field("small_uint", FieldType::new("uint8"));
+        schema.add_field("med_uint", FieldType::new("uint16"));
+        schema.add_field("uint32_val", FieldType::new("uint"));
+        schema.add_field("uint64_val", FieldType::new("uint64"));
+        schema.add_field("f32_val", FieldType::new("float32"));
+        schema.add_field("f64_val", FieldType::new("float"));
+        schema.add_field("name", FieldType::new("string"));
+        schema.add_field("data", FieldType::new("bytes"));
+
+        let mut w = Writer::new();
+        w.add_schema(schema.clone());
+
+        // Create a record with all typed fields
+        let mut obj = HashMap::new();
+        obj.insert("flag".to_string(), Value::Bool(true));
+        obj.insert("small_int".to_string(), Value::Int(42));
+        obj.insert("med_int".to_string(), Value::Int(1000));
+        obj.insert("int32_val".to_string(), Value::Int(50000));
+        obj.insert("int64_val".to_string(), Value::Int(1_000_000_000_000));
+        obj.insert("small_uint".to_string(), Value::UInt(200));
+        obj.insert("med_uint".to_string(), Value::UInt(40000));
+        obj.insert("uint32_val".to_string(), Value::UInt(3_000_000));
+        obj.insert("uint64_val".to_string(), Value::UInt(9_000_000_000));
+        obj.insert("f32_val".to_string(), Value::Float(3.14));
+        obj.insert("f64_val".to_string(), Value::Float(2.718281828));
+        obj.insert("name".to_string(), Value::String("test".into()));
+        obj.insert("data".to_string(), Value::Bytes(vec![0xDE, 0xAD]));
+
+        let arr = Value::Array(vec![Value::Object(obj)]);
+        w.add_section("records", &arr, Some(&schema));
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let records = r.get("records").unwrap();
+        let items = records.as_array().unwrap();
+        assert_eq!(items.len(), 1);
+
+        let rec = items[0].as_object().unwrap();
+        assert_eq!(rec.get("flag").unwrap().as_bool(), Some(true));
+        assert_eq!(rec.get("name").unwrap().as_str(), Some("test"));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_typed_schema_array_field() {
+        // Schema with an array field to exercise typed array encoding
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_typed_array_field.tlbx");
+
+        let mut schema = Schema::new("WithArray");
+        schema.add_field("name", FieldType::new("string"));
+        schema.add_field("scores", FieldType::new("int").array());
+
+        let mut w = Writer::new();
+        w.add_schema(schema.clone());
+
+        let mut obj = HashMap::new();
+        obj.insert("name".to_string(), Value::String("Alice".into()));
+        obj.insert("scores".to_string(), Value::Array(vec![Value::Int(90), Value::Int(85)]));
+
+        let arr = Value::Array(vec![Value::Object(obj)]);
+        w.add_section("users", &arr, Some(&schema));
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let users = r.get("users").unwrap();
+        let items = users.as_array().unwrap();
+        assert_eq!(items.len(), 1);
+        let rec = items[0].as_object().unwrap();
+        assert_eq!(rec.get("name").unwrap().as_str(), Some("Alice"));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_object_encoding_roundtrip() {
+        // Direct object (non-struct-array) encoding
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_object_enc.tlbx");
+
+        let mut obj = HashMap::new();
+        obj.insert("x".to_string(), Value::Int(10));
+        obj.insert("y".to_string(), Value::String("hello".into()));
+
+        let mut w = Writer::new();
+        w.add_section("data", &Value::Object(obj), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let val = r.get("data").unwrap();
+        let o = val.as_object().unwrap();
+        assert_eq!(o.get("x").unwrap().as_int(), Some(10));
+        assert_eq!(o.get("y").unwrap().as_str(), Some("hello"));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_map_roundtrip_binary() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_map_binary.tlbx");
+
+        let pairs = vec![
+            (Value::String("key1".into()), Value::Int(100)),
+            (Value::String("key2".into()), Value::Bool(true)),
+        ];
+
+        let mut w = Writer::new();
+        w.add_section("mapping", &Value::Map(pairs), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let val = r.get("mapping").unwrap();
+        if let Value::Map(pairs) = val {
+            assert_eq!(pairs.len(), 2);
+        } else {
+            panic!("Expected Map value");
+        }
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_ref_and_tagged_roundtrip() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_ref_tagged.tlbx");
+
+        let mut w = Writer::new();
+        w.add_section("myref", &Value::Ref("some_ref".into()), None);
+        w.add_section("mytag", &Value::Tagged("label".into(), Box::new(Value::Int(42))), None);
+        w.add_section("myts", &Value::Timestamp(1700000000000), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+
+        if let Value::Ref(s) = r.get("myref").unwrap() {
+            assert_eq!(s, "some_ref");
+        } else { panic!("Expected Ref"); }
+
+        if let Value::Tagged(tag, inner) = r.get("mytag").unwrap() {
+            assert_eq!(tag, "label");
+            assert_eq!(inner.as_int(), Some(42));
+        } else { panic!("Expected Tagged"); }
+
+        if let Value::Timestamp(ts) = r.get("myts").unwrap() {
+            assert_eq!(ts, 1700000000000);
+        } else { panic!("Expected Timestamp"); }
+
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_compressed_roundtrip() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_compressed.tlbx");
+
+        // Create large enough data to trigger compression
+        let mut arr = Vec::new();
+        for i in 0..100 {
+            arr.push(Value::Int(i));
+        }
+
+        let mut w = Writer::new();
+        w.add_section("numbers", &Value::Array(arr), None);
+        w.write(&path, true).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let val = r.get("numbers").unwrap();
+        let items = val.as_array().unwrap();
+        assert_eq!(items.len(), 100);
+        assert_eq!(items[0].as_int(), Some(0));
+        assert_eq!(items[99].as_int(), Some(99));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_root_array_flag() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_root_array_flag.tlbx");
+
+        let mut w = Writer::new();
+        w.set_root_array(true);
+        w.add_section("root", &Value::Array(vec![Value::Int(1)]), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        assert!(r.is_root_array());
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_bytes_value_roundtrip() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_bytes_val.tlbx");
+
+        let mut w = Writer::new();
+        w.add_section("blob", &Value::Bytes(vec![1, 2, 3, 4, 5]), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let val = r.get("blob").unwrap();
+        assert_eq!(val.as_bytes(), Some(&[1u8, 2, 3, 4, 5][..]));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_nested_struct_schema_roundtrip() {
+        // Test encode_typed_value with TLType::Struct (nested struct field)
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_nested_struct.tlbx");
+
+        let mut inner_schema = Schema::new("Address");
+        inner_schema.add_field("city", FieldType::new("string"));
+        inner_schema.add_field("zip", FieldType::new("string"));
+
+        let mut outer_schema = Schema::new("Person");
+        outer_schema.add_field("name", FieldType::new("string"));
+        outer_schema.add_field("home", FieldType::new("Address"));
+
+        let mut w = Writer::new();
+        w.add_schema(inner_schema.clone());
+        w.add_schema(outer_schema.clone());
+
+        let mut addr = HashMap::new();
+        addr.insert("city".to_string(), Value::String("Seattle".into()));
+        addr.insert("zip".to_string(), Value::String("98101".into()));
+
+        let mut person = HashMap::new();
+        person.insert("name".to_string(), Value::String("Alice".into()));
+        person.insert("home".to_string(), Value::Object(addr));
+
+        let arr = Value::Array(vec![Value::Object(person)]);
+        w.add_section("people", &arr, Some(&outer_schema));
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let people = r.get("people").unwrap();
+        let items = people.as_array().unwrap();
+        assert_eq!(items.len(), 1);
+        let p = items[0].as_object().unwrap();
+        assert_eq!(p.get("name").unwrap().as_str(), Some("Alice"));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_timestamp_typed_field() {
+        // Struct array with a timestamp field
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_ts_typed.tlbx");
+
+        let mut schema = Schema::new("Event");
+        schema.add_field("name", FieldType::new("string"));
+        schema.add_field("ts", FieldType::new("timestamp"));
+
+        let mut w = Writer::new();
+        w.add_schema(schema.clone());
+
+        let mut obj = HashMap::new();
+        obj.insert("name".to_string(), Value::String("deploy".into()));
+        obj.insert("ts".to_string(), Value::Timestamp(1700000000000));
+
+        let arr = Value::Array(vec![Value::Object(obj)]);
+        w.add_section("events", &arr, Some(&schema));
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let events = r.get("events").unwrap();
+        let items = events.as_array().unwrap();
+        assert_eq!(items.len(), 1);
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_bytes_typed_field() {
+        // Struct array with a bytes field
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_bytes_typed.tlbx");
+
+        let mut schema = Schema::new("Blob");
+        schema.add_field("name", FieldType::new("string"));
+        schema.add_field("data", FieldType::new("bytes"));
+
+        let mut w = Writer::new();
+        w.add_schema(schema.clone());
+
+        let mut obj = HashMap::new();
+        obj.insert("name".to_string(), Value::String("img".into()));
+        obj.insert("data".to_string(), Value::Bytes(vec![0xDE, 0xAD, 0xBE, 0xEF]));
+
+        let arr = Value::Array(vec![Value::Object(obj)]);
+        w.add_section("blobs", &arr, Some(&schema));
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let blobs = r.get("blobs").unwrap();
+        let items = blobs.as_array().unwrap();
+        assert_eq!(items.len(), 1);
+        std::fs::remove_file(&path).ok();
+    }
+}

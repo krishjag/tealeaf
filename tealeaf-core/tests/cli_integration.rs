@@ -945,3 +945,118 @@ fn large_data_compile_and_read_back_via_cli() {
     let expected = load_json_file(&expected_json_path("large_data"));
     assert_eq!(actual, expected, "large_data compile -> tlbx-to-json should preserve content");
 }
+
+// =============================================================================
+// Decompile tests for special value types (Ref, Tagged, Map, Timestamp)
+// =============================================================================
+
+#[test]
+fn decompile_refs_tags_maps_succeeds() {
+    let dir = tempfile::tempdir().unwrap();
+    let input = sample_tl("refs_tags_maps");
+
+    // compile to binary
+    let tlbx = dir.path().join("refs_tags_maps.tlbx");
+    let output = run(&["compile", path_str(&input), "-o", path_str(&tlbx)]);
+    assert_success(&output);
+
+    // decompile back to text
+    let tl_out = dir.path().join("refs_tags_maps_decompiled.tl");
+    let output = run(&["decompile", path_str(&tlbx), "-o", path_str(&tl_out)]);
+    assert_success(&output);
+
+    let text = std::fs::read_to_string(&tl_out).unwrap();
+    assert!(!text.is_empty(), "Decompiled text should not be empty");
+}
+
+#[test]
+fn decompile_timestamps_succeeds() {
+    let dir = tempfile::tempdir().unwrap();
+    let input = sample_tl("timestamps");
+
+    let tlbx = dir.path().join("timestamps.tlbx");
+    let output = run(&["compile", path_str(&input), "-o", path_str(&tlbx)]);
+    assert_success(&output);
+
+    let tl_out = dir.path().join("timestamps_decompiled.tl");
+    let output = run(&["decompile", path_str(&tlbx), "-o", path_str(&tl_out)]);
+    assert_success(&output);
+
+    let text = std::fs::read_to_string(&tl_out).unwrap();
+    assert!(!text.is_empty(), "Decompiled text should not be empty");
+}
+
+#[test]
+fn decompile_special_types_succeeds() {
+    let dir = tempfile::tempdir().unwrap();
+    let input = sample_tl("special_types");
+
+    let tlbx = dir.path().join("special_types.tlbx");
+    let output = run(&["compile", path_str(&input), "-o", path_str(&tlbx)]);
+    assert_success(&output);
+
+    let tl_out = dir.path().join("special_types_decompiled.tl");
+    let output = run(&["decompile", path_str(&tlbx), "-o", path_str(&tl_out)]);
+    assert_success(&output);
+
+    let text = std::fs::read_to_string(&tl_out).unwrap();
+    assert!(!text.is_empty());
+}
+
+#[test]
+fn decompile_all_canonical_samples() {
+    let dir = tempfile::tempdir().unwrap();
+    for name in CANONICAL_SAMPLES {
+        let input = sample_tl(name);
+        let tlbx = dir.path().join(format!("{}.tlbx", name));
+        let output = run(&["compile", path_str(&input), "-o", path_str(&tlbx)]);
+        assert_success(&output);
+
+        let tl_out = dir.path().join(format!("{}_decompiled.tl", name));
+        let output = run(&["decompile", path_str(&tlbx), "-o", path_str(&tl_out)]);
+        assert_success(&output);
+    }
+}
+
+#[test]
+fn info_all_canonical_samples_text_and_binary() {
+    let dir = tempfile::tempdir().unwrap();
+    for name in CANONICAL_SAMPLES {
+        // info on text file
+        let tl_file = sample_tl(name);
+        let output = run(&["info", path_str(&tl_file)]);
+        assert_success(&output);
+        let info = stdout_str(&output);
+        assert!(!info.is_empty(), "info on {} should produce output", name);
+
+        // compile and info on binary
+        let tlbx = dir.path().join(format!("{}.tlbx", name));
+        let compile_out = run(&["compile", path_str(&tl_file), "-o", path_str(&tlbx)]);
+        assert_success(&compile_out);
+
+        let output = run(&["info", path_str(&tlbx)]);
+        assert_success(&output);
+        let info = stdout_str(&output);
+        assert!(!info.is_empty(), "info on binary {} should produce output", name);
+    }
+}
+
+#[test]
+fn from_json_invalid_json_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let bad_json = dir.path().join("bad.json");
+    std::fs::write(&bad_json, "not valid json {{{").unwrap();
+
+    let tl_out = dir.path().join("output.tl");
+    let output = run(&["from-json", path_str(&bad_json), "-o", path_str(&tl_out)]);
+    assert_failure(&output);
+}
+
+#[test]
+fn validate_all_canonical_samples() {
+    for name in CANONICAL_SAMPLES {
+        let tl_file = sample_tl(name);
+        let output = run(&["validate", path_str(&tl_file)]);
+        assert_success(&output);
+    }
+}

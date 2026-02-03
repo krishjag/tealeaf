@@ -1,0 +1,104 @@
+# Codecov configuration for TeaLeaf
+# https://docs.codecov.com/docs/codecov-yaml
+
+codecov:
+  require_ci_to_pass: false
+  notify:
+    wait_for_ci: true
+
+coverage:
+  precision: 2
+  round: down
+  range: "60...90"
+
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 2%
+        if_ci_failed: error
+
+      rust:
+        target: auto
+        threshold: 2%
+        flags:
+          - rust
+
+      dotnet:
+        target: auto
+        threshold: 5%
+        flags:
+          - dotnet
+
+    patch:
+      default:
+        target: 60%
+        threshold: 5%
+
+flags:
+  rust:
+    paths:
+      - tealeaf-core/
+      - tealeaf-derive/
+      - tealeaf-ffi/
+    carryforward: true
+
+  dotnet:
+    paths:
+      - bindings/dotnet/
+    carryforward: true
+
+ignore:
+  - "accuracy-benchmark/**"
+  - "adversarial-tests/**"
+  - "docs-site/**"
+  - "examples/**"
+  - "canonical/**"
+  - "scripts/**"
+  - "vscode-tealeaf/**"
+  - "spec/**"
+  - "throwaway/**"
+  - "assets/**"
+  - "tealeaf-core/benches/**"
+  - "tealeaf-core/examples/**"
+  - "tealeaf-core/build.rs"
+  - "tealeaf-ffi/build.rs"
+  - "tealeaf-core/tests/**"
+  - "bindings/dotnet/TeaLeaf.Tests/**"
+  - "bindings/dotnet/TeaLeaf.Generators.Tests/**"
+  - "bindings/dotnet/**/obj/**"
+
+comment:
+  layout: "header, diff, flags, components"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+component_management:
+  individual_components:
+    - component_id: rust_core
+      name: "Rust Core (tealeaf-core)"
+      paths:
+        - tealeaf-core/src/**
+
+    - component_id: rust_derive
+      name: "Rust Derive (tealeaf-derive)"
+      paths:
+        - tealeaf-derive/src/**
+
+    - component_id: rust_ffi
+      name: "Rust FFI (tealeaf-ffi)"
+      paths:
+        - tealeaf-ffi/src/**
+
+    - component_id: dotnet_bindings
+      name: ".NET Bindings"
+      paths:
+        - bindings/dotnet/TeaLeaf/**
+        - bindings/dotnet/TeaLeaf.Annotations/**
+
+    - component_id: dotnet_generators
+      name: ".NET Source Generator"
+      paths:
+        - bindings/dotnet/TeaLeaf.Generators/**

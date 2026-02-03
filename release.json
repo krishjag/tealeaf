@@ -5,7 +5,7 @@
   "repository": "https://github.com/krishjag/tealeaf",
   "packages": {
     "tealeaf-core": {
-      "description": "Schema-aware document format with human-readable text and compact binary representation"
+      "description": "Schema-aware data format with human-readable text and compact binary representation"
     },
     "tealeaf-ffi": {
       "description": "Foreign function interface for TeaLeaf format"
@@ -15,7 +15,7 @@
     },
     "dotnet": {
       "packageId": "TeaLeaf",
-      "description": "Schema-aware document format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization."
+      "description": "Schema-aware data format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization."
     }
   }
 }

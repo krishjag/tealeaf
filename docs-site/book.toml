@@ -1,7 +1,7 @@
 [book]
 title = "TeaLeaf Documentation"
 authors = ["krishjag"]
-description = "Comprehensive documentation for the TeaLeaf format -- a schema-aware document format with human-readable text and compact binary representation."
+description = "Comprehensive documentation for the TeaLeaf format -- a schema-aware data format with human-readable text and compact binary representation."
 src = "src"
 language = "en"
 

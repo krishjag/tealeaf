@@ -553,12 +553,303 @@ mod tests {
         let tokens = Lexer::new(input).tokenize().unwrap();
         let mut parser = Parser::new(tokens);
         let data = parser.parse().unwrap();
-        
+
         let points = data.get("points").unwrap().as_array().unwrap();
         assert_eq!(points.len(), 2);
-        
+
         let p0 = points[0].as_object().unwrap();
         assert_eq!(p0.get("x").unwrap().as_int(), Some(1));
         assert_eq!(p0.get("y").unwrap().as_int(), Some(2));
+    }
+
+    // -------------------------------------------------------------------------
+    // Union parsing
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_union_def() {
+        let input = r#"
+            @union Shape {
+                Circle(radius: float),
+                Rectangle(width: float, height: float),
+                Point(),
+            }
+        "#;
+        let tokens = Lexer::new(input).tokenize().unwrap();
+        let mut parser = Parser::new(tokens);
+        parser.parse().unwrap();
+        let unions = parser.into_unions();
+        let shape = unions.get("Shape").unwrap();
+        assert_eq!(shape.variants.len(), 3);
+        assert_eq!(shape.variants[0].name, "Circle");
+        assert_eq!(shape.variants[0].fields.len(), 1);
+        assert_eq!(shape.variants[1].name, "Rectangle");
+        assert_eq!(shape.variants[1].fields.len(), 2);
+        assert_eq!(shape.variants[2].name, "Point");
+        assert_eq!(shape.variants[2].fields.len(), 0);
+    }
+
+    // -------------------------------------------------------------------------
+    // Map parsing
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_map_value() {
+        let data = parse("m: @map {1: one, 2: two}").unwrap();
+        let m = data.get("m").unwrap().as_map().unwrap();
+        assert_eq!(m.len(), 2);
+        assert_eq!(m[0].0.as_int(), Some(1));
+        assert_eq!(m[0].1.as_str(), Some("one"));
+        assert_eq!(m[1].0.as_int(), Some(2));
+        assert_eq!(m[1].1.as_str(), Some("two"));
+    }
+
+    #[test]
+    fn test_map_with_string_keys() {
+        let data = parse(r#"m: @map {"key1": 10, "key2": 20}"#).unwrap();
+        let m = data.get("m").unwrap().as_map().unwrap();
+        assert_eq!(m.len(), 2);
+    }
+
+    #[test]
+    fn test_map_empty() {
+        let data = parse("m: @map {}").unwrap();
+        let m = data.get("m").unwrap().as_map().unwrap();
+        assert_eq!(m.len(), 0);
+    }
+
+    // -------------------------------------------------------------------------
+    // Ref and Tagged values
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_ref_value() {
+        let data = parse("config: !base_config").unwrap();
+        assert_eq!(data.get("config").unwrap().as_ref_name(), Some("base_config"));
+    }
+
+    #[test]
+    fn test_tagged_value() {
+        let data = parse("status: :ok 200").unwrap();
+        let (tag, inner) = data.get("status").unwrap().as_tagged().unwrap();
+        assert_eq!(tag, "ok");
+        assert_eq!(inner.as_int(), Some(200));
+    }
+
+    #[test]
+    fn test_tagged_null() {
+        let data = parse("status: :none ~").unwrap();
+        let (tag, inner) = data.get("status").unwrap().as_tagged().unwrap();
+        assert_eq!(tag, "none");
+        assert!(inner.is_null());
+    }
+
+    // -------------------------------------------------------------------------
+    // Tuple and nested structures
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_tuple_value() {
+        let data = parse("point: (1, 2, 3)").unwrap();
+        let arr = data.get("point").unwrap().as_array().unwrap();
+        assert_eq!(arr.len(), 3);
+        assert_eq!(arr[0].as_int(), Some(1));
+        assert_eq!(arr[1].as_int(), Some(2));
+        assert_eq!(arr[2].as_int(), Some(3));
+    }
+
+    #[test]
+    fn test_nested_object() {
+        let data = parse("outer: {inner: {x: 1}}").unwrap();
+        let outer = data.get("outer").unwrap().as_object().unwrap();
+        let inner = outer.get("inner").unwrap().as_object().unwrap();
+        assert_eq!(inner.get("x").unwrap().as_int(), Some(1));
+    }
+
+    #[test]
+    fn test_nested_arrays() {
+        let data = parse("matrix: [[1, 2], [3, 4]]").unwrap();
+        let matrix = data.get("matrix").unwrap().as_array().unwrap();
+        assert_eq!(matrix.len(), 2);
+        let row0 = matrix[0].as_array().unwrap();
+        assert_eq!(row0[0].as_int(), Some(1));
+    }
+
+    // -------------------------------------------------------------------------
+    // Struct fields with types
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_struct_with_nullable_field() {
+        let input = r#"
+            @struct user (name: string, email: string?)
+            users: @table user [
+                (alice, "a@test.com"),
+                (bob, ~),
+            ]
+        "#;
+        let tokens = Lexer::new(input).tokenize().unwrap();
+        let mut parser = Parser::new(tokens);
+        let data = parser.parse().unwrap();
+        let schemas = parser.into_schemas();
+
+        let schema = schemas.get("user").unwrap();
+        assert!(schema.fields[1].field_type.nullable);
+
+        let users = data.get("users").unwrap().as_array().unwrap();
+        assert_eq!(users.len(), 2);
+        assert!(users[1].as_object().unwrap().get("email").unwrap().is_null());
+    }
+
+    #[test]
+    fn test_struct_with_array_field() {
+        let input = r#"
+            @struct item (name: string, tags: []string)
+            items: @table item [
+                (widget, [cool, useful]),
+            ]
+        "#;
+        let tokens = Lexer::new(input).tokenize().unwrap();
+        let mut parser = Parser::new(tokens);
+        let data = parser.parse().unwrap();
+
+        let items = data.get("items").unwrap().as_array().unwrap();
+        let tags = items[0].as_object().unwrap().get("tags").unwrap().as_array().unwrap();
+        assert_eq!(tags.len(), 2);
+    }
+
+    // -------------------------------------------------------------------------
+    // Root-array directive
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_root_array_directive() {
+        let input = "@root-array\nroot: [1, 2, 3]";
+        let tokens = Lexer::new(input).tokenize().unwrap();
+        let mut parser = Parser::new(tokens);
+        parser.parse().unwrap();
+        assert!(parser.is_root_array());
+    }
+
+    // -------------------------------------------------------------------------
+    // Ref key at top level
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_ref_key_at_top_level() {
+        let input = "!defaults: {theme: dark}";
+        let data = parse(input).unwrap();
+        assert!(data.contains_key("!defaults"));
+        let obj = data.get("!defaults").unwrap().as_object().unwrap();
+        assert_eq!(obj.get("theme").unwrap().as_str(), Some("dark"));
+    }
+
+    // -------------------------------------------------------------------------
+    // String keys
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_string_key() {
+        let data = parse(r#""my key": 42"#).unwrap();
+        assert_eq!(data.get("my key").unwrap().as_int(), Some(42));
+    }
+
+    // -------------------------------------------------------------------------
+    // Error cases
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_unexpected_token_error() {
+        let result = parse("] invalid");
+        // The parser may skip unexpected tokens or error
+        // Just ensure it doesn't panic
+        let _ = result;
+    }
+
+    #[test]
+    fn test_missing_colon_error() {
+        // A word followed by a value without colon
+        let input = "key value";
+        let result = parse(input);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_unknown_struct_in_table() {
+        let input = "data: @table nonexistent [(1, 2)]";
+        let result = parse(input);
+        assert!(result.is_err());
+    }
+
+    // -------------------------------------------------------------------------
+    // Struct field type defaults
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_struct_field_without_type() {
+        let input = r#"
+            @struct simple (name, value)
+            items: @table simple [
+                (hello, world),
+            ]
+        "#;
+        let tokens = Lexer::new(input).tokenize().unwrap();
+        let mut parser = Parser::new(tokens);
+        let data = parser.parse().unwrap();
+        let schemas = parser.into_schemas();
+
+        // Fields without explicit type default to "string"
+        let schema = schemas.get("simple").unwrap();
+        assert_eq!(schema.fields[0].field_type.base, "string");
+        assert_eq!(schema.fields[1].field_type.base, "string");
+
+        let items = data.get("items").unwrap().as_array().unwrap();
+        assert_eq!(items[0].as_object().unwrap().get("name").unwrap().as_str(), Some("hello"));
+    }
+
+    // -------------------------------------------------------------------------
+    // Unknown directive
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_unknown_directive_ignored() {
+        let data = parse("@custom_directive\nkey: value").unwrap();
+        assert_eq!(data.get("key").unwrap().as_str(), Some("value"));
+    }
+
+    // -------------------------------------------------------------------------
+    // Object with ref keys
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_object_with_ref_key() {
+        let data = parse("obj: {!base: 1, key: 2}").unwrap();
+        let obj = data.get("obj").unwrap().as_object().unwrap();
+        assert!(obj.contains_key("!base"));
+        assert_eq!(obj.get("!base").unwrap().as_int(), Some(1));
+        assert_eq!(obj.get("key").unwrap().as_int(), Some(2));
+    }
+
+    // -------------------------------------------------------------------------
+    // Nested struct in table
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_nested_struct_in_table() {
+        let input = r#"
+            @struct addr (city: string, zip: string)
+            @struct person (name: string, home: addr)
+            people: @table person [
+                (alice, (Boston, "02101")),
+                (bob, (NYC, "10001")),
+            ]
+        "#;
+        let tokens = Lexer::new(input).tokenize().unwrap();
+        let mut parser = Parser::new(tokens);
+        let data = parser.parse().unwrap();
+
+        let people = data.get("people").unwrap().as_array().unwrap();
+        let alice_home = people[0].as_object().unwrap().get("home").unwrap().as_object().unwrap();
+        assert_eq!(alice_home.get("city").unwrap().as_str(), Some("Boston"));
     }
 }

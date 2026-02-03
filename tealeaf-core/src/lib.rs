@@ -1,4 +1,4 @@
-//! TeaLeaf - Schema-aware document format
+//! TeaLeaf - Schema-aware data format
 //!
 //! # Example
 //!
@@ -2513,5 +2513,847 @@ mod tests {
         let customer_schema = doc.schema("customer").unwrap();
         let phone_field = customer_schema.fields.iter().find(|f| f.name == "phone").unwrap();
         assert!(phone_field.field_type.nullable, "phone field should be nullable");
+    }
+
+    // =========================================================================
+    // Coverage: dumps(), write_value(), escape_string(), format_float()
+    // =========================================================================
+
+    #[test]
+    fn test_dumps_all_value_types() {
+        let mut data = std::collections::HashMap::new();
+        data.insert("null_val".to_string(), Value::Null);
+        data.insert("bool_val".to_string(), Value::Bool(true));
+        data.insert("int_val".to_string(), Value::Int(42));
+        data.insert("uint_val".to_string(), Value::UInt(999));
+        data.insert("float_val".to_string(), Value::Float(3.14));
+        data.insert("str_val".to_string(), Value::String("hello".to_string()));
+        data.insert("bytes_val".to_string(), Value::Bytes(vec![0xca, 0xfe]));
+        data.insert("arr_val".to_string(), Value::Array(vec![Value::Int(1), Value::Int(2)]));
+        data.insert("obj_val".to_string(), Value::Object(
+            vec![("x".to_string(), Value::Int(1))].into_iter().collect()
+        ));
+        data.insert("map_val".to_string(), Value::Map(vec![
+            (Value::Int(1), Value::String("one".to_string())),
+        ]));
+        data.insert("ref_val".to_string(), Value::Ref("target".to_string()));
+        data.insert("tag_val".to_string(), Value::Tagged("ok".to_string(), Box::new(Value::Int(200))));
+        data.insert("ts_val".to_string(), Value::Timestamp(0));
+        data.insert("ts_millis".to_string(), Value::Timestamp(1705315800123));
+
+        let output = dumps(&data);
+
+        assert!(output.contains("~"), "Should contain null");
+        assert!(output.contains("true"), "Should contain bool");
+        assert!(output.contains("42"), "Should contain int");
+        assert!(output.contains("999"), "Should contain uint");
+        assert!(output.contains("3.14"), "Should contain float");
+        assert!(output.contains("hello"), "Should contain string");
+        assert!(output.contains("0xcafe"), "Should contain bytes hex");
+        assert!(output.contains("[1, 2]"), "Should contain array");
+        assert!(output.contains("@map {"), "Should contain map");
+        assert!(output.contains("!target"), "Should contain ref");
+        assert!(output.contains(":ok 200"), "Should contain tagged");
+        assert!(output.contains("1970-01-01T00:00:00Z"), "Should contain epoch timestamp");
+        assert!(output.contains(".123Z"), "Should contain millis timestamp");
+    }
+
+    #[test]
+    fn test_dumps_string_quoting() {
+        let mut data = std::collections::HashMap::new();
+        data.insert("quoted".to_string(), Value::String("hello world".to_string()));
+        data.insert("unquoted".to_string(), Value::String("hello".to_string()));
+        data.insert("reserved_true".to_string(), Value::String("true".to_string()));
+        data.insert("reserved_null".to_string(), Value::String("null".to_string()));
+        data.insert("reserved_tilde".to_string(), Value::String("~".to_string()));
+        data.insert("empty".to_string(), Value::String("".to_string()));
+        data.insert("at_start".to_string(), Value::String("@directive".to_string()));
+        data.insert("hash_start".to_string(), Value::String("#comment".to_string()));
+        data.insert("bang_start".to_string(), Value::String("!ref".to_string()));
+        data.insert("hex_start".to_string(), Value::String("0xabc".to_string()));
+        data.insert("number_like".to_string(), Value::String("42abc".to_string()));
+        data.insert("negative_like".to_string(), Value::String("-5".to_string()));
+        data.insert("slash".to_string(), Value::String("a/b".to_string()));
+        data.insert("dot".to_string(), Value::String("a.b".to_string()));
+
+        let output = dumps(&data);
+
+        // Quoted values should be wrapped in double quotes
+        assert!(output.contains("\"hello world\""), "Spaces need quoting");
+        assert!(output.contains("\"true\""), "Reserved word true needs quoting");
+        assert!(output.contains("\"null\""), "Reserved word null needs quoting");
+        assert!(output.contains("\"~\""), "Tilde needs quoting");
+        assert!(output.contains("\"\""), "Empty string needs quoting");
+        assert!(output.contains("\"@directive\""), "@ prefix needs quoting");
+        assert!(output.contains("\"#comment\""), "# prefix needs quoting");
+        assert!(output.contains("\"!ref\""), "! prefix needs quoting");
+        assert!(output.contains("\"0xabc\""), "0x prefix needs quoting");
+        assert!(output.contains("\"42abc\""), "Digit start needs quoting");
+        assert!(output.contains("\"-5\""), "Negative number needs quoting");
+        assert!(output.contains("\"a/b\""), "Slash needs quoting");
+        assert!(output.contains("\"a.b\""), "Dot needs quoting");
+    }
+
+    #[test]
+    fn test_escape_string_control_chars() {
+        let result = escape_string("tab\there\nnewline\rreturn");
+        assert!(result.contains("\\t"), "Tab should be escaped");
+        assert!(result.contains("\\n"), "Newline should be escaped");
+        assert!(result.contains("\\r"), "CR should be escaped");
+
+        let result = escape_string("\x08backspace\x0cformfeed");
+        assert!(result.contains("\\b"), "Backspace should be escaped");
+        assert!(result.contains("\\f"), "Formfeed should be escaped");
+
+        let result = escape_string("quote\"and\\backslash");
+        assert!(result.contains("\\\""), "Quote should be escaped");
+        assert!(result.contains("\\\\"), "Backslash should be escaped");
+
+        // Other control characters use \uXXXX
+        let result = escape_string("\x01");
+        assert!(result.contains("\\u0001"), "Control char should use \\uXXXX");
+    }
+
+    #[test]
+    fn test_format_float_both_branches() {
+        // Whole number float: Rust's to_string() drops .0, so format_float adds it back
+        assert_eq!(format_float(42.0), "42.0");
+
+        // Float with decimals should stay as-is
+        assert_eq!(format_float(3.14), "3.14");
+
+        // Scientific notation stays as-is
+        let very_small = format_float(1e-20);
+        assert!(very_small.contains('e') || very_small.contains('.'));
+    }
+
+    #[test]
+    fn test_needs_quoting_various_patterns() {
+        // Should need quoting
+        assert!(needs_quoting(""), "Empty string");
+        assert!(needs_quoting("hello world"), "Whitespace");
+        assert!(needs_quoting("a,b"), "Comma");
+        assert!(needs_quoting("(x)"), "Parens");
+        assert!(needs_quoting("[x]"), "Brackets");
+        assert!(needs_quoting("{x}"), "Braces");
+        assert!(needs_quoting("a:b"), "Colon");
+        assert!(needs_quoting("@x"), "At sign");
+        assert!(needs_quoting("a/b"), "Slash");
+        assert!(needs_quoting("a.b"), "Dot");
+        assert!(needs_quoting("true"), "Reserved true");
+        assert!(needs_quoting("false"), "Reserved false");
+        assert!(needs_quoting("null"), "Reserved null");
+        assert!(needs_quoting("~"), "Reserved tilde");
+        assert!(needs_quoting("!bang"), "Bang prefix");
+        assert!(needs_quoting("#hash"), "Hash prefix");
+        assert!(needs_quoting("0xdead"), "Hex prefix");
+        assert!(needs_quoting("0Xdead"), "Hex prefix uppercase");
+        assert!(needs_quoting("42abc"), "Starts with digit");
+        assert!(needs_quoting("-5"), "Starts with minus+digit");
+        assert!(needs_quoting("+5"), "Starts with plus+digit");
+
+        // Should NOT need quoting
+        assert!(!needs_quoting("hello"), "Simple word");
+        assert!(!needs_quoting("foo_bar"), "Underscore word");
+        assert!(!needs_quoting("abc123"), "Alpha then digits");
+    }
+
+    // =========================================================================
+    // Coverage: singularize()
+    // =========================================================================
+
+    #[test]
+    fn test_singularize_rules() {
+        // -ies → -y
+        assert_eq!(singularize("categories"), "category");
+        assert_eq!(singularize("entries"), "entry");
+
+        // -sses → -ss (special -es rule)
+        assert_eq!(singularize("classes"), "class");
+        assert_eq!(singularize("dresses"), "dress");
+
+        // -xes → -x
+        assert_eq!(singularize("boxes"), "box");
+        assert_eq!(singularize("indexes"), "index");
+
+        // -ches → -ch
+        assert_eq!(singularize("watches"), "watch");
+
+        // -shes → -sh
+        assert_eq!(singularize("dishes"), "dish");
+
+        // Regular -s
+        assert_eq!(singularize("users"), "user");
+        assert_eq!(singularize("products"), "product");
+
+        // Words ending in -ss (should NOT remove s)
+        assert_eq!(singularize("boss"), "boss");
+        assert_eq!(singularize("class"), "class");
+
+        // Already singular (no trailing s)
+        assert_eq!(singularize("item"), "item");
+        assert_eq!(singularize("child"), "child");
+    }
+
+    // =========================================================================
+    // Coverage: from_json root primitives, loads()
+    // =========================================================================
+
+    #[test]
+    fn test_from_json_root_primitive() {
+        // Root-level string
+        let doc = TeaLeaf::from_json(r#""hello""#).unwrap();
+        assert_eq!(doc.get("root").unwrap().as_str(), Some("hello"));
+        assert!(!doc.is_root_array);
+
+        // Root-level number
+        let doc = TeaLeaf::from_json("42").unwrap();
+        assert_eq!(doc.get("root").unwrap().as_int(), Some(42));
+
+        // Root-level bool
+        let doc = TeaLeaf::from_json("true").unwrap();
+        assert_eq!(doc.get("root").unwrap().as_bool(), Some(true));
+
+        // Root-level null
+        let doc = TeaLeaf::from_json("null").unwrap();
+        assert!(doc.get("root").unwrap().is_null());
+    }
+
+    #[test]
+    fn test_from_json_invalid() {
+        let result = TeaLeaf::from_json("not valid json {{{");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_loads_convenience() {
+        let data = loads("name: alice\nage: 30").unwrap();
+        assert_eq!(data.get("name").unwrap().as_str(), Some("alice"));
+        assert_eq!(data.get("age").unwrap().as_int(), Some(30));
+    }
+
+    // =========================================================================
+    // Coverage: InferredType::merge() branches
+    // =========================================================================
+
+    #[test]
+    fn test_inferred_type_merge_int_float() {
+        let t = infer_type(&Value::Int(42));
+        let f = infer_type(&Value::Float(3.14));
+        let merged = t.merge(&f);
+        assert_eq!(merged, InferredType::Float);
+
+        // Reverse
+        let merged = f.merge(&t);
+        assert_eq!(merged, InferredType::Float);
+    }
+
+    #[test]
+    fn test_inferred_type_merge_null_with_type() {
+        let n = InferredType::Null;
+        let s = InferredType::String;
+        let merged = n.merge(&s);
+        assert_eq!(merged, InferredType::String);
+
+        // Reverse
+        let merged = s.merge(&n);
+        assert_eq!(merged, InferredType::String);
+    }
+
+    #[test]
+    fn test_inferred_type_merge_arrays() {
+        let a1 = InferredType::Array(Box::new(InferredType::Int));
+        let a2 = InferredType::Array(Box::new(InferredType::Float));
+        let merged = a1.merge(&a2);
+        assert_eq!(merged, InferredType::Array(Box::new(InferredType::Float)));
+    }
+
+    #[test]
+    fn test_inferred_type_merge_objects_same_fields() {
+        let o1 = InferredType::Object(vec![
+            ("a".to_string(), InferredType::Int),
+            ("b".to_string(), InferredType::String),
+        ]);
+        let o2 = InferredType::Object(vec![
+            ("a".to_string(), InferredType::Float),
+            ("b".to_string(), InferredType::String),
+        ]);
+        let merged = o1.merge(&o2);
+        if let InferredType::Object(fields) = &merged {
+            assert_eq!(fields.len(), 2);
+            assert_eq!(fields[0].1, InferredType::Float); // Int+Float → Float
+            assert_eq!(fields[1].1, InferredType::String);
+        } else {
+            panic!("Expected Object, got {:?}", merged);
+        }
+    }
+
+    #[test]
+    fn test_inferred_type_merge_objects_different_fields() {
+        let o1 = InferredType::Object(vec![
+            ("a".to_string(), InferredType::Int),
+        ]);
+        let o2 = InferredType::Object(vec![
+            ("b".to_string(), InferredType::String),
+        ]);
+        let merged = o1.merge(&o2);
+        assert_eq!(merged, InferredType::Mixed);
+    }
+
+    #[test]
+    fn test_inferred_type_merge_incompatible() {
+        let s = InferredType::String;
+        let i = InferredType::Int;
+        let merged = s.merge(&i);
+        assert_eq!(merged, InferredType::Mixed);
+    }
+
+    #[test]
+    fn test_inferred_type_to_field_type() {
+        let schemas = HashMap::new();
+
+        assert_eq!(InferredType::Null.to_field_type(&schemas).base, "string");
+        assert!(InferredType::Null.to_field_type(&schemas).nullable);
+        assert_eq!(InferredType::Bool.to_field_type(&schemas).base, "bool");
+        assert_eq!(InferredType::Int.to_field_type(&schemas).base, "int");
+        assert_eq!(InferredType::Float.to_field_type(&schemas).base, "float");
+        assert_eq!(InferredType::String.to_field_type(&schemas).base, "string");
+        assert_eq!(InferredType::Mixed.to_field_type(&schemas).base, "any");
+
+        // Array type
+        let arr_type = InferredType::Array(Box::new(InferredType::Int));
+        let ft = arr_type.to_field_type(&schemas);
+        assert_eq!(ft.base, "int");
+        assert!(ft.is_array);
+
+        // Object with no matching schema → "object"
+        let obj_type = InferredType::Object(vec![("x".to_string(), InferredType::Int)]);
+        assert_eq!(obj_type.to_field_type(&schemas).base, "object");
+    }
+
+    #[test]
+    fn test_inferred_type_to_field_type_with_matching_schema() {
+        let mut schemas = HashMap::new();
+        let mut schema = Schema::new("point");
+        schema.add_field("x", FieldType::new("int"));
+        schema.add_field("y", FieldType::new("int"));
+        schemas.insert("point".to_string(), schema);
+
+        let obj_type = InferredType::Object(vec![
+            ("x".to_string(), InferredType::Int),
+            ("y".to_string(), InferredType::Int),
+        ]);
+        let ft = obj_type.to_field_type(&schemas);
+        assert_eq!(ft.base, "point");
+    }
+
+    #[test]
+    fn test_infer_type_special_values() {
+        // Bytes, Ref, Tagged, Timestamp, Map all become Mixed
+        assert_eq!(infer_type(&Value::Bytes(vec![1, 2])), InferredType::Mixed);
+        assert_eq!(infer_type(&Value::Ref("x".to_string())), InferredType::Mixed);
+        assert_eq!(infer_type(&Value::Tagged("t".to_string(), Box::new(Value::Null))), InferredType::Mixed);
+        assert_eq!(infer_type(&Value::Timestamp(0)), InferredType::Mixed);
+        assert_eq!(infer_type(&Value::Map(vec![])), InferredType::Mixed);
+
+        // Empty array
+        if let InferredType::Array(inner) = infer_type(&Value::Array(vec![])) {
+            assert_eq!(*inner, InferredType::Mixed);
+        } else {
+            panic!("Expected Array");
+        }
+
+        // UInt becomes Int
+        assert_eq!(infer_type(&Value::UInt(42)), InferredType::Int);
+    }
+
+    // =========================================================================
+    // Coverage: to_tl_with_schemas() edge cases
+    // =========================================================================
+
+    #[test]
+    fn test_to_tl_with_schemas_no_schemas() {
+        let mut data = HashMap::new();
+        data.insert("name".to_string(), Value::String("alice".to_string()));
+        let doc = TeaLeaf { data, schemas: HashMap::new(), is_root_array: false };
+
+        let output = doc.to_tl_with_schemas();
+        assert!(output.contains("name: alice"), "Should use dumps() format");
+        assert!(!output.contains("@struct"), "No schemas");
+    }
+
+    #[test]
+    fn test_to_tl_with_schemas_root_array() {
+        let mut data = HashMap::new();
+        data.insert("root".to_string(), Value::Array(vec![Value::Int(1), Value::Int(2)]));
+        let doc = TeaLeaf { data, schemas: HashMap::new(), is_root_array: true };
+
+        let output = doc.to_tl_with_schemas();
+        assert!(output.starts_with("@root-array"), "Should have root-array directive");
+    }
+
+    // =========================================================================
+    // Coverage: write_value_with_schemas() for special types
+    // =========================================================================
+
+    #[test]
+    fn test_dumps_with_schemas_all_types() {
+        let mut schemas = HashMap::new();
+        let mut schema = Schema::new("item");
+        schema.add_field("id", FieldType::new("int"));
+        schema.add_field("name", FieldType::new("string"));
+        schemas.insert("item".to_string(), schema);
+
+        let mut data = HashMap::new();
+        // Array matching schema → @table
+        data.insert("items".to_string(), Value::Array(vec![
+            Value::Object(vec![
+                ("id".to_string(), Value::Int(1)),
+                ("name".to_string(), Value::String("Widget".to_string())),
+            ].into_iter().collect()),
+        ]));
+        // Special types
+        data.insert("ref_val".to_string(), Value::Ref("target".to_string()));
+        data.insert("tag_val".to_string(), Value::Tagged("ok".to_string(), Box::new(Value::Int(200))));
+        data.insert("map_val".to_string(), Value::Map(vec![
+            (Value::Int(1), Value::String("one".to_string())),
+        ]));
+        data.insert("bytes_val".to_string(), Value::Bytes(vec![0xde, 0xad]));
+        data.insert("ts_val".to_string(), Value::Timestamp(0));
+        data.insert("ts_millis".to_string(), Value::Timestamp(1705315800123));
+
+        let schema_order = vec!["item".to_string()];
+        let output = dumps_with_schemas(&data, &schemas, &schema_order);
+
+        assert!(output.contains("@struct item"), "Should contain schema def");
+        assert!(output.contains("@table item"), "Should use @table format");
+        assert!(output.contains("!target"), "Should contain ref");
+        assert!(output.contains(":ok 200"), "Should contain tagged");
+        assert!(output.contains("@map {"), "Should contain map");
+        assert!(output.contains("0xdead"), "Should contain bytes");
+        assert!(output.contains("1970-01-01T00:00:00Z"), "Should contain timestamp");
+        assert!(output.contains(".123Z"), "Should contain millis timestamp");
+    }
+
+    #[test]
+    fn test_dumps_with_schemas_object_value() {
+        let schemas = HashMap::new();
+        let mut data = HashMap::new();
+        data.insert("config".to_string(), Value::Object(
+            vec![
+                ("host".to_string(), Value::String("localhost".to_string())),
+                ("port".to_string(), Value::Int(8080)),
+            ].into_iter().collect()
+        ));
+
+        let output = dumps_with_schemas(&data, &schemas, &[]);
+        assert!(output.contains("config:"), "Should contain key");
+        assert!(output.contains("{"), "Should contain object");
+    }
+
+    #[test]
+    fn test_write_tuple_with_nested_schema() {
+        // Test tuple writing with nested struct fields
+        let mut schemas = HashMap::new();
+
+        let mut addr = Schema::new("address");
+        addr.add_field("city", FieldType::new("string"));
+        addr.add_field("zip", FieldType::new("string"));
+        schemas.insert("address".to_string(), addr);
+
+        let mut user = Schema::new("user");
+        user.add_field("name", FieldType::new("string"));
+        user.add_field("home", FieldType::new("address"));
+        schemas.insert("user".to_string(), user);
+
+        let mut data = HashMap::new();
+        data.insert("users".to_string(), Value::Array(vec![
+            Value::Object(vec![
+                ("name".to_string(), Value::String("Alice".to_string())),
+                ("home".to_string(), Value::Object(vec![
+                    ("city".to_string(), Value::String("Boston".to_string())),
+                    ("zip".to_string(), Value::String("02101".to_string())),
+                ].into_iter().collect())),
+            ].into_iter().collect()),
+        ]));
+
+        let schema_order = vec!["address".to_string(), "user".to_string()];
+        let output = dumps_with_schemas(&data, &schemas, &schema_order);
+
+        assert!(output.contains("@struct address"), "Should have address schema");
+        assert!(output.contains("@struct user"), "Should have user schema");
+        assert!(output.contains("@table user"), "Should use @table for users");
+        // Nested tuples
+        assert!(output.contains("("), "Should have tuple format");
+    }
+
+    #[test]
+    fn test_write_tuple_with_schema_array_field() {
+        // Test tuple writing with array fields that have schemas
+        let mut schemas = HashMap::new();
+
+        let mut tag = Schema::new("tag");
+        tag.add_field("name", FieldType::new("string"));
+        schemas.insert("tag".to_string(), tag);
+
+        let mut item = Schema::new("item");
+        item.add_field("id", FieldType::new("int"));
+        item.add_field("tags", FieldType { base: "tag".to_string(), nullable: false, is_array: true });
+        schemas.insert("item".to_string(), item);
+
+        let mut data = HashMap::new();
+        data.insert("items".to_string(), Value::Array(vec![
+            Value::Object(vec![
+                ("id".to_string(), Value::Int(1)),
+                ("tags".to_string(), Value::Array(vec![
+                    Value::Object(vec![
+                        ("name".to_string(), Value::String("rust".to_string())),
+                    ].into_iter().collect()),
+                ])),
+            ].into_iter().collect()),
+        ]));
+
+        let schema_order = vec!["tag".to_string(), "item".to_string()];
+        let output = dumps_with_schemas(&data, &schemas, &schema_order);
+
+        assert!(output.contains("@table item"), "Should use @table for items");
+    }
+
+    #[test]
+    fn test_write_schema_array_empty() {
+        let schemas = HashMap::new();
+        let schema = Schema::new("empty");
+        let mut out = String::new();
+        write_schema_array(&mut out, &Value::Array(vec![]), &schema, &schemas, 0);
+        assert_eq!(out, "[]");
+    }
+
+    #[test]
+    fn test_write_schema_array_non_array_fallback() {
+        let schemas = HashMap::new();
+        let schema = Schema::new("test");
+        let mut out = String::new();
+        write_schema_array(&mut out, &Value::Int(42), &schema, &schemas, 0);
+        assert_eq!(out, "42");
+    }
+
+    #[test]
+    fn test_write_tuple_missing_field() {
+        // Test that missing fields in object produce ~
+        let schemas = HashMap::new();
+        let mut schema = Schema::new("test");
+        schema.add_field("present", FieldType::new("int"));
+        schema.add_field("missing", FieldType::new("string"));
+
+        let value = Value::Object(
+            vec![("present".to_string(), Value::Int(42))].into_iter().collect()
+        );
+
+        let mut out = String::new();
+        write_tuple(&mut out, &value, &schema, &schemas, 0);
+        assert!(out.contains("42"), "Present field should be written");
+        assert!(out.contains("~"), "Missing field should be ~");
+    }
+
+    #[test]
+    fn test_write_tuple_non_object() {
+        // When tuple receives a non-object value
+        let schemas = HashMap::new();
+        let schema = Schema::new("test");
+
+        let mut out = String::new();
+        write_tuple(&mut out, &Value::Int(42), &schema, &schemas, 0);
+        assert_eq!(out, "42");
+    }
+
+    // =========================================================================
+    // Coverage: array_matches_schema()
+    // =========================================================================
+
+    #[test]
+    fn test_array_matches_schema_empty() {
+        let schema = Schema::new("test");
+        assert!(!array_matches_schema(&[], &schema));
+    }
+
+    #[test]
+    fn test_array_matches_schema_non_object() {
+        let schema = Schema::new("test");
+        assert!(!array_matches_schema(&[Value::Int(1)], &schema));
+    }
+
+    #[test]
+    fn test_array_matches_schema_matching() {
+        let mut schema = Schema::new("user");
+        schema.add_field("name", FieldType::new("string"));
+        schema.add_field("age", FieldType::new("int"));
+
+        let arr = vec![Value::Object(vec![
+            ("name".to_string(), Value::String("Alice".to_string())),
+            ("age".to_string(), Value::Int(30)),
+        ].into_iter().collect())];
+
+        assert!(array_matches_schema(&arr, &schema));
+    }
+
+    // =========================================================================
+    // Coverage: from_dto, from_dto_array, to_dto, to_dto_vec
+    // =========================================================================
+
+    #[test]
+    fn test_from_dto_and_back() {
+        use crate::convert::{FromTeaLeaf, ConvertError};
+
+        let doc = TeaLeaf::from_dto("greeting", &"hello".to_string());
+        assert_eq!(doc.get("greeting").unwrap().as_str(), Some("hello"));
+
+        let result: std::result::Result<String, ConvertError> = String::from_tealeaf_value(doc.get("greeting").unwrap());
+        assert_eq!(result.unwrap(), "hello");
+    }
+
+    #[test]
+    fn test_from_dto_array() {
+        let items = vec!["apple".to_string(), "banana".to_string()];
+        let doc = TeaLeaf::from_dto_array("fruits", &items);
+        let arr = doc.get("fruits").unwrap().as_array().unwrap();
+        assert_eq!(arr.len(), 2);
+        assert_eq!(arr[0].as_str(), Some("apple"));
+    }
+
+    #[test]
+    fn test_to_dto_missing_key() {
+        let doc = TeaLeaf::new(HashMap::new(), HashMap::new());
+        let result: Result<String> = doc.to_dto("missing");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_to_dto_vec() {
+        let mut data = HashMap::new();
+        data.insert("items".to_string(), Value::Array(vec![
+            Value::String("a".to_string()),
+            Value::String("b".to_string()),
+        ]));
+        let doc = TeaLeaf::new(HashMap::new(), data);
+        let result: Vec<String> = doc.to_dto_vec("items").unwrap();
+        assert_eq!(result, vec!["a", "b"]);
+    }
+
+    #[test]
+    fn test_to_dto_vec_not_array() {
+        let mut data = HashMap::new();
+        data.insert("item".to_string(), Value::String("not_an_array".to_string()));
+        let doc = TeaLeaf::new(HashMap::new(), data);
+        let result: Result<Vec<String>> = doc.to_dto_vec("item");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_to_dto_vec_missing_key() {
+        let doc = TeaLeaf::new(HashMap::new(), HashMap::new());
+        let result: Result<Vec<String>> = doc.to_dto_vec("missing");
+        assert!(result.is_err());
+    }
+
+    // =========================================================================
+    // Coverage: set_root_array, SchemaInferrer edge cases
+    // =========================================================================
+
+    #[test]
+    fn test_set_root_array() {
+        let mut doc = TeaLeaf::new(HashMap::new(), HashMap::new());
+        assert!(!doc.is_root_array);
+        doc.set_root_array(true);
+        assert!(doc.is_root_array);
+    }
+
+    #[test]
+    fn test_schema_inferrer_non_uniform_array() {
+        // Array with different object structures should not create a schema
+        let json = r#"{"items": [{"a": 1}, {"b": 2}]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        assert!(doc.schema("item").is_none(), "Non-uniform array should not produce schema");
+    }
+
+    #[test]
+    fn test_schema_inferrer_mixed_types_in_array() {
+        // Array with non-objects
+        let json = r#"{"items": [1, 2, 3]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        assert!(doc.schema("item").is_none(), "Non-object array should not produce schema");
+    }
+
+    #[test]
+    fn test_schema_inferrer_empty_array() {
+        let json = r#"{"items": []}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        assert!(doc.schema("item").is_none(), "Empty array should not produce schema");
+    }
+
+    #[test]
+    fn test_schema_inferrer_duplicate_schema_name() {
+        // Two arrays that would produce the same schema name
+        let json = r#"{
+            "items": [{"id": 1, "name": "A"}],
+            "nested": {"items": [{"id": 2, "name": "B"}]}
+        }"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        // Should have "item" schema (first one wins)
+        assert!(doc.schema("item").is_some());
+    }
+
+    #[test]
+    fn test_schema_inferrer_int_float_merge() {
+        // Field that has int in one record and float in another
+        let json = r#"{"values": [{"x": 1}, {"x": 2.5}]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let schema = doc.schema("value").unwrap();
+        let x_field = schema.fields.iter().find(|f| f.name == "x").unwrap();
+        assert_eq!(x_field.field_type.base, "float", "Int+Float merge should produce float");
+    }
+
+    #[test]
+    fn test_schema_inference_with_root_array() {
+        let json = r#"[{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        // Root array is stored under "root" key - the schema name should be derived from "root"
+        // The singularize of "root" is "root" (no trailing s)
+        // Actually, root arrays aren't typically analyzed because the key is "root" and it goes through analyze_value
+        let root_val = doc.get("root").unwrap().as_array().unwrap();
+        assert_eq!(root_val.len(), 2);
+    }
+
+    // =========================================================================
+    // Coverage: dumps_with_schemas with quoting in schemas
+    // =========================================================================
+
+    #[test]
+    fn test_dumps_with_schemas_string_quoting_in_tuples() {
+        let mut schemas = HashMap::new();
+        let mut schema = Schema::new("item");
+        schema.add_field("name", FieldType::new("string"));
+        schemas.insert("item".to_string(), schema);
+
+        let mut data = HashMap::new();
+        data.insert("items".to_string(), Value::Array(vec![
+            Value::Object(vec![
+                ("name".to_string(), Value::String("hello world".to_string())),
+            ].into_iter().collect()),
+        ]));
+
+        let schema_order = vec!["item".to_string()];
+        let output = dumps_with_schemas(&data, &schemas, &schema_order);
+        assert!(output.contains("\"hello world\""), "String with space should be quoted in tuple");
+    }
+
+    #[test]
+    fn test_dumps_with_schemas_array_without_schema() {
+        // Array that doesn't match any schema
+        let schemas = HashMap::new();
+        let mut data = HashMap::new();
+        data.insert("nums".to_string(), Value::Array(vec![Value::Int(1), Value::Int(2)]));
+
+        let output = dumps_with_schemas(&data, &schemas, &[]);
+        assert!(output.contains("[1, 2]"), "Should use regular array format");
+    }
+
+    // =========================================================================
+    // Coverage: convenience functions open(), parse(), root array to_json
+    // =========================================================================
+
+    #[test]
+    fn test_open_convenience_function() {
+        // Write a binary file first, then open with the convenience function
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_open_conv.tlbx");
+
+        let mut data = HashMap::new();
+        data.insert("x".to_string(), Value::Int(42));
+        let doc = TeaLeaf::new(HashMap::new(), data);
+        doc.compile(&path, false).unwrap();
+
+        let reader = super::open(&path).unwrap();
+        assert_eq!(reader.get("x").unwrap().as_int(), Some(42));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_parse_convenience_function() {
+        let doc = super::parse("greeting: hello").unwrap();
+        assert_eq!(doc.get("greeting").unwrap().as_str(), Some("hello"));
+    }
+
+    #[test]
+    fn test_to_json_root_array() {
+        let mut data = HashMap::new();
+        data.insert("root".to_string(), Value::Array(vec![Value::Int(1), Value::Int(2)]));
+        let mut doc = TeaLeaf::new(HashMap::new(), data);
+        doc.set_root_array(true);
+
+        let json = doc.to_json().unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert!(parsed.is_array(), "Root array to_json should output array");
+        assert_eq!(parsed.as_array().unwrap().len(), 2);
+    }
+
+    #[test]
+    fn test_to_json_compact_root_array() {
+        let mut data = HashMap::new();
+        data.insert("root".to_string(), Value::Array(vec![Value::Int(1)]));
+        let mut doc = TeaLeaf::new(HashMap::new(), data);
+        doc.set_root_array(true);
+
+        let json = doc.to_json_compact().unwrap();
+        assert_eq!(json, "[1]");
+    }
+
+    #[test]
+    fn test_infer_type_bool_value() {
+        let it = infer_type(&Value::Bool(true));
+        assert!(matches!(it, InferredType::Bool));
+    }
+
+    #[test]
+    fn test_schema_inference_nested_object_fields() {
+        // JSON with nested objects inside array items
+        let json = r#"{"records": [
+            {"id": 1, "details": {"city": "NYC", "zip": "10001"}},
+            {"id": 2, "details": {"city": "LA", "zip": "90001"}}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        // Should infer both "record" and "detail" schemas
+        assert!(doc.schema("record").is_some(), "Should infer record schema");
+    }
+
+    #[test]
+    fn test_schema_inference_not_all_objects_returns_early() {
+        // Array where second element is not an object
+        let json = r#"{"items": [{"a": 1}, "not_an_object"]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        assert!(doc.schema("item").is_none(), "Mixed array should not produce schema");
+    }
+
+    #[test]
+    fn test_to_tl_with_schemas_with_nested_array_field() {
+        // Schema with an array-typed field
+        let mut schemas = HashMap::new();
+        let mut schema = Schema::new("user");
+        schema.add_field("name", FieldType::new("string"));
+        schema.add_field("tags", FieldType::new("string").array());
+        schemas.insert("user".to_string(), schema);
+
+        let mut data = HashMap::new();
+        let mut obj = HashMap::new();
+        obj.insert("name".to_string(), Value::String("Alice".into()));
+        obj.insert("tags".to_string(), Value::Array(vec![
+            Value::String("admin".into()),
+            Value::String("active".into()),
+        ]));
+        data.insert("users".to_string(), Value::Array(vec![Value::Object(obj)]));
+
+        let doc = TeaLeaf::new(schemas, data);
+        let text = doc.to_tl_with_schemas();
+        assert!(text.contains("@struct user"), "Should have schema definition");
+        assert!(text.contains("@table user"), "Should use table format");
     }
 }

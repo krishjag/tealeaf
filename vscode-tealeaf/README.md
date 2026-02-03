@@ -78,7 +78,7 @@ status: :ok 200
 
 ## TeaLeaf Format
 
-TeaLeaf is a schema-aware document format with:
+TeaLeaf is a schema-aware data format with:
 - Human-readable text representation (`.tl`)
 - Compact binary representation (`.tlbx`)
 - Schema definitions with types

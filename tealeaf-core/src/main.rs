@@ -37,7 +37,7 @@ fn main() {
 }
 
 fn print_usage() {
-    println!("TeaLeaf v2.0 - Schema-aware document format");
+    println!("TeaLeaf v2.0 - Schema-aware data format");
     println!();
     println!("Usage: tealeaf <command> [options]");
     println!();

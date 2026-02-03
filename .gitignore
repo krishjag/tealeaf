@@ -21,6 +21,7 @@ bindings/dotnet/TeaLeaf/runtimes/
 *.swp
 *.swo
 *~
+CLAUDE.md
 
 # OS
 .DS_Store
@@ -37,10 +38,16 @@ TestResults/
 results/
 *.trx
 
+# Coverage reports
+coverage/
+*.lcov
+*.cobertura.xml
+
 # Temporary files
 *.tmp
 *.temp
 *.log
+TODOS.txt
 
 # Temp directories
 temp/

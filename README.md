@@ -1,6 +1,8 @@
 # TeaLeaf Data Format
 
-**A schema-aware document format with human-readable text and compact binary representation.**
+[![codecov](https://codecov.io/gh/krishjag/tealeaf/graph/badge.svg)](https://codecov.io/gh/krishjag/tealeaf)
+
+**A schema-aware data format with human-readable text and compact binary representation.**
 
 
 

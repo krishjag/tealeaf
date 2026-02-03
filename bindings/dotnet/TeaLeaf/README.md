@@ -1,6 +1,6 @@
 # TeaLeaf
 
-Schema-aware document format with human-readable text and compact binary representation.
+Schema-aware data format with human-readable text and compact binary representation.
 
 ## Features
 

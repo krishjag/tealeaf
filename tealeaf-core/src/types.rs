@@ -542,3 +542,606 @@ impl From<HashMap<String, Value>> for Value {
         Value::Object(m)
     }
 }
+
+// =============================================================================
+// Tests
+// =============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // -------------------------------------------------------------------------
+    // TLType::try_from
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_tltype_try_from_all_valid() {
+        let cases: Vec<(u8, TLType)> = vec![
+            (0x00, TLType::Null),
+            (0x01, TLType::Bool),
+            (0x02, TLType::Int8),
+            (0x03, TLType::Int16),
+            (0x04, TLType::Int32),
+            (0x05, TLType::Int64),
+            (0x06, TLType::UInt8),
+            (0x07, TLType::UInt16),
+            (0x08, TLType::UInt32),
+            (0x09, TLType::UInt64),
+            (0x0A, TLType::Float32),
+            (0x0B, TLType::Float64),
+            (0x10, TLType::String),
+            (0x11, TLType::Bytes),
+            (0x20, TLType::Array),
+            (0x21, TLType::Object),
+            (0x22, TLType::Struct),
+            (0x23, TLType::Map),
+            (0x24, TLType::Tuple),
+            (0x30, TLType::Ref),
+            (0x31, TLType::Tagged),
+            (0x32, TLType::Timestamp),
+        ];
+        for (byte, expected) in cases {
+            assert_eq!(TLType::try_from(byte).unwrap(), expected, "byte=0x{:02X}", byte);
+        }
+    }
+
+    #[test]
+    fn test_tltype_try_from_invalid() {
+        let err = TLType::try_from(0xFF).unwrap_err();
+        assert!(matches!(err, Error::InvalidType(0xFF)));
+
+        let err2 = TLType::try_from(0x0C).unwrap_err();
+        assert!(matches!(err2, Error::InvalidType(0x0C)));
+    }
+
+    // -------------------------------------------------------------------------
+    // FieldType
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_fieldtype_new() {
+        let ft = FieldType::new("int");
+        assert_eq!(ft.base, "int");
+        assert!(!ft.nullable);
+        assert!(!ft.is_array);
+    }
+
+    #[test]
+    fn test_fieldtype_nullable() {
+        let ft = FieldType::new("string").nullable();
+        assert!(ft.nullable);
+        assert!(!ft.is_array);
+    }
+
+    #[test]
+    fn test_fieldtype_array() {
+        let ft = FieldType::new("int").array();
+        assert!(ft.is_array);
+        assert!(!ft.nullable);
+    }
+
+    #[test]
+    fn test_fieldtype_parse_simple() {
+        let ft = FieldType::parse("int");
+        assert_eq!(ft.base, "int");
+        assert!(!ft.nullable);
+        assert!(!ft.is_array);
+    }
+
+    #[test]
+    fn test_fieldtype_parse_nullable() {
+        let ft = FieldType::parse("string?");
+        assert_eq!(ft.base, "string");
+        assert!(ft.nullable);
+        assert!(!ft.is_array);
+    }
+
+    #[test]
+    fn test_fieldtype_parse_array() {
+        let ft = FieldType::parse("[]int");
+        assert_eq!(ft.base, "int");
+        assert!(!ft.nullable);
+        assert!(ft.is_array);
+    }
+
+    #[test]
+    fn test_fieldtype_parse_array_nullable() {
+        let ft = FieldType::parse("[]string?");
+        assert_eq!(ft.base, "string");
+        assert!(ft.nullable);
+        assert!(ft.is_array);
+    }
+
+    #[test]
+    fn test_fieldtype_parse_with_whitespace() {
+        let ft = FieldType::parse("  int64  ");
+        assert_eq!(ft.base, "int64");
+    }
+
+    #[test]
+    fn test_fieldtype_display() {
+        assert_eq!(FieldType::new("int").to_string(), "int");
+        assert_eq!(FieldType::new("string").nullable().to_string(), "string?");
+        assert_eq!(FieldType::new("int").array().to_string(), "[]int");
+        assert_eq!(
+            FieldType::new("string").array().nullable().to_string(),
+            "[]string?"
+        );
+    }
+
+    #[test]
+    fn test_fieldtype_to_tl_type_all_bases() {
+        let cases = vec![
+            ("bool", TLType::Bool),
+            ("int8", TLType::Int8),
+            ("int16", TLType::Int16),
+            ("int", TLType::Int32),
+            ("int32", TLType::Int32),
+            ("int64", TLType::Int64),
+            ("uint8", TLType::UInt8),
+            ("uint16", TLType::UInt16),
+            ("uint", TLType::UInt32),
+            ("uint32", TLType::UInt32),
+            ("uint64", TLType::UInt64),
+            ("float32", TLType::Float32),
+            ("float", TLType::Float64),
+            ("float64", TLType::Float64),
+            ("string", TLType::String),
+            ("bytes", TLType::Bytes),
+            ("timestamp", TLType::Timestamp),
+            ("MyStruct", TLType::Struct),
+            ("SomeUnknown", TLType::Struct),
+        ];
+        for (base, expected) in cases {
+            let ft = FieldType::new(base);
+            assert_eq!(ft.to_tl_type(), expected, "base={}", base);
+        }
+    }
+
+    #[test]
+    fn test_fieldtype_array_overrides_base() {
+        let ft = FieldType::new("int").array();
+        assert_eq!(ft.to_tl_type(), TLType::Array);
+    }
+
+    #[test]
+    fn test_fieldtype_is_struct() {
+        assert!(FieldType::new("MyStruct").is_struct());
+        assert!(!FieldType::new("int").is_struct());
+        assert!(!FieldType::new("string").is_struct());
+        assert!(!FieldType::new("int").array().is_struct()); // array is not struct
+    }
+
+    // -------------------------------------------------------------------------
+    // Schema
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_schema_builder() {
+        let schema = Schema::new("User")
+            .field("id", FieldType::new("int64"))
+            .field("name", FieldType::new("string"));
+        assert_eq!(schema.name, "User");
+        assert_eq!(schema.fields.len(), 2);
+        assert_eq!(schema.fields[0].name, "id");
+        assert_eq!(schema.fields[1].name, "name");
+    }
+
+    #[test]
+    fn test_schema_add_field() {
+        let mut schema = Schema::new("Event");
+        schema.add_field("ts", FieldType::new("timestamp"));
+        assert_eq!(schema.fields.len(), 1);
+        assert_eq!(schema.fields[0].name, "ts");
+    }
+
+    #[test]
+    fn test_schema_get_field_found() {
+        let schema = Schema::new("User")
+            .field("id", FieldType::new("int64"))
+            .field("name", FieldType::new("string"));
+        let f = schema.get_field("name").unwrap();
+        assert_eq!(f.name, "name");
+        assert_eq!(f.field_type.base, "string");
+    }
+
+    #[test]
+    fn test_schema_get_field_missing() {
+        let schema = Schema::new("User")
+            .field("id", FieldType::new("int64"));
+        assert!(schema.get_field("nonexistent").is_none());
+    }
+
+    #[test]
+    fn test_schema_field_index_found() {
+        let schema = Schema::new("User")
+            .field("id", FieldType::new("int64"))
+            .field("name", FieldType::new("string"));
+        assert_eq!(schema.field_index("id"), Some(0));
+        assert_eq!(schema.field_index("name"), Some(1));
+    }
+
+    #[test]
+    fn test_schema_field_index_missing() {
+        let schema = Schema::new("User")
+            .field("id", FieldType::new("int64"));
+        assert_eq!(schema.field_index("missing"), None);
+    }
+
+    // -------------------------------------------------------------------------
+    // Union / Variant
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_variant_builder() {
+        let v = Variant::new("Circle")
+            .field("radius", FieldType::new("float"));
+        assert_eq!(v.name, "Circle");
+        assert_eq!(v.fields.len(), 1);
+        assert_eq!(v.fields[0].name, "radius");
+    }
+
+    #[test]
+    fn test_union_builder() {
+        let u = Union::new("Shape")
+            .variant(Variant::new("Circle").field("radius", FieldType::new("float")))
+            .variant(Variant::new("Point"));
+        assert_eq!(u.name, "Shape");
+        assert_eq!(u.variants.len(), 2);
+    }
+
+    #[test]
+    fn test_union_add_variant() {
+        let mut u = Union::new("Shape");
+        u.add_variant(Variant::new("Circle"));
+        assert_eq!(u.variants.len(), 1);
+    }
+
+    #[test]
+    fn test_union_get_variant() {
+        let u = Union::new("Shape")
+            .variant(Variant::new("Circle").field("radius", FieldType::new("float")))
+            .variant(Variant::new("Point"));
+        assert!(u.get_variant("Circle").is_some());
+        assert!(u.get_variant("Point").is_some());
+        assert!(u.get_variant("Unknown").is_none());
+    }
+
+    // -------------------------------------------------------------------------
+    // Value accessors
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_value_is_null() {
+        assert!(Value::Null.is_null());
+        assert!(!Value::Bool(false).is_null());
+    }
+
+    #[test]
+    fn test_value_as_bool() {
+        assert_eq!(Value::Bool(true).as_bool(), Some(true));
+        assert_eq!(Value::Int(1).as_bool(), None);
+    }
+
+    #[test]
+    fn test_value_as_int_from_uint() {
+        // UInt coercion to i64
+        assert_eq!(Value::UInt(42).as_int(), Some(42));
+    }
+
+    #[test]
+    fn test_value_as_int_from_non_numeric() {
+        assert_eq!(Value::String("nope".into()).as_int(), None);
+    }
+
+    #[test]
+    fn test_value_as_uint_from_positive_int() {
+        // Positive Int coercion to u64
+        assert_eq!(Value::Int(42).as_uint(), Some(42));
+    }
+
+    #[test]
+    fn test_value_as_uint_from_negative_int() {
+        // Negative Int should not coerce to u64
+        assert_eq!(Value::Int(-1).as_uint(), None);
+    }
+
+    #[test]
+    fn test_value_as_uint_from_non_numeric() {
+        assert_eq!(Value::Bool(true).as_uint(), None);
+    }
+
+    #[test]
+    fn test_value_as_float_from_int() {
+        assert_eq!(Value::Int(42).as_float(), Some(42.0));
+    }
+
+    #[test]
+    fn test_value_as_float_from_uint() {
+        assert_eq!(Value::UInt(100).as_float(), Some(100.0));
+    }
+
+    #[test]
+    fn test_value_as_float_from_non_numeric() {
+        assert_eq!(Value::String("no".into()).as_float(), None);
+    }
+
+    #[test]
+    fn test_value_as_str() {
+        assert_eq!(Value::String("hello".into()).as_str(), Some("hello"));
+        assert_eq!(Value::Int(1).as_str(), None);
+    }
+
+    #[test]
+    fn test_value_as_bytes() {
+        let data = vec![1u8, 2, 3];
+        assert_eq!(Value::Bytes(data.clone()).as_bytes(), Some(data.as_slice()));
+        assert_eq!(Value::Null.as_bytes(), None);
+    }
+
+    #[test]
+    fn test_value_as_array() {
+        let arr = vec![Value::Int(1), Value::Int(2)];
+        assert_eq!(
+            Value::Array(arr.clone()).as_array(),
+            Some(arr.as_slice())
+        );
+        assert_eq!(Value::Null.as_array(), None);
+    }
+
+    #[test]
+    fn test_value_as_object() {
+        let mut obj = HashMap::new();
+        obj.insert("k".to_string(), Value::Int(1));
+        assert!(Value::Object(obj).as_object().is_some());
+        assert!(Value::Null.as_object().is_none());
+    }
+
+    #[test]
+    fn test_value_get() {
+        let mut obj = HashMap::new();
+        obj.insert("key".to_string(), Value::Int(42));
+        let val = Value::Object(obj);
+        assert_eq!(val.get("key"), Some(&Value::Int(42)));
+        assert_eq!(val.get("missing"), None);
+        assert_eq!(Value::Int(1).get("x"), None);
+    }
+
+    #[test]
+    fn test_value_index() {
+        let val = Value::Array(vec![Value::Int(10), Value::Int(20)]);
+        assert_eq!(val.index(0), Some(&Value::Int(10)));
+        assert_eq!(val.index(1), Some(&Value::Int(20)));
+        assert_eq!(val.index(5), None);
+        assert_eq!(Value::Int(1).index(0), None);
+    }
+
+    #[test]
+    fn test_value_as_timestamp() {
+        assert_eq!(Value::Timestamp(1700000000).as_timestamp(), Some(1700000000));
+        assert_eq!(Value::Int(42).as_timestamp(), None);
+    }
+
+    #[test]
+    fn test_value_as_map() {
+        let pairs = vec![(Value::String("k".into()), Value::Int(1))];
+        assert_eq!(
+            Value::Map(pairs.clone()).as_map(),
+            Some(pairs.as_slice())
+        );
+        assert_eq!(Value::Null.as_map(), None);
+    }
+
+    #[test]
+    fn test_value_as_ref_name() {
+        assert_eq!(Value::Ref("MyRef".into()).as_ref_name(), Some("MyRef"));
+        assert_eq!(Value::Null.as_ref_name(), None);
+    }
+
+    #[test]
+    fn test_value_as_tagged() {
+        let val = Value::Tagged("tag".into(), Box::new(Value::Int(1)));
+        let (tag, inner) = val.as_tagged().unwrap();
+        assert_eq!(tag, "tag");
+        assert_eq!(inner, &Value::Int(1));
+        assert_eq!(Value::Null.as_tagged(), None);
+    }
+
+    #[test]
+    fn test_value_default() {
+        assert_eq!(Value::default(), Value::Null);
+    }
+
+    // -------------------------------------------------------------------------
+    // Value::tl_type() boundary values
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_value_tl_type_int_boundaries() {
+        // i8 range
+        assert_eq!(Value::Int(0).tl_type(), TLType::Int8);
+        assert_eq!(Value::Int(127).tl_type(), TLType::Int8);
+        assert_eq!(Value::Int(-128).tl_type(), TLType::Int8);
+
+        // i16 range
+        assert_eq!(Value::Int(128).tl_type(), TLType::Int16);
+        assert_eq!(Value::Int(-129).tl_type(), TLType::Int16);
+        assert_eq!(Value::Int(32767).tl_type(), TLType::Int16);
+        assert_eq!(Value::Int(-32768).tl_type(), TLType::Int16);
+
+        // i32 range
+        assert_eq!(Value::Int(32768).tl_type(), TLType::Int32);
+        assert_eq!(Value::Int(-32769).tl_type(), TLType::Int32);
+        assert_eq!(Value::Int(i32::MAX as i64).tl_type(), TLType::Int32);
+        assert_eq!(Value::Int(i32::MIN as i64).tl_type(), TLType::Int32);
+
+        // i64 range
+        assert_eq!(Value::Int(i32::MAX as i64 + 1).tl_type(), TLType::Int64);
+        assert_eq!(Value::Int(i32::MIN as i64 - 1).tl_type(), TLType::Int64);
+        assert_eq!(Value::Int(i64::MAX).tl_type(), TLType::Int64);
+        assert_eq!(Value::Int(i64::MIN).tl_type(), TLType::Int64);
+    }
+
+    #[test]
+    fn test_value_tl_type_uint_boundaries() {
+        // u8 range
+        assert_eq!(Value::UInt(0).tl_type(), TLType::UInt8);
+        assert_eq!(Value::UInt(255).tl_type(), TLType::UInt8);
+
+        // u16 range
+        assert_eq!(Value::UInt(256).tl_type(), TLType::UInt16);
+        assert_eq!(Value::UInt(65535).tl_type(), TLType::UInt16);
+
+        // u32 range
+        assert_eq!(Value::UInt(65536).tl_type(), TLType::UInt32);
+        assert_eq!(Value::UInt(u32::MAX as u64).tl_type(), TLType::UInt32);
+
+        // u64 range
+        assert_eq!(Value::UInt(u32::MAX as u64 + 1).tl_type(), TLType::UInt64);
+        assert_eq!(Value::UInt(u64::MAX).tl_type(), TLType::UInt64);
+    }
+
+    #[test]
+    fn test_value_tl_type_other_variants() {
+        assert_eq!(Value::Null.tl_type(), TLType::Null);
+        assert_eq!(Value::Bool(true).tl_type(), TLType::Bool);
+        assert_eq!(Value::Float(1.0).tl_type(), TLType::Float64);
+        assert_eq!(Value::String("s".into()).tl_type(), TLType::String);
+        assert_eq!(Value::Bytes(vec![]).tl_type(), TLType::Bytes);
+        assert_eq!(Value::Array(vec![]).tl_type(), TLType::Array);
+        assert_eq!(Value::Object(HashMap::new()).tl_type(), TLType::Object);
+        assert_eq!(Value::Map(vec![]).tl_type(), TLType::Map);
+        assert_eq!(Value::Ref("r".into()).tl_type(), TLType::Ref);
+        assert_eq!(
+            Value::Tagged("t".into(), Box::new(Value::Null)).tl_type(),
+            TLType::Tagged
+        );
+        assert_eq!(Value::Timestamp(0).tl_type(), TLType::Timestamp);
+    }
+
+    // -------------------------------------------------------------------------
+    // Value::From impls
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_value_from_bool() {
+        assert_eq!(Value::from(true), Value::Bool(true));
+        assert_eq!(Value::from(false), Value::Bool(false));
+    }
+
+    #[test]
+    fn test_value_from_i32() {
+        assert_eq!(Value::from(42i32), Value::Int(42));
+        assert_eq!(Value::from(-1i32), Value::Int(-1));
+    }
+
+    #[test]
+    fn test_value_from_i64() {
+        assert_eq!(Value::from(42i64), Value::Int(42));
+    }
+
+    #[test]
+    fn test_value_from_u32() {
+        assert_eq!(Value::from(42u32), Value::UInt(42));
+    }
+
+    #[test]
+    fn test_value_from_u64() {
+        assert_eq!(Value::from(42u64), Value::UInt(42));
+    }
+
+    #[test]
+    fn test_value_from_f64() {
+        assert_eq!(Value::from(3.14f64), Value::Float(3.14));
+    }
+
+    #[test]
+    fn test_value_from_string() {
+        assert_eq!(Value::from("hello".to_string()), Value::String("hello".into()));
+    }
+
+    #[test]
+    fn test_value_from_str() {
+        assert_eq!(Value::from("hello"), Value::String("hello".into()));
+    }
+
+    #[test]
+    fn test_value_from_vec() {
+        let v: Vec<i32> = vec![1, 2, 3];
+        assert_eq!(
+            Value::from(v),
+            Value::Array(vec![Value::Int(1), Value::Int(2), Value::Int(3)])
+        );
+    }
+
+    #[test]
+    fn test_value_from_hashmap() {
+        let mut m = HashMap::new();
+        m.insert("key".to_string(), Value::Int(42));
+        let val = Value::from(m.clone());
+        assert_eq!(val, Value::Object(m));
+    }
+
+    // -------------------------------------------------------------------------
+    // Error Display
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_error_display_all_variants() {
+        assert_eq!(
+            Error::Io(io::Error::new(io::ErrorKind::NotFound, "gone")).to_string(),
+            "IO error: gone"
+        );
+        assert_eq!(Error::InvalidMagic.to_string(), "Invalid TeaLeaf magic bytes");
+        assert_eq!(
+            Error::InvalidVersion { major: 99, minor: 1 }.to_string(),
+            "Unsupported version: 99.1"
+        );
+        assert_eq!(
+            Error::InvalidType(0xFF).to_string(),
+            "Invalid type code: 0xFF"
+        );
+        assert_eq!(Error::InvalidUtf8.to_string(), "Invalid UTF-8");
+        assert_eq!(
+            Error::UnexpectedToken {
+                expected: "number".into(),
+                got: "string".into()
+            }
+            .to_string(),
+            "Expected number, got string"
+        );
+        assert_eq!(Error::UnexpectedEof.to_string(), "Unexpected end of input");
+        assert_eq!(
+            Error::UnknownStruct("Foo".into()).to_string(),
+            "Unknown struct: Foo"
+        );
+        assert_eq!(
+            Error::MissingField("bar".into()).to_string(),
+            "Missing field: bar"
+        );
+        assert_eq!(
+            Error::ParseError("bad input".into()).to_string(),
+            "Parse error: bad input"
+        );
+    }
+
+    #[test]
+    fn test_error_from_io() {
+        let io_err = io::Error::new(io::ErrorKind::PermissionDenied, "denied");
+        let tl_err = Error::from(io_err);
+        assert!(matches!(tl_err, Error::Io(_)));
+        assert!(tl_err.to_string().contains("denied"));
+    }
+
+    // -------------------------------------------------------------------------
+    // Field
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_field_new() {
+        let f = Field::new("age", FieldType::new("int"));
+        assert_eq!(f.name, "age");
+        assert_eq!(f.field_type.base, "int");
+    }
+}

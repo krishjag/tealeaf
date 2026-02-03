@@ -601,4 +601,273 @@ mod tests {
         assert!(matches!(&tokens[1].kind, TokenKind::Ref(s) if s == "ref"));
         assert!(matches!(&tokens[2].kind, TokenKind::Word(s) if s == "value2"));
     }
+
+    // -------------------------------------------------------------------------
+    // String escape sequences
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_string_escape_tab() {
+        let mut lexer = Lexer::new(r#""\t""#);
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "\t"));
+    }
+
+    #[test]
+    fn test_string_escape_cr() {
+        let mut lexer = Lexer::new(r#""\r""#);
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "\r"));
+    }
+
+    #[test]
+    fn test_string_escape_backspace() {
+        let mut lexer = Lexer::new(r#""\b""#);
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "\u{0008}"));
+    }
+
+    #[test]
+    fn test_string_escape_formfeed() {
+        let mut lexer = Lexer::new(r#""\f""#);
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "\u{000C}"));
+    }
+
+    #[test]
+    fn test_string_escape_backslash() {
+        let mut lexer = Lexer::new(r#""\\""#);
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "\\"));
+    }
+
+    #[test]
+    fn test_string_escape_quote() {
+        let mut lexer = Lexer::new(r#""\"hello\"""#);
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "\"hello\""));
+    }
+
+    #[test]
+    fn test_string_escape_unicode() {
+        let mut lexer = Lexer::new(r#""\u0041""#);
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "A"));
+    }
+
+    #[test]
+    fn test_string_escape_unicode_emoji_range() {
+        // Heart suit: U+2665
+        let mut lexer = Lexer::new(r#""\u2665""#);
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "\u{2665}"));
+    }
+
+    #[test]
+    fn test_string_invalid_escape() {
+        let mut lexer = Lexer::new(r#""\x""#);
+        let err = lexer.tokenize().unwrap_err();
+        assert!(err.to_string().contains("Invalid escape sequence"));
+    }
+
+    #[test]
+    fn test_string_invalid_unicode_short() {
+        let mut lexer = Lexer::new(r#""\u00""#);
+        let err = lexer.tokenize().unwrap_err();
+        assert!(err.to_string().contains("Invalid unicode escape"));
+    }
+
+    #[test]
+    fn test_unterminated_string() {
+        let mut lexer = Lexer::new(r#""hello"#);
+        let err = lexer.tokenize().unwrap_err();
+        assert!(err.to_string().contains("Unterminated string"));
+    }
+
+    // -------------------------------------------------------------------------
+    // Multiline strings
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_multiline_string() {
+        let input = "\"\"\"
+    hello
+    world
+\"\"\"";
+        let mut lexer = Lexer::new(input);
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s.contains("hello") && s.contains("world")));
+    }
+
+    #[test]
+    fn test_unterminated_multiline_string() {
+        let input = "\"\"\"
+    hello world";
+        let mut lexer = Lexer::new(input);
+        let err = lexer.tokenize().unwrap_err();
+        assert!(err.to_string().contains("Unterminated multiline string"));
+    }
+
+    // -------------------------------------------------------------------------
+    // Timestamps
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_timestamp_basic() {
+        let mut lexer = Lexer::new("2024-01-15T10:30:00Z");
+        let tokens = lexer.tokenize().unwrap();
+        match &tokens[0].kind {
+            TokenKind::Timestamp(ts) => {
+                // 2024-01-15T10:30:00Z should be a valid timestamp
+                assert!(*ts > 0);
+            }
+            other => panic!("Expected Timestamp, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn test_timestamp_with_millis() {
+        let mut lexer = Lexer::new("2024-01-15T10:30:00.123Z");
+        let tokens = lexer.tokenize().unwrap();
+        match &tokens[0].kind {
+            TokenKind::Timestamp(ts) => {
+                assert_eq!(*ts % 1000, 123); // milliseconds preserved
+            }
+            other => panic!("Expected Timestamp, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn test_timestamp_date_only() {
+        let mut lexer = Lexer::new("2024-01-15");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::Timestamp(_)));
+    }
+
+    #[test]
+    fn test_timestamp_with_offset() {
+        let mut lexer = Lexer::new("2024-01-15T10:30:00+05:30");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::Timestamp(_)));
+    }
+
+    #[test]
+    fn test_timestamp_with_negative_offset() {
+        let mut lexer = Lexer::new("2024-01-15T10:30:00-08:00");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::Timestamp(_)));
+    }
+
+    // -------------------------------------------------------------------------
+    // Number edge cases
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_scientific_notation() {
+        let mut lexer = Lexer::new("1.5e10 2.3E-5 1e+3");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::Float(f) if (f - 1.5e10).abs() < 1.0));
+        assert!(matches!(tokens[1].kind, TokenKind::Float(f) if (f - 2.3e-5).abs() < 1e-10));
+        assert!(matches!(tokens[2].kind, TokenKind::Float(f) if (f - 1e3).abs() < 1.0));
+    }
+
+    #[test]
+    fn test_binary_literal() {
+        let mut lexer = Lexer::new("0b1100 0B1010");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::Int(12)));
+        assert!(matches!(tokens[1].kind, TokenKind::Int(10)));
+    }
+
+    #[test]
+    fn test_hex_uppercase() {
+        let mut lexer = Lexer::new("0XDEAD");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::Int(0xDEAD)));
+    }
+
+    #[test]
+    fn test_negative_number() {
+        let mut lexer = Lexer::new("-42 -3.14");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::Int(-42)));
+        assert!(matches!(tokens[1].kind, TokenKind::Float(f) if (f - (-3.14)).abs() < 0.001));
+    }
+
+    // -------------------------------------------------------------------------
+    // Tags and special tokens
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_tag_token() {
+        let mut lexer = Lexer::new(":Circle {radius: 5.0}");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::Tag(s) if s == "Circle"));
+    }
+
+    #[test]
+    fn test_colon_without_word() {
+        let mut lexer = Lexer::new(": 5");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::Colon));
+    }
+
+    #[test]
+    fn test_question_mark() {
+        let mut lexer = Lexer::new("string?");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(&tokens[0].kind, TokenKind::Word(s) if s == "string"));
+        assert!(matches!(tokens[1].kind, TokenKind::Question));
+    }
+
+    #[test]
+    fn test_equals_token() {
+        let mut lexer = Lexer::new("x = 5");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[1].kind, TokenKind::Eq));
+    }
+
+    #[test]
+    fn test_bool_keywords() {
+        let mut lexer = Lexer::new("true false");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::Bool(true)));
+        assert!(matches!(tokens[1].kind, TokenKind::Bool(false)));
+    }
+
+    #[test]
+    fn test_empty_input() {
+        let mut lexer = Lexer::new("");
+        let tokens = lexer.tokenize().unwrap();
+        assert_eq!(tokens.len(), 1);
+        assert!(matches!(tokens[0].kind, TokenKind::Eof));
+    }
+
+    #[test]
+    fn test_whitespace_only() {
+        let mut lexer = Lexer::new("   \n\t  ");
+        let tokens = lexer.tokenize().unwrap();
+        assert_eq!(tokens.len(), 1);
+        assert!(matches!(tokens[0].kind, TokenKind::Eof));
+    }
+
+    #[test]
+    fn test_token_positions() {
+        let mut lexer = Lexer::new("hello: 42");
+        let tokens = lexer.tokenize().unwrap();
+        assert_eq!(tokens[0].line, 1);
+        assert_eq!(tokens[0].col, 1);
+    }
+
+    #[test]
+    fn test_all_brackets() {
+        let mut lexer = Lexer::new("() {} []");
+        let tokens = lexer.tokenize().unwrap();
+        assert!(matches!(tokens[0].kind, TokenKind::LParen));
+        assert!(matches!(tokens[1].kind, TokenKind::RParen));
+        assert!(matches!(tokens[2].kind, TokenKind::LBrace));
+        assert!(matches!(tokens[3].kind, TokenKind::RBrace));
+        assert!(matches!(tokens[4].kind, TokenKind::LBracket));
+        assert!(matches!(tokens[5].kind, TokenKind::RBracket));
+    }
 }

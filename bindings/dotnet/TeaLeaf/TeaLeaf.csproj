@@ -11,7 +11,7 @@
     <PackageId>TeaLeaf</PackageId>
     <Version>2.0.0-beta.1</Version>
     <Authors>TeaLeaf Contributors</Authors>
-    <Description>Schema-aware document format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization.</Description>
+    <Description>Schema-aware data format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization.</Description>
     <PackageTags>serialization;schema;binary;config;tealeaf;json;document</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/krishjag/tealeaf</PackageProjectUrl>

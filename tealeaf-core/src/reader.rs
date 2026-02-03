@@ -553,10 +553,193 @@ impl<'a> Cursor<'a> {
 
 fn decompress_data(data: &[u8]) -> Result<Vec<u8>> {
     use flate2::read::ZlibDecoder;
-    
+
     let mut decoder = ZlibDecoder::new(data);
     let mut result = Vec::new();
     decoder.read_to_end(&mut result)
         .map_err(|_| Error::ParseError("Decompression failed".to_string()))?;
     Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::writer::Writer;
+
+    #[test]
+    fn test_open_mmap() {
+        // Write a binary file first, then open with mmap
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_reader_mmap.tlbx");
+
+        let mut w = Writer::new();
+        w.add_section("val", &Value::Int(42), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::open_mmap(&path).unwrap();
+        assert_eq!(r.get("val").unwrap().as_int(), Some(42));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_open_regular() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_reader_open.tlbx");
+
+        let mut w = Writer::new();
+        w.add_section("greeting", &Value::String("hi".into()), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::open(&path).unwrap();
+        assert_eq!(r.get("greeting").unwrap().as_str(), Some("hi"));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_invalid_magic() {
+        let result = Reader::from_bytes(vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_too_short_data() {
+        let result = Reader::from_bytes(vec![0; 10]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_wrong_version() {
+        let mut data = vec![0u8; 64];
+        // Set correct magic bytes "TLFX"
+        data[0] = b'T'; data[1] = b'L'; data[2] = b'F'; data[3] = b'X';
+        // Set wrong major version (3)
+        data[4] = 3; data[5] = 0;
+        let result = Reader::from_bytes(data);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_string_index_out_of_bounds() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_str_oob.tlbx");
+
+        let mut w = Writer::new();
+        w.add_section("x", &Value::Int(1), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let result = r.get_string(9999);
+        assert!(result.is_err());
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_keys() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_reader_keys.tlbx");
+
+        let mut w = Writer::new();
+        w.add_section("alpha", &Value::Int(1), None);
+        w.add_section("beta", &Value::Int(2), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let keys = r.keys();
+        assert!(keys.contains(&"alpha"));
+        assert!(keys.contains(&"beta"));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_missing_key() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_reader_missing.tlbx");
+
+        let mut w = Writer::new();
+        w.add_section("exists", &Value::Int(1), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        assert!(r.get("nonexistent").is_err());
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_struct_section_roundtrip() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_struct_section.tlbx");
+
+        let mut schema = Schema::new("Point");
+        schema.add_field("x", FieldType::new("int"));
+        schema.add_field("y", FieldType::new("int"));
+
+        let mut w = Writer::new();
+        w.add_schema(schema.clone());
+
+        let mut obj1 = HashMap::new();
+        obj1.insert("x".to_string(), Value::Int(10));
+        obj1.insert("y".to_string(), Value::Int(20));
+
+        let mut obj2 = HashMap::new();
+        obj2.insert("x".to_string(), Value::Int(30));
+        obj2.insert("y".to_string(), Value::Null);
+
+        let arr = Value::Array(vec![Value::Object(obj1), Value::Object(obj2)]);
+        w.add_section("points", &arr, Some(&schema));
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        assert!(!r.schemas.is_empty());
+
+        let points = r.get("points").unwrap();
+        let items = points.as_array().unwrap();
+        assert_eq!(items.len(), 2);
+        let p1 = items[0].as_object().unwrap();
+        assert_eq!(p1.get("x").unwrap().as_int(), Some(10));
+        let p2 = items[1].as_object().unwrap();
+        assert!(p2.get("y").unwrap().is_null());
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_heterogeneous_array() {
+        // Mixed-type array uses 0xFF element type marker
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_hetero_arr.tlbx");
+
+        let arr = Value::Array(vec![
+            Value::Int(1),
+            Value::String("hello".into()),
+            Value::Bool(true),
+        ]);
+
+        let mut w = Writer::new();
+        w.add_section("mixed", &arr, None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let val = r.get("mixed").unwrap();
+        let items = val.as_array().unwrap();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].as_int(), Some(1));
+        assert_eq!(items[1].as_str(), Some("hello"));
+        assert_eq!(items[2].as_bool(), Some(true));
+        std::fs::remove_file(&path).ok();
+    }
+
+    #[test]
+    fn test_empty_array() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("test_empty_arr.tlbx");
+
+        let mut w = Writer::new();
+        w.add_section("empty", &Value::Array(vec![]), None);
+        w.write(&path, false).unwrap();
+
+        let r = Reader::from_bytes(std::fs::read(&path).unwrap()).unwrap();
+        let val = r.get("empty").unwrap();
+        let items = val.as_array().unwrap();
+        assert_eq!(items.len(), 0);
+        std::fs::remove_file(&path).ok();
+    }
 }
