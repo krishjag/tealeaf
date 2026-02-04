@@ -6,6 +6,7 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Derive macros for TeaLeaf DTO conversion"
+readme = "README.md"
 
 [lib]
 proc-macro = true

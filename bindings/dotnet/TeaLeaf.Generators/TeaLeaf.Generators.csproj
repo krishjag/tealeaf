@@ -15,6 +15,7 @@
     <PackageTags>serialization;schema;tealeaf;sourcegen;codegen</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <DevelopmentDependency>true</DevelopmentDependency>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- Source generator packaging -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -29,6 +30,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeaLeaf.Annotations\TeaLeaf.Annotations.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Package README -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <!-- Pack as analyzer/generator -->

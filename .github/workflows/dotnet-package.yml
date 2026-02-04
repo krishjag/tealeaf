@@ -212,7 +212,8 @@ jobs:
       - name: Create NuGet packages
         run: |
           dotnet pack bindings/dotnet/TeaLeaf.Annotations -c Release -o artifacts/packages
-          dotnet pack bindings/dotnet/TeaLeaf.Generators -c Release -o artifacts/packages
+          dotnet build bindings/dotnet/TeaLeaf.Generators -c Release
+          dotnet pack bindings/dotnet/TeaLeaf.Generators -c Release --no-build -o artifacts/packages
           dotnet pack bindings/dotnet/TeaLeaf -c Release --no-build -o artifacts/packages
 
       - name: Upload NuGet package artifacts

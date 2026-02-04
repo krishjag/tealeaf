@@ -9,6 +9,7 @@ description = "Schema-aware data format with human-readable text and compact bin
 keywords = ["serialization", "schema", "binary", "config"]
 categories = ["encoding", "config", "parser-implementations"]
 exclude = ["benches_proto/"]
+readme = "README.md"
 
 [lib]
 name = "tealeaf"
