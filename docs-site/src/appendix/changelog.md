@@ -10,6 +10,8 @@
 - Contributing guide added (`CONTRIBUTING.md`)
 - Spec governance documentation added
 - Accuracy benchmark `dump-prompts` subcommand for offline prompt inspection
+- `TeaLeaf.Annotations` published as separate NuGet package (fixes dependency resolution)
+- `benches_proto/` excluded from crates.io package (removes `protoc` requirement for consumers)
 
 ---
 

@@ -209,11 +209,13 @@ jobs:
           cp bindings/dotnet/TeaLeaf/runtimes/linux-x64/native/libtealeaf_ffi.so bindings/dotnet/TeaLeaf.Tests/bin/Release/net8.0/ || true
           dotnet test bindings/dotnet -c Release --no-build
 
-      - name: Create NuGet package
+      - name: Create NuGet packages
         run: |
+          dotnet pack bindings/dotnet/TeaLeaf.Annotations -c Release -o artifacts/packages
+          dotnet pack bindings/dotnet/TeaLeaf.Generators -c Release -o artifacts/packages
           dotnet pack bindings/dotnet/TeaLeaf -c Release --no-build -o artifacts/packages
 
-      - name: Upload NuGet package artifact
+      - name: Upload NuGet package artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nuget-package
@@ -239,9 +241,23 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Publish to NuGet.org
+      - name: Publish TeaLeaf.Annotations to NuGet.org
         run: |
-          dotnet nuget push packages/*.nupkg \
+          dotnet nuget push packages/TeaLeaf.Annotations.*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Publish TeaLeaf.Generators to NuGet.org
+        run: |
+          dotnet nuget push packages/TeaLeaf.Generators.*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Publish TeaLeaf to NuGet.org
+        run: |
+          dotnet nuget push packages/TeaLeaf.*.nupkg \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
