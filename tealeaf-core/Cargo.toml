@@ -8,6 +8,7 @@ repository.workspace = true
 description = "Schema-aware data format with human-readable text and compact binary"
 keywords = ["serialization", "schema", "binary", "config"]
 categories = ["encoding", "config", "parser-implementations"]
+exclude = ["benches_proto/"]
 
 [lib]
 name = "tealeaf"
