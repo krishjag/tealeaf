@@ -1,6 +1,6 @@
 # Development Setup
 
-How to set up a development environment for working on TeaLeaf.
+How to set up a development environment for working on TeaLeaf. See also the comprehensive [CONTRIBUTING.md](https://github.com/krishjag/tealeaf/blob/main/CONTRIBUTING.md) in the repository root for project architecture, version management, and PR guidelines.
 
 ## Prerequisites
 
