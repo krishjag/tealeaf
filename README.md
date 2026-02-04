@@ -1,5 +1,7 @@
 # TeaLeaf Data Format
 
+[![Rust CI](https://github.com/krishjag/tealeaf/actions/workflows/rust-cli.yml/badge.svg)](https://github.com/krishjag/tealeaf/actions/workflows/rust-cli.yml)
+[![.NET CI](https://github.com/krishjag/tealeaf/actions/workflows/dotnet-package.yml/badge.svg)](https://github.com/krishjag/tealeaf/actions/workflows/dotnet-package.yml)
 [![codecov](https://codecov.io/gh/krishjag/tealeaf/graph/badge.svg)](https://codecov.io/gh/krishjag/tealeaf)
 
 **A schema-aware data format with human-readable text and compact binary representation.**
