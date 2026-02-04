@@ -2,7 +2,10 @@
 
 [![Rust CI](https://github.com/krishjag/tealeaf/actions/workflows/rust-cli.yml/badge.svg)](https://github.com/krishjag/tealeaf/actions/workflows/rust-cli.yml)
 [![.NET CI](https://github.com/krishjag/tealeaf/actions/workflows/dotnet-package.yml/badge.svg)](https://github.com/krishjag/tealeaf/actions/workflows/dotnet-package.yml)
+[![crates.io](https://img.shields.io/crates/v/tealeaf-core.svg)](https://crates.io/crates/tealeaf-core)
+[![NuGet](https://img.shields.io/nuget/v/TeaLeaf.svg)](https://www.nuget.org/packages/TeaLeaf)
 [![codecov](https://codecov.io/gh/krishjag/tealeaf/graph/badge.svg)](https://codecov.io/gh/krishjag/tealeaf)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **A schema-aware data format with human-readable text and compact binary representation.**
 

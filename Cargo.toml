@@ -10,8 +10,8 @@ license = "MIT"
 repository = "https://github.com/krishjag/tealeaf"
 
 [workspace.dependencies]
-tealeaf-core = { path = "tealeaf-core" }
-tealeaf-derive = { path = "tealeaf-derive" }
+tealeaf-core = { path = "tealeaf-core", version = "2.0.0-beta.1" }
+tealeaf-derive = { path = "tealeaf-derive", version = "2.0.0-beta.1" }
 thiserror = "1.0"
 memmap2 = "0.9"
 crc32fast = "1.3"

@@ -84,6 +84,9 @@ Update-File -Path $CargoPath -Description "Cargo.toml (workspace)" -Transform {
     $content = $content -replace '(?m)^(authors\s*=\s*\[")[^"]*("\])', "`${1}$Authors`${2}"
     $content = $content -replace '(?m)^(license\s*=\s*")[^"]*(")', "`${1}$License`${2}"
     $content = $content -replace '(?m)^(repository\s*=\s*")[^"]*(")', "`${1}$Repository`${2}"
+    # Update workspace dependency version specifiers (required for crates.io publish)
+    $content = $content -replace '(tealeaf-core = \{ path = "tealeaf-core", version = ")[^"]*(")', "`${1}$Version`${2}"
+    $content = $content -replace '(tealeaf-derive = \{ path = "tealeaf-derive", version = ")[^"]*(")', "`${1}$Version`${2}"
     return $content
 }
 

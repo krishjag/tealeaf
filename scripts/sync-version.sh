@@ -78,8 +78,14 @@ update_file() {
 
 # Update Cargo.toml
 CARGO_FILE="$REPO_ROOT/Cargo.toml"
-update_file "$CARGO_FILE" "Cargo.toml (version)" \
+update_file "$CARGO_FILE" "Cargo.toml (workspace version)" \
     "^(version = \")[^\"]*(\")$" "\1$VERSION\2"
+
+# Update workspace dependency version specifiers (required for crates.io publish)
+update_file "$CARGO_FILE" "Cargo.toml (tealeaf-core dep version)" \
+    "(tealeaf-core = \{ path = \"tealeaf-core\", version = \")[^\"]*(\")" "\1$VERSION\2"
+update_file "$CARGO_FILE" "Cargo.toml (tealeaf-derive dep version)" \
+    "(tealeaf-derive = \{ path = \"tealeaf-derive\", version = \")[^\"]*(\")" "\1$VERSION\2"
 
 # Update .NET csproj
 CSPROJ_FILE="$REPO_ROOT/bindings/dotnet/TeaLeaf/TeaLeaf.csproj"

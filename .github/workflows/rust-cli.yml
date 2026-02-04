@@ -279,6 +279,13 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Publish tealeaf-derive to crates.io
+        run: cargo publish --package tealeaf-derive --token ${{ secrets.CRATES_IO_TOKEN }}
+        continue-on-error: true  # In case version already exists
+
+      - name: Wait for crates.io index update
+        run: sleep 30
+
       - name: Publish tealeaf-core to crates.io
         run: cargo publish --package tealeaf-core --token ${{ secrets.CRATES_IO_TOKEN }}
         continue-on-error: true  # In case version already exists
