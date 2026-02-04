@@ -1,6 +1,19 @@
 # Changelog
 
-## v2.0.0-beta.1 (Current)
+## v2.0.0-beta.2 (Current)
+
+### Improvements
+- Version sync automation expanded to cover all project files (16 targets)
+- NuGet package icon added (dark background variant)
+- CI badges added to README (Rust CI, .NET CI, crates.io, NuGet, codecov, License)
+- crates.io publish ordering fixed (`tealeaf-derive` before `tealeaf-core`)
+- Contributing guide added (`CONTRIBUTING.md`)
+- Spec governance documentation added
+- Accuracy benchmark `dump-prompts` subcommand for offline prompt inspection
+
+---
+
+## v2.0.0-beta.1
 
 Initial public beta release.
 

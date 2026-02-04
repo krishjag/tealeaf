@@ -14,7 +14,7 @@ pub const VERSION_MAJOR: u16 = 2;
 /// Binary format version (minor) - for compatibility checks
 pub const VERSION_MINOR: u16 = 0;
 /// Library version string (beta/RFC stage)
-pub const VERSION: &str = "2.0.0-beta.1";
+pub const VERSION: &str = "2.0.0-beta.2";
 pub const HEADER_SIZE: usize = 64;
 
 // =============================================================================

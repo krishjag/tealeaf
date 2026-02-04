@@ -4,7 +4,7 @@
 
 **30-40% fewer tokens than JSON for LLM applications, with near zero accuracy loss.**
 
-<span class="version-badge">v2.0.0-beta.1</span>
+<span class="version-badge">v2.0.0-beta.2</span>
 
 ---
 

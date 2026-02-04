@@ -11,7 +11,7 @@ documentation_style = "auto"
 header = """
 /*
  * TeaLeaf FFI - C bindings for the TeaLeaf format library
- * Version: 2.0.0-beta.1 (Request for Comments)
+ * Version: 2.0.0-beta.2 (Request for Comments)
  *
  * This header provides a C-compatible API for parsing and manipulating
  * TeaLeaf documents from languages like C# via FFI.

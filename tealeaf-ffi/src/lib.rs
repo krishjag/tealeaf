@@ -928,7 +928,7 @@ pub unsafe extern "C" fn tl_result_free(result: *mut TLResult) {
 /// Get the library version string.
 #[no_mangle]
 pub extern "C" fn tl_version() -> *const c_char {
-    static VERSION: &[u8] = b"2.0.0-beta.1\0";
+    static VERSION: &[u8] = b"2.0.0-beta.2\0";
     VERSION.as_ptr() as *const c_char
 }
 
@@ -2158,7 +2158,7 @@ headers: @map {"Content-Type": "application/json", "Accept": "*/*"}
         let v = tl_version();
         assert!(!v.is_null());
         let version = unsafe { CStr::from_ptr(v) }.to_str().unwrap();
-        assert_eq!(version, "2.0.0-beta.1");
+        assert_eq!(version, "2.0.0-beta.2");
         // Note: do NOT free this - it's a static string
     }
 

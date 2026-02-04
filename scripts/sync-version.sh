@@ -102,6 +102,74 @@ SPEC_FILE="$REPO_ROOT/spec/TEALEAF_SPEC.md"
 update_file "$SPEC_FILE" "spec/TEALEAF_SPEC.md (title)" \
     "(# TeaLeaf Format Specification v)[^ ]+" "\1$VERSION"
 
+# Update Rust source version constants
+update_file "$REPO_ROOT/tealeaf-core/src/types.rs" "tealeaf-core/src/types.rs (VERSION)" \
+    "(pub const VERSION: \&str = \")[^\"]*(\";)" "\1$VERSION\2"
+
+update_file "$REPO_ROOT/tealeaf-ffi/src/lib.rs" "tealeaf-ffi/src/lib.rs (tl_version)" \
+    "(static VERSION: \&\[u8\] = b\")[^\\\\]*(\\\\0\")" "\1$VERSION\2"
+
+update_file "$REPO_ROOT/tealeaf-ffi/src/lib.rs" "tealeaf-ffi/src/lib.rs (version test)" \
+    "(assert_eq!\(version, \")[^\"]*(\")" "\1$VERSION\2"
+
+# Update generated C header
+update_file "$REPO_ROOT/tealeaf-ffi/tealeaf.h" "tealeaf-ffi/tealeaf.h (header version)" \
+    "(\* Version: )[^ ]+ (\(Request)" "\1$VERSION \2"
+
+# Update CLAUDE.md version
+update_file "$REPO_ROOT/CLAUDE.md" "CLAUDE.md (current version)" \
+    "(Current version: \*\*)[^\*]+(\*\*)" "\1$VERSION\2"
+
+# Update .NET Annotations csproj
+update_file "$REPO_ROOT/bindings/dotnet/TeaLeaf.Annotations/TeaLeaf.Annotations.csproj" \
+    "TeaLeaf.Annotations.csproj (version)" \
+    "(<Version>)[^<]*(</Version>)" "\1$VERSION\2"
+
+# Update .NET Generators csproj
+update_file "$REPO_ROOT/bindings/dotnet/TeaLeaf.Generators/TeaLeaf.Generators.csproj" \
+    "TeaLeaf.Generators.csproj (version)" \
+    "(<Version>)[^<]*(</Version>)" "\1$VERSION\2"
+
+# Update cbindgen.toml header version
+update_file "$REPO_ROOT/tealeaf-ffi/cbindgen.toml" "cbindgen.toml (header version)" \
+    "(\* Version: )[^ ]+ (\(Request)" "\1$VERSION \2"
+
+# Update docfx.json footer
+update_file "$REPO_ROOT/bindings/dotnet/docfx.json" "docfx.json (footer version)" \
+    "(TeaLeaf v)[^ ]+ (—)" "\1$VERSION \2"
+
+# Update BUILD.md nupkg filename
+update_file "$REPO_ROOT/bindings/dotnet/BUILD.md" "BUILD.md (nupkg filename)" \
+    "(TeaLeaf\.)[^ ]+(\.nupkg)" "\1$VERSION\2"
+
+# Update docs-site version references
+update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (version badge)" \
+    "(version-badge\">v)[^<]*(</span>)" "\1$VERSION\2"
+
+update_file "$REPO_ROOT/docs-site/src/appendix/comparison-matrix.md" \
+    "comparison-matrix.md (version)" \
+    "(young format \(v)[^\)]*(\))" "\1$VERSION\2"
+
+update_file "$REPO_ROOT/docs-site/src/getting-started/installation.md" \
+    "installation.md (CLI version)" \
+    "(# tealeaf )[^ ]+" "\1$VERSION"
+
+update_file "$REPO_ROOT/docs-site/src/getting-started/installation.md" \
+    "installation.md (cargo version)" \
+    "(tealeaf-core = \{ version = \")[^\"]*(\")" "\1$VERSION\2"
+
+update_file "$REPO_ROOT/docs-site/src/rust/overview.md" \
+    "rust/overview.md (cargo version)" \
+    "(tealeaf-core = \{ version = \")[^\"]*(\")" "\1$VERSION\2"
+
+update_file "$REPO_ROOT/docs-site/src/rust/derive-macros.md" \
+    "rust/derive-macros.md (cargo version)" \
+    "(tealeaf-core = \{ version = \")[^\"]*(\")" "\1$VERSION\2"
+
+update_file "$REPO_ROOT/docs-site/src/ffi/api-reference.md" \
+    "ffi/api-reference.md (version example)" \
+    "(e\.g\., \`\")[^\"]*(\")" "\1$VERSION\2"
+
 echo ""
 if [[ "$DRY_RUN" == "true" ]]; then
     echo "Dry run complete. No files were modified."

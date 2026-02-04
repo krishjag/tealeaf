@@ -16,7 +16,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tealeaf-core = { version = "2.0.0-beta.1", features = ["derive"] }
+tealeaf-core = { version = "2.0.0-beta.2", features = ["derive"] }
 ```
 
 The `derive` feature pulls in `tealeaf-derive` for proc-macro support.
