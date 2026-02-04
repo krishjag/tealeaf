@@ -100,4 +100,5 @@
 
 - [Type Reference](./appendix/type-reference.md)
 - [Comparison Matrix](./appendix/comparison-matrix.md)
+- [Spec Governance](./appendix/spec-governance.md)
 - [Changelog](./appendix/changelog.md)
