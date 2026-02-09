@@ -13,6 +13,7 @@
     - tealeaf-ffi/cbindgen.toml (header version)
     - CLAUDE.md (current version)
     - README.md (footer version)
+    - tealeaf-core/README.md (cargo versions)
     - spec/TEALEAF_SPEC.md (title version)
     - docs-site/src/introduction.md (version badge)
     - docs-site/src/appendix/comparison-matrix.md (version mention)
@@ -204,6 +205,15 @@ $BuildMdPath = Join-Path $RepoRoot "bindings/dotnet/BUILD.md"
 Update-File -Path $BuildMdPath -Description "BUILD.md (nupkg filename)" -Transform {
     param($content)
     $content = $content -replace '(TeaLeaf\.)[^\s]+(\.nupkg)', "`${1}$Version`${2}"
+    return $content
+}
+
+# Update tealeaf-core/README.md cargo versions
+$CoreReadmePath = Join-Path $RepoRoot "tealeaf-core/README.md"
+Update-File -Path $CoreReadmePath -Description "tealeaf-core/README.md (cargo versions)" -Transform {
+    param($content)
+    $content = $content -replace '(tealeaf-core = ")[^"]*(")', "`${1}$Version`${2}"
+    $content = $content -replace '(tealeaf-core = \{ version = ")[^"]*(")', "`${1}$Version`${2}"
     return $content
 }
 

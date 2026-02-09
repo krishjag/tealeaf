@@ -142,6 +142,14 @@ update_file "$REPO_ROOT/bindings/dotnet/docfx.json" "docfx.json (footer version)
 update_file "$REPO_ROOT/bindings/dotnet/BUILD.md" "BUILD.md (nupkg filename)" \
     "(TeaLeaf\.)[^ ]+(\.nupkg)" "\1$VERSION\2"
 
+# Update tealeaf-core/README.md cargo versions
+update_file "$REPO_ROOT/tealeaf-core/README.md" \
+    "tealeaf-core/README.md (cargo plain version)" \
+    "(tealeaf-core = \")[^\"]*(\")" "\1$VERSION\2"
+update_file "$REPO_ROOT/tealeaf-core/README.md" \
+    "tealeaf-core/README.md (cargo features version)" \
+    "(tealeaf-core = \{ version = \")[^\"]*(\")" "\1$VERSION\2"
+
 # Update docs-site version references
 update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (version badge)" \
     "(version-badge\">v)[^<]*(</span>)" "\1$VERSION\2"
