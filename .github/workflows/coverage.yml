@@ -1,7 +1,7 @@
 # Code coverage reporting for Rust and .NET
 #
 # Rust: cargo-llvm-cov → lcov → Codecov (gate: 90% line coverage)
-# .NET: coverlet → Cobertura → Codecov (gate: 85% TeaLeaf, 80% Generators)
+# .NET: dotnet-coverage → Cobertura → Codecov (gate: 85% TeaLeaf, 80% Generators)
 #
 # Coverage thresholds (update these as coverage improves):
 #   Rust line coverage:         90%
@@ -103,7 +103,7 @@ jobs:
           retention-days: 30
 
   # =========================================================================
-  # .NET Coverage
+  # .NET Coverage (dotnet-coverage — profiler-based, no IL rewriting)
   # =========================================================================
   dotnet-coverage:
     runs-on: ubuntu-latest
@@ -146,6 +146,9 @@ jobs:
             8.0.x
             10.0.x
 
+      - name: Install dotnet-coverage
+        run: dotnet tool install -g dotnet-coverage
+
       - name: Restore .NET dependencies
         run: dotnet restore bindings/dotnet
 
@@ -159,25 +162,20 @@ jobs:
 
       - name: Run TeaLeaf.Tests with coverage
         run: |
-          dotnet test bindings/dotnet/TeaLeaf.Tests \
-            -c Debug \
-            --no-build \
-            /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput="${{ github.workspace }}/coverage/dotnet-tealeaf-tests.cobertura.xml" \
-            '/p:Include=[TeaLeaf]*%2c[TeaLeaf.Annotations]*' \
-            '/p:Exclude=[*.Tests]*%2c[*.Generators.Tests]*'
+          mkdir -p coverage
+          dotnet-coverage collect \
+            --output "${{ github.workspace }}/coverage/dotnet-tealeaf-tests.cobertura.xml" \
+            --output-format cobertura \
+            --settings bindings/dotnet/coverage-tealeaf.settings.xml \
+            -- dotnet test bindings/dotnet/TeaLeaf.Tests -c Debug --no-build
 
       - name: Run TeaLeaf.Generators.Tests with coverage
         run: |
-          dotnet test bindings/dotnet/TeaLeaf.Generators.Tests \
-            -c Debug \
-            --no-build \
-            /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput="${{ github.workspace }}/coverage/dotnet-generators-tests.cobertura.xml" \
-            '/p:Include=[TeaLeaf.Generators]*%2c[TeaLeaf.Annotations]*' \
-            '/p:Exclude=[*.Tests]*'
+          dotnet-coverage collect \
+            --output "${{ github.workspace }}/coverage/dotnet-generators-tests.cobertura.xml" \
+            --output-format cobertura \
+            --settings bindings/dotnet/coverage-generators.settings.xml \
+            -- dotnet test bindings/dotnet/TeaLeaf.Generators.Tests -c Debug --no-build
 
       - name: Enforce .NET coverage gates
         run: |
@@ -190,9 +188,10 @@ jobs:
             fi
 
             # Extract line-rate for the target module from cobertura XML
-            # <package name="TeaLeaf" line-rate="0.8909" ...>
+            # Attribute order varies by tool (coverlet vs dotnet-coverage), so match
+            # the package line by name, then extract line-rate from that line.
             local rate
-            rate=$(grep -oP "package name=\"${module}\"[^>]*line-rate=\"\K[0-9.]+" "$file" || echo "")
+            rate=$(grep "package.*name=\"${module}\"" "$file" | grep -oP "line-rate=\"\K[0-9.]+" || echo "")
 
             if [ -z "$rate" ]; then
               echo "⚠️  Module '${module}' not found in ${file}, skipping gate"

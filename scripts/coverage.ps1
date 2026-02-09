@@ -3,13 +3,14 @@
     Generates code coverage reports for the TeaLeaf project.
 
 .DESCRIPTION
-    Runs Rust coverage (cargo-llvm-cov) and .NET coverage (coverlet) and
+    Runs Rust coverage (cargo-llvm-cov) and .NET coverage (dotnet-coverage) and
     produces HTML reports for local viewing or lcov/cobertura for CI upload.
 
     Prerequisites:
     - Rust toolchain with llvm-tools-preview component
     - cargo-llvm-cov: cargo install cargo-llvm-cov
     - .NET SDK 10.0 (for .NET coverage)
+    - dotnet-coverage: dotnet tool install -g dotnet-coverage
     - Optional: dotnet tool install -g dotnet-reportgenerator-globaltool (for HTML)
 
 .PARAMETER CI
@@ -97,13 +98,20 @@ function Invoke-RustCoverage {
 }
 
 # =========================================================================
-# .NET Coverage
+# .NET Coverage (dotnet-coverage — profiler-based, no IL rewriting)
 # =========================================================================
 function Invoke-DotnetCoverage {
     Write-Host "============================================" -ForegroundColor Cyan
-    Write-Host "  .NET Coverage (coverlet)" -ForegroundColor Cyan
+    Write-Host "  .NET Coverage (dotnet-coverage)" -ForegroundColor Cyan
     Write-Host "============================================" -ForegroundColor Cyan
     Write-Host ""
+
+    # Verify dotnet-coverage is installed
+    $dcTool = Get-Command dotnet-coverage -ErrorAction SilentlyContinue
+    if (-not $dcTool) {
+        Write-Error "dotnet-coverage is not installed. Install with: dotnet tool install -g dotnet-coverage"
+        return
+    }
 
     $DotnetDir = Join-Path $RepoRoot "bindings\dotnet"
 
@@ -111,32 +119,26 @@ function Invoke-DotnetCoverage {
     dotnet build $DotnetDir -c Debug
 
     # Run TeaLeaf.Tests with coverage
-    # Note: Use -p: (not /p:) for .NET SDK 10 compat. Use %2c (URL-encoded comma)
-    # in Include/Exclude filters to prevent MSBuild argument splitting.
     Write-Host ""
     Write-Host "Running TeaLeaf.Tests with coverage..."
     $tealeafTestsOutput = Join-Path $CoverageDir "dotnet-tealeaf-tests.cobertura.xml"
-    dotnet test "$DotnetDir\TeaLeaf.Tests" `
-        -c Debug `
-        --no-build `
-        -p:CollectCoverage=true `
-        -p:CoverletOutputFormat=cobertura `
-        -p:CoverletOutput="$tealeafTestsOutput" `
-        '-p:Include=[TeaLeaf]*%2c[TeaLeaf.Annotations]*' `
-        '-p:Exclude=[*.Tests]*%2c[*.Generators.Tests]*'
+    $tealeafSettings = Join-Path $DotnetDir "coverage-tealeaf.settings.xml"
+    dotnet-coverage collect `
+        --output "$tealeafTestsOutput" `
+        --output-format cobertura `
+        --settings "$tealeafSettings" `
+        -- dotnet test "$DotnetDir\TeaLeaf.Tests" -c Debug --no-build
 
     # Run TeaLeaf.Generators.Tests with coverage
     Write-Host ""
     Write-Host "Running TeaLeaf.Generators.Tests with coverage..."
     $generatorsOutput = Join-Path $CoverageDir "dotnet-generators-tests.cobertura.xml"
-    dotnet test "$DotnetDir\TeaLeaf.Generators.Tests" `
-        -c Debug `
-        --no-build `
-        -p:CollectCoverage=true `
-        -p:CoverletOutputFormat=cobertura `
-        -p:CoverletOutput="$generatorsOutput" `
-        '-p:Include=[TeaLeaf.Generators]*%2c[TeaLeaf.Annotations]*' `
-        '-p:Exclude=[*.Tests]*'
+    $generatorsSettings = Join-Path $DotnetDir "coverage-generators.settings.xml"
+    dotnet-coverage collect `
+        --output "$generatorsOutput" `
+        --output-format cobertura `
+        --settings "$generatorsSettings" `
+        -- dotnet test "$DotnetDir\TeaLeaf.Generators.Tests" -c Debug --no-build
 
     if (-not $CI) {
         # Local mode: try to generate HTML report

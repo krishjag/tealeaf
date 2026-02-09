@@ -64,6 +64,37 @@ public class DateTimeModel
     public DateTime CreatedAt { get; set; }
 }
 
+// For ReadPrimitive int-to-double/float/decimal coercion paths.
+// Not [TeaLeaf]-annotated to keep it reflection-only.
+public class NumericCoercionModel
+{
+    public string Name { get; set; } = "";
+    public double? DoubleVal { get; set; }
+    public float? FloatVal { get; set; }
+    public decimal? DecimalVal { get; set; }
+}
+
+// For ReadPrimitiveValue enum branch via ReadList
+public class WithEnumList
+{
+    public string Name { get; set; } = "";
+    public List<OrderStatus> Statuses { get; set; } = new();
+}
+
+// For ReadPrimitiveValue nested TeaLeaf object via ReadDictionary
+public class WithAddressDict
+{
+    public string Name { get; set; } = "";
+    public Dictionary<string, Address> Locations { get; set; } = new();
+}
+
+// For ReadPrimitiveValue ToObject() fallback via ReadDictionary
+public class WithObjectDict
+{
+    public string Name { get; set; } = "";
+    public Dictionary<string, object> Extra { get; set; } = new();
+}
+
 [TeaLeaf]
 public partial class WithNullableAddress
 {
@@ -599,18 +630,35 @@ public class TLValueEdgeCaseTests
     [Fact]
     public void ToObject_UInt_ReturnsUlong()
     {
-        // Create a document with a UInt value via binary roundtrip
-        var fixturePath = Path.Combine(
-            AppContext.BaseDirectory, "..", "..", "..", "fixtures", "comprehensive.tlbx");
-        if (!File.Exists(fixturePath)) return;
-
-        using var reader = TLReader.Open(fixturePath);
-        using var val = reader["uint_val"];
-        if (val == null) return;
-        if (val.Type == TLType.UInt)
+        // Schema-typed uint produces TLType.UInt; compile + read roundtrip
+        var path = Path.Combine(Path.GetTempPath(), $"test_uint_{Guid.NewGuid()}.tlbx");
+        try
         {
-            var obj = val.ToObject();
+            using (var doc = TLDocument.Parse(
+                "@struct Counter (count: uint)\ndata: @table Counter [(42)]"))
+            {
+                doc.Compile(path);
+            }
+
+            using var reader = TLReader.Open(path);
+            using var data = reader["data"];
+            Assert.NotNull(data);
+            Assert.Equal(TLType.Array, data!.Type);
+
+            var arr = data.AsArray().ToList();
+            Assert.NotEmpty(arr);
+            using var row = arr[0];
+            using var countVal = row.GetField("count");
+            Assert.NotNull(countVal);
+            Assert.Equal(TLType.UInt, countVal!.Type);
+
+            var obj = countVal.ToObject();
             Assert.IsType<ulong>(obj);
+            Assert.Equal(42UL, (ulong)obj!);
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
         }
     }
 
@@ -1879,5 +1927,133 @@ public class TeaLeafTextHelperEdgeCaseTests
         Assert.Equal("alice", restored.Name);
         Assert.NotNull(restored.HomeAddress);
         Assert.Equal("123 Main", restored.HomeAddress!.Street);
+    }
+
+    // ----------------------------------------------------------------
+    // ReadPrimitive int-to-double/float/decimal coercion (lines 509, 517-518, 526-527)
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_ReadPrimitive_IntToDouble_Coercion()
+    {
+        // Whole number 42 is parsed as int; ReadPrimitive falls through AsFloat → AsInt → (double)
+        var tlText = @"
+            numeric_coercion_model: {
+                name: test
+                double_val: 42
+            }
+        ";
+
+        var restored = TeaLeafSerializer.FromText<NumericCoercionModel>(tlText);
+
+        Assert.Equal(42.0, restored.DoubleVal);
+    }
+
+    [Fact]
+    public void Serializer_ReadPrimitive_IntToFloat_Coercion()
+    {
+        var tlText = @"
+            numeric_coercion_model: {
+                name: test
+                float_val: 42
+            }
+        ";
+
+        var restored = TeaLeafSerializer.FromText<NumericCoercionModel>(tlText);
+
+        Assert.Equal(42.0f, restored.FloatVal);
+    }
+
+    [Fact]
+    public void Serializer_ReadPrimitive_IntToDecimal_Coercion()
+    {
+        var tlText = @"
+            numeric_coercion_model: {
+                name: test
+                decimal_val: 42
+            }
+        ";
+
+        var restored = TeaLeafSerializer.FromText<NumericCoercionModel>(tlText);
+
+        Assert.Equal(42m, restored.DecimalVal);
+    }
+
+    // ----------------------------------------------------------------
+    // ReadPrimitiveValue: enum via list (lines 635-638)
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_ReadPrimitiveValue_EnumInList()
+    {
+        var tlText = @"
+            with_enum_list: {
+                name: test
+                statuses: [pending, in_progress, completed_successfully]
+            }
+        ";
+
+        var restored = TeaLeafSerializer.FromText<WithEnumList>(tlText);
+
+        Assert.Equal(3, restored.Statuses.Count);
+        Assert.Equal(OrderStatus.Pending, restored.Statuses[0]);
+        Assert.Equal(OrderStatus.InProgress, restored.Statuses[1]);
+        Assert.Equal(OrderStatus.CompletedSuccessfully, restored.Statuses[2]);
+    }
+
+    // ----------------------------------------------------------------
+    // ReadPrimitiveValue: nested TeaLeaf object via dict (lines 642-643)
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_ReadPrimitiveValue_NestedTeaLeafInDict()
+    {
+        var tlText = "with_address_dict: {\n" +
+            "  name: test\n" +
+            "  locations: {\n" +
+            "    home: {\n" +
+            "      street: \"123 Main\"\n" +
+            "      city: Springfield\n" +
+            "      zip: \"62701\"\n" +
+            "    }\n" +
+            "    work: {\n" +
+            "      street: \"456 Oak\"\n" +
+            "      city: Shelbyville\n" +
+            "      zip: \"62702\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "}\n";
+
+        var restored = TeaLeafSerializer.FromText<WithAddressDict>(tlText);
+
+        Assert.Equal(2, restored.Locations.Count);
+        Assert.Equal("123 Main", restored.Locations["home"].Street);
+        Assert.Equal("Shelbyville", restored.Locations["work"].City);
+    }
+
+    // ----------------------------------------------------------------
+    // ReadPrimitiveValue: ToObject() fallback (line 645)
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_ReadPrimitiveValue_ToObjectFallback()
+    {
+        // Includes bytes value to hit TLType.Bytes branch of ToObject() (line 342)
+        var tlText = "with_object_dict: {\n" +
+            "  name: test\n" +
+            "  extra: {\n" +
+            "    greeting: hello\n" +
+            "    count: 42\n" +
+            "    data: b\"cafe\"\n" +
+            "  }\n" +
+            "}\n";
+
+        var restored = TeaLeafSerializer.FromText<WithObjectDict>(tlText);
+
+        Assert.Equal(3, restored.Extra.Count);
+        Assert.True(restored.Extra.ContainsKey("greeting"));
+        Assert.True(restored.Extra.ContainsKey("count"));
+        Assert.True(restored.Extra.ContainsKey("data"));
+        Assert.IsType<byte[]>(restored.Extra["data"]);
     }
 }
