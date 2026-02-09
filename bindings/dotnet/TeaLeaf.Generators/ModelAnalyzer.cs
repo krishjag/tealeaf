@@ -103,7 +103,9 @@ internal static class ModelAnalyzer
                 properties.Add(tlProp);
         }
 
-        string ns = typeSymbol.ContainingNamespace?.ToDisplayString() ?? "";
+        string ns = typeSymbol.ContainingNamespace is { IsGlobalNamespace: false } nsSymbol
+            ? nsSymbol.ToDisplayString()
+            : "";
         string fqn = typeSymbol.ToDisplayString();
 
         return new TeaLeafModel

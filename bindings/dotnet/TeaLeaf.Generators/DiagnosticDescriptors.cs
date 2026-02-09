@@ -51,4 +51,12 @@ internal static class DiagnosticDescriptors
         category: "TeaLeaf",
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor GlobalNamespace = new(
+        id: "TL007",
+        title: "TeaLeaf type must be in a named namespace",
+        messageFormat: "Type '{0}' is in the global namespace. [TeaLeaf] classes must be declared inside a named namespace for source generation to work correctly.",
+        category: "TeaLeaf",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 }

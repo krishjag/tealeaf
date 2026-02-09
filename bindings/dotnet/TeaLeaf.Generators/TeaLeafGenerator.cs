@@ -51,6 +51,19 @@ public class TeaLeafGenerator : IIncrementalGenerator
                 loc.TypeName));
         });
 
+        // Report diagnostics for global namespace types (TL007)
+        var globalNamespaceTypes = allTeaLeafTypes
+            .Where(static r => r.IsGlobalNamespace)
+            .Select(static (r, _) => r.DiagnosticLocation!);
+
+        context.RegisterSourceOutput(globalNamespaceTypes, static (spc, loc) =>
+        {
+            spc.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.GlobalNamespace,
+                loc.Location,
+                loc.TypeName));
+        });
+
         // Generate source for concrete (non-generic) types
         var concreteModels = allTeaLeafTypes
             .Where(static r => r.Model is not null)
@@ -93,6 +106,14 @@ public class TeaLeafGenerator : IIncrementalGenerator
         {
             return new GeneratorResult(
                 isNonPartial: true,
+                diagnosticLocation: location);
+        }
+
+        // Check if the type is in the global namespace (TL007)
+        if (typeSymbol.ContainingNamespace is null or { IsGlobalNamespace: true })
+        {
+            return new GeneratorResult(
+                isGlobalNamespace: true,
                 diagnosticLocation: location);
         }
 
@@ -140,17 +161,20 @@ public class TeaLeafGenerator : IIncrementalGenerator
         public TeaLeafModel? Model { get; }
         public bool IsOpenGeneric { get; }
         public bool IsNonPartial { get; }
+        public bool IsGlobalNamespace { get; }
         public DiagnosticLocationInfo? DiagnosticLocation { get; }
 
         public GeneratorResult(
             TeaLeafModel? model = null,
             bool isOpenGeneric = false,
             bool isNonPartial = false,
+            bool isGlobalNamespace = false,
             DiagnosticLocationInfo? diagnosticLocation = null)
         {
             Model = model;
             IsOpenGeneric = isOpenGeneric;
             IsNonPartial = isNonPartial;
+            IsGlobalNamespace = isGlobalNamespace;
             DiagnosticLocation = diagnosticLocation;
         }
     }

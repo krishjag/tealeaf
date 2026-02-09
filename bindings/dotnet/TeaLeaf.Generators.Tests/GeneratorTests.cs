@@ -1037,4 +1037,60 @@ public partial class WithDecimalList
         // decimal is not in GetTLTypeForElement switch, falls to _ => string
         Assert.Contains("prices: []string", gen);
     }
+
+    // =========================================================================
+    // TL007: Global namespace diagnostic
+    // =========================================================================
+
+    [Fact]
+    public void Generator_GlobalNamespace_ReportsTL007()
+    {
+        // Class in global namespace (no namespace declaration)
+        var source = @"
+using TeaLeaf.Annotations;
+
+[TeaLeaf]
+public partial class GlobalModel
+{
+    public string Name { get; set; } = """";
+}
+";
+        var result = RunGenerator(source);
+
+        // Should produce TL007 diagnostic
+        var tl007 = result.Diagnostics.FirstOrDefault(d => d.Id == "TL007");
+        Assert.NotNull(tl007);
+        Assert.Equal(DiagnosticSeverity.Error, tl007!.Severity);
+        Assert.Contains("GlobalModel", tl007.GetMessage());
+        Assert.Contains("global namespace", tl007.GetMessage());
+
+        // Should NOT generate any source for this type
+        Assert.DoesNotContain(result.GeneratedTrees,
+            t => t.FilePath.Contains("GlobalModel.TeaLeaf.g.cs"));
+    }
+
+    [Fact]
+    public void Generator_NamedNamespace_DoesNotReportTL007()
+    {
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace MyApp.Models;
+
+[TeaLeaf]
+public partial class NamespacedModel
+{
+    public string Name { get; set; } = """";
+}
+";
+        var result = RunGenerator(source);
+
+        // Should NOT produce TL007 diagnostic
+        var tl007 = result.Diagnostics.FirstOrDefault(d => d.Id == "TL007");
+        Assert.Null(tl007);
+
+        // Should generate source normally
+        Assert.Contains(result.GeneratedTrees,
+            t => t.FilePath.Contains("NamespacedModel.TeaLeaf.g.cs"));
+    }
 }

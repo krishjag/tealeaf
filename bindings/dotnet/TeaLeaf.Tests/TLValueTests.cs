@@ -298,4 +298,59 @@ public class TLValueTests
         Assert.Equal(1L, arr[0].Key);
         Assert.Equal("one", arr[0].Value);
     }
+
+    // =========================================================================
+    // GetRequired() extension methods
+    // =========================================================================
+
+    [Fact]
+    public void GetRequired_Document_ReturnsValue()
+    {
+        using var doc = TLDocument.Parse("name: alice");
+        using var value = doc.GetRequired("name");
+        Assert.Equal("alice", value.AsString());
+    }
+
+    [Fact]
+    public void GetRequired_Document_ThrowsOnMissingKey()
+    {
+        using var doc = TLDocument.Parse("name: alice");
+        var ex = Assert.Throws<KeyNotFoundException>(() => doc.GetRequired("missing"));
+        Assert.Contains("missing", ex.Message);
+    }
+
+    [Fact]
+    public void GetRequired_ObjectField_ReturnsValue()
+    {
+        using var doc = TLDocument.Parse("user: {name: alice, age: 30}");
+        using var user = doc.GetRequired("user");
+        using var name = user.GetRequired("name");
+        Assert.Equal("alice", name.AsString());
+    }
+
+    [Fact]
+    public void GetRequired_ObjectField_ThrowsOnMissingKey()
+    {
+        using var doc = TLDocument.Parse("user: {name: alice}");
+        using var user = doc.GetRequired("user");
+        var ex = Assert.Throws<KeyNotFoundException>(() => user.GetRequired("email"));
+        Assert.Contains("email", ex.Message);
+    }
+
+    [Fact]
+    public void GetRequired_ArrayElement_ReturnsValue()
+    {
+        using var doc = TLDocument.Parse("items: [10, 20, 30]");
+        using var items = doc.GetRequired("items");
+        using var second = items.GetRequired(1);
+        Assert.Equal(20L, second.AsInt());
+    }
+
+    [Fact]
+    public void GetRequired_ArrayElement_ThrowsOnOutOfBounds()
+    {
+        using var doc = TLDocument.Parse("items: [10, 20]");
+        using var items = doc.GetRequired("items");
+        Assert.Throws<IndexOutOfRangeException>(() => items.GetRequired(99));
+    }
 }

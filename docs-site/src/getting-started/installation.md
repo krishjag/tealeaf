@@ -76,6 +76,11 @@ The `derive` feature enables `#[derive(ToTeaLeaf, FromTeaLeaf)]` macros.
 dotnet add package TeaLeaf
 ```
 
-The NuGet package includes native libraries for all supported platforms (Windows, Linux, macOS -- x64 and ARM64). No additional setup is needed.
+The NuGet package includes everything needed:
+- `TeaLeaf.Annotations` -- `[TeaLeaf]`, `[TLSkip]`, and other attributes
+- `TeaLeaf.Generators` -- C# incremental source generator (bundled as an analyzer)
+- Native libraries for all supported platforms (Windows, Linux, macOS -- x64 and ARM64)
+
+No additional packages required. `[TeaLeaf]` classes get compile-time serialization methods automatically.
 
 > **Note:** The .NET package requires .NET 8.0 or later. The source generator requires a C# compiler with incremental generator support.

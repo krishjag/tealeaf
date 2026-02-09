@@ -25,11 +25,14 @@ TeaLeaf provides .NET bindings through a NuGet package that includes a C# source
 dotnet add package TeaLeaf
 ```
 
-The NuGet package includes:
-- `TeaLeaf.Annotations` -- attributes (`[TeaLeaf]`, `[TLSkip]`, etc.)
-- `TeaLeaf.Generators` -- C# incremental source generator
-- `TeaLeaf` -- managed wrapper types and reflection serializer
-- Native libraries for all supported platforms
+The single package bundles everything:
+
+| Component | What it provides |
+|-----------|------------------|
+| `TeaLeaf` | Managed wrapper types (`TLDocument`, `TLValue`, `TLReader`), reflection serializer |
+| `TeaLeaf.Annotations` | Attributes (`[TeaLeaf]`, `[TLSkip]`, etc.) -- included as a dependency |
+| `TeaLeaf.Generators` | C# incremental source generator -- bundled as an analyzer |
+| Native libraries | `tealeaf_ffi` for all supported platforms (win/linux/osx, x64/arm64) |
 
 ## Two Serialization Approaches
 
