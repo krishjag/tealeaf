@@ -1,5 +1,6 @@
 using System.Text;
 using TeaLeaf.Annotations;
+using TeaLeaf.Native;
 using Xunit;
 
 namespace TeaLeaf.Tests;
@@ -28,6 +29,46 @@ public partial class NullableNumericModel
     public uint? UnsignedVal { get; set; }
     public float? FloatVal { get; set; }
     public decimal? DecimalVal { get; set; }
+}
+
+// Multi-word enum for ParseEnumFromSnakeCase coverage
+public enum OrderStatus { Pending, InProgress, CompletedSuccessfully }
+
+[TeaLeaf]
+public partial class WithOrderStatus
+{
+    public string Name { get; set; } = "";
+    public OrderStatus Status { get; set; }
+}
+
+[TeaLeaf]
+public partial class WithDictionary
+{
+    public string Name { get; set; } = "";
+    public Dictionary<string, string> Metadata { get; set; } = new();
+}
+
+[TeaLeaf]
+public partial class WithTimestamps
+{
+    public string Label { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
+}
+
+// Not annotated with [TeaLeaf] to avoid source generator DateTime issue;
+// used only with reflection-based TeaLeafSerializer.FromText<T>().
+public class DateTimeModel
+{
+    public string Name { get; set; } = "";
+    public DateTime CreatedAt { get; set; }
+}
+
+[TeaLeaf]
+public partial class WithNullableAddress
+{
+    public string Name { get; set; } = "";
+    public Address? HomeAddress { get; set; }
 }
 
 // ========================================================================
@@ -1360,5 +1401,357 @@ public class TeaLeafTextHelperEdgeCaseTests
     public void GetTLTypeName_UnknownType_ReturnsObject()
     {
         Assert.Equal("object", TeaLeafTextHelper.GetTLTypeName(typeof(Uri)));
+    }
+
+    // TLException constructor coverage
+
+    [Fact]
+    public void TLException_DefaultConstructor()
+    {
+        var ex = new TLException();
+        Assert.NotNull(ex);
+        Assert.Null(ex.InnerException);
+    }
+
+    [Fact]
+    public void TLException_InnerExceptionConstructor()
+    {
+        var inner = new InvalidOperationException("inner error");
+        var ex = new TLException("outer error", inner);
+        Assert.Equal("outer error", ex.Message);
+        Assert.Same(inner, ex.InnerException);
+    }
+
+    [Fact]
+    public void GetLastError_NoError_ReturnsNull()
+    {
+        // Successful operation clears the error state
+        using var doc = TLDocument.Parse("key: 42");
+        Assert.Null(NativeMethods.GetLastError());
+    }
+
+    [Fact]
+    public void PtrToStringAndFree_Zero_ReturnsNull()
+    {
+        Assert.Null(NativeMethods.PtrToStringAndFree(IntPtr.Zero));
+    }
+
+    [Fact]
+    public void PtrToStringArrayAndFree_Zero_ReturnsEmpty()
+    {
+        var result = NativeMethods.PtrToStringArrayAndFree(IntPtr.Zero);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void TLResult_Success_DoesNotThrow()
+    {
+        var result = new TLResult { Success = true, ErrorMessage = IntPtr.Zero };
+        result.ThrowIfError(); // should not throw
+    }
+
+    [Fact]
+    public void TLResult_FailWithoutMessage_DoesNotThrow()
+    {
+        // Success == false but ErrorMessage == IntPtr.Zero: edge case, no throw
+        var result = new TLResult { Success = false, ErrorMessage = IntPtr.Zero };
+        result.ThrowIfError();
+    }
+
+    // TLField / TLSchema coverage
+
+    [Fact]
+    public void TLField_Properties_And_ToString()
+    {
+        var field = new TLField("name", "string", nullable: false, isArray: false);
+        Assert.Equal("name", field.Name);
+        Assert.Equal("string", field.Type);
+        Assert.False(field.IsNullable);
+        Assert.False(field.IsArray);
+        Assert.Equal("name: string", field.ToString());
+    }
+
+    [Fact]
+    public void TLField_Nullable_ToString()
+    {
+        var field = new TLField("email", "string", nullable: true, isArray: false);
+        Assert.True(field.IsNullable);
+        Assert.Equal("email: string?", field.ToString());
+    }
+
+    [Fact]
+    public void TLField_Array_ToString()
+    {
+        var field = new TLField("tags", "string", nullable: false, isArray: true);
+        Assert.True(field.IsArray);
+        Assert.Equal("tags: string[]", field.ToString());
+    }
+
+    [Fact]
+    public void TLField_NullableArray_ToString()
+    {
+        var field = new TLField("items", "int", nullable: true, isArray: true);
+        Assert.Equal("items: int[]?", field.ToString());
+    }
+
+    [Fact]
+    public void TLSchema_GetField_And_HasField()
+    {
+        var fields = new List<TLField>
+        {
+            new TLField("name", "string", false, false),
+            new TLField("age", "int", false, false),
+        };
+        var schema = new TLSchema("User", fields);
+
+        Assert.Equal("User", schema.Name);
+        Assert.Equal(2, schema.Fields.Count);
+
+        Assert.True(schema.HasField("name"));
+        Assert.True(schema.HasField("age"));
+        Assert.False(schema.HasField("missing"));
+
+        var nameField = schema.GetField("name");
+        Assert.NotNull(nameField);
+        Assert.Equal("string", nameField!.Type);
+
+        Assert.Null(schema.GetField("missing"));
+    }
+
+    [Fact]
+    public void TLSchema_ToString()
+    {
+        var fields = new List<TLField>
+        {
+            new TLField("name", "string", false, false),
+            new TLField("email", "string", true, false),
+        };
+        var schema = new TLSchema("User", fields);
+        Assert.Equal("@struct User (name: string, email: string?)", schema.ToString());
+    }
+
+    // ----------------------------------------------------------------
+    // WriteDictionary coverage
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_WriteDictionary_ContainsEntries()
+    {
+        var model = new WithDictionary
+        {
+            Name = "test",
+            Metadata = new Dictionary<string, string>
+            {
+                { "env", "prod" },
+                { "region", "us-east" }
+            }
+        };
+
+        var text = TeaLeafSerializer.ToText(model);
+        Assert.Contains("metadata:", text);
+        Assert.Contains("env:", text);
+        Assert.Contains("prod", text);
+        Assert.Contains("region:", text);
+    }
+
+    [Fact]
+    public void Serializer_WriteDictionary_NullValue()
+    {
+        var model = new WithDictionary
+        {
+            Name = "test",
+            Metadata = new Dictionary<string, string>
+            {
+                { "present", "value" },
+                { "absent", null! }
+            }
+        };
+
+        var text = TeaLeafSerializer.ToText(model);
+        Assert.Contains("present:", text);
+        Assert.Contains("value", text);
+        Assert.Contains("~", text);
+    }
+
+    // ----------------------------------------------------------------
+    // ReadDictionary coverage
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_ReadDictionary_FromText()
+    {
+        // Construct TL text without schema (avoids 'object' type rejection)
+        var tlText = @"
+            with_dictionary: {
+                name: test
+                metadata: {
+                    color: blue
+                    size: large
+                }
+            }
+        ";
+
+        var restored = TeaLeafSerializer.FromText<WithDictionary>(tlText);
+
+        Assert.Equal("test", restored.Name);
+        Assert.Equal(2, restored.Metadata.Count);
+        Assert.Equal("blue", restored.Metadata["color"]);
+        Assert.Equal("large", restored.Metadata["size"]);
+    }
+
+    // ----------------------------------------------------------------
+    // WriteList empty branch coverage
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_WriteList_Empty()
+    {
+        var model = new WithCollections
+        {
+            Name = "test",
+            Tags = new List<string>(),
+            Scores = new List<int>()
+        };
+
+        var text = TeaLeafSerializer.ToText(model);
+        Assert.Contains("tags: []", text);
+        Assert.Contains("scores: []", text);
+    }
+
+    // ----------------------------------------------------------------
+    // ReadPrimitive DateTime / DateTimeOffset coverage
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_DateTimeOffset_Roundtrip()
+    {
+        var original = new WithTimestamps
+        {
+            Label = "event",
+            CreatedAt = new DateTimeOffset(2024, 6, 15, 10, 30, 0, TimeSpan.Zero),
+            UpdatedAt = new DateTimeOffset(2024, 6, 15, 16, 0, 0, TimeSpan.FromHours(5.5))
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var restored = TeaLeafSerializer.FromDocument<WithTimestamps>(doc);
+
+        Assert.Equal("event", restored.Label);
+        Assert.Equal(2024, restored.CreatedAt.Year);
+        Assert.Equal(6, restored.CreatedAt.Month);
+        Assert.Equal(15, restored.CreatedAt.Day);
+        Assert.NotNull(restored.UpdatedAt);
+        Assert.Equal(2024, restored.UpdatedAt!.Value.Year);
+    }
+
+    [Fact]
+    public void Serializer_DateTimeOffset_NullPreserved()
+    {
+        var original = new WithTimestamps
+        {
+            Label = "no-update",
+            CreatedAt = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
+            UpdatedAt = null
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var restored = TeaLeafSerializer.FromDocument<WithTimestamps>(doc);
+
+        Assert.Equal("no-update", restored.Label);
+        Assert.Null(restored.UpdatedAt);
+    }
+
+    [Fact]
+    public void Serializer_ReadPrimitive_DateTime()
+    {
+        // DateTimeModel is not [TeaLeaf]-annotated to avoid generator DateTime issue.
+        // Tests the ReadPrimitive DateTime branch (line 533-537).
+        var tlText = @"
+            date_time_model: {
+                name: test
+                created_at: 2024-06-15T10:30:00Z
+            }
+        ";
+
+        var restored = TeaLeafSerializer.FromText<DateTimeModel>(tlText);
+
+        Assert.Equal("test", restored.Name);
+        Assert.Equal(2024, restored.CreatedAt.Year);
+        Assert.Equal(6, restored.CreatedAt.Month);
+        Assert.Equal(15, restored.CreatedAt.Day);
+    }
+
+    // ----------------------------------------------------------------
+    // ParseEnumFromSnakeCase multi-word enum coverage
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_MultiWordEnum_InProgress_Roundtrip()
+    {
+        var original = new WithOrderStatus
+        {
+            Name = "order1",
+            Status = OrderStatus.InProgress
+        };
+
+        var text = TeaLeafSerializer.ToText(original);
+        Assert.Contains("in_progress", text);
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var restored = TeaLeafSerializer.FromDocument<WithOrderStatus>(doc);
+
+        Assert.Equal("order1", restored.Name);
+        Assert.Equal(OrderStatus.InProgress, restored.Status);
+    }
+
+    [Fact]
+    public void Serializer_MultiWordEnum_CompletedSuccessfully_Roundtrip()
+    {
+        var original = new WithOrderStatus
+        {
+            Name = "order2",
+            Status = OrderStatus.CompletedSuccessfully
+        };
+
+        var text = TeaLeafSerializer.ToText(original);
+        Assert.Contains("completed_successfully", text);
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var restored = TeaLeafSerializer.FromDocument<WithOrderStatus>(doc);
+
+        Assert.Equal(OrderStatus.CompletedSuccessfully, restored.Status);
+    }
+
+    // ----------------------------------------------------------------
+    // Nullable nested object coverage
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_NullableNestedObject_Null_SerializesAsTilde()
+    {
+        var model = new WithNullableAddress
+        {
+            Name = "homeless",
+            HomeAddress = null
+        };
+
+        var text = TeaLeafSerializer.ToText(model);
+        Assert.Contains("home_address: ~", text);
+    }
+
+    [Fact]
+    public void Serializer_NullableNestedObject_Present_Roundtrip()
+    {
+        var original = new WithNullableAddress
+        {
+            Name = "alice",
+            HomeAddress = new Address { Street = "123 Main", City = "Springfield", Zip = "62701" }
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var restored = TeaLeafSerializer.FromDocument<WithNullableAddress>(doc);
+
+        Assert.Equal("alice", restored.Name);
+        Assert.NotNull(restored.HomeAddress);
+        Assert.Equal("123 Main", restored.HomeAddress!.Street);
     }
 }
