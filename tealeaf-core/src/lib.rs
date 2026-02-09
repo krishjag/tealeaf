@@ -4045,4 +4045,25 @@ mod tests {
         }
     }
 
+    #[test]
+    fn test_json_any_type_compile_roundtrip() {
+        // Regression: from_json_with_schemas infers "any" for fields whose nested objects
+        // don't match a schema. encode_typed_value must fall back to generic encoding
+        // instead of erroring with "requires a schema for encoding".
+        use tempfile::NamedTempFile;
+
+        let json = r#"[
+            {"name": "alice", "meta": {"x": 1}},
+            {"name": "bob",   "meta": {"y": "two", "z": true}}
+        ]"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        // "meta" has varying shapes → inferred as "any"
+        let temp = NamedTempFile::new().unwrap();
+        doc.compile(temp.path(), false).expect("compile with 'any' field must not error");
+
+        // Read back and verify data survived
+        let reader = Reader::open(temp.path()).unwrap();
+        assert_eq!(reader.keys().len(), doc.data.len());
+    }
+
 }

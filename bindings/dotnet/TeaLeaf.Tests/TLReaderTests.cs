@@ -720,6 +720,156 @@ public class TLReaderTests
     }
 
     // ==========================================================================
+    // Schema Inference → Binary Compilation Tests
+    // ==========================================================================
+    // These tests verify that FromJson (with schema inference) → Compile → Read
+    // works correctly, including edge cases where schema inference produces
+    // pseudo-types like 'any' for heterogeneous nested objects.
+
+    [Fact]
+    public void FromJson_HeterogeneousNestedObjects_CompileSucceeds()
+    {
+        // Regression: FromJson infers 'any' pseudo-type for fields whose nested objects
+        // have varying shapes. The binary encoder must fall back to generic encoding
+        // instead of erroring with "schema-typed field 'any' requires a schema".
+        var tlbxPath = Path.Combine(_tempDir, "test_any_type.tlbx");
+
+        try
+        {
+            const string json = @"[
+                {""name"": ""alice"", ""meta"": {""x"": 1}},
+                {""name"": ""bob"",   ""meta"": {""y"": ""two"", ""z"": true}}
+            ]";
+
+            TLReader.CreateFromJson(json, tlbxPath);
+
+            Assert.True(File.Exists(tlbxPath));
+
+            using var reader = TLReader.Open(tlbxPath);
+            var resultJson = reader.ToJson();
+            Assert.Contains("alice", resultJson);
+            Assert.Contains("bob", resultJson);
+        }
+        finally
+        {
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
+        }
+    }
+
+    [Fact]
+    public void FromJson_MixedStructureArrays_CompileRoundTrips()
+    {
+        // Array elements with different field sets → inferred as 'any', not a schema.
+        // Must compile and round-trip correctly through binary.
+        var tlbxPath = Path.Combine(_tempDir, "test_mixed_compile.tlbx");
+
+        try
+        {
+            const string json = @"{
+                ""data"": [
+                    {""type"": ""user"", ""name"": ""alice""},
+                    {""type"": ""product"", ""price"": 9.99}
+                ]
+            }";
+
+            using (var doc = TLDocument.FromJson(json))
+            {
+                doc.Compile(tlbxPath);
+            }
+
+            using var reader = TLReader.Open(tlbxPath);
+            var resultJson = reader.ToJson();
+
+            using var jsonDoc = JsonDocument.Parse(resultJson);
+            var root = jsonDoc.RootElement;
+
+            Assert.True(root.TryGetProperty("data", out var data));
+            Assert.Equal(JsonValueKind.Array, data.ValueKind);
+            Assert.Equal(2, data.GetArrayLength());
+        }
+        finally
+        {
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
+        }
+    }
+
+    [Fact]
+    public void FromJson_ComplexNestedWithSchemaInference_CompileRoundTrips()
+    {
+        // Realistic scenario: uniform arrays (get schemas) alongside heterogeneous
+        // nested objects (get 'any' type). Both paths must work in the same document.
+        var tlbxPath = Path.Combine(_tempDir, "test_complex_inference.tlbx");
+
+        try
+        {
+            const string json = @"{
+                ""users"": [
+                    {""name"": ""alice"", ""age"": 30, ""prefs"": {""theme"": ""dark""}},
+                    {""name"": ""bob"",   ""age"": 25, ""prefs"": {""lang"": ""en"", ""tz"": ""UTC""}}
+                ],
+                ""config"": {""debug"": true, ""version"": 2}
+            }";
+
+            TLReader.CreateFromJson(json, tlbxPath);
+
+            using var reader = TLReader.Open(tlbxPath);
+            var resultJson = reader.ToJson();
+
+            Assert.Contains("alice", resultJson);
+            Assert.Contains("bob", resultJson);
+            Assert.Contains("debug", resultJson);
+        }
+        finally
+        {
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
+        }
+    }
+
+    [Fact]
+    public void FromJson_RetailOrdersFixture_CompileRoundTrips()
+    {
+        // End-to-end test with the retail_orders.json example file.
+        // This is the exact scenario that triggered the 'any' type regression.
+        // Uses TLDocument.FromJson → doc.Compile (not TLReader.CreateFromJson)
+        // to match the user's original code path.
+        var jsonPath = FindRepoFile(Path.Combine("examples", "retail_orders.json"));
+        if (jsonPath == null)
+        {
+            // Skip if examples directory not found (e.g., CI without full repo)
+            return;
+        }
+
+        var tlbxPath = Path.Combine(_tempDir, "test_retail_orders.tlbx");
+
+        try
+        {
+            var json = File.ReadAllText(jsonPath);
+
+            using (var doc = TLDocument.FromJson(json))
+            {
+                doc.Compile(tlbxPath, compress: true);
+            }
+
+            Assert.True(File.Exists(tlbxPath));
+
+            using var reader = TLReader.Open(tlbxPath);
+            var keys = reader.Keys;
+            Assert.NotEmpty(keys);
+
+            var resultJson = reader.ToJson();
+            Assert.Contains("orders", resultJson);
+        }
+        finally
+        {
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
+        }
+    }
+
+    // ==========================================================================
     // Fixture-Based Tests (for types that can't be created from text)
     // ==========================================================================
     // These fixtures are created by: cargo run --example create_test_fixtures
@@ -952,6 +1102,24 @@ public class TLReaderTests
         var pair0 = mapVal[0];
         Assert.Equal(JsonValueKind.Array, pair0.ValueKind);
         Assert.Equal(2, pair0.GetArrayLength());
+    }
+
+    /// <summary>
+    /// Walk up from AppContext.BaseDirectory until we find a directory containing
+    /// the given relative path (e.g. "examples/retail_orders.json").
+    /// Returns null if not found (caller should skip the test).
+    /// </summary>
+    private static string? FindRepoFile(string relativePath)
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir != null)
+        {
+            var candidate = Path.Combine(dir.FullName, relativePath);
+            if (File.Exists(candidate))
+                return candidate;
+            dir = dir.Parent;
+        }
+        return null;
     }
 
     private static void VerifyJsonValue(JsonElement actual, JsonElement expected, string key, JsonValueKind expectedKind)

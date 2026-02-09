@@ -573,9 +573,10 @@ impl Writer {
                     }
                     Ok(buf)
                 } else {
-                    Err(crate::Error::ParseError(
-                        format!("schema-typed field '{}' requires a schema for encoding", field_type.base)
-                    ))
+                    // No schema found — fall back to generic encoding
+                    // (e.g., 'any' pseudo-type from JSON schema inference)
+                    let (d, _, _, _) = self.encode_value(value, None)?;
+                    Ok(d)
                 }
             }
             _ => {

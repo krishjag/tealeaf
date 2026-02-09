@@ -1,4 +1,4 @@
-# TeaLeaf Format Specification v2.0.0-beta.3
+# TeaLeaf Format Specification v2.0.0-beta.4
 
 > **Status: Beta / Request for Comments**
 >

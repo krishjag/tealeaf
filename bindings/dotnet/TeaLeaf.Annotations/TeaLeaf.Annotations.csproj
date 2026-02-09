@@ -7,7 +7,7 @@
 
     <!-- Package metadata -->
     <PackageId>TeaLeaf.Annotations</PackageId>
-    <Version>2.0.0-beta.3</Version>
+    <Version>2.0.0-beta.4</Version>
     <Authors>TeaLeaf Contributors</Authors>
     <Description>Attribute definitions for TeaLeaf source generator. Use [TeaLeaf] on classes/records to enable DTO-to-TeaLeaf conversion.</Description>
     <PackageTags>serialization;schema;tealeaf;sourcegen;attributes</PackageTags>

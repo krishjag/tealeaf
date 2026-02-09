@@ -1,6 +1,29 @@
 # Changelog
 
-## v2.0.0-beta.3 (Current)
+## v2.0.0-beta.4 (Current)
+
+### Bug Fixes
+- Fixed binary encoding crash when compiling JSON with heterogeneous nested objects — `from_json_with_schemas` infers `any` pseudo-type for fields whose nested objects have varying shapes; the binary encoder now falls back to generic encoding instead of erroring with "schema-typed field 'any' requires a schema"
+
+### CI/CD
+- Re-enabled all 6 GitHub Actions workflows after making the repository public (rust-cli, dotnet-package, accuracy-benchmark, docs, coverage, fuzz)
+- Fixed coverlet filter quoting in coverage workflow — commas URL-encoded as `%2c` to prevent shell argument splitting
+- Fixed Codecov token handling — made `CODECOV_TOKEN` optional for public repo tokenless uploads
+- Fixed Codecov multi-file upload format — changed from YAML block scalar to comma-separated single-line
+
+### Testing
+- Added Rust regression test for `any` pseudo-type compile round-trip
+- Added 4 .NET regression tests covering `TLDocument.FromJson` → `Compile` with heterogeneous nested objects, mixed-structure arrays, complex schema inference, and retail_orders.json end-to-end
+- Added cross-platform `FindRepoFile` helper for .NET test fixture discovery (walks up directory tree instead of hardcoded relative path depth)
+- Verified full .NET test suite on Linux (WSL Ubuntu 24.04)
+
+### Tooling
+- Added `--version` / `-V` CLI flag
+- Added `delete-caches.ps1` and `delete-caches.sh` GitHub Actions cache cleanup scripts
+
+---
+
+## v2.0.0-beta.3
 
 ### Features
 - **Byte literals** — `b"..."` hex syntax for byte data in text format (e.g., `payload: b"cafef00d"`)
