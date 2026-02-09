@@ -4,22 +4,44 @@
 
 ### Bug Fixes
 - Fixed binary encoding crash when compiling JSON with heterogeneous nested objects — `from_json_with_schemas` infers `any` pseudo-type for fields whose nested objects have varying shapes; the binary encoder now falls back to generic encoding instead of erroring with "schema-typed field 'any' requires a schema"
+- Fixed parser failing to resolve schema names that shadow built-in type keywords — schemas named `bool`, `int`, `string`, etc. now correctly resolve via LParen lookahead disambiguation (struct tuples always start with `(`, primitives never do)
+- Fixed `validate_tokens.py` token comparison by converting API input to `int` for safety
+
+### .NET
+- Added `TLValueExtensions` with `GetRequired()` extension methods for `TLValue` and `TLDocument` — provides non-nullable access patterns, reducing CS8602 warnings in consuming code
+- Added TL007 diagnostic: `[TeaLeaf]` classes in the global namespace now produce a compile-time error ("TeaLeaf type must be in a named namespace")
+- Removed `SuppressDependenciesWhenPacking` property from `TeaLeaf.Generators.csproj`
+- Exposed `InternalsVisibleTo` for `TeaLeaf.Tests`
 
 ### CI/CD
 - Re-enabled all 6 GitHub Actions workflows after making the repository public (rust-cli, dotnet-package, accuracy-benchmark, docs, coverage, fuzz)
 - Fixed coverlet filter quoting in coverage workflow — commas URL-encoded as `%2c` to prevent shell argument splitting
 - Fixed Codecov token handling — made `CODECOV_TOKEN` optional for public repo tokenless uploads
 - Fixed Codecov multi-file upload format — changed from YAML block scalar to comma-separated single-line
+- Refactored coverage workflow to use `dotnet-coverage` with dedicated settings XML files
+- Added CodeQL security analysis workflow
+- Fixed accuracy-benchmark workflow permissions
 
 ### Testing
 - Added Rust regression test for `any` pseudo-type compile round-trip
+- Added 21 Rust tests for schema names shadowing all built-in type keywords (`bool`, `int`, `int8`..`int64`, `uint`..`uint64`, `float`, `float32`, `float64`, `string`, `timestamp`, `bytes`) — covers JSON inference round-trip, direct TL parsing, self-referencing schemas, duplicate declarations, and multiple built-in-named schemas in one document
 - Added 4 .NET regression tests covering `TLDocument.FromJson` → `Compile` with heterogeneous nested objects, mixed-structure arrays, complex schema inference, and retail_orders.json end-to-end
+- Added .NET tests for JSON serialization of timestamps and byte arrays
+- Added .NET coverage tests for multi-word enums and nullable nested objects
+- Added .NET source generator tests (524 new lines in `GeneratorTests.cs`) including TL007 global namespace diagnostic
+- Added .NET `TLValue.GetRequired()` extension method tests
+- Added .NET `TLReader` binary reader tests (168 new lines)
 - Added cross-platform `FindRepoFile` helper for .NET test fixture discovery (walks up directory tree instead of hardcoded relative path depth)
 - Verified full .NET test suite on Linux (WSL Ubuntu 24.04)
 
 ### Tooling
 - Added `--version` / `-V` CLI flag
 - Added `delete-caches.ps1` and `delete-caches.sh` GitHub Actions cache cleanup scripts
+- Updated `coverage.ps1` to support `dotnet-coverage` collection with XML settings files
+
+### Documentation
+- Updated binary deserialization method names in quick-start, LLM context guide, schema evolution guide, and derive macros docs
+- Updated tealeaf workflow diagram
 
 ---
 

@@ -4066,4 +4066,289 @@ mod tests {
         assert_eq!(reader.keys().len(), doc.data.len());
     }
 
+    #[test]
+    fn fuzz_repro_json_schema_bool_field_name() {
+        // Fuzz crash: field named "bool" conflicts with type keyword
+        let input = r#"[{"bool":{"b":2}}]"#;
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        let tl_text = tl.to_tl_with_schemas();
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        assert_eq!(tl.data.len(), reparsed.data.len(), "key count mismatch");
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    /// Helper: verify that a JSON field named after a built-in type correctly
+    /// round-trips through TL text when schema inference is used.
+    fn assert_builtin_name_text_roundtrip(type_name: &str, inner_json: &str) {
+        let input = format!(r#"[{{"{type_name}":{inner_json}}}]"#);
+        let tl = TeaLeaf::from_json_with_schemas(&input)
+            .unwrap_or_else(|e| panic!("[{type_name}] from_json_with_schemas failed: {e}"));
+        let tl_text = tl.to_tl_with_schemas();
+
+        // The schema should appear in the text output
+        assert!(
+            tl_text.contains(&format!("@struct {type_name}")),
+            "[{type_name}] expected @struct {type_name} in TL text:\n{tl_text}"
+        );
+
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("[{type_name}] re-parse failed: {e}\nTL text:\n{tl_text}"));
+
+        assert_eq!(
+            tl.data.len(), reparsed.data.len(),
+            "[{type_name}] key count mismatch"
+        );
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key)
+                .unwrap_or_else(|| panic!("[{type_name}] lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "[{type_name}] value mismatch for key '{key}'");
+        }
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_bool() {
+        assert_builtin_name_text_roundtrip("bool", r#"{"x":1}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_int() {
+        // Inner value is a string so field type "string" doesn't collide with schema "int"
+        assert_builtin_name_text_roundtrip("int", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_int8() {
+        assert_builtin_name_text_roundtrip("int8", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_int16() {
+        assert_builtin_name_text_roundtrip("int16", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_int32() {
+        assert_builtin_name_text_roundtrip("int32", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_int64() {
+        assert_builtin_name_text_roundtrip("int64", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_uint() {
+        assert_builtin_name_text_roundtrip("uint", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_uint8() {
+        assert_builtin_name_text_roundtrip("uint8", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_uint16() {
+        assert_builtin_name_text_roundtrip("uint16", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_uint32() {
+        assert_builtin_name_text_roundtrip("uint32", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_uint64() {
+        assert_builtin_name_text_roundtrip("uint64", r#"{"x":"hello"}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_float() {
+        assert_builtin_name_text_roundtrip("float", r#"{"x":1}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_float32() {
+        assert_builtin_name_text_roundtrip("float32", r#"{"x":1}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_float64() {
+        assert_builtin_name_text_roundtrip("float64", r#"{"x":1}"#);
+    }
+
+    #[test]
+    fn schema_name_shadows_builtin_string() {
+        assert_builtin_name_text_roundtrip("string", r#"{"x":1}"#);
+    }
+
+    // Note: "bytes" is not tested via JSON inference because singularize("bytes") = "byte"
+    // which is NOT a built-in type. The direct TL-parsing test below covers "bytes" as a
+    // schema name.
+
+    #[test]
+    fn schema_name_shadows_builtin_timestamp() {
+        assert_builtin_name_text_roundtrip("timestamp", r#"{"x":1}"#);
+    }
+
+    /// Test built-in type names as schemas via direct TL text parsing (not JSON inference).
+    /// This covers names that can't arise through singularization (like "bytes").
+    #[test]
+    fn schema_name_shadows_builtin_direct_tl_parse() {
+        let test_cases = &[
+            // (TL text, expected field name, expected inner value)
+            (
+                "@struct bytes (x: int)\n@struct root (data: bytes)\nroot: @table root [\n  ((42))\n]",
+                "data",
+                Value::Object(IndexMap::from([
+                    ("x".to_string(), Value::Int(42)),
+                ])),
+            ),
+            (
+                "@struct bool (a: int, b: string)\n@struct root (flag: bool)\nroot: @table root [\n  ((1, hello))\n]",
+                "flag",
+                Value::Object(IndexMap::from([
+                    ("a".to_string(), Value::Int(1)),
+                    ("b".to_string(), Value::String("hello".into())),
+                ])),
+            ),
+        ];
+
+        for (tl_text, field_name, expected_val) in test_cases {
+            let doc = TeaLeaf::parse(tl_text)
+                .unwrap_or_else(|e| panic!("parse failed for field '{field_name}': {e}\n{tl_text}"));
+
+            let root_arr = doc.data.get("root").expect("missing 'root' key");
+            if let Value::Array(arr) = root_arr {
+                if let Value::Object(obj) = &arr[0] {
+                    let actual = obj.get(*field_name)
+                        .unwrap_or_else(|| panic!("missing field '{field_name}'"));
+                    assert_eq!(actual, expected_val, "mismatch for field '{field_name}'");
+                } else {
+                    panic!("expected Object, got {:?}", arr[0]);
+                }
+            } else {
+                panic!("expected Array, got {:?}", root_arr);
+            }
+        }
+    }
+
+    /// Self-referencing case: @struct int (x: int) where the inner field type
+    /// matches the schema name. The LParen guard ensures `x: int` resolves to
+    /// primitive int (next token is a literal, not `(`).
+    #[test]
+    fn schema_name_shadows_builtin_self_referencing() {
+        // JSON: [{"int": {"x": 1}}] — creates @struct int (x: int)
+        // The inner field "x: int" must resolve to primitive int, not struct "int"
+        let input = r#"[{"int":{"x":1}}]"#;
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        let tl_text = tl.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct int"), "expected @struct int in:\n{tl_text}");
+
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("re-parse failed: {e}\nTL text:\n{tl_text}"));
+
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key)
+                .unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    /// Self-referencing: @struct int (int: int) — field name AND type both "int"
+    #[test]
+    fn schema_name_shadows_builtin_self_ref_same_field_name() {
+        let tl_text = "\
+@struct int (int: int)
+@struct root (val: int)
+
+root: @table root [
+  ((42))
+]
+";
+        let doc = TeaLeaf::parse(tl_text)
+            .unwrap_or_else(|e| panic!("parse failed: {e}\nTL text:\n{tl_text}"));
+
+        let json = doc.to_json().unwrap();
+        eprintln!("=== JSON ===\n{json}");
+
+        // The root array should have one element with field "val" as an Object
+        let root_arr = doc.data.get("root").expect("missing 'root'");
+        if let Value::Array(arr) = root_arr {
+            if let Value::Object(obj) = &arr[0] {
+                let val = obj.get("val").expect("missing field 'val'");
+                // val should be Object({"int": Int(42)}) — struct "int" with field "int" = 42
+                assert_eq!(
+                    val,
+                    &Value::Object(IndexMap::from([
+                        ("int".to_string(), Value::Int(42)),
+                    ])),
+                    "expected struct instance, got {val:?}"
+                );
+            } else {
+                panic!("expected Object, got {:?}", arr[0]);
+            }
+        } else {
+            panic!("expected Array, got {root_arr:?}");
+        }
+    }
+
+    /// Duplicate @struct declarations: second overwrites first
+    #[test]
+    fn schema_name_shadows_builtin_duplicate_struct_decl() {
+        let tl_text = "\
+@struct int (x: int)
+@struct int (int: int)
+@struct root (val: int)
+
+root: @table root [
+  ((42))
+]
+";
+        let result = TeaLeaf::parse(tl_text);
+        match &result {
+            Ok(doc) => {
+                let json = doc.to_json().unwrap();
+                eprintln!("=== JSON ===\n{json}");
+                eprintln!("=== schemas ===");
+                for (name, schema) in &doc.schemas {
+                    let fields: Vec<String> = schema.fields.iter()
+                        .map(|f| format!("{}: {}", f.name, f.field_type.base))
+                        .collect();
+                    eprintln!("  @struct {name} ({})", fields.join(", "));
+                }
+            }
+            Err(e) => {
+                eprintln!("=== parse error ===\n{e}");
+            }
+        }
+        // Assert that parsing succeeds
+        result.unwrap();
+    }
+
+    /// Multiple built-in-named schemas in the same document
+    #[test]
+    fn schema_name_shadows_multiple_builtins() {
+        let input = r#"[{"bool":{"a":1},"int":{"b":"hello"},"float":{"c":true}}]"#;
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        let tl_text = tl.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct bool"), "missing @struct bool");
+        assert!(tl_text.contains("@struct int"), "missing @struct int");
+        assert!(tl_text.contains("@struct float"), "missing @struct float");
+
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("re-parse failed: {e}\nTL text:\n{tl_text}"));
+
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key)
+                .unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
 }

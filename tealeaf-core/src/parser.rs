@@ -474,8 +474,11 @@ impl Parser {
             return Ok(Value::Null);
         }
 
-        // Handle nested struct
-        if field_type.is_struct() {
+        // Handle nested struct — schema names shadow built-in types, so check
+        // by name rather than relying on is_struct() which lacks schema context.
+        // The LParen guard disambiguates: struct tuples always start with `(`,
+        // while primitive values (int, bool, string, etc.) never do.
+        if !field_type.is_array && self.check(TokenKind::LParen) {
             if let Some(schema) = self.schemas.get(&field_type.base).cloned() {
                 return self.parse_tuple_with_schema(&schema, depth + 1);
             }
