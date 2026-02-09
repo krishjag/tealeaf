@@ -50,7 +50,7 @@ let schemas = Config::collect_schemas();
 Deserializes a TeaLeaf `Value` back to a Rust struct:
 
 ```rust
-use tealeaf::{TeaLeaf, FromTeaLeaf};
+use tealeaf::{Reader, FromTeaLeaf};
 
 #[derive(ToTeaLeaf, FromTeaLeaf)]
 struct Config {
@@ -59,9 +59,9 @@ struct Config {
     debug: bool,
 }
 
-let doc = TeaLeaf::load("config.tlbx")?;
-let value = doc.get("config").unwrap();
-let config = Config::from_tealeaf_value(value)?;
+let reader = Reader::open("config.tlbx")?;
+let value = reader.get("config")?;
+let config = Config::from_tealeaf_value(&value)?;
 ```
 
 ## Struct Example

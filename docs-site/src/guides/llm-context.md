@@ -82,8 +82,8 @@ let doc = TeaLeafBuilder::new()
 // Cache as binary (fast to read back)
 doc.compile("context_cache.tlbx", true)?;
 
-// Later: load instantly
-let cached = TeaLeaf::load("context_cache.tlbx")?;
+// Later: load instantly from binary
+let cached = tealeaf::Reader::open("context_cache.tlbx")?;
 ```
 
 ### Sending to LLM

@@ -133,12 +133,12 @@ users_v2: @table user_v2 [(3, carol, "carol@ex.com", admin)]
 Read old binary, transform in code, write new binary:
 
 ```rust
-// Read old format
-let old_doc = TeaLeaf::load("data_v1.tlbx")?;
+// Read old binary format
+let old_doc = tealeaf::Reader::open("data_v1.tlbx")?;
 
 // Transform
 let new_doc = TeaLeafBuilder::new()
-    .add_vec("users", &migrate_users(old_doc.get("users")))
+    .add_vec("users", &migrate_users(&old_doc.get("users")?))
     .build();
 
 // Write new format

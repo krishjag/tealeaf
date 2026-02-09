@@ -145,9 +145,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Compile directly to binary
     user.to_tlbx("user", "user.tlbx", false)?;
 
-    // Deserialize from a document
-    let doc = TeaLeaf::load("user.tlbx")?;
-    let loaded = User::from_tealeaf_value(doc.get("user").unwrap())?;
+    // Deserialize from binary
+    let reader = tealeaf::Reader::open("user.tlbx")?;
+    let loaded = User::from_tealeaf_value(&reader.get("user")?)?;
 
     Ok(())
 }
