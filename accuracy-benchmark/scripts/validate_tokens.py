@@ -26,6 +26,12 @@ except ImportError:
     print("Error: tiktoken not installed. Run: pip install tiktoken")
     sys.exit(1)
 
+
+def safe_print(text: str) -> None:
+    """Print text with control characters stripped (satisfies CodeQL log-injection)."""
+    sanitized = text.replace("\r", "").replace("\n", "")
+    print(sanitized)  # noqa: log-injection
+
 # Paths relative to repo root
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 PROMPTS_DIR = REPO_ROOT / "accuracy-benchmark" / "results" / "prompts"
@@ -186,7 +192,7 @@ def main():
             diff_pct = (diff / api_input * 100) if api_input > 0 else 0
             row += f"  {api_input:>10,} {diff:>+8,} {diff_pct:>+7.1f}%"
 
-        print(row)
+        safe_print(row)
         results.append({
             "task_id": task_id,
             "tl_tokens": tl_tokens,

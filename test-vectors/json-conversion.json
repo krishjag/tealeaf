@@ -1,6 +1,6 @@
 {
   "$schema": "./json-conversion-schema.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Test vectors for JSON↔TeaLeaf conversion contracts",
   "stability_policy": {
     "plain_json_roundtrip": "STABLE - Plain JSON (primitives, arrays, objects with string keys) MUST roundtrip perfectly through TeaLeaf",
@@ -56,6 +56,12 @@
         "json": "1.5e10",
         "expected": "15000000000.0",
         "note": "Scientific notation normalized to decimal"
+      },
+      {
+        "name": "json_number_roundtrip",
+        "json": "99999999999999999999",
+        "expected": "99999999999999999999",
+        "note": "Numbers exceeding native ranges roundtrip through JsonNumber with exact preservation"
       },
       {
         "name": "string_empty",
@@ -207,6 +213,27 @@
         "tl_pairs": [],
         "expected_json": "[]",
         "contract": "Empty Map serializes as empty array"
+      },
+      {
+        "name": "json_number_large_to_json",
+        "tl_type": "JsonNumber",
+        "tl_raw": "99999999999999999999",
+        "expected_json": "99999999999999999999",
+        "contract": "JsonNumber MUST serialize as raw JSON number (not quoted string)"
+      },
+      {
+        "name": "json_number_scientific_to_json",
+        "tl_type": "JsonNumber",
+        "tl_raw": "5e550",
+        "expected_json": "5e550",
+        "contract": "JsonNumber preserves scientific notation as raw JSON number"
+      },
+      {
+        "name": "json_number_negative_to_json",
+        "tl_type": "JsonNumber",
+        "tl_raw": "-99999999999999999999",
+        "expected_json": "-99999999999999999999",
+        "contract": "Negative JsonNumber MUST serialize as raw JSON number"
       }
     ]
   },
@@ -277,6 +304,27 @@
         "input_json": "1e10",
         "expected_tl_type": "Float",
         "contract": "Scientific notation becomes Float"
+      },
+      {
+        "name": "json_number_large_integer",
+        "input_json": "99999999999999999999",
+        "expected_tl_type": "JsonNumber",
+        "expected_raw": "99999999999999999999",
+        "contract": "Integers exceeding both i64 and u64 range become JsonNumber with exact decimal preserved"
+      },
+      {
+        "name": "json_number_overflow_float",
+        "input_json": "5e550",
+        "expected_tl_type": "JsonNumber",
+        "expected_raw": "5e550",
+        "contract": "Scientific notation exceeding f64 range becomes JsonNumber"
+      },
+      {
+        "name": "json_number_negative_overflow",
+        "input_json": "-5e550",
+        "expected_tl_type": "JsonNumber",
+        "expected_raw": "-5e550",
+        "contract": "Negative numbers exceeding f64 range become JsonNumber"
       }
     ]
   },
@@ -308,6 +356,13 @@
         "name": "large_array",
         "note": "Array with 10000 elements",
         "contract": "Large arrays MUST be handled without truncation"
+      },
+      {
+        "name": "json_number_binary_roundtrip",
+        "tl_type": "JsonNumber",
+        "tl_raw": "99999999999999999999",
+        "binary_type_code": "0x12",
+        "contract": "JsonNumber stored in binary as string table entry with type code 0x12, MUST roundtrip exactly"
       }
     ]
   }

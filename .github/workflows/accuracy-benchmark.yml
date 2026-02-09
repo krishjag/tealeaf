@@ -30,6 +30,9 @@ on:
     types: [published]
   workflow_dispatch:
 
+permissions:
+  contents: write  # Required for uploading release assets
+
 env:
   CARGO_TERM_COLOR: always
 
