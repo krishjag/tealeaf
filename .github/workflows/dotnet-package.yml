@@ -1,0 +1,266 @@
+# GitHub Actions workflow for building and packaging TeaLeaf .NET library
+# with multi-platform native dependencies
+#
+# This workflow:
+# 1. Builds native libraries on Windows, Linux, and macOS
+# 2. Combines all native libraries into a single NuGet package
+# 3. Optionally publishes to NuGet.org on release
+
+name: .NET Package
+
+# TEMPORARILY DISABLED — re-enable after repo migration
+# on:
+#   push:
+#     branches: [main, develop]
+#     paths:
+#       - 'tealeaf-core/**'
+#       - 'tealeaf-ffi/**'
+#       - 'bindings/dotnet/**'
+#       - 'release.json'
+#       - 'scripts/**'
+#       - '.github/workflows/dotnet-package.yml'
+#   pull_request:
+#     branches: [main]
+#     paths:
+#       - 'tealeaf-core/**'
+#       - 'tealeaf-ffi/**'
+#       - 'bindings/dotnet/**'
+#       - 'release.json'
+#   release:
+#     types: [published]
+#   workflow_dispatch:
+#     inputs:
+#       publish_nuget:
+#         description: 'Publish to NuGet.org'
+#         required: false
+#         default: false
+#         type: boolean
+on: workflow_dispatch
+
+env:
+  CARGO_TERM_COLOR: always
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+permissions:
+  contents: write  # Required for release operations
+
+jobs:
+  # Validate version consistency (PR/push only)
+  validate-version:
+    runs-on: ubuntu-latest
+    name: Validate Version
+    if: github.event_name != 'release'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Validate version consistency
+        run: |
+          chmod +x scripts/validate-version.sh scripts/sync-version.sh
+          ./scripts/validate-version.sh
+
+  # Build native libraries on each platform
+  build-native:
+    needs: [validate-version]
+    if: always() && (needs.validate-version.result == 'success' || needs.validate-version.result == 'skipped')
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows
+          - os: windows-latest
+            rid: win-x64
+            rust-target: x86_64-pc-windows-msvc
+            library: tealeaf_ffi.dll
+          - os: windows-latest
+            rid: win-arm64
+            rust-target: aarch64-pc-windows-msvc
+            library: tealeaf_ffi.dll
+
+          # Linux (glibc)
+          - os: ubuntu-latest
+            rid: linux-x64
+            rust-target: x86_64-unknown-linux-gnu
+            library: libtealeaf_ffi.so
+          - os: ubuntu-latest
+            rid: linux-arm64
+            rust-target: aarch64-unknown-linux-gnu
+            library: libtealeaf_ffi.so
+            cross: true
+
+          # macOS
+          - os: macos-latest
+            rid: osx-x64
+            rust-target: x86_64-apple-darwin
+            library: libtealeaf_ffi.dylib
+          - os: macos-latest
+            rid: osx-arm64
+            rust-target: aarch64-apple-darwin
+            library: libtealeaf_ffi.dylib
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.rid }}
+
+    steps:
+      - name: Configure Git line endings
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - name: Sync version from release.json (Unix)
+        if: runner.os != 'Windows' && github.event_name == 'release'
+        run: |
+          chmod +x scripts/sync-version.sh
+          ./scripts/sync-version.sh
+
+      - name: Sync version from release.json (Windows)
+        if: runner.os == 'Windows' && github.event_name == 'release'
+        shell: pwsh
+        run: ./scripts/sync-version.ps1
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-target }}
+
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.rid == 'linux-arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Configure Rust for cross-compilation (Linux ARM64 glibc)
+        if: matrix.rid == 'linux-arm64'
+        run: |
+          mkdir -p .cargo
+          echo '[target.aarch64-unknown-linux-gnu]' >> .cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
+
+      - name: Build native library
+        run: |
+          cargo build --release --package tealeaf-ffi --target ${{ matrix.rust-target }}
+
+      - name: Upload native library artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.rid }}
+          path: target/${{ matrix.rust-target }}/release/${{ matrix.library }}
+          if-no-files-found: error
+          retention-days: 1
+
+  # Combine all native libraries and create NuGet package
+  package:
+    needs: build-native
+    if: always() && needs.build-native.result == 'success'
+    runs-on: ubuntu-latest
+    name: Create NuGet Package
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync version from release.json
+        if: github.event_name == 'release'
+        run: |
+          chmod +x scripts/sync-version.sh
+          ./scripts/sync-version.sh
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Download all native library artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Organize native libraries
+        run: |
+          cd bindings/dotnet/TeaLeaf
+
+          # Create runtimes directory structure
+          for rid_dir in ../../../artifacts/native-*; do
+            rid=$(basename "$rid_dir" | sed 's/native-//')
+            mkdir -p "runtimes/$rid/native"
+
+            # Find and copy the library file
+            find "$rid_dir" -type f \( -name "*.dll" -o -name "*.so" -o -name "*.dylib" \) -exec cp {} "runtimes/$rid/native/" \;
+          done
+
+          # Show what we have
+          echo "Native libraries:"
+          find runtimes -type f -exec ls -la {} \;
+
+      - name: Build .NET project
+        run: dotnet build bindings/dotnet/TeaLeaf -c Release
+
+      - name: Run tests
+        run: |
+          # Copy a native library for tests
+          cp bindings/dotnet/TeaLeaf/runtimes/linux-x64/native/libtealeaf_ffi.so bindings/dotnet/TeaLeaf.Tests/bin/Release/net8.0/ || true
+          dotnet test bindings/dotnet -c Release --no-build
+
+      - name: Create NuGet packages
+        run: |
+          dotnet pack bindings/dotnet/TeaLeaf.Annotations -c Release -o artifacts/packages
+          dotnet build bindings/dotnet/TeaLeaf.Generators -c Release
+          dotnet pack bindings/dotnet/TeaLeaf.Generators -c Release --no-build -o artifacts/packages
+          dotnet pack bindings/dotnet/TeaLeaf -c Release --no-build -o artifacts/packages
+
+      - name: Upload NuGet package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: artifacts/packages/*.nupkg
+          if-no-files-found: error
+
+  # Publish to NuGet.org
+  publish:
+    needs: package
+    runs-on: ubuntu-latest
+    name: Publish to NuGet
+    if: always() && needs.package.result == 'success' && (github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_nuget))
+
+    steps:
+      - name: Download NuGet package
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-package
+          path: packages
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish TeaLeaf.Annotations to NuGet.org
+        run: |
+          dotnet nuget push packages/TeaLeaf.Annotations.*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Publish TeaLeaf.Generators to NuGet.org
+        run: |
+          dotnet nuget push packages/TeaLeaf.Generators.*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Publish TeaLeaf to NuGet.org
+        run: |
+          dotnet nuget push packages/TeaLeaf.*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate

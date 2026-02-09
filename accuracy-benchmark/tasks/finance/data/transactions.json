@@ -1,0 +1,25 @@
+{
+  "account": {
+    "id": "CHK-12345",
+    "type": "checking",
+    "owner": "Jane Doe"
+  },
+  "period": {
+    "start": "2024-01-01",
+    "end": "2024-01-31"
+  },
+  "transactions": [
+    {"id": "TXN001", "date": "2024-01-02", "amount": 125.50, "category": "groceries", "merchant": "Whole Foods", "description": "Weekly groceries"},
+    {"id": "TXN002", "date": "2024-01-05", "amount": 45.00, "category": "transportation", "merchant": "Shell Gas", "description": "Gas"},
+    {"id": "TXN003", "date": "2024-01-07", "amount": 15.99, "category": "entertainment", "merchant": "Netflix", "description": "Monthly subscription"},
+    {"id": "TXN004", "date": "2024-01-10", "amount": 3500.00, "category": "groceries", "merchant": "Whole Foods", "description": "Bulk purchase"},
+    {"id": "TXN005", "date": "2024-01-12", "amount": 89.99, "category": "shopping", "merchant": "Amazon", "description": "Electronics"},
+    {"id": "TXN006", "date": "2024-01-15", "amount": 145.00, "category": "utilities", "merchant": "City Power", "description": "Electric bill"},
+    {"id": "TXN007", "date": "2024-01-18", "amount": 98.75, "category": "groceries", "merchant": "Whole Foods", "description": "Weekly groceries"},
+    {"id": "TXN008", "date": "2024-01-20", "amount": 10.99, "category": "entertainment", "merchant": "Spotify", "description": "Monthly subscription"},
+    {"id": "TXN009", "date": "2024-01-22", "amount": 234.50, "category": "shopping", "merchant": "Target", "description": "Household items"},
+    {"id": "TXN010", "date": "2024-01-25", "amount": 50.00, "category": "health", "merchant": "Planet Fitness", "description": "Gym membership"},
+    {"id": "TXN011", "date": "2024-01-28", "amount": 112.25, "category": "groceries", "merchant": "Whole Foods", "description": "Weekly groceries"},
+    {"id": "TXN012", "date": "2024-01-30", "amount": 52.00, "category": "transportation", "merchant": "Shell Gas", "description": "Gas"}
+  ]
+}

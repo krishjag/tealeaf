@@ -1,0 +1,11 @@
+[package]
+name = "tealeaf-adversarial-harness"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tealeaf-core = { path = "../../tealeaf-core" }
+tempfile = "3.10"
+serde_json = "1.0"
+
+[workspace]

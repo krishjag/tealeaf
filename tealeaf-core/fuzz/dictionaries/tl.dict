@@ -1,0 +1,159 @@
+# TeaLeaf text format dictionary for libFuzzer
+# Keywords and reserved words
+"true"
+"false"
+"null"
+"NaN"
+"inf"
+"Infinity"
+"-inf"
+
+# Null literal
+"~"
+
+# Directives
+"@struct"
+"@table"
+"@union"
+"@map"
+"@root-array"
+"@include"
+
+# Punctuation / delimiters
+"{"
+"}"
+"["
+"]"
+"("
+")"
+":"
+","
+"="
+"?"
+
+# References and tags
+"!"
+"@"
+"#"
+
+# String tokens
+"\""
+"\"\"\""
+"\\\""
+"\\n"
+"\\t"
+"\\r"
+"\\b"
+"\\f"
+"\\\\"
+"\\u"
+"\\u0000"
+"\\u0041"
+"\\uFFFF"
+
+# Bytes literal prefix
+"b\""
+
+# Number prefixes
+"0x"
+"0X"
+"0b"
+"0B"
+
+# Scientific notation
+"e"
+"E"
+"e+"
+"e-"
+"E+"
+"E-"
+
+# Decimal point
+"."
+
+# Signs
+"-"
+"+"
+
+# Type names (for @struct field types)
+"int"
+"int8"
+"int16"
+"int32"
+"int64"
+"uint"
+"uint8"
+"uint16"
+"uint32"
+"uint64"
+"float"
+"float32"
+"float64"
+"string"
+"bytes"
+"timestamp"
+"object"
+"tuple"
+"map"
+"bool"
+
+# Array type prefix
+"[]"
+
+# Nullable suffix
+"?"
+
+# Timestamp patterns
+"T"
+"Z"
+"2024-01-15"
+"T10:30:00"
+"T10:30:00Z"
+"T10:30:00.123Z"
+"T10:30Z"
+"T10:30+05:30"
+"T10:30-08:00"
+"+05:30"
+"-08:00"
+"+00:00"
+
+# Comments
+"# "
+
+# Newline (important for key: value pairs)
+"\x0a"
+
+# Common key-value patterns
+"key: "
+"name: "
+"id: "
+"value: "
+
+# Boundary numbers
+"0"
+"127"
+"-128"
+"255"
+"32767"
+"-32768"
+"65535"
+"2147483647"
+"-2147483648"
+"4294967295"
+"9223372036854775807"
+"-9223372036854775808"
+"18446744073709551615"
+"18446744073709551616"
+"99999999999999999999"
+
+# Negative hex/binary
+"-0xFF"
+"-0b1010"
+
+# Float edge cases
+"1e50"
+"5e550"
+"-5e550"
+"3.14"
+"1.0e308"
+"1.8e308"

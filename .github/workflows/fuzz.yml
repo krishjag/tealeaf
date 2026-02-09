@@ -1,0 +1,186 @@
+# Continuous fuzzing for TeaLeaf core library
+#
+# Runs 7 fuzz targets serially with dictionary-guided and structure-aware fuzzing.
+# See ADR-0002 for architecture details.
+#
+# Targets run serially to avoid memory pressure (each can use up to 1024 MB RSS):
+#   1. fuzz_reader         (byte-level binary reader, no dict)
+#   2. fuzz_json           (JSON import/export roundtrip, JSON dict)
+#   3. fuzz_parse          (TL text parser, TL dict)
+#   4. fuzz_serialize      (TL text roundtrip, TL dict)
+#   5. fuzz_roundtrip      (TL text → binary → read roundtrip, TL dict)
+#   6. fuzz_json_schemas   (JSON with schema inference roundtrip, JSON dict)
+#   7. fuzz_structured     (structure-aware generation, no dict)
+#
+# Each target runs for 120 seconds (coverage plateaus ~30s, 120s provides buffer).
+# Total wall time: ~15 minutes.
+
+name: Fuzz
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tealeaf-core/src/**'
+      - 'tealeaf-core/fuzz/**'
+      - 'tealeaf-core/Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/fuzz.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tealeaf-core/src/**'
+      - 'tealeaf-core/fuzz/**'
+      - 'tealeaf-core/Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/fuzz.yml'
+  # Weekly schedule prevents GitHub's 7-day cache eviction from resetting the corpus
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      fuzz_duration:
+        description: 'Fuzz duration per target (seconds)'
+        required: false
+        default: '120'
+        type: string
+
+env:
+  CARGO_TERM_COLOR: always
+  FUZZ_DURATION: ${{ github.event.inputs.fuzz_duration || '120' }}
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    if: false  # Temporarily disabled
+    runs-on: ubuntu-latest
+    name: Fuzz Targets
+
+    steps:
+      - name: Configure Git line endings
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust nightly toolchain
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz --locked || true
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-fuzz-registry-${{ hashFiles('tealeaf-core/fuzz/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-fuzz-registry-
+
+      - name: Cache fuzz build artifacts
+        uses: actions/cache@v4
+        with:
+          path: tealeaf-core/fuzz/target
+          key: ${{ runner.os }}-fuzz-target-${{ hashFiles('tealeaf-core/fuzz/Cargo.toml', 'tealeaf-core/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-fuzz-target-
+
+      - name: Restore fuzz corpus
+        uses: actions/cache/restore@v4
+        with:
+          path: tealeaf-core/fuzz/corpus
+          key: fuzz-corpus-${{ github.sha }}
+          restore-keys: |
+            fuzz-corpus-
+
+      - name: Build all fuzz targets
+        working-directory: tealeaf-core
+        run: cargo +nightly fuzz build
+
+      - name: Create corpus directories
+        working-directory: tealeaf-core
+        run: |
+          mkdir -p fuzz/corpus/fuzz_reader
+          mkdir -p fuzz/corpus/fuzz_json
+          mkdir -p fuzz/corpus/fuzz_parse
+          mkdir -p fuzz/corpus/fuzz_serialize
+          mkdir -p fuzz/corpus/fuzz_roundtrip
+          mkdir -p fuzz/corpus/fuzz_json_schemas
+          mkdir -p fuzz/corpus/fuzz_structured
+
+      - name: "fuzz_reader"
+        working-directory: tealeaf-core
+        run: |
+          cargo +nightly fuzz run fuzz_reader \
+            fuzz/corpus/fuzz_reader \
+            -- -max_total_time=${FUZZ_DURATION} -rss_limit_mb=1024
+
+      - name: "fuzz_json"
+        working-directory: tealeaf-core
+        run: |
+          cargo +nightly fuzz run fuzz_json \
+            fuzz/corpus/fuzz_json \
+            -- -dict=fuzz/dictionaries/json.dict -max_total_time=${FUZZ_DURATION} -rss_limit_mb=1024
+
+      - name: "fuzz_parse"
+        working-directory: tealeaf-core
+        run: |
+          cargo +nightly fuzz run fuzz_parse \
+            fuzz/corpus/fuzz_parse \
+            -- -dict=fuzz/dictionaries/tl.dict -max_total_time=${FUZZ_DURATION} -rss_limit_mb=1024
+
+      - name: "fuzz_serialize"
+        working-directory: tealeaf-core
+        run: |
+          cargo +nightly fuzz run fuzz_serialize \
+            fuzz/corpus/fuzz_serialize \
+            -- -dict=fuzz/dictionaries/tl.dict -max_total_time=${FUZZ_DURATION} -rss_limit_mb=1024
+
+      - name: "fuzz_roundtrip"
+        working-directory: tealeaf-core
+        run: |
+          cargo +nightly fuzz run fuzz_roundtrip \
+            fuzz/corpus/fuzz_roundtrip \
+            -- -dict=fuzz/dictionaries/tl.dict -max_total_time=${FUZZ_DURATION} -rss_limit_mb=1024
+
+      - name: "fuzz_json_schemas"
+        working-directory: tealeaf-core
+        run: |
+          cargo +nightly fuzz run fuzz_json_schemas \
+            fuzz/corpus/fuzz_json_schemas \
+            -- -dict=fuzz/dictionaries/json.dict -max_total_time=${FUZZ_DURATION} -rss_limit_mb=1024
+
+      - name: "fuzz_structured"
+        working-directory: tealeaf-core
+        run: |
+          cargo +nightly fuzz run fuzz_structured \
+            fuzz/corpus/fuzz_structured \
+            -- -max_total_time=${FUZZ_DURATION} -rss_limit_mb=1024
+
+      # Save corpus even if a fuzz target crashes — the crash input is valuable
+      - name: Save fuzz corpus
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: tealeaf-core/fuzz/corpus
+          key: fuzz-corpus-${{ github.sha }}
+
+      # Upload crash artifacts if any target found a bug
+      - name: Upload crash artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crash-artifacts
+          path: tealeaf-core/fuzz/artifacts/
+          if-no-files-found: ignore
+          retention-days: 90

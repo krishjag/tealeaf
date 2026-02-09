@@ -1,0 +1,33 @@
+[package]
+name = "accuracy-benchmark"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Accuracy benchmark suite for TeaLeaf format across multiple LLM providers"
+keywords = ["benchmark", "llm", "accuracy", "tealeaf"]
+categories = ["development-tools::testing"]
+
+[[bin]]
+name = "accuracy-benchmark"
+path = "src/main.rs"
+
+[dependencies]
+tealeaf-core = { path = "../tealeaf-core" }
+indexmap.workspace = true
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+async-trait = "0.1"
+thiserror.workspace = true
+regex = "1.10"
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "4", features = ["derive"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+tempfile = "3.0"

@@ -1,0 +1,1485 @@
+{
+  "analytics": {
+    "average_order_value": 1470.59,
+    "customer_metrics": [
+      {
+        "avg_order_value": 877.88,
+        "customer_id": "CUST-10001",
+        "total_orders": 4,
+        "total_spent": 3511.51
+      },
+      {
+        "avg_order_value": 2316.24,
+        "customer_id": "CUST-10002",
+        "total_orders": 3,
+        "total_spent": 6948.73
+      },
+      {
+        "avg_order_value": 1415.24,
+        "customer_id": "CUST-10003",
+        "total_orders": 3,
+        "total_spent": 4245.71
+      }
+    ],
+    "orders_by_status": [
+      [
+        "delivered",
+        4
+      ],
+      [
+        "shipped",
+        2
+      ],
+      [
+        "processing",
+        1
+      ],
+      [
+        "cancelled",
+        1
+      ],
+      [
+        "partial_return",
+        1
+      ],
+      [
+        "pending_payment",
+        1
+      ]
+    ],
+    "period": "2024-01-01 to 2024-03-10",
+    "top_products": [
+      {
+        "name": "Smart Watch Pro",
+        "product_id": "PROD-003",
+        "revenue": 3582.0,
+        "units_sold": 8
+      },
+      {
+        "name": "Mechanical Keyboard",
+        "product_id": "PROD-004",
+        "revenue": 1243.0,
+        "units_sold": 8
+      },
+      {
+        "name": "Premium Wireless Headphones",
+        "product_id": "PROD-001",
+        "revenue": 3599.89,
+        "units_sold": 11
+      },
+      {
+        "name": "Ergonomic Office Chair",
+        "product_id": "PROD-002",
+        "revenue": 6281.0,
+        "units_sold": 9
+      }
+    ],
+    "total_orders": 10,
+    "total_revenue": 14705.91
+  },
+  "customers": [
+    {
+      "billing_address": {
+        "city": "Seattle",
+        "country": "USA",
+        "postal_code": "98101",
+        "state": "WA",
+        "street": "123 Main Street"
+      },
+      "email": "alice.johnson@email.com",
+      "id": "CUST-10001",
+      "name": "Alice Johnson",
+      "phone": "+1-555-123-4567",
+      "shipping_address": {
+        "city": "Seattle",
+        "country": "USA",
+        "postal_code": "98102",
+        "state": "WA",
+        "street": "456 Work Ave, Suite 200"
+      }
+    },
+    {
+      "billing_address": {
+        "city": "Portland",
+        "country": "USA",
+        "postal_code": "97201",
+        "state": "OR",
+        "street": "789 Oak Lane"
+      },
+      "email": "bob.smith@company.com",
+      "id": "CUST-10002",
+      "name": "Bob Smith",
+      "phone": "+1-555-987-6543",
+      "shipping_address": null
+    },
+    {
+      "billing_address": {
+        "city": "San Francisco",
+        "country": "USA",
+        "postal_code": "94102",
+        "state": "CA",
+        "street": "321 Pine Road"
+      },
+      "email": "carol.d@techcorp.io",
+      "id": "CUST-10003",
+      "name": "Carol Davis",
+      "phone": null,
+      "shipping_address": {
+        "city": "Palo Alto",
+        "country": "USA",
+        "postal_code": "94301",
+        "state": "CA",
+        "street": "100 Corporate Blvd"
+      }
+    }
+  ],
+  "metadata": {
+    "description": "Sample retail order data for analysis",
+    "generated_at": "2024-03-10T17:00:00Z",
+    "source": "Retail Order Management System",
+    "version": "1.0"
+  },
+  "orders": [
+    {
+      "created_at": "2024-01-15T10:28:00Z",
+      "customer": [
+        "CUST-10001",
+        "Alice Johnson",
+        "alice.johnson@email.com",
+        "+1-555-123-4567",
+        [
+          "123 Main Street",
+          "Seattle",
+          "WA",
+          "98101",
+          "USA"
+        ],
+        [
+          "456 Work Ave, Suite 200",
+          "Seattle",
+          "WA",
+          "98102",
+          "USA"
+        ]
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 0.0,
+              "selected_value": "Black"
+            },
+            {
+              "option_name": "warranty",
+              "price_adjustment": 50.0,
+              "selected_value": "5-Year Extended"
+            }
+          ],
+          "product_id": "PROD-001",
+          "product_name": "Premium Wireless Headphones",
+          "quantity": 1,
+          "subtotal": 349.99,
+          "unit_price": 349.99,
+          "variant_sku": "SKU-001-BLK-EXT"
+        },
+        {
+          "line_number": 2,
+          "notes": "Gift wrap requested",
+          "options": [
+            {
+              "option_name": "switches",
+              "price_adjustment": 0.0,
+              "selected_value": "Cherry MX Brown"
+            },
+            {
+              "option_name": "layout",
+              "price_adjustment": 0.0,
+              "selected_value": "Full Size"
+            }
+          ],
+          "product_id": "PROD-004",
+          "product_name": "Mechanical Keyboard",
+          "quantity": 2,
+          "subtotal": 318.0,
+          "unit_price": 159.0,
+          "variant_sku": "SKU-004-BRN"
+        },
+        {
+          "line_number": 3,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "size",
+              "price_adjustment": 30.0,
+              "selected_value": "44mm"
+            },
+            {
+              "option_name": "band",
+              "price_adjustment": 70.0,
+              "selected_value": "Brown Leather"
+            }
+          ],
+          "product_id": "PROD-003",
+          "product_name": "Smart Watch Pro",
+          "quantity": 1,
+          "subtotal": 499.0,
+          "unit_price": 499.0,
+          "variant_sku": "SKU-003-44-LTH"
+        }
+      ],
+      "notes": "Leave at front door",
+      "order_id": "ORD-2024-00001",
+      "order_number": "WEB-1001",
+      "payment": [
+        "credit_card",
+        "4242",
+        "TXN-CC-78912345",
+        1236.61,
+        "completed",
+        "2024-01-15T10:30:00Z"
+      ],
+      "shipping": [
+        "express",
+        "FedEx",
+        "FX123456789",
+        "2024-01-17T14:00:00Z",
+        0.0
+      ],
+      "status": "delivered",
+      "totals": [
+        1166.99,
+        0.1025,
+        119.62,
+        0.0,
+        50.0,
+        1236.61
+      ],
+      "updated_at": "2024-01-17T15:30:00Z"
+    },
+    {
+      "created_at": "2024-01-20T08:45:00Z",
+      "customer": [
+        "CUST-10002",
+        "Bob Smith",
+        "bob.smith@company.com",
+        "+1-555-987-6543",
+        [
+          "789 Oak Lane",
+          "Portland",
+          "OR",
+          "97201",
+          "USA"
+        ],
+        null
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": "Corporate bulk order",
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 0.0,
+              "selected_value": "Graphite"
+            },
+            {
+              "option_name": "armrest",
+              "price_adjustment": 50.0,
+              "selected_value": "4D Adjustable"
+            },
+            {
+              "option_name": "headrest",
+              "price_adjustment": 100.0,
+              "selected_value": "Adjustable Headrest"
+            }
+          ],
+          "product_id": "PROD-002",
+          "product_name": "Ergonomic Office Chair",
+          "quantity": 4,
+          "subtotal": 2796.0,
+          "unit_price": 699.0,
+          "variant_sku": "SKU-002-GRY-FULL"
+        },
+        {
+          "line_number": 2,
+          "notes": "Executive offices",
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 30.0,
+              "selected_value": "Ocean Blue"
+            },
+            {
+              "option_name": "armrest",
+              "price_adjustment": 50.0,
+              "selected_value": "4D Adjustable"
+            },
+            {
+              "option_name": "headrest",
+              "price_adjustment": 100.0,
+              "selected_value": "Adjustable Headrest"
+            }
+          ],
+          "product_id": "PROD-002",
+          "product_name": "Ergonomic Office Chair",
+          "quantity": 2,
+          "subtotal": 1458.0,
+          "unit_price": 729.0,
+          "variant_sku": "SKU-002-BLU-FULL"
+        }
+      ],
+      "notes": "Deliver to loading dock B. Call ahead.",
+      "order_id": "ORD-2024-00002",
+      "order_number": "WEB-1002",
+      "payment": [
+        "purchase_order",
+        null,
+        "PO-2024-5678",
+        3978.6,
+        "pending",
+        "2024-01-20T09:00:00Z"
+      ],
+      "shipping": [
+        "freight",
+        "XPO Logistics",
+        null,
+        "2024-02-01T00:00:00Z",
+        150.0
+      ],
+      "status": "processing",
+      "totals": [
+        4254.0,
+        0.0,
+        0.0,
+        150.0,
+        425.4,
+        3978.6
+      ],
+      "updated_at": "2024-01-20T09:00:00Z"
+    },
+    {
+      "created_at": "2024-01-22T16:42:00Z",
+      "customer": [
+        "CUST-10003",
+        "Carol Davis",
+        "carol.d@techcorp.io",
+        null,
+        [
+          "321 Pine Road",
+          "San Francisco",
+          "CA",
+          "94102",
+          "USA"
+        ],
+        [
+          "100 Corporate Blvd",
+          "Palo Alto",
+          "CA",
+          "94301",
+          "USA"
+        ]
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "size",
+              "price_adjustment": 30.0,
+              "selected_value": "44mm"
+            },
+            {
+              "option_name": "band",
+              "price_adjustment": 170.0,
+              "selected_value": "Stainless Steel"
+            }
+          ],
+          "product_id": "PROD-003",
+          "product_name": "Smart Watch Pro",
+          "quantity": 1,
+          "subtotal": 599.0,
+          "unit_price": 599.0,
+          "variant_sku": "SKU-003-44-SS"
+        }
+      ],
+      "notes": null,
+      "order_id": "ORD-2024-00003",
+      "order_number": "WEB-1003",
+      "payment": [
+        "apple_pay",
+        null,
+        "AP-9876543210",
+        676.41,
+        "completed",
+        "2024-01-22T16:45:00Z"
+      ],
+      "shipping": [
+        "next_day",
+        "UPS",
+        "1Z999AA10123456784",
+        "2024-01-23T18:00:00Z",
+        25.0
+      ],
+      "status": "shipped",
+      "totals": [
+        599.0,
+        0.0875,
+        52.41,
+        25.0,
+        0.0,
+        676.41
+      ],
+      "updated_at": "2024-01-23T08:15:00Z"
+    },
+    {
+      "created_at": "2024-01-25T11:18:00Z",
+      "customer": [
+        "CUST-10001",
+        "Alice Johnson",
+        "alice.johnson@email.com",
+        "+1-555-123-4567",
+        [
+          "123 Main Street",
+          "Seattle",
+          "WA",
+          "98101",
+          "USA"
+        ],
+        null
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": "Birthday gift",
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 0.0,
+              "selected_value": "White"
+            },
+            {
+              "option_name": "warranty",
+              "price_adjustment": 0.0,
+              "selected_value": "2-Year Standard"
+            }
+          ],
+          "product_id": "PROD-001",
+          "product_name": "Premium Wireless Headphones",
+          "quantity": 1,
+          "subtotal": 299.99,
+          "unit_price": 299.99,
+          "variant_sku": "SKU-001-WHT"
+        },
+        {
+          "line_number": 2,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "switches",
+              "price_adjustment": 0.0,
+              "selected_value": "Cherry MX Red"
+            },
+            {
+              "option_name": "layout",
+              "price_adjustment": 0.0,
+              "selected_value": "Full Size"
+            }
+          ],
+          "product_id": "PROD-004",
+          "product_name": "Mechanical Keyboard",
+          "quantity": 1,
+          "subtotal": 159.0,
+          "unit_price": 159.0,
+          "variant_sku": "SKU-004-RED"
+        }
+      ],
+      "notes": null,
+      "order_id": "ORD-2024-00004",
+      "order_number": "WEB-1004",
+      "payment": [
+        "credit_card",
+        "1234",
+        "TXN-CC-45678901",
+        506.04,
+        "completed",
+        "2024-01-25T11:20:00Z"
+      ],
+      "shipping": [
+        "standard",
+        "USPS",
+        "9400111899223033005",
+        "2024-01-30T12:00:00Z",
+        0.0
+      ],
+      "status": "delivered",
+      "totals": [
+        458.99,
+        0.1025,
+        47.05,
+        0.0,
+        0.0,
+        506.04
+      ],
+      "updated_at": "2024-01-30T14:22:00Z"
+    },
+    {
+      "created_at": "2024-02-01T13:55:00Z",
+      "customer": [
+        "CUST-10002",
+        "Bob Smith",
+        "bob.smith@company.com",
+        "+1-555-987-6543",
+        [
+          "789 Oak Lane",
+          "Portland",
+          "OR",
+          "97201",
+          "USA"
+        ],
+        null
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "switches",
+              "price_adjustment": 0.0,
+              "selected_value": "Cherry MX Brown"
+            },
+            {
+              "option_name": "layout",
+              "price_adjustment": 0.0,
+              "selected_value": "Full Size"
+            }
+          ],
+          "product_id": "PROD-004",
+          "product_name": "Mechanical Keyboard",
+          "quantity": 1,
+          "subtotal": 159.0,
+          "unit_price": 159.0,
+          "variant_sku": "SKU-004-BRN"
+        },
+        {
+          "line_number": 2,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "switches",
+              "price_adjustment": 0.0,
+              "selected_value": "Cherry MX Blue"
+            },
+            {
+              "option_name": "layout",
+              "price_adjustment": 0.0,
+              "selected_value": "Full Size"
+            }
+          ],
+          "product_id": "PROD-004",
+          "product_name": "Mechanical Keyboard",
+          "quantity": 1,
+          "subtotal": 159.0,
+          "unit_price": 159.0,
+          "variant_sku": "SKU-004-BLU"
+        },
+        {
+          "line_number": 3,
+          "notes": "For home office",
+          "options": [
+            {
+              "option_name": "switches",
+              "price_adjustment": 0.0,
+              "selected_value": "Cherry MX Brown"
+            },
+            {
+              "option_name": "layout",
+              "price_adjustment": -10.0,
+              "selected_value": "Tenkeyless"
+            }
+          ],
+          "product_id": "PROD-004",
+          "product_name": "Mechanical Keyboard",
+          "quantity": 2,
+          "subtotal": 298.0,
+          "unit_price": 149.0,
+          "variant_sku": "SKU-004-BRN-TKL"
+        }
+      ],
+      "notes": null,
+      "order_id": "ORD-2024-00005",
+      "order_number": "WEB-1005",
+      "payment": [
+        "paypal",
+        null,
+        "PP-ABC123DEF456",
+        585.2,
+        "completed",
+        "2024-02-01T14:00:00Z"
+      ],
+      "shipping": [
+        "standard",
+        "USPS",
+        "9400111899223033006",
+        "2024-02-05T10:00:00Z",
+        0.0
+      ],
+      "status": "delivered",
+      "totals": [
+        616.0,
+        0.0,
+        0.0,
+        0.0,
+        30.8,
+        585.2
+      ],
+      "updated_at": "2024-02-05T11:30:00Z"
+    },
+    {
+      "created_at": "2024-02-10T09:25:00Z",
+      "customer": [
+        "CUST-10003",
+        "Carol Davis",
+        "carol.d@techcorp.io",
+        null,
+        [
+          "321 Pine Road",
+          "San Francisco",
+          "CA",
+          "94102",
+          "USA"
+        ],
+        null
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": "Employee gifts",
+          "options": [
+            {
+              "option_name": "size",
+              "price_adjustment": 0.0,
+              "selected_value": "40mm"
+            },
+            {
+              "option_name": "band",
+              "price_adjustment": 0.0,
+              "selected_value": "Black Sport"
+            }
+          ],
+          "product_id": "PROD-003",
+          "product_name": "Smart Watch Pro",
+          "quantity": 3,
+          "subtotal": 1197.0,
+          "unit_price": 399.0,
+          "variant_sku": "SKU-003-40-BLK"
+        },
+        {
+          "line_number": 2,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "size",
+              "price_adjustment": 30.0,
+              "selected_value": "44mm"
+            },
+            {
+              "option_name": "band",
+              "price_adjustment": 0.0,
+              "selected_value": "Black Sport"
+            }
+          ],
+          "product_id": "PROD-003",
+          "product_name": "Smart Watch Pro",
+          "quantity": 2,
+          "subtotal": 858.0,
+          "unit_price": 429.0,
+          "variant_sku": "SKU-003-44-BLK"
+        }
+      ],
+      "notes": "Corporate account - tax exempt certificate on file",
+      "order_id": "ORD-2024-00006",
+      "order_number": "WEB-1006",
+      "payment": [
+        "credit_card",
+        "5678",
+        "TXN-CC-11223344",
+        2132.06,
+        "completed",
+        "2024-02-10T09:30:00Z"
+      ],
+      "shipping": [
+        "express",
+        "FedEx",
+        "FX987654321",
+        "2024-02-12T16:00:00Z",
+        0.0
+      ],
+      "status": "shipped",
+      "totals": [
+        2055.0,
+        0.0875,
+        179.81,
+        0.0,
+        102.75,
+        2132.06
+      ],
+      "updated_at": "2024-02-11T08:00:00Z"
+    },
+    {
+      "created_at": "2024-02-15T09:45:00Z",
+      "customer": [
+        "CUST-10001",
+        "Alice Johnson",
+        "alice.johnson@email.com",
+        "+1-555-123-4567",
+        [
+          "123 Main Street",
+          "Seattle",
+          "WA",
+          "98101",
+          "USA"
+        ],
+        null
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 0.0,
+              "selected_value": "Graphite"
+            },
+            {
+              "option_name": "armrest",
+              "price_adjustment": 50.0,
+              "selected_value": "4D Adjustable"
+            },
+            {
+              "option_name": "headrest",
+              "price_adjustment": 0.0,
+              "selected_value": "None"
+            }
+          ],
+          "product_id": "PROD-002",
+          "product_name": "Ergonomic Office Chair",
+          "quantity": 1,
+          "subtotal": 599.0,
+          "unit_price": 599.0,
+          "variant_sku": "SKU-002-GRY-ADJ"
+        }
+      ],
+      "notes": "Customer requested cancellation - found better price elsewhere",
+      "order_id": "ORD-2024-00007",
+      "order_number": "WEB-1007",
+      "payment": [
+        "credit_card",
+        "4242",
+        "TXN-CC-99887766",
+        735.4,
+        "refunded",
+        "2024-02-15T10:00:00Z"
+      ],
+      "shipping": null,
+      "status": "cancelled",
+      "totals": [
+        599.0,
+        0.1025,
+        61.4,
+        75.0,
+        0.0,
+        735.4
+      ],
+      "updated_at": "2024-02-15T14:30:00Z"
+    },
+    {
+      "created_at": "2024-02-20T10:30:00Z",
+      "customer": [
+        "CUST-10002",
+        "Bob Smith",
+        "bob.smith@company.com",
+        "+1-555-987-6543",
+        [
+          "789 Oak Lane",
+          "Portland",
+          "OR",
+          "97201",
+          "USA"
+        ],
+        null
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": "Team equipment",
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 0.0,
+              "selected_value": "Black"
+            },
+            {
+              "option_name": "warranty",
+              "price_adjustment": 50.0,
+              "selected_value": "5-Year Extended"
+            }
+          ],
+          "product_id": "PROD-001",
+          "product_name": "Premium Wireless Headphones",
+          "quantity": 5,
+          "subtotal": 1749.95,
+          "unit_price": 349.99,
+          "variant_sku": "SKU-001-BLK-EXT"
+        },
+        {
+          "line_number": 2,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 0.0,
+              "selected_value": "White"
+            },
+            {
+              "option_name": "warranty",
+              "price_adjustment": 0.0,
+              "selected_value": "2-Year Standard"
+            }
+          ],
+          "product_id": "PROD-001",
+          "product_name": "Premium Wireless Headphones",
+          "quantity": 3,
+          "subtotal": 899.97,
+          "unit_price": 299.99,
+          "variant_sku": "SKU-001-WHT"
+        }
+      ],
+      "notes": "Bulk corporate order - 10% volume discount applied",
+      "order_id": "ORD-2024-00008",
+      "order_number": "WEB-1008",
+      "payment": [
+        "wire_transfer",
+        null,
+        "WT-2024-789012",
+        2384.93,
+        "completed",
+        "2024-02-20T11:00:00Z"
+      ],
+      "shipping": [
+        "standard",
+        "FedEx",
+        "FX111222333",
+        "2024-02-25T12:00:00Z",
+        0.0
+      ],
+      "status": "delivered",
+      "totals": [
+        2649.92,
+        0.0,
+        0.0,
+        0.0,
+        264.99,
+        2384.93
+      ],
+      "updated_at": "2024-02-25T13:45:00Z"
+    },
+    {
+      "created_at": "2024-02-25T14:50:00Z",
+      "customer": [
+        "CUST-10003",
+        "Carol Davis",
+        "carol.d@techcorp.io",
+        null,
+        [
+          "321 Pine Road",
+          "San Francisco",
+          "CA",
+          "94102",
+          "USA"
+        ],
+        [
+          "100 Corporate Blvd",
+          "Palo Alto",
+          "CA",
+          "94301",
+          "USA"
+        ]
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": "RETURNED - wrong color",
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 30.0,
+              "selected_value": "Ocean Blue"
+            },
+            {
+              "option_name": "armrest",
+              "price_adjustment": 50.0,
+              "selected_value": "4D Adjustable"
+            },
+            {
+              "option_name": "headrest",
+              "price_adjustment": 100.0,
+              "selected_value": "Adjustable Headrest"
+            }
+          ],
+          "product_id": "PROD-002",
+          "product_name": "Ergonomic Office Chair",
+          "quantity": 1,
+          "subtotal": 729.0,
+          "unit_price": 729.0,
+          "variant_sku": "SKU-002-BLU-FULL"
+        },
+        {
+          "line_number": 2,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "switches",
+              "price_adjustment": 0.0,
+              "selected_value": "Cherry MX Brown"
+            },
+            {
+              "option_name": "layout",
+              "price_adjustment": 0.0,
+              "selected_value": "Full Size"
+            }
+          ],
+          "product_id": "PROD-004",
+          "product_name": "Mechanical Keyboard",
+          "quantity": 1,
+          "subtotal": 159.0,
+          "unit_price": 159.0,
+          "variant_sku": "SKU-004-BRN"
+        },
+        {
+          "line_number": 3,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "size",
+              "price_adjustment": 30.0,
+              "selected_value": "44mm"
+            },
+            {
+              "option_name": "band",
+              "price_adjustment": 0.0,
+              "selected_value": "Black Sport"
+            }
+          ],
+          "product_id": "PROD-003",
+          "product_name": "Smart Watch Pro",
+          "quantity": 1,
+          "subtotal": 429.0,
+          "unit_price": 429.0,
+          "variant_sku": "SKU-003-44-BLK"
+        }
+      ],
+      "notes": "Chair returned 2024-03-05. Refund processed: $729.00 + tax",
+      "order_id": "ORD-2024-00009",
+      "order_number": "WEB-1009",
+      "payment": [
+        "credit_card",
+        "9999",
+        "TXN-CC-55443322",
+        1432.24,
+        "partial_refund",
+        "2024-02-25T15:00:00Z"
+      ],
+      "shipping": [
+        "standard",
+        "UPS",
+        "1Z999AA10123456785",
+        "2024-02-28T14:00:00Z",
+        0.0
+      ],
+      "status": "partial_return",
+      "totals": [
+        1317.0,
+        0.0875,
+        115.24,
+        0.0,
+        0.0,
+        1432.24
+      ],
+      "updated_at": "2024-03-06T10:00:00Z"
+    },
+    {
+      "created_at": "2024-03-10T16:25:00Z",
+      "customer": [
+        "CUST-10001",
+        "Alice Johnson",
+        "alice.johnson@email.com",
+        "+1-555-123-4567",
+        [
+          "123 Main Street",
+          "Seattle",
+          "WA",
+          "98101",
+          "USA"
+        ],
+        [
+          "456 Work Ave, Suite 200",
+          "Seattle",
+          "WA",
+          "98102",
+          "USA"
+        ]
+      ],
+      "items": [
+        {
+          "line_number": 1,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 0.0,
+              "selected_value": "Graphite"
+            },
+            {
+              "option_name": "armrest",
+              "price_adjustment": 50.0,
+              "selected_value": "4D Adjustable"
+            },
+            {
+              "option_name": "headrest",
+              "price_adjustment": 100.0,
+              "selected_value": "Adjustable Headrest"
+            }
+          ],
+          "product_id": "PROD-002",
+          "product_name": "Ergonomic Office Chair",
+          "quantity": 1,
+          "subtotal": 699.0,
+          "unit_price": 699.0,
+          "variant_sku": "SKU-002-GRY-FULL"
+        },
+        {
+          "line_number": 2,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "color",
+              "price_adjustment": 0.0,
+              "selected_value": "Black"
+            },
+            {
+              "option_name": "warranty",
+              "price_adjustment": 0.0,
+              "selected_value": "2-Year Standard"
+            }
+          ],
+          "product_id": "PROD-001",
+          "product_name": "Premium Wireless Headphones",
+          "quantity": 1,
+          "subtotal": 299.99,
+          "unit_price": 299.99,
+          "variant_sku": "SKU-001-BLK"
+        },
+        {
+          "line_number": 3,
+          "notes": "Engraving: 'AD 2024'",
+          "options": [
+            {
+              "option_name": "size",
+              "price_adjustment": 30.0,
+              "selected_value": "44mm"
+            },
+            {
+              "option_name": "band",
+              "price_adjustment": 70.0,
+              "selected_value": "Brown Leather"
+            }
+          ],
+          "product_id": "PROD-003",
+          "product_name": "Smart Watch Pro",
+          "quantity": 1,
+          "subtotal": 499.0,
+          "unit_price": 499.0,
+          "variant_sku": "SKU-003-44-LTH"
+        },
+        {
+          "line_number": 4,
+          "notes": null,
+          "options": [
+            {
+              "option_name": "switches",
+              "price_adjustment": 0.0,
+              "selected_value": "Cherry MX Brown"
+            },
+            {
+              "option_name": "layout",
+              "price_adjustment": -10.0,
+              "selected_value": "Tenkeyless"
+            }
+          ],
+          "product_id": "PROD-004",
+          "product_name": "Mechanical Keyboard",
+          "quantity": 1,
+          "subtotal": 149.0,
+          "unit_price": 149.0,
+          "variant_sku": "SKU-004-BRN-TKL"
+        }
+      ],
+      "notes": "Payment processing - awaiting card verification",
+      "order_id": "ORD-2024-00010",
+      "order_number": "WEB-1010",
+      "payment": [
+        "credit_card",
+        null,
+        null,
+        0.0,
+        "awaiting",
+        "2024-03-10T16:30:00Z"
+      ],
+      "shipping": null,
+      "status": "pending_payment",
+      "totals": [
+        1646.99,
+        0.1025,
+        168.82,
+        0.0,
+        82.35,
+        1733.46
+      ],
+      "updated_at": "2024-03-10T16:30:00Z"
+    }
+  ],
+  "products": [
+    {
+      "base_price": 299.99,
+      "category": "Electronics/Audio",
+      "description": "High-fidelity wireless headphones with active noise cancellation",
+      "id": "PROD-001",
+      "name": "Premium Wireless Headphones",
+      "variants": [
+        {
+          "name": "Midnight Black",
+          "options": [
+            {
+              "name": "color",
+              "price_modifier": 0.0,
+              "value": "Black"
+            },
+            {
+              "name": "warranty",
+              "price_modifier": 0.0,
+              "value": "2-Year Standard"
+            }
+          ],
+          "price": 299.99,
+          "sku": "SKU-001-BLK",
+          "stock_quantity": 150
+        },
+        {
+          "name": "Pearl White",
+          "options": [
+            {
+              "name": "color",
+              "price_modifier": 0.0,
+              "value": "White"
+            },
+            {
+              "name": "warranty",
+              "price_modifier": 0.0,
+              "value": "2-Year Standard"
+            }
+          ],
+          "price": 299.99,
+          "sku": "SKU-001-WHT",
+          "stock_quantity": 85
+        },
+        {
+          "name": "Midnight Black + Extended Warranty",
+          "options": [
+            {
+              "name": "color",
+              "price_modifier": 0.0,
+              "value": "Black"
+            },
+            {
+              "name": "warranty",
+              "price_modifier": 50.0,
+              "value": "5-Year Extended"
+            }
+          ],
+          "price": 349.99,
+          "sku": "SKU-001-BLK-EXT",
+          "stock_quantity": 45
+        }
+      ]
+    },
+    {
+      "base_price": 549.0,
+      "category": "Furniture/Office",
+      "description": "Adjustable lumbar support, breathable mesh, 10-year warranty",
+      "id": "PROD-002",
+      "name": "Ergonomic Office Chair",
+      "variants": [
+        {
+          "name": "Graphite - Standard Arms",
+          "options": [
+            {
+              "name": "color",
+              "price_modifier": 0.0,
+              "value": "Graphite"
+            },
+            {
+              "name": "armrest",
+              "price_modifier": 0.0,
+              "value": "Standard Fixed"
+            },
+            {
+              "name": "headrest",
+              "price_modifier": 0.0,
+              "value": "None"
+            }
+          ],
+          "price": 549.0,
+          "sku": "SKU-002-GRY-STD",
+          "stock_quantity": 32
+        },
+        {
+          "name": "Graphite - Adjustable Arms",
+          "options": [
+            {
+              "name": "color",
+              "price_modifier": 0.0,
+              "value": "Graphite"
+            },
+            {
+              "name": "armrest",
+              "price_modifier": 50.0,
+              "value": "4D Adjustable"
+            },
+            {
+              "name": "headrest",
+              "price_modifier": 0.0,
+              "value": "None"
+            }
+          ],
+          "price": 599.0,
+          "sku": "SKU-002-GRY-ADJ",
+          "stock_quantity": 28
+        },
+        {
+          "name": "Graphite - Full Options",
+          "options": [
+            {
+              "name": "color",
+              "price_modifier": 0.0,
+              "value": "Graphite"
+            },
+            {
+              "name": "armrest",
+              "price_modifier": 50.0,
+              "value": "4D Adjustable"
+            },
+            {
+              "name": "headrest",
+              "price_modifier": 100.0,
+              "value": "Adjustable Headrest"
+            }
+          ],
+          "price": 699.0,
+          "sku": "SKU-002-GRY-FULL",
+          "stock_quantity": 15
+        },
+        {
+          "name": "Ocean Blue - Full Options",
+          "options": [
+            {
+              "name": "color",
+              "price_modifier": 30.0,
+              "value": "Ocean Blue"
+            },
+            {
+              "name": "armrest",
+              "price_modifier": 50.0,
+              "value": "4D Adjustable"
+            },
+            {
+              "name": "headrest",
+              "price_modifier": 100.0,
+              "value": "Adjustable Headrest"
+            }
+          ],
+          "price": 729.0,
+          "sku": "SKU-002-BLU-FULL",
+          "stock_quantity": 8
+        }
+      ]
+    },
+    {
+      "base_price": 399.0,
+      "category": "Electronics/Wearables",
+      "description": "Health monitoring, GPS, 5-day battery life",
+      "id": "PROD-003",
+      "name": "Smart Watch Pro",
+      "variants": [
+        {
+          "name": "40mm Black Sport Band",
+          "options": [
+            {
+              "name": "size",
+              "price_modifier": 0.0,
+              "value": "40mm"
+            },
+            {
+              "name": "band",
+              "price_modifier": 0.0,
+              "value": "Black Sport"
+            }
+          ],
+          "price": 399.0,
+          "sku": "SKU-003-40-BLK",
+          "stock_quantity": 200
+        },
+        {
+          "name": "44mm Black Sport Band",
+          "options": [
+            {
+              "name": "size",
+              "price_modifier": 30.0,
+              "value": "44mm"
+            },
+            {
+              "name": "band",
+              "price_modifier": 0.0,
+              "value": "Black Sport"
+            }
+          ],
+          "price": 429.0,
+          "sku": "SKU-003-44-BLK",
+          "stock_quantity": 180
+        },
+        {
+          "name": "44mm Leather Band",
+          "options": [
+            {
+              "name": "size",
+              "price_modifier": 30.0,
+              "value": "44mm"
+            },
+            {
+              "name": "band",
+              "price_modifier": 70.0,
+              "value": "Brown Leather"
+            }
+          ],
+          "price": 499.0,
+          "sku": "SKU-003-44-LTH",
+          "stock_quantity": 50
+        },
+        {
+          "name": "44mm Stainless Steel Band",
+          "options": [
+            {
+              "name": "size",
+              "price_modifier": 30.0,
+              "value": "44mm"
+            },
+            {
+              "name": "band",
+              "price_modifier": 170.0,
+              "value": "Stainless Steel"
+            }
+          ],
+          "price": 599.0,
+          "sku": "SKU-003-44-SS",
+          "stock_quantity": 25
+        }
+      ]
+    },
+    {
+      "base_price": 159.0,
+      "category": "Electronics/Peripherals",
+      "description": "Hot-swappable switches, RGB backlight, aluminum frame",
+      "id": "PROD-004",
+      "name": "Mechanical Keyboard",
+      "variants": [
+        {
+          "name": "Brown Switches - Quiet",
+          "options": [
+            {
+              "name": "switches",
+              "price_modifier": 0.0,
+              "value": "Cherry MX Brown"
+            },
+            {
+              "name": "layout",
+              "price_modifier": 0.0,
+              "value": "Full Size"
+            }
+          ],
+          "price": 159.0,
+          "sku": "SKU-004-BRN",
+          "stock_quantity": 75
+        },
+        {
+          "name": "Red Switches - Linear",
+          "options": [
+            {
+              "name": "switches",
+              "price_modifier": 0.0,
+              "value": "Cherry MX Red"
+            },
+            {
+              "name": "layout",
+              "price_modifier": 0.0,
+              "value": "Full Size"
+            }
+          ],
+          "price": 159.0,
+          "sku": "SKU-004-RED",
+          "stock_quantity": 60
+        },
+        {
+          "name": "Blue Switches - Clicky",
+          "options": [
+            {
+              "name": "switches",
+              "price_modifier": 0.0,
+              "value": "Cherry MX Blue"
+            },
+            {
+              "name": "layout",
+              "price_modifier": 0.0,
+              "value": "Full Size"
+            }
+          ],
+          "price": 159.0,
+          "sku": "SKU-004-BLU",
+          "stock_quantity": 45
+        },
+        {
+          "name": "Brown Switches - TKL",
+          "options": [
+            {
+              "name": "switches",
+              "price_modifier": 0.0,
+              "value": "Cherry MX Brown"
+            },
+            {
+              "name": "layout",
+              "price_modifier": -10.0,
+              "value": "Tenkeyless"
+            }
+          ],
+          "price": 149.0,
+          "sku": "SKU-004-BRN-TKL",
+          "stock_quantity": 40
+        }
+      ]
+    }
+  ]
+}

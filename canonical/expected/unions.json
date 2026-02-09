@@ -1,0 +1,156 @@
+{
+  "api_result": {
+    "$tag": "ok",
+    "$value": [
+      42
+    ]
+  },
+  "current_shape": {
+    "$tag": "circle",
+    "$value": [
+      3.14
+    ]
+  },
+  "drawing": {
+    "elements": [
+      {
+        "$tag": "circle",
+        "$value": [
+          10.0
+        ]
+      },
+      {
+        "$tag": "rectangle",
+        "$value": [
+          5.0,
+          8.0
+        ]
+      },
+      {
+        "$tag": "point",
+        "$value": []
+      }
+    ],
+    "name": "My Drawing"
+  },
+  "empty_optional": {
+    "$tag": "none",
+    "$value": []
+  },
+  "event_log": [
+    {
+      "$tag": "click",
+      "$value": [
+        100,
+        200
+      ]
+    },
+    {
+      "$tag": "keypress",
+      "$value": [
+        "Enter"
+      ]
+    },
+    {
+      "$tag": "scroll",
+      "$value": [
+        -50
+      ]
+    },
+    {
+      "$tag": "resize",
+      "$value": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "$tag": "click",
+      "$value": [
+        150,
+        250
+      ]
+    }
+  ],
+  "maybes": [
+    {
+      "$tag": "some",
+      "$value": [
+        "hello"
+      ]
+    },
+    {
+      "$tag": "none",
+      "$value": []
+    },
+    {
+      "$tag": "some",
+      "$value": [
+        "world"
+      ]
+    },
+    {
+      "$tag": "none",
+      "$value": []
+    }
+  ],
+  "optional_name": {
+    "$tag": "some",
+    "$value": [
+      "Alice"
+    ]
+  },
+  "results": [
+    {
+      "$tag": "ok",
+      "$value": [
+        200
+      ]
+    },
+    {
+      "$tag": "error",
+      "$value": [
+        404,
+        "Not Found"
+      ]
+    },
+    {
+      "$tag": "ok",
+      "$value": [
+        201
+      ]
+    },
+    {
+      "$tag": "error",
+      "$value": [
+        500,
+        "Internal Server Error"
+      ]
+    }
+  ],
+  "shapes": [
+    {
+      "$tag": "circle",
+      "$value": [
+        5.0
+      ]
+    },
+    {
+      "$tag": "rectangle",
+      "$value": [
+        10.0,
+        20.0
+      ]
+    },
+    {
+      "$tag": "point",
+      "$value": []
+    },
+    {
+      "$tag": "circle",
+      "$value": [
+        2.5
+      ]
+    }
+  ]
+}

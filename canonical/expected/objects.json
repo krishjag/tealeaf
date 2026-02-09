@@ -1,0 +1,49 @@
+{
+  "deeply_nested": {
+    "level1": {
+      "level2": {
+        "level3": {
+          "level4": {
+            "value": "deep value"
+          }
+        }
+      }
+    }
+  },
+  "empty_object": {},
+  "mixed_content": {
+    "enabled": true,
+    "id": 1,
+    "metadata": {
+      "created": "2024-01-15",
+      "version": 2
+    },
+    "name": "Test Record",
+    "notes": null,
+    "scores": [
+      95.5,
+      87.3,
+      92.1
+    ],
+    "tags": [
+      "alpha",
+      "beta",
+      "gamma"
+    ]
+  },
+  "nested_object": {
+    "settings": {
+      "notifications": true,
+      "theme": "dark"
+    },
+    "user": {
+      "email": "bob@example.com",
+      "name": "bob"
+    }
+  },
+  "simple_object": {
+    "active": true,
+    "age": 30,
+    "name": "alice"
+  }
+}

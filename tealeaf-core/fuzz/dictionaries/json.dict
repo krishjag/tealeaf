@@ -1,0 +1,93 @@
+# JSON dictionary for libFuzzer (fuzz_json, fuzz_json_schemas)
+# Standard JSON tokens
+"{"
+"}"
+"["
+"]"
+":"
+","
+
+# JSON values
+"true"
+"false"
+"null"
+
+# String delimiters and escapes
+"\""
+"\\\""
+"\\n"
+"\\t"
+"\\r"
+"\\b"
+"\\f"
+"\\\\"
+"\\/"
+"\\u"
+"\\u0000"
+"\\u0041"
+"\\uFFFF"
+"\\uD800"
+"\\uDBFF"
+"\\uDC00"
+"\\uDFFF"
+
+# Number patterns
+"0"
+"-0"
+"0.0"
+"-0.0"
+"1e10"
+"1E10"
+"1e+10"
+"1e-10"
+"1.5e10"
+"."
+
+# Boundary numbers
+"127"
+"-128"
+"255"
+"32767"
+"-32768"
+"65535"
+"2147483647"
+"-2147483648"
+"4294967295"
+"9223372036854775807"
+"-9223372036854775808"
+"18446744073709551615"
+"18446744073709551616"
+"99999999999999999999"
+
+# Float edge cases
+"1.7976931348623157e308"
+"5e-324"
+"2.2250738585072014e-308"
+"1e309"
+"5e550"
+
+# serde_json arbitrary_precision magic string
+"$serde_json::private::Number"
+
+# Common JSON patterns
+"{\"key\":\"value\"}"
+"{\"a\":1}"
+"[1,2,3]"
+"[{},{}]"
+
+# Nested structures
+"{\"a\":{\"b\":1}}"
+"{\"a\":[1,2]}"
+"[[[]]]"
+"{{{}}"
+
+# Empty structures
+"{}"
+"[]"
+"\"\""
+
+# Whitespace variations
+" "
+"\x09"
+"\x0a"
+"\x0d\x0a"

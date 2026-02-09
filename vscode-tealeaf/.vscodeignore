@@ -1,0 +1,12 @@
+.vscode/**
+.vscode-test/**
+.gitignore
+vsc-extension-quickstart.md
+**/tsconfig.json
+**/*.map
+**/*.ts
+node_modules/**
+images/tealeaf-icon.png
+images/tealeaf-icon-darkbg.png
+images/tealeaf-icon-resized.png
+images/tealeaf-icon-darkbg-resized.png

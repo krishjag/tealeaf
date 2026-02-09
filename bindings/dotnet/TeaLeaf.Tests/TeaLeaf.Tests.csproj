@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.6.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="6.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TeaLeaf\TeaLeaf.csproj" />
+    <ProjectReference Include="..\TeaLeaf.Annotations\TeaLeaf.Annotations.csproj" />
+    <ProjectReference Include="..\TeaLeaf.Generators\TeaLeaf.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <!-- Copy native library for tests -->
+  <ItemGroup>
+    <None Include="..\..\..\target\release\tealeaf_ffi.dll" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\..\target\release\tealeaf_ffi.dll')" />
+    <None Include="..\..\..\target\debug\tealeaf_ffi.dll" CopyToOutputDirectory="PreserveNewest" Condition="!Exists('..\..\..\target\release\tealeaf_ffi.dll') And Exists('..\..\..\target\debug\tealeaf_ffi.dll')" />
+  </ItemGroup>
+
+</Project>

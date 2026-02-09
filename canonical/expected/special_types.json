@@ -1,0 +1,56 @@
+{
+  "!base_config": {
+    "debug": false,
+    "language": "en",
+    "theme": "dark"
+  },
+  "config_ref": {
+    "$ref": "base_config"
+  },
+  "empty_string": "",
+  "headers": [
+    [
+      "Content-Type",
+      "application/json"
+    ],
+    [
+      "Accept",
+      "*/*"
+    ]
+  ],
+  "multiline_value": "line one\nline two\nline three",
+  "pseudo_ref": {
+    "$ref": "some_key"
+  },
+  "pseudo_tag": {
+    "$tag": "ok",
+    "$value": 200
+  },
+  "result_error": {
+    "$tag": "error",
+    "$value": {
+      "code": 404,
+      "message": "Not found"
+    }
+  },
+  "result_ok": {
+    "$tag": "ok",
+    "$value": 200
+  },
+  "special_chars": "tab:\there\nquote:\"end",
+  "status_codes": [
+    [
+      200,
+      "OK"
+    ],
+    [
+      404,
+      "Not Found"
+    ],
+    [
+      500,
+      "Internal Server Error"
+    ]
+  ],
+  "whitespace_string": "   "
+}

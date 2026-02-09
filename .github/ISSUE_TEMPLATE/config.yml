@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/krishjag/tealeaf/discussions
+    about: Ask questions, share ideas, or discuss TeaLeaf usage
+  - name: 📚 Documentation
+    url: https://krishjag.github.io/tealeaf/
+    about: Read the official TeaLeaf documentation
+  - name: 📖 Format Specification
+    url: https://github.com/krishjag/tealeaf/blob/main/spec/TEALEAF_SPEC.md
+    about: View the TeaLeaf format specification

@@ -1,0 +1,22 @@
+[package]
+name = "tealeaf-ffi"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "C FFI bindings for the TeaLeaf format library"
+
+[lib]
+name = "tealeaf_ffi"
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+tealeaf-core.workspace = true
+
+[dev-dependencies]
+tempfile = "3.0"
+serde_json = "1.0"
+
+[build-dependencies]
+cbindgen = "0.27"

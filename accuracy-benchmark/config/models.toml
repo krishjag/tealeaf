@@ -1,0 +1,98 @@
+# Model Configuration for Accuracy Benchmark Suite
+# This file defines the LLM providers and their model configurations
+
+[providers.anthropic]
+name = "anthropic"
+enabled = true
+default_model = "claude-sonnet-4-5-20250929"
+# Rate limits (Anthropic Tier 2 for Sonnet/Opus)
+# Actual limits: 1K RPM, 450K input TPM, 90K output TPM
+rpm = 1000         # Requests per minute
+tpm = 450000       # Input tokens per minute (Tier 2 limit)
+# Extended thinking configuration
+enable_thinking = true
+thinking_budget = 10000
+
+[providers.anthropic.models.sonnet-4-5]
+id = "claude-sonnet-4-5-20250929"
+display_name = "Claude Sonnet 4.5"
+max_output_tokens = 8192
+supports_thinking = true
+
+[providers.anthropic.models.opus-4-5]
+id = "claude-opus-4-5-20251101"
+display_name = "Claude Opus 4.5"
+max_output_tokens = 8192
+supports_thinking = true
+
+[providers.anthropic.models.sonnet-4]
+id = "claude-sonnet-4-20250514"
+display_name = "Claude Sonnet 4"
+max_output_tokens = 8192
+supports_thinking = true
+
+[providers.anthropic.models.haiku-3-5]
+id = "claude-3-5-haiku-20241022"
+display_name = "Claude 3.5 Haiku"
+max_output_tokens = 8192
+supports_thinking = false
+
+[providers.openai]
+name = "openai"
+enabled = true
+default_model = "gpt-5.2"
+# Rate limits
+rpm = 500
+tpm = 200000
+# Reasoning configuration
+reasoning_effort = "medium"  # low, medium, high (for o3 models)
+
+[providers.openai.models.gpt-5-2]
+id = "gpt-5.2"
+display_name = "GPT-5.2"
+max_output_tokens = 16384
+uses_completion_tokens = true  # Uses max_completion_tokens instead of max_tokens
+supports_temperature = true
+
+[providers.openai.models.gpt-4-turbo]
+id = "gpt-4-turbo"
+display_name = "GPT-4 Turbo"
+max_output_tokens = 4096
+uses_completion_tokens = false
+supports_temperature = true
+
+[providers.openai.models.o3-mini]
+id = "o3-mini-2025-01-31"
+display_name = "o3-mini"
+max_output_tokens = 16384
+uses_completion_tokens = true
+supports_temperature = false
+is_reasoning_model = true
+
+[providers.openai.models.o1]
+id = "o1-2024-12-17"
+display_name = "o1"
+max_output_tokens = 32768
+uses_completion_tokens = true
+supports_temperature = false
+is_reasoning_model = true
+
+# Benchmark settings
+[benchmark]
+# Default parallel requests per provider
+parallel_requests = 3
+# Number of retries on failure
+retry_count = 3
+# Initial retry delay in milliseconds
+retry_delay_ms = 1000
+# Maximum retry delay in milliseconds
+max_retry_delay_ms = 60000
+# Request timeout in milliseconds
+timeout_ms = 120000
+
+# Format comparison settings
+[benchmark.format_comparison]
+# Enable comparing JSON vs TeaLeaf format performance
+enabled = true
+# Run each task in both formats
+compare_formats = true

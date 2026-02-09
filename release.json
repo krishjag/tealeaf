@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0-beta.3",
+  "authors": "TeaLeaf Contributors",
+  "license": "MIT",
+  "repository": "https://github.com/krishjag/tealeaf",
+  "packages": {
+    "tealeaf-core": {
+      "description": "Schema-aware data format with human-readable text and compact binary representation"
+    },
+    "tealeaf-ffi": {
+      "description": "Foreign function interface for TeaLeaf format"
+    },
+    "accuracy-benchmark": {
+      "description": "Accuracy benchmark suite for TeaLeaf format across multiple LLM providers"
+    },
+    "dotnet": {
+      "packageId": "TeaLeaf",
+      "description": "Schema-aware data format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization."
+    }
+  }
+}

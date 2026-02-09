@@ -1,0 +1,31 @@
+{
+  "store": {
+    "id": "STORE-101",
+    "name": "Downtown Electronics",
+    "region": "Northeast",
+    "type": "retail"
+  },
+  "period": {
+    "start": "2024-01-01",
+    "end": "2024-01-31"
+  },
+  "transactions": [
+    {"id": "TXN001", "date": "2024-01-02", "customer_id": "C001", "items": [{"sku": "LAPTOP-001", "name": "ProBook 15", "quantity": 1, "unit_price": 899.99, "category": "Laptops"}], "total": 899.99, "payment_method": "credit_card"},
+    {"id": "TXN002", "date": "2024-01-03", "customer_id": "C002", "items": [{"sku": "PHONE-005", "name": "Galaxy S24", "quantity": 1, "unit_price": 799.99, "category": "Phones"}, {"sku": "CASE-012", "name": "Phone Case", "quantity": 1, "unit_price": 29.99, "category": "Accessories"}], "total": 829.98, "payment_method": "debit_card"},
+    {"id": "TXN003", "date": "2024-01-05", "customer_id": "C003", "items": [{"sku": "TV-003", "name": "4K Smart TV 55\"", "quantity": 1, "unit_price": 649.99, "category": "TVs"}], "total": 649.99, "payment_method": "credit_card"},
+    {"id": "TXN004", "date": "2024-01-08", "customer_id": "C001", "items": [{"sku": "HDMI-001", "name": "HDMI Cable", "quantity": 2, "unit_price": 15.99, "category": "Accessories"}], "total": 31.98, "payment_method": "cash"},
+    {"id": "TXN005", "date": "2024-01-10", "customer_id": "C004", "items": [{"sku": "TABLET-002", "name": "iPad Air", "quantity": 1, "unit_price": 599.99, "category": "Tablets"}, {"sku": "PENCIL-001", "name": "Apple Pencil", "quantity": 1, "unit_price": 129.99, "category": "Accessories"}], "total": 729.98, "payment_method": "credit_card"},
+    {"id": "TXN006", "date": "2024-01-12", "customer_id": "C005", "items": [{"sku": "LAPTOP-003", "name": "MacBook Pro", "quantity": 1, "unit_price": 1999.99, "category": "Laptops"}], "total": 1999.99, "payment_method": "credit_card"},
+    {"id": "TXN007", "date": "2024-01-15", "customer_id": "C006", "items": [{"sku": "SPEAKER-002", "name": "Bluetooth Speaker", "quantity": 2, "unit_price": 79.99, "category": "Audio"}], "total": 159.98, "payment_method": "debit_card"},
+    {"id": "TXN008", "date": "2024-01-18", "customer_id": "C002", "items": [{"sku": "CHARGER-005", "name": "Fast Charger", "quantity": 1, "unit_price": 39.99, "category": "Accessories"}], "total": 39.99, "payment_method": "cash"},
+    {"id": "TXN009", "date": "2024-01-22", "customer_id": "C007", "items": [{"sku": "LAPTOP-001", "name": "ProBook 15", "quantity": 2, "unit_price": 899.99, "category": "Laptops"}], "total": 1799.98, "payment_method": "credit_card"},
+    {"id": "TXN010", "date": "2024-01-25", "customer_id": "C008", "items": [{"sku": "MONITOR-001", "name": "27\" Gaming Monitor", "quantity": 1, "unit_price": 349.99, "category": "Monitors"}, {"sku": "KEYBOARD-002", "name": "Mechanical Keyboard", "quantity": 1, "unit_price": 129.99, "category": "Peripherals"}], "total": 479.98, "payment_method": "credit_card"}
+  ],
+  "inventory": [
+    {"sku": "LAPTOP-001", "name": "ProBook 15", "stock": 15, "reorder_point": 5, "cost": 650.00, "category": "Laptops"},
+    {"sku": "LAPTOP-003", "name": "MacBook Pro", "stock": 8, "reorder_point": 3, "cost": 1500.00, "category": "Laptops"},
+    {"sku": "PHONE-005", "name": "Galaxy S24", "stock": 25, "reorder_point": 10, "cost": 550.00, "category": "Phones"},
+    {"sku": "TV-003", "name": "4K Smart TV 55\"", "stock": 12, "reorder_point": 4, "cost": 400.00, "category": "TVs"},
+    {"sku": "TABLET-002", "name": "iPad Air", "stock": 18, "reorder_point": 6, "cost": 420.00, "category": "Tablets"}
+  ]
+}

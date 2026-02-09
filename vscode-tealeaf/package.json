@@ -1,0 +1,49 @@
+{
+  "name": "tealeaf-lang",
+  "displayName": "TeaLeaf Language Support",
+  "description": "Syntax highlighting and language support for TeaLeaf format (.tl files)",
+  "version": "0.1.0",
+  "publisher": "RiatixLabs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/krishjag/tealeaf"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "tealeaf",
+    "schema",
+    "serialization",
+    "config",
+    "data format"
+  ],
+  "icon": "images/tealeaf-icon-128.png",
+  "contributes": {
+    "languages": [
+      {
+        "id": "tealeaf",
+        "aliases": [
+          "TeaLeaf",
+          "tealeaf",
+          "tl"
+        ],
+        "extensions": [
+          ".tl"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "tealeaf",
+        "scopeName": "source.tealeaf",
+        "path": "./syntaxes/tealeaf.tmLanguage.json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net8.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Package metadata -->
+    <PackageId>TeaLeaf</PackageId>
+    <Version>2.0.0-beta.3</Version>
+    <Authors>TeaLeaf Contributors</Authors>
+    <Description>Schema-aware data format with human-readable text and compact binary representation. Includes native libraries for high-performance parsing and serialization.</Description>
+    <PackageTags>serialization;schema;binary;config;tealeaf;json;document</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/krishjag/tealeaf</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/krishjag/tealeaf</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>tealeaf-icon-darkbg-128.png</PackageIcon>
+
+    <!-- Build settings -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <!-- Package README and icon -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" Condition="Exists('README.md')" />
+    <None Include="..\..\..\assets\tealeaf-icon-darkbg-128.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <!-- Project references -->
+  <ItemGroup>
+    <ProjectReference Include="..\TeaLeaf.Annotations\TeaLeaf.Annotations.csproj" />
+  </ItemGroup>
+
+  <!--
+    Native library references for NuGet package
+
+    The runtimes folder structure follows NuGet conventions:
+    runtimes/{RID}/native/{library}
+
+    Supported platforms (built by CI workflow):
+    - win-x64, win-arm64
+    - linux-x64, linux-arm64
+    - osx-x64, osx-arm64
+
+    Build scripts populate the runtimes folder before packing.
+  -->
+
+  <!-- Windows native libraries -->
+  <ItemGroup>
+    <None Include="runtimes\win-x64\native\tealeaf_ffi.dll"
+          Pack="true"
+          PackagePath="runtimes\win-x64\native"
+          Condition="Exists('runtimes\win-x64\native\tealeaf_ffi.dll')" />
+    <None Include="runtimes\win-arm64\native\tealeaf_ffi.dll"
+          Pack="true"
+          PackagePath="runtimes\win-arm64\native"
+          Condition="Exists('runtimes\win-arm64\native\tealeaf_ffi.dll')" />
+  </ItemGroup>
+
+  <!-- Linux native libraries -->
+  <ItemGroup>
+    <None Include="runtimes\linux-x64\native\libtealeaf_ffi.so"
+          Pack="true"
+          PackagePath="runtimes\linux-x64\native"
+          Condition="Exists('runtimes\linux-x64\native\libtealeaf_ffi.so')" />
+    <None Include="runtimes\linux-arm64\native\libtealeaf_ffi.so"
+          Pack="true"
+          PackagePath="runtimes\linux-arm64\native"
+          Condition="Exists('runtimes\linux-arm64\native\libtealeaf_ffi.so')" />
+  </ItemGroup>
+
+  <!-- macOS native libraries -->
+  <ItemGroup>
+    <None Include="runtimes\osx-x64\native\libtealeaf_ffi.dylib"
+          Pack="true"
+          PackagePath="runtimes\osx-x64\native"
+          Condition="Exists('runtimes\osx-x64\native\libtealeaf_ffi.dylib')" />
+    <None Include="runtimes\osx-arm64\native\libtealeaf_ffi.dylib"
+          Pack="true"
+          PackagePath="runtimes\osx-arm64\native"
+          Condition="Exists('runtimes\osx-arm64\native\libtealeaf_ffi.dylib')" />
+  </ItemGroup>
+
+</Project>

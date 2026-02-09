@@ -1,0 +1,76 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# .NET
+bindings/dotnet/**/bin/
+bindings/dotnet/**/obj/
+bindings/dotnet/**/*.user
+bindings/dotnet/**/.vs/
+*.nupkg
+
+# Native libraries (built artifacts)
+bindings/dotnet/TeaLeaf/runtimes/
+
+# IDE
+.idea/
+.vscode/
+.claude/
+.claude/settings.local.json
+*.swp
+*.swo
+*~
+CLAUDE.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.pdb
+*.dll
+*.so
+*.dylib
+
+# Test results
+TestResults/
+results/
+!accuracy-benchmark/results/
+accuracy-benchmark/results/*
+!accuracy-benchmark/results/sample/
+*.trx
+
+# Coverage reports
+coverage/
+*.lcov
+*.cobertura.xml
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+TODOS.txt
+
+# Temp directories
+temp/
+tmp/
+throwaway/
+
+# Binary TeaLeaf files (keep examples and canonical test fixtures, ignore generated)
+*.tlbx
+!examples/*.tlbx
+!canonical/binary/*.tlbx
+!canonical/errors/*.tlbx
+
+# Adversarial test files
+adversarial-tests/**/bin/
+adversarial-tests/**/obj/
+adversarial-tests/**/results/
+adversarial-tests/**/target/
+
+# Fuzz artifacts
+tealeaf-core/fuzz/target/
+tealeaf-core/fuzz/corpus/
+tealeaf-core/fuzz/artifacts/
+tealeaf-core/fuzz/coverage/

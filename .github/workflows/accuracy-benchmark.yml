@@ -1,0 +1,260 @@
+# GitHub Actions workflow for building and releasing Accuracy Benchmark CLI
+#
+# This workflow:
+# 1. Builds the accuracy-benchmark CLI binary for Windows, Linux, and macOS
+# 2. Runs tests on all platforms
+# 3. Creates release artifacts with platform-specific binaries
+
+name: Accuracy Benchmark
+
+# TEMPORARILY DISABLED — re-enable after repo migration
+# on:
+#   push:
+#     branches: [main, develop]
+#     paths:
+#       - 'accuracy-benchmark/**'
+#       - 'tealeaf-core/**'
+#       - 'Cargo.toml'
+#       - 'Cargo.lock'
+#       - 'release.json'
+#       - 'scripts/**'
+#       - '.github/workflows/accuracy-benchmark.yml'
+#   pull_request:
+#     branches: [main]
+#     paths:
+#       - 'accuracy-benchmark/**'
+#       - 'tealeaf-core/**'
+#       - 'Cargo.toml'
+#       - 'Cargo.lock'
+#       - 'release.json'
+#   release:
+#     types: [published]
+#   workflow_dispatch:
+on: workflow_dispatch
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Validate version consistency (PR/push only)
+  validate-version:
+    runs-on: ubuntu-latest
+    name: Validate Version
+    if: github.event_name != 'release'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Validate version consistency
+        run: |
+          chmod +x scripts/validate-version.sh scripts/sync-version.sh
+          ./scripts/validate-version.sh
+
+  # Run tests on all platforms
+  test:
+    needs: [validate-version]
+    if: always() && (needs.validate-version.result == 'success' || needs.validate-version.result == 'skipped')
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    name: Test (${{ matrix.os }})
+
+    steps:
+      - name: Configure Git line endings
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - name: Sync version from release.json (Unix)
+        if: runner.os != 'Windows' && github.event_name == 'release'
+        run: |
+          chmod +x scripts/sync-version.sh
+          ./scripts/sync-version.sh
+
+      - name: Sync version from release.json (Windows)
+        if: runner.os == 'Windows' && github.event_name == 'release'
+        shell: pwsh
+        run: ./scripts/sync-version.ps1
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-benchmark-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run tests
+        run: cargo test --package accuracy-benchmark
+
+  # Build release binaries for all platforms
+  build:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: accuracy-benchmark-windows-x64
+            binary: accuracy-benchmark.exe
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            artifact: accuracy-benchmark-windows-arm64
+            binary: accuracy-benchmark.exe
+
+          # Linux (glibc)
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: accuracy-benchmark-linux-x64
+            binary: accuracy-benchmark
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            artifact: accuracy-benchmark-linux-arm64
+            binary: accuracy-benchmark
+            cross: true
+
+          # Linux (musl - static binary)
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            artifact: accuracy-benchmark-linux-musl-x64
+            binary: accuracy-benchmark
+            cross: true
+
+          # macOS
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact: accuracy-benchmark-macos-x64
+            binary: accuracy-benchmark
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact: accuracy-benchmark-macos-arm64
+            binary: accuracy-benchmark
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.artifact }}
+
+    steps:
+      - name: Configure Git line endings
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - name: Sync version from release.json (Unix)
+        if: runner.os != 'Windows' && github.event_name == 'release'
+        run: |
+          chmod +x scripts/sync-version.sh
+          ./scripts/sync-version.sh
+
+      - name: Sync version from release.json (Windows)
+        if: runner.os == 'Windows' && github.event_name == 'release'
+        shell: pwsh
+        run: ./scripts/sync-version.ps1
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          mkdir -p .cargo
+          echo '[target.aarch64-unknown-linux-gnu]' >> .cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
+
+      - name: Install cross-compilation tools (Linux musl)
+        if: contains(matrix.target, 'musl')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+
+      - name: Build release binary
+        run: cargo build --release --package accuracy-benchmark --target ${{ matrix.target }}
+
+      - name: Create artifact directory
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp target/${{ matrix.target }}/release/${{ matrix.binary }} dist/
+
+          # Add README
+          cp accuracy-benchmark/README.md dist/ 2>/dev/null || echo "No README.md found"
+          cp LICENSE* dist/ 2>/dev/null || echo "No LICENSE found"
+
+      - name: Create archive (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cd dist
+          tar -czvf ../${{ matrix.artifact }}.tar.gz *
+
+      - name: Create archive (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/* -DestinationPath ${{ matrix.artifact }}.zip
+
+      - name: Upload artifact (Unix)
+        if: runner.os != 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.tar.gz
+          if-no-files-found: error
+
+      - name: Upload artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
+          if-no-files-found: error
+
+  # Create GitHub release with all binaries
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Create Release
+    if: always() && needs.build.result == 'success' && github.event_name == 'release'
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/**/*.tar.gz
+            artifacts/**/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

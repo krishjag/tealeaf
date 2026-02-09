@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package benchmark;
+
+// Small configuration object
+message SmallConfig {
+    string name = 1;
+    int32 version = 2;
+    bool enabled = 3;
+    double threshold = 4;
+}
+
+// 3D Point for array benchmarks
+message Point {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}
+
+message PointList {
+    repeated Point points = 1;
+}
+
+// Nested structures
+message Address {
+    string street = 1;
+    string city = 2;
+    string zip = 3;
+    string country = 4;
+}
+
+message Company {
+    string name = 1;
+    Address address = 2;
+    int32 employee_count = 3;
+}
+
+message Person {
+    int64 id = 1;
+    string name = 2;
+    string email = 3;
+    int32 age = 4;
+    Company employer = 5;
+}
+
+message PersonList {
+    repeated Person people = 1;
+}
+
+// Mixed types
+message MixedData {
+    int64 id = 1;
+    string name = 2;
+    repeated string tags = 3;
+    repeated double scores = 4;
+    map<string, string> metadata = 5;
+    bool active = 6;
+    bytes raw_bytes = 7;
+}
+
+// Tabular user data
+message User {
+    int64 id = 1;
+    string username = 2;
+    string email = 3;
+    int64 created_at = 4;
+    bool is_admin = 5;
+}
+
+message UserList {
+    repeated User users = 1;
+}

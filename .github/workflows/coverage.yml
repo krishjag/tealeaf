@@ -1,0 +1,257 @@
+# Code coverage reporting for Rust and .NET
+#
+# Rust: cargo-llvm-cov → lcov → Codecov (gate: 90% line coverage)
+# .NET: coverlet → Cobertura → Codecov (gate: 85% TeaLeaf, 80% Generators)
+#
+# Coverage thresholds (update these as coverage improves):
+#   Rust line coverage:         90%
+#   .NET TeaLeaf line coverage: 85%
+#   .NET Generators line cov:   80%
+
+name: Coverage
+
+on:
+  workflow_dispatch:
+  # Disabled while repo is private — re-enable these triggers when public:
+  # push:
+  #   branches: [main]
+  # pull_request:
+  #   branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # Coverage thresholds — single source of truth
+  RUST_LINE_COVERAGE_MIN: 90
+  DOTNET_TEALEAF_LINE_MIN: 85
+  DOTNET_GENERATORS_LINE_MIN: 80
+
+permissions:
+  contents: read
+
+jobs:
+  # =========================================================================
+  # Rust Coverage
+  # =========================================================================
+  rust-coverage:
+    runs-on: ubuntu-latest
+    name: Rust Coverage
+
+    steps:
+      - name: Configure Git line endings
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-coverage-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-coverage-
+            ${{ runner.os }}-cargo-
+
+      - name: Generate Rust coverage (lcov)
+        run: |
+          cargo llvm-cov --workspace \
+            --exclude accuracy-benchmark \
+            --lcov \
+            --output-path rust-lcov.info
+
+      - name: Enforce Rust coverage gate
+        run: |
+          cargo llvm-cov --workspace \
+            --exclude accuracy-benchmark \
+            --fail-under-lines ${{ env.RUST_LINE_COVERAGE_MIN }} \
+            --no-run
+          echo "✅ Rust line coverage meets ${RUST_LINE_COVERAGE_MIN}% threshold"
+
+      - name: Upload Rust coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: rust-lcov.info
+          flags: rust
+          name: rust-coverage
+          fail_ci_if_error: false
+
+      - name: Upload Rust coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rust-coverage-lcov
+          path: rust-lcov.info
+          retention-days: 30
+
+  # =========================================================================
+  # .NET Coverage
+  # =========================================================================
+  dotnet-coverage:
+    runs-on: ubuntu-latest
+    name: .NET Coverage
+
+    steps:
+      - name: Configure Git line endings
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-ffi-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build native FFI library
+        run: cargo build --release --package tealeaf-ffi
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore .NET dependencies
+        run: dotnet restore bindings/dotnet
+
+      - name: Build .NET solution
+        run: dotnet build bindings/dotnet -c Debug --no-restore
+
+      - name: Copy native library for tests
+        run: |
+          cp target/release/libtealeaf_ffi.so \
+             bindings/dotnet/TeaLeaf.Tests/bin/Debug/net10.0/ || true
+
+      - name: Run TeaLeaf.Tests with coverage
+        run: |
+          dotnet test bindings/dotnet/TeaLeaf.Tests \
+            -c Debug \
+            --no-build \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=cobertura \
+            /p:CoverletOutput="${{ github.workspace }}/coverage/dotnet-tealeaf-tests.cobertura.xml" \
+            '/p:Include=[TeaLeaf]*,[TeaLeaf.Annotations]*' \
+            '/p:Exclude=[*.Tests]*,[*.Generators.Tests]*'
+
+      - name: Run TeaLeaf.Generators.Tests with coverage
+        run: |
+          dotnet test bindings/dotnet/TeaLeaf.Generators.Tests \
+            -c Debug \
+            --no-build \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=cobertura \
+            /p:CoverletOutput="${{ github.workspace }}/coverage/dotnet-generators-tests.cobertura.xml" \
+            '/p:Include=[TeaLeaf.Generators]*,[TeaLeaf.Annotations]*' \
+            '/p:Exclude=[*.Tests]*'
+
+      - name: Enforce .NET coverage gates
+        run: |
+          check_coverage() {
+            local file="$1" module="$2" threshold="$3"
+
+            if [ ! -f "$file" ]; then
+              echo "❌ Coverage file not found: $file"
+              return 1
+            fi
+
+            # Extract line-rate for the target module from cobertura XML
+            # <package name="TeaLeaf" line-rate="0.8909" ...>
+            local rate
+            rate=$(grep -oP "package name=\"${module}\"[^>]*line-rate=\"\K[0-9.]+" "$file" || echo "")
+
+            if [ -z "$rate" ]; then
+              echo "⚠️  Module '${module}' not found in ${file}, skipping gate"
+              return 0
+            fi
+
+            # Convert 0.xx to percentage (awk handles floating point)
+            local pct
+            pct=$(awk "BEGIN { printf \"%.1f\", ${rate} * 100 }")
+
+            echo "  ${module}: ${pct}% (threshold: ${threshold}%)"
+
+            # Compare: fail if below threshold
+            local ok
+            ok=$(awk "BEGIN { print (${pct} >= ${threshold}) ? 1 : 0 }")
+            if [ "$ok" -eq 0 ]; then
+              echo "❌ ${module} line coverage ${pct}% is below ${threshold}% threshold"
+              return 1
+            fi
+            return 0
+          }
+
+          echo "Checking .NET coverage gates..."
+          failed=0
+
+          check_coverage \
+            "${{ github.workspace }}/coverage/dotnet-tealeaf-tests.cobertura.xml" \
+            "TeaLeaf" \
+            "${{ env.DOTNET_TEALEAF_LINE_MIN }}" || failed=1
+
+          check_coverage \
+            "${{ github.workspace }}/coverage/dotnet-generators-tests.cobertura.xml" \
+            "TeaLeaf.Generators" \
+            "${{ env.DOTNET_GENERATORS_LINE_MIN }}" || failed=1
+
+          if [ "$failed" -eq 1 ]; then
+            echo ""
+            echo "❌ .NET coverage gate failed"
+            exit 1
+          fi
+
+          echo "✅ All .NET coverage gates passed"
+
+      - name: Upload .NET coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: |
+            coverage/dotnet-tealeaf-tests.cobertura.xml
+            coverage/dotnet-generators-tests.cobertura.xml
+          flags: dotnet
+          name: dotnet-coverage
+          fail_ci_if_error: false
+
+      - name: Upload .NET coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dotnet-coverage-cobertura
+          path: coverage/
+          retention-days: 30

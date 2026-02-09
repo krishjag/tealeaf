@@ -1,0 +1,31 @@
+[book]
+title = "TeaLeaf Documentation"
+authors = ["krishjag"]
+description = "Comprehensive documentation for the TeaLeaf format -- a schema-aware data format with human-readable text and compact binary representation."
+src = "src"
+language = "en"
+
+[build]
+build-dir = "book"
+create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/krishjag/tealeaf"
+edit-url-template = "https://github.com/krishjag/tealeaf/edit/main/docs-site/{path}"
+site-url = "/tealeaf/"
+additional-css = ["theme/custom.css"]
+no-section-label = false
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.search]
+enable = true
+limit-results = 30
+teaser-word-count = 30
+
+[output.html.playground]
+editable = false
