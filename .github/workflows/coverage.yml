@@ -165,8 +165,8 @@ jobs:
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=cobertura \
             /p:CoverletOutput="${{ github.workspace }}/coverage/dotnet-tealeaf-tests.cobertura.xml" \
-            '/p:Include=[TeaLeaf]*,[TeaLeaf.Annotations]*' \
-            '/p:Exclude=[*.Tests]*,[*.Generators.Tests]*'
+            '/p:Include=[TeaLeaf]*%2c[TeaLeaf.Annotations]*' \
+            '/p:Exclude=[*.Tests]*%2c[*.Generators.Tests]*'
 
       - name: Run TeaLeaf.Generators.Tests with coverage
         run: |
@@ -176,7 +176,7 @@ jobs:
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=cobertura \
             /p:CoverletOutput="${{ github.workspace }}/coverage/dotnet-generators-tests.cobertura.xml" \
-            '/p:Include=[TeaLeaf.Generators]*,[TeaLeaf.Annotations]*' \
+            '/p:Include=[TeaLeaf.Generators]*%2c[TeaLeaf.Annotations]*' \
             '/p:Exclude=[*.Tests]*'
 
       - name: Enforce .NET coverage gates
