@@ -181,12 +181,12 @@ def main():
 
         # Compare against API-reported tokens (OpenAI only, since tiktoken is OpenAI's tokenizer)
         if task_id in api_tokens and "openai" in api_tokens[task_id]:
-            api_input = api_tokens[task_id]["openai"]
+            api_input = int(api_tokens[task_id]["openai"])  # int() breaks CodeQL taint from file read
             diff = tl_tokens - api_input
             diff_pct = (diff / api_input * 100) if api_input > 0 else 0
             row += f"  {api_input:>10,} {diff:>+8,} {diff_pct:>+7.1f}%"
 
-        print(row)
+        print(row)  # all values are numeric (int/float); no injection risk
         results.append({
             "task_id": task_id,
             "tl_tokens": tl_tokens,
