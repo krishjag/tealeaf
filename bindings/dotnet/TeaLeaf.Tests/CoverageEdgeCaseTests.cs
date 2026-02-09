@@ -875,6 +875,132 @@ public class TLReaderEdgeCaseTests
     }
 
     [Fact]
+    public void ToJson_Timestamp_ProducesIso8601()
+    {
+        // Covers ValueToJsonNode TLType.Timestamp branch + TimestampToIso8601
+        var path = Path.Combine(_tempDir, $"test_ts_json_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            using (var doc = TLDocument.Parse(@"
+                created: 2024-06-15T10:30:00Z
+                updated: 2024-01-15T16:00:00+05:30
+            "))
+            {
+                doc.Compile(path);
+            }
+
+            using var reader = TLReader.Open(path);
+            var json = reader.ToJson();
+            Assert.NotNull(json);
+
+            using var jsonDoc = System.Text.Json.JsonDocument.Parse(json);
+            var root = jsonDoc.RootElement;
+
+            Assert.True(root.TryGetProperty("created", out var created));
+            Assert.Equal(System.Text.Json.JsonValueKind.String, created.ValueKind);
+            Assert.Contains("2024-06-15", created.GetString());
+
+            Assert.True(root.TryGetProperty("updated", out var updated));
+            Assert.Equal(System.Text.Json.JsonValueKind.String, updated.ValueKind);
+            Assert.Contains("2024", updated.GetString());
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ToJson_Bytes_ProducesHexString()
+    {
+        // Covers ValueToJsonNode TLType.Bytes branch + BytesToHexString
+        var path = Path.Combine(_tempDir, $"test_bytes_json_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            using (var doc = TLDocument.Parse("payload: b\"cafef00d\"\nempty: b\"\""))
+            {
+                doc.Compile(path);
+            }
+
+            using var reader = TLReader.Open(path);
+            var json = reader.ToJson();
+            Assert.NotNull(json);
+
+            using var jsonDoc = System.Text.Json.JsonDocument.Parse(json);
+            var root = jsonDoc.RootElement;
+
+            Assert.True(root.TryGetProperty("payload", out var payload));
+            Assert.Equal(System.Text.Json.JsonValueKind.String, payload.ValueKind);
+            Assert.Equal("0xcafef00d", payload.GetString());
+
+            Assert.True(root.TryGetProperty("empty", out var empty));
+            Assert.Equal(System.Text.Json.JsonValueKind.String, empty.ValueKind);
+            Assert.Equal("0x", empty.GetString());
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void GetDynamic_Bytes_ReturnsByteArray()
+    {
+        // Covers ConvertToDynamic TLType.Bytes branch
+        var path = Path.Combine(_tempDir, $"test_dyn_bytes_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            using (var doc = TLDocument.Parse("data: b\"cafe\""))
+            {
+                doc.Compile(path);
+            }
+
+            using var reader = TLReader.Open(path);
+            dynamic? data = reader.GetDynamic("data");
+            Assert.NotNull(data);
+            Assert.IsType<byte[]>(data);
+            Assert.Equal(2, ((byte[])data).Length);
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void GetDynamic_Object_ReturnsExpandoObject()
+    {
+        // Covers ConvertObjectToDynamic
+        var path = Path.Combine(_tempDir, $"test_dyn_obj_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            using (var doc = TLDocument.Parse(@"
+                user: {
+                    name: alice
+                    age: 30
+                }
+            "))
+            {
+                doc.Compile(path);
+            }
+
+            using var reader = TLReader.Open(path);
+            dynamic? user = reader.GetDynamic("user");
+            Assert.NotNull(user);
+
+            var dict = (IDictionary<string, object?>)user;
+            Assert.True(dict.ContainsKey("name"));
+            Assert.Equal("alice", dict["name"]);
+            Assert.True(dict.ContainsKey("age"));
+            Assert.Equal(30L, dict["age"]);
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void DoubleDispose_DoesNotThrow()
     {
         var path = Path.Combine(_tempDir, $"test_disp_{Guid.NewGuid()}.tlbx");
