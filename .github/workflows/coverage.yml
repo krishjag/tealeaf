@@ -11,12 +11,11 @@
 name: Coverage
 
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
-  # Disabled while repo is private — re-enable these triggers when public:
-  # push:
-  #   branches: [main]
-  # pull_request:
-  #   branches: [main]
 
 env:
   CARGO_TERM_COLOR: always

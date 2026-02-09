@@ -7,30 +7,28 @@
 
 name: Accuracy Benchmark
 
-# TEMPORARILY DISABLED — re-enable after repo migration
-# on:
-#   push:
-#     branches: [main, develop]
-#     paths:
-#       - 'accuracy-benchmark/**'
-#       - 'tealeaf-core/**'
-#       - 'Cargo.toml'
-#       - 'Cargo.lock'
-#       - 'release.json'
-#       - 'scripts/**'
-#       - '.github/workflows/accuracy-benchmark.yml'
-#   pull_request:
-#     branches: [main]
-#     paths:
-#       - 'accuracy-benchmark/**'
-#       - 'tealeaf-core/**'
-#       - 'Cargo.toml'
-#       - 'Cargo.lock'
-#       - 'release.json'
-#   release:
-#     types: [published]
-#   workflow_dispatch:
-on: workflow_dispatch
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'accuracy-benchmark/**'
+      - 'tealeaf-core/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'release.json'
+      - 'scripts/**'
+      - '.github/workflows/accuracy-benchmark.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'accuracy-benchmark/**'
+      - 'tealeaf-core/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'release.json'
+  release:
+    types: [published]
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always

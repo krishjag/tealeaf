@@ -8,34 +8,32 @@
 
 name: .NET Package
 
-# TEMPORARILY DISABLED — re-enable after repo migration
-# on:
-#   push:
-#     branches: [main, develop]
-#     paths:
-#       - 'tealeaf-core/**'
-#       - 'tealeaf-ffi/**'
-#       - 'bindings/dotnet/**'
-#       - 'release.json'
-#       - 'scripts/**'
-#       - '.github/workflows/dotnet-package.yml'
-#   pull_request:
-#     branches: [main]
-#     paths:
-#       - 'tealeaf-core/**'
-#       - 'tealeaf-ffi/**'
-#       - 'bindings/dotnet/**'
-#       - 'release.json'
-#   release:
-#     types: [published]
-#   workflow_dispatch:
-#     inputs:
-#       publish_nuget:
-#         description: 'Publish to NuGet.org'
-#         required: false
-#         default: false
-#         type: boolean
-on: workflow_dispatch
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'tealeaf-core/**'
+      - 'tealeaf-ffi/**'
+      - 'bindings/dotnet/**'
+      - 'release.json'
+      - 'scripts/**'
+      - '.github/workflows/dotnet-package.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tealeaf-core/**'
+      - 'tealeaf-ffi/**'
+      - 'bindings/dotnet/**'
+      - 'release.json'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      publish_nuget:
+        description: 'Publish to NuGet.org'
+        required: false
+        default: false
+        type: boolean
 
 env:
   CARGO_TERM_COLOR: always
