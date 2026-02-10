@@ -1,4 +1,5 @@
 using System.Dynamic;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TeaLeaf.Native;
@@ -10,6 +11,17 @@ namespace TeaLeaf;
 /// </summary>
 public sealed class TLReader : IDisposable
 {
+    private static readonly JsonSerializerOptions JsonPretty = new()
+    {
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
+    private static readonly JsonSerializerOptions JsonCompact = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
     private IntPtr _handle;
     private bool _disposed;
     private TLSchema[]? _schemas;
@@ -206,7 +218,7 @@ public sealed class TLReader : IDisposable
     {
         ThrowIfDisposed();
         var jsonObj = BuildJsonObject();
-        return JsonSerializer.Serialize(jsonObj, new JsonSerializerOptions { WriteIndented = true });
+        return JsonSerializer.Serialize(jsonObj, JsonPretty);
     }
 
     /// <summary>
@@ -217,7 +229,7 @@ public sealed class TLReader : IDisposable
     {
         ThrowIfDisposed();
         var jsonObj = BuildJsonObject();
-        return JsonSerializer.Serialize(jsonObj);
+        return JsonSerializer.Serialize(jsonObj, JsonCompact);
     }
 
     /// <summary>
@@ -232,7 +244,7 @@ public sealed class TLReader : IDisposable
         if (value == null)
             return null;
         var jsonNode = ValueToJsonNode(value);
-        return JsonSerializer.Serialize(jsonNode, new JsonSerializerOptions { WriteIndented = true });
+        return JsonSerializer.Serialize(jsonNode, JsonPretty);
     }
 
     private JsonObject BuildJsonObject()
