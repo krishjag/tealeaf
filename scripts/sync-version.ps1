@@ -21,6 +21,7 @@
     - docs-site/src/rust/overview.md (cargo version)
     - docs-site/src/rust/derive-macros.md (cargo version)
     - docs-site/src/ffi/api-reference.md (version example)
+    - assets/tealeaf_workflow.png (regenerated via generate_workflow_diagram.py)
 
 .PARAMETER DryRun
     Show what would be changed without making changes.
@@ -259,6 +260,27 @@ Update-File -Path $FfiRefPath -Description "ffi/api-reference.md (version exampl
     param($content)
     $content = $content -replace '(e\.g\., `")[^"]*(")', "`${1}$Version`${2}"
     return $content
+}
+
+# Regenerate workflow diagram (picks up version from release.json)
+$DiagramScript = Join-Path $RepoRoot "assets/generate_workflow_diagram.py"
+if (Test-Path $DiagramScript) {
+    if ($DryRun) {
+        Write-Host "[DRY RUN] Would regenerate: assets/tealeaf_workflow.png" -ForegroundColor Yellow
+    } else {
+        Write-Host "Regenerating workflow diagram..." -ForegroundColor Cyan
+        try {
+            Push-Location $RepoRoot
+            python $DiagramScript
+            Pop-Location
+            Write-Host "Updated: assets/tealeaf_workflow.png" -ForegroundColor Green
+        } catch {
+            Pop-Location
+            Write-Warning "Failed to regenerate workflow diagram: $_"
+        }
+    }
+} else {
+    Write-Host "No changes: assets/generate_workflow_diagram.py (not found)" -ForegroundColor DarkGray
 }
 
 Write-Host ""

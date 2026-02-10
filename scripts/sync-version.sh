@@ -178,6 +178,23 @@ update_file "$REPO_ROOT/docs-site/src/ffi/api-reference.md" \
     "ffi/api-reference.md (version example)" \
     "(e\.g\., \`\")[^\"]*(\")" "\1$VERSION\2"
 
+# Regenerate workflow diagram (picks up version from release.json)
+DIAGRAM_SCRIPT="$REPO_ROOT/assets/generate_workflow_diagram.py"
+if [[ -f "$DIAGRAM_SCRIPT" ]]; then
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "[DRY RUN] Would regenerate: assets/tealeaf_workflow.png"
+    else
+        echo "Regenerating workflow diagram..."
+        if (cd "$REPO_ROOT" && python "$DIAGRAM_SCRIPT"); then
+            echo "Updated: assets/tealeaf_workflow.png"
+        else
+            echo "Warning: Failed to regenerate workflow diagram" >&2
+        fi
+    fi
+else
+    echo "No changes: assets/generate_workflow_diagram.py (not found)"
+fi
+
 echo ""
 if [[ "$DRY_RUN" == "true" ]]; then
     echo "Dry run complete. No files were modified."

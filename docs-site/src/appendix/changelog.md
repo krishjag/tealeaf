@@ -1,6 +1,20 @@
 # Changelog
 
-## v2.0.0-beta.5 (Current)
+## v2.0.0-beta.6 (Current)
+
+### Features
+- **Recursive array schema inference in JSON import** — `from_json_with_schemas` now discovers schemas for arrays nested inside objects at arbitrary depth (e.g., `items[].product.stock[]`). Previously, `analyze_nested_objects` only recursed into nested objects but not nested arrays, causing deeply nested arrays to fall back to `[]any`. The CLI and derive-macro paths now produce equivalent schema coverage.
+
+### Tooling
+- Version sync scripts (`sync-version.ps1`, `sync-version.sh`) now regenerate the workflow diagram (`assets/tealeaf_workflow.png`) via `generate_workflow_diagram.py` on each version bump
+
+### Testing
+- Added `json_inference_nested_array_inside_object` — verifies arrays nested inside objects (e.g., `items[].product.stock[]`) get their own schema and typed array fields
+- Verified all 7 fuzz targets pass (~566K total runs, zero crashes)
+
+---
+
+## v2.0.0-beta.5
 
 ### Features
 - **Schema-aware serialization for Builder API** — `to_tl_with_schemas()` now produces compact `@table` output for documents built via `TeaLeafBuilder` with derive-macro schemas. Previously, PascalCase schema names from `#[derive(ToTeaLeaf)]` (e.g., `SalesOrder`) didn't match the serializer's `singularize()` heuristic (e.g., `"orders"` → `"order"`), causing all arrays to fall back to verbose `[{k: v}]` format. The serializer now resolves schemas via a 4-step chain: declared type from parent schema → singularize → case-insensitive singularize → structural field matching.

@@ -54,7 +54,7 @@ The binary will be at `target/release/tealeaf` (or `tealeaf.exe` on Windows).
 
 ```bash
 tealeaf --version
-# tealeaf 2.0.0-beta.5
+# tealeaf 2.0.0-beta.6
 
 tealeaf help
 ```
@@ -65,7 +65,7 @@ Add `tealeaf-core` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tealeaf-core = { version = "2.0.0-beta.5", features = ["derive"] }
+tealeaf-core = { version = "2.0.0-beta.6", features = ["derive"] }
 ```
 
 The `derive` feature enables `#[derive(ToTeaLeaf, FromTeaLeaf)]` macros.

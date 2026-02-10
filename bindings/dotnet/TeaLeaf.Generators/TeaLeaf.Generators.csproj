@@ -9,7 +9,7 @@
 
     <!-- Package metadata -->
     <PackageId>TeaLeaf.Generators</PackageId>
-    <Version>2.0.0-beta.5</Version>
+    <Version>2.0.0-beta.6</Version>
     <Authors>TeaLeaf Contributors</Authors>
     <Description>C# source generator for TeaLeaf format. Generates compile-time serialization/deserialization code for DTOs annotated with [TeaLeaf].</Description>
     <PackageTags>serialization;schema;tealeaf;sourcegen;codegen</PackageTags>
