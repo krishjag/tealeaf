@@ -829,12 +829,68 @@ public class TLReaderTests
     }
 
     [Fact]
+    public void FromJson_HeterogeneousArrayInStruct_BinaryRoundTrips()
+    {
+        // Regression: []any fields (from JSON inference of heterogeneous arrays inside
+        // schema-typed objects) caused binary corruption. encode_typed_value wrote
+        // TLType::Struct as the element type for "any" (the to_tl_type default),
+        // but data was heterogeneous. Reader then read garbage as schema indices.
+        var tlbxPath = Path.Combine(_tempDir, "test_any_array_roundtrip.tlbx");
+
+        try
+        {
+            const string json = @"{
+                ""events"": [
+                    {
+                        ""id"": ""E1"",
+                        ""type"": ""sale"",
+                        ""data"": [""SKU-100"", 3, 29.99, true],
+                        ""tags"": [""flash"", ""online""]
+                    },
+                    {
+                        ""id"": ""E2"",
+                        ""type"": ""return"",
+                        ""data"": [""SKU-200"", 1, 15.0, false],
+                        ""tags"": [""in-store""]
+                    }
+                ]
+            }";
+
+            using (var doc = TLDocument.FromJson(json))
+            {
+                doc.Compile(tlbxPath);
+            }
+
+            using var reader = TLReader.Open(tlbxPath);
+            var resultJson = reader.ToJson();
+            using var jsonDoc = JsonDocument.Parse(resultJson);
+            var root = jsonDoc.RootElement;
+
+            Assert.True(root.TryGetProperty("events", out var events));
+            Assert.Equal(JsonValueKind.Array, events.ValueKind);
+            Assert.Equal(2, events.GetArrayLength());
+
+            // Verify first event's heterogeneous data array survived binary roundtrip
+            var e1 = events[0];
+            Assert.Equal("E1", e1.GetProperty("id").GetString());
+            var data1 = e1.GetProperty("data");
+            Assert.Equal(4, data1.GetArrayLength());
+            Assert.Equal("SKU-100", data1[0].GetString());
+        }
+        finally
+        {
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
+        }
+    }
+
+    [Fact]
     public void FromJson_RetailOrdersFixture_CompileRoundTrips()
     {
         // End-to-end test with the retail_orders.json example file.
-        // This is the exact scenario that triggered the 'any' type regression.
-        // Uses TLDocument.FromJson → doc.Compile (not TLReader.CreateFromJson)
-        // to match the user's original code path.
+        // Exercises JSON → infer schemas → compile → binary read with complex
+        // real-world data including []any fields (heterogeneous arrays inside
+        // schema-typed objects like order.customer, order.payment, order.shipping).
         var jsonPath = FindRepoFile(Path.Combine("examples", "retail_orders.json"));
         if (jsonPath == null)
         {
@@ -857,10 +913,27 @@ public class TLReaderTests
 
             using var reader = TLReader.Open(tlbxPath);
             var keys = reader.Keys;
-            Assert.NotEmpty(keys);
+            Assert.Equal(5, keys.Length);
 
+            // Parse the round-tripped JSON and verify data integrity
             var resultJson = reader.ToJson();
-            Assert.Contains("orders", resultJson);
+            using var jsonDoc = JsonDocument.Parse(resultJson);
+            var root = jsonDoc.RootElement;
+
+            Assert.True(root.TryGetProperty("orders", out var orders));
+            Assert.Equal(10, orders.GetArrayLength());
+
+            Assert.True(root.TryGetProperty("products", out var products));
+            Assert.Equal(4, products.GetArrayLength());
+
+            Assert.True(root.TryGetProperty("customers", out var customers));
+            Assert.Equal(3, customers.GetArrayLength());
+
+            // Spot-check: first order preserves heterogeneous fields
+            var order1 = orders[0];
+            Assert.Equal("ORD-2024-00001", order1.GetProperty("order_id").GetString());
+            var items = order1.GetProperty("items");
+            Assert.Equal(3, items.GetArrayLength());
         }
         finally
         {

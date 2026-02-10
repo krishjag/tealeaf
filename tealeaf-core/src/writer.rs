@@ -452,6 +452,19 @@ impl Writer {
                     .find(|s| s.name == field_type.base)
                     .cloned();
 
+                // If elem type resolves to Struct but no schema exists (e.g., "any"
+                // pseudo-type from JSON inference), use heterogeneous encoding —
+                // the reader can't decode struct format without a schema.
+                if elem_tl_type == TLType::Struct && elem_schema.is_none() {
+                    buf.push(0xFF);
+                    for v in arr {
+                        let (d, t, _, _) = self.encode_value(v, None)?;
+                        buf.push(t as u8);
+                        buf.extend(d);
+                    }
+                    return Ok(buf);
+                }
+
                 // Write element type byte (standard array format)
                 buf.push(elem_tl_type as u8);
 

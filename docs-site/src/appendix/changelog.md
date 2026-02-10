@@ -6,13 +6,21 @@
 - **Recursive array schema inference in JSON import** — `from_json_with_schemas` now discovers schemas for arrays nested inside objects at arbitrary depth (e.g., `items[].product.stock[]`). Previously, `analyze_nested_objects` only recursed into nested objects but not nested arrays, causing deeply nested arrays to fall back to `[]any`. The CLI and derive-macro paths now produce equivalent schema coverage.
 - **Deterministic schema declaration order** — `analyze_array` and `analyze_nested_objects` now use single-pass field-order traversal (depth-first), matching the derive macro's field-declaration-order strategy. Previously, both functions made two separate passes (arrays first, then objects), causing schema declarations to appear in a different order than the derive/Builder API path. CLI and Builder API now produce byte-identical `.tl` output for the same data.
 
+### Bug Fixes
+- Fixed binary encoding corruption for `[]any` typed arrays — `encode_typed_value` incorrectly wrote `TLType::Struct` as the element type for the "any" pseudo-type (the `to_tl_type()` default for unknown names), causing the reader to interpret heterogeneous data as struct schema indices. Arrays with mixed element types inside schema-typed objects (e.g., `order.customer`, `order.payment`) now correctly use heterogeneous `0xFF` encoding when no matching schema exists.
+
 ### Tooling
 - Version sync scripts (`sync-version.ps1`, `sync-version.sh`) now regenerate the workflow diagram (`assets/tealeaf_workflow.png`) via `generate_workflow_diagram.py` on each version bump
 
 ### Testing
+- Added `json_any_array_binary_roundtrip` — focused regression test verifying `[]any` fields inside schema-typed structs survive binary compilation with full data integrity verification
+- Added `retail_orders_json_binary_roundtrip` — end-to-end test exercising JSON → infer schemas → compile → binary read with `retail_orders.json` (the exact path that was untested)
+- Added .NET `FromJson_HeterogeneousArrayInStruct_BinaryRoundTrips` — mirrors the Rust `[]any` regression test through the FFI layer
+- Strengthened .NET `FromJson_RetailOrdersFixture_CompileRoundTrips` — upgraded from string-contains check to structural JSON verification (10 orders, 4 products, 3 customers, spot-check order ID and item count)
 - Added `json_inference_nested_array_inside_object` — verifies arrays nested inside objects (e.g., `items[].product.stock[]`) get their own schema and typed array fields
 - Added `gen_retail_orders_api_tl` derive integration test — generates `.tl` from Rust DTOs via Builder API and confirms byte-identical output with CLI path
 - Added `examples/retail_orders_different_shape_cli.tl` and `retail_orders_different_shape_api.tl` comparison fixtures (2,395 bytes each, zero diff)
+- Moved `retail_orders_different_shape.rs` from `examples/` to `tealeaf-core/tests/fixtures/` to keep test dependencies within the crate boundary
 - Verified all 7 fuzz targets pass (~566K total runs, zero crashes)
 
 ---

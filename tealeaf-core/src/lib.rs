@@ -4188,6 +4188,99 @@ mod tests {
     }
 
     #[test]
+    fn json_any_array_binary_roundtrip() {
+        // Regression: []any fields (from JSON inference of heterogeneous arrays inside
+        // schema-typed objects) caused binary corruption. encode_typed_value wrote
+        // TLType::Struct as the element type for "any" (the to_tl_type default),
+        // but the actual data was heterogeneous. The reader then read garbage bytes
+        // as schema indices, crashing with "schema index N out of bounds".
+        use tempfile::NamedTempFile;
+
+        let json = r#"{
+            "events": [
+                {
+                    "id": "E1",
+                    "type": "sale",
+                    "data": ["SKU-100", 3, 29.99, true],
+                    "tags": ["flash", "online"]
+                },
+                {
+                    "id": "E2",
+                    "type": "return",
+                    "data": ["SKU-200", 1, 15.0, false],
+                    "tags": ["in-store"]
+                }
+            ]
+        }"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+
+        // Verify inference: "data" should be []any (heterogeneous), "tags" should be []string
+        let event_schema = doc.schemas.get("event").expect("missing 'event' schema");
+        let data_field = event_schema.fields.iter().find(|f| f.name == "data").unwrap();
+        assert!(data_field.field_type.is_array, "data should be array");
+        assert_eq!(data_field.field_type.base, "any", "data should be []any, got []{}", data_field.field_type.base);
+
+        // Compile to binary
+        let temp = NamedTempFile::new().unwrap();
+        doc.compile(temp.path(), false).expect("compile must not error");
+
+        // Read back and verify full data integrity
+        let reader = Reader::open(temp.path()).unwrap();
+        let events_val = reader.get("events").expect("missing 'events' key");
+        let events = events_val.as_array().expect("events should be array");
+        assert_eq!(events.len(), 2, "should have 2 events");
+
+        // Verify first event's heterogeneous data array
+        let e1 = events[0].as_object().expect("event should be object");
+        assert_eq!(e1.get("id").unwrap().as_str(), Some("E1"));
+        let data1 = e1.get("data").unwrap().as_array().expect("data should be array");
+        assert_eq!(data1.len(), 4);
+        assert_eq!(data1[0].as_str(), Some("SKU-100"));
+        assert_eq!(data1[2].as_float(), Some(29.99));
+    }
+
+    #[test]
+    fn retail_orders_json_binary_roundtrip() {
+        // End-to-end: retail_orders.json → infer schemas → compile → read → JSON
+        // Exercises the full path that was missing from the test suite: complex
+        // real-world JSON with heterogeneous arrays ([]any) inside schema-typed objects.
+        use tempfile::NamedTempFile;
+
+        let fixture = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/retail_orders.json");
+        let json = std::fs::read_to_string(&fixture)
+            .unwrap_or_else(|e| panic!("read fixture {}: {e}", fixture.display()));
+
+        let doc = TeaLeaf::from_json_with_schemas(&json).unwrap();
+        let temp = NamedTempFile::new().unwrap();
+        doc.compile(temp.path(), true).expect("compile retail_orders must not error");
+
+        // Read binary back to JSON and compare
+        let reader = Reader::open(temp.path()).unwrap();
+        let keys = reader.keys();
+        assert_eq!(keys.len(), 5, "expected 5 top-level keys, got {keys:?}");
+
+        // Verify all sections are readable and have correct element counts
+        let orders_val = reader.get("orders").unwrap();
+        let orders = orders_val.as_array().expect("orders");
+        assert_eq!(orders.len(), 10, "expected 10 orders");
+
+        let products_val = reader.get("products").unwrap();
+        let products = products_val.as_array().expect("products");
+        assert_eq!(products.len(), 4, "expected 4 products");
+
+        let customers_val = reader.get("customers").unwrap();
+        let customers = customers_val.as_array().expect("customers");
+        assert_eq!(customers.len(), 3, "expected 3 customers");
+
+        // Spot-check: first order preserves heterogeneous fields
+        let order1 = orders[0].as_object().expect("order should be object");
+        assert_eq!(order1.get("order_id").unwrap().as_str(), Some("ORD-2024-00001"));
+        let items = order1.get("items").unwrap().as_array().expect("items");
+        assert_eq!(items.len(), 3, "first order should have 3 items");
+    }
+
+    #[test]
     fn fuzz_repro_json_schema_bool_field_name() {
         // Fuzz crash: field named "bool" conflicts with type keyword
         let input = r#"[{"bool":{"b":2}}]"#;
