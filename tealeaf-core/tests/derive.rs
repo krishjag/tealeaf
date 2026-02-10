@@ -1574,3 +1574,21 @@ fn test_builder_schema_aware_table_output() {
     assert_eq!(stock.len(), 1);
     assert_eq!(stock[0].as_object().unwrap().get("warehouse").unwrap().as_str(), Some("W1"));
 }
+
+#[path = "fixtures/retail_orders_different_shape.rs"]
+mod retail_data;
+
+#[test]
+fn gen_retail_orders_api_tl() {
+    let orders = retail_data::sample_orders();
+    let doc = TeaLeafBuilder::new()
+        .add_vec("orders", &orders)
+        .build();
+    let tl = doc.to_tl_with_schemas();
+    let out_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent().unwrap()
+        .join("examples/retail_orders_different_shape_api.tl");
+    std::fs::write(&out_path, &tl).unwrap();
+    eprintln!("Wrote {} bytes to {}", tl.len(), out_path.display());
+}
+

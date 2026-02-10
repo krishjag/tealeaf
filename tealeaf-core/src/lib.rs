@@ -1071,43 +1071,45 @@ impl SchemaInferrer {
             return;
         }
 
-        // First, recursively analyze nested arrays and objects to create their schemas
-        for item in arr {
-            if let Value::Object(obj) = item {
-                for (field_name, field_val) in obj {
-                    if let Value::Array(nested) = field_val {
+        // Recursively analyze nested fields in field order (depth-first).
+        // Single pass processes arrays and objects as encountered, matching
+        // the derive path's field-declaration-order traversal.
+        for field_name in &field_names {
+            // Check the first object's value for this field
+            if let Value::Object(first_obj) = &arr[0] {
+                match first_obj.get(field_name) {
+                    Some(Value::Array(nested)) => {
+                        // Arrays are always analyzed — same-name recursion
+                        // (e.g., nodes[].nodes[]) is safe because depth-first
+                        // ensures the inner schema is created first.
                         self.analyze_array(field_name, nested);
                     }
-                }
-                break;  // Only need to process first object for nested arrays
-            }
-        }
+                    Some(Value::Object(_)) => {
+                        // Skip object fields whose singularized name collides
+                        // with this array's schema name — prevents
+                        // self-referencing schemas (e.g., @struct root (root: root)).
+                        if singularize(field_name) == schema_name {
+                            continue;
+                        }
 
-        // Analyze nested object fields - collect all non-null objects for each field
-        // and create schemas if they're uniform across all array items.
-        // Skip fields whose singularized name collides with this array's schema
-        // name — otherwise the inner schema would be overwritten and a
-        // self-referencing field type created (e.g., @struct root (root: root)).
-        for field_name in &field_names {
-            if singularize(field_name) == schema_name {
-                continue;
-            }
+                        let nested_objects: Vec<&IndexMap<String, Value>> = arr
+                            .iter()
+                            .filter_map(|item| {
+                                if let Value::Object(obj) = item {
+                                    if let Some(Value::Object(nested)) = obj.get(field_name) {
+                                        return Some(nested);
+                                    }
+                                }
+                                None
+                            })
+                            .collect();
 
-            let nested_objects: Vec<&IndexMap<String, Value>> = arr
-                .iter()
-                .filter_map(|item| {
-                    if let Value::Object(obj) = item {
-                        if let Some(Value::Object(nested)) = obj.get(field_name) {
-                            return Some(nested);
+                        if !nested_objects.is_empty() {
+                            self.analyze_nested_objects(field_name, &nested_objects);
                         }
                     }
-                    None
-                })
-                .collect();
-
-            // If we found at least one object, check if they're uniform
-            if !nested_objects.is_empty() {
-                self.analyze_nested_objects(field_name, &nested_objects);
+                    _ => {}
+                }
             }
         }
 
@@ -1225,31 +1227,27 @@ impl SchemaInferrer {
             }
         }
 
-        // Recursively analyze nested arrays within these objects.
-        // This mirrors what analyze_array does for its direct children — without
-        // this, arrays-inside-objects (e.g., product.stock[]) never get schemas.
+        // Recursively analyze nested fields in field order (depth-first).
+        // Single pass mirrors the derive path's field-declaration-order traversal,
+        // so CLI and Builder API produce schemas in the same order.
         for nested_field in &nested_field_names {
-            // Collect array values for this field from the first object that has one
             if let Some(Value::Array(nested_arr)) = objects[0].get(nested_field) {
                 self.analyze_array(nested_field, nested_arr);
-            }
-        }
+            } else {
+                let deeper_objects: Vec<&IndexMap<String, Value>> = objects
+                    .iter()
+                    .filter_map(|obj| {
+                        if let Some(Value::Object(nested)) = obj.get(nested_field) {
+                            Some(nested)
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
 
-        // Recursively analyze nested objects within these objects
-        for nested_field in &nested_field_names {
-            let deeper_objects: Vec<&IndexMap<String, Value>> = objects
-                .iter()
-                .filter_map(|obj| {
-                    if let Some(Value::Object(nested)) = obj.get(nested_field) {
-                        Some(nested)
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-
-            if !deeper_objects.is_empty() {
-                self.analyze_nested_objects(nested_field, &deeper_objects);
+                if !deeper_objects.is_empty() {
+                    self.analyze_nested_objects(nested_field, &deeper_objects);
+                }
             }
         }
 

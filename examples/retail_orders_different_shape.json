@@ -1,0 +1,202 @@
+{
+  "orders": [
+    {
+      "order_id": "ORD-2025-00847",
+      "status": "shipped",
+      "placed_at": "2025-06-14T09:23:17Z",
+      "shipped_at": "2025-06-15T14:02:00Z",
+      "customer_id": "CUST-30291",
+      "customer_email": "marcus.chen@gmail.com",
+      "shipping": {
+        "name": "Marcus Chen",
+        "street": "4521 Olive Branch Ln",
+        "city": "Portland",
+        "state": "OR",
+        "zip": "97201",
+        "country": "US"
+      },
+      "items": [
+        {
+          "line_number": 1,
+          "product": {
+            "id": "PROD-7841",
+            "name": "Sony WH-1000XM5 Wireless Headphones",
+            "sku": "SNY-WH1000XM5-BLK",
+            "category": "Electronics/Audio",
+            "brand": "Sony",
+            "price": {
+              "base_price": 399.99,
+              "discount_pct": 15.0,
+              "currency": "USD",
+              "tax_rate": 8.25
+            },
+            "stock": [
+              {
+                "warehouse": "US-WEST-01",
+                "qty_available": 342,
+                "reorder_level": 50,
+                "backordered": false
+              },
+              {
+                "warehouse": "US-EAST-02",
+                "qty_available": 189,
+                "reorder_level": 50,
+                "backordered": false
+              }
+            ]
+          },
+          "quantity": 1,
+          "unit_price": 339.99,
+          "line_total": 339.99,
+          "notes": "Gift wrap requested"
+        },
+        {
+          "line_number": 2,
+          "product": {
+            "id": "PROD-2156",
+            "name": "Anker USB-C to Lightning Cable 6ft",
+            "sku": "ANK-USBC-LTN-6FT",
+            "category": "Electronics/Accessories",
+            "brand": "Anker",
+            "price": {
+              "base_price": 15.99,
+              "discount_pct": null,
+              "currency": "USD",
+              "tax_rate": 8.25
+            },
+            "stock": [
+              {
+                "warehouse": "US-WEST-01",
+                "qty_available": 2841,
+                "reorder_level": 500,
+                "backordered": false
+              }
+            ]
+          },
+          "quantity": 2,
+          "unit_price": 15.99,
+          "line_total": 31.98,
+          "notes": null
+        }
+      ],
+      "subtotal": 371.97,
+      "tax": 30.69,
+      "shipping_cost": 0.0,
+      "total": 402.66,
+      "payment_method": "visa_ending_4242"
+    },
+    {
+      "order_id": "ORD-2025-00848",
+      "status": "processing",
+      "placed_at": "2025-06-14T11:47:53Z",
+      "shipped_at": null,
+      "customer_id": "CUST-18774",
+      "customer_email": "sofia.r@outlook.com",
+      "shipping": {
+        "name": "Sofia Ramirez",
+        "street": "88 Beacon St Apt 3F",
+        "city": "Boston",
+        "state": "MA",
+        "zip": "02108",
+        "country": "US"
+      },
+      "items": [
+        {
+          "line_number": 1,
+          "product": {
+            "id": "PROD-9034",
+            "name": "Patagonia Better Sweater Jacket - Navy L",
+            "sku": "PAT-BSWEATER-NVY-L",
+            "category": "Apparel/Outerwear",
+            "brand": "Patagonia",
+            "price": {
+              "base_price": 149.0,
+              "discount_pct": 20.0,
+              "currency": "USD",
+              "tax_rate": 9.5
+            },
+            "stock": [
+              {
+                "warehouse": "US-WEST-01",
+                "qty_available": 23,
+                "reorder_level": 30,
+                "backordered": false
+              },
+              {
+                "warehouse": "US-EAST-02",
+                "qty_available": 0,
+                "reorder_level": 30,
+                "backordered": true
+              }
+            ]
+          },
+          "quantity": 1,
+          "unit_price": 119.2,
+          "line_total": 119.2,
+          "notes": null
+        },
+        {
+          "line_number": 2,
+          "product": {
+            "id": "PROD-5512",
+            "name": "Chemex 8-Cup Pour-Over Coffee Maker",
+            "sku": "CHX-POUROVER-8CUP",
+            "category": "Home/Kitchen",
+            "brand": "Chemex",
+            "price": {
+              "base_price": 44.95,
+              "discount_pct": null,
+              "currency": "USD",
+              "tax_rate": 8.25
+            },
+            "stock": [
+              {
+                "warehouse": "US-EAST-02",
+                "qty_available": 567,
+                "reorder_level": 100,
+                "backordered": false
+              }
+            ]
+          },
+          "quantity": 1,
+          "unit_price": 44.95,
+          "line_total": 44.95,
+          "notes": "Include Chemex filters sample pack"
+        },
+        {
+          "line_number": 3,
+          "product": {
+            "id": "PROD-2156",
+            "name": "Anker USB-C to Lightning Cable 6ft",
+            "sku": "ANK-USBC-LTN-6FT",
+            "category": "Electronics/Accessories",
+            "brand": "Anker",
+            "price": {
+              "base_price": 15.99,
+              "discount_pct": null,
+              "currency": "USD",
+              "tax_rate": 8.25
+            },
+            "stock": [
+              {
+                "warehouse": "US-WEST-01",
+                "qty_available": 2841,
+                "reorder_level": 500,
+                "backordered": false
+              }
+            ]
+          },
+          "quantity": 3,
+          "unit_price": 15.99,
+          "line_total": 47.97,
+          "notes": null
+        }
+      ],
+      "subtotal": 212.12,
+      "tax": 18.9,
+      "shipping_cost": 7.99,
+      "total": 239.01,
+      "payment_method": "paypal_sofia.r@outlook.com"
+    }
+  ]
+}
