@@ -1225,6 +1225,16 @@ impl SchemaInferrer {
             }
         }
 
+        // Recursively analyze nested arrays within these objects.
+        // This mirrors what analyze_array does for its direct children — without
+        // this, arrays-inside-objects (e.g., product.stock[]) never get schemas.
+        for nested_field in &nested_field_names {
+            // Collect array values for this field from the first object that has one
+            if let Some(Value::Array(nested_arr)) = objects[0].get(nested_field) {
+                self.analyze_array(nested_field, nested_arr);
+            }
+        }
+
         // Recursively analyze nested objects within these objects
         for nested_field in &nested_field_names {
             let deeper_objects: Vec<&IndexMap<String, Value>> = objects
@@ -1254,7 +1264,23 @@ impl SchemaInferrer {
                     field_type.nullable = true;
                 }
 
-                // Check if this field has a nested schema
+                // Check if this field has a nested array schema
+                if matches!(inferred, InferredType::Array(_)) {
+                    if let Some(Value::Array(nested_arr)) = objects[0].get(nested_field) {
+                        let nested_schema_name = singularize(nested_field);
+                        if let Some(nested_schema) = self.schemas.get(&nested_schema_name) {
+                            if array_matches_schema(nested_arr, nested_schema) {
+                                field_type = FieldType {
+                                    base: nested_schema_name,
+                                    nullable: field_type.nullable,
+                                    is_array: true,
+                                };
+                            }
+                        }
+                    }
+                }
+
+                // Check if this field has a nested object schema
                 if let Some(nested_schema) = self.schemas.get(&singularize(nested_field)) {
                     if matches!(inferred, InferredType::Object(_)) {
                         field_type = FieldType::new(nested_schema.name.clone());
@@ -4766,6 +4792,63 @@ root: @table root [
 
         let reparsed = TeaLeaf::parse(&tl_text)
             .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    #[test]
+    fn json_inference_nested_array_inside_object() {
+        // JSON inference must discover array schemas inside nested objects.
+        // e.g., items[].product.stock[] should get its own @struct stock schema,
+        // not fall back to []any.
+        let input = r#"{
+          "items": [
+            {
+              "name": "Widget",
+              "product": {
+                "id": "P-1",
+                "stock": [
+                  {"warehouse": "W1", "qty": 100, "backordered": false},
+                  {"warehouse": "W2", "qty": 50, "backordered": true}
+                ]
+              }
+            },
+            {
+              "name": "Gadget",
+              "product": {
+                "id": "P-2",
+                "stock": [
+                  {"warehouse": "W1", "qty": 200, "backordered": false}
+                ]
+              }
+            }
+          ]
+        }"#;
+
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        let tl_text = tl.to_tl_with_schemas();
+
+        // Must have a "stock" schema (from singularize("stock") = "stock")
+        assert!(tl.schemas.contains_key("stock"),
+            "Missing 'stock' schema. Schemas: {:?}\nTL:\n{tl_text}",
+            tl.schemas.keys().collect::<Vec<_>>());
+
+        // The product schema must reference stock[] not []any
+        let product_schema = tl.schemas.get("product").expect("missing product schema");
+        let stock_field = product_schema.fields.iter().find(|f| f.name == "stock")
+            .expect("product schema missing stock field");
+        assert!(stock_field.field_type.is_array, "stock should be array");
+        assert_eq!(stock_field.field_type.base, "stock",
+            "stock field type should be 'stock', got '{}'", stock_field.field_type.base);
+
+        // Must produce @table for items and tuples for stock inside product
+        assert!(tl_text.contains("@table item"), "Missing @table item:\n{tl_text}");
+
+        // Round-trip: parse back and verify data integrity
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL:\n{tl_text}"));
         for (key, orig_val) in &tl.data {
             let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
             assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
