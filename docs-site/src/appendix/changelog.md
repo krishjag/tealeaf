@@ -5,6 +5,9 @@
 ### Bug Fixes
 - Fixed binary encoding crash when compiling JSON with heterogeneous nested objects — `from_json_with_schemas` infers `any` pseudo-type for fields whose nested objects have varying shapes; the binary encoder now falls back to generic encoding instead of erroring with "schema-typed field 'any' requires a schema"
 - Fixed parser failing to resolve schema names that shadow built-in type keywords — schemas named `bool`, `int`, `string`, etc. now correctly resolve via LParen lookahead disambiguation (struct tuples always start with `(`, primitives never do)
+- Fixed `singularize()` producing empty string for single-character field names (e.g., `"s"` → `""`) — caused `@struct` definitions with missing names and unparseable TL text output
+- Fixed schema inference name collision when a field singularizes to the same name as its parent array's schema — prevented self-referencing schemas (e.g., `@struct root (root: root)`) and data loss during round-trip (found via fuzzing)
+- Fixed `@table` serializer applying wrong schema when the same field name appears at multiple nesting levels with different object shapes — serializer now validates schema fields match the actual object keys before using positional tuple encoding
 - Fixed `validate_tokens.py` token comparison by converting API input to `int` for safety
 
 ### .NET

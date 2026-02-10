@@ -943,7 +943,7 @@ fn singularize(name: &str) -> String {
         format!("{}y", &name[..name.len()-3])
     } else if name.ends_with("es") && (name.ends_with("sses") || name.ends_with("xes") || name.ends_with("ches") || name.ends_with("shes")) {
         name[..name.len()-2].to_string()
-    } else if name.ends_with('s') && !name.ends_with("ss") {
+    } else if name.len() > 1 && name.ends_with('s') && !name.ends_with("ss") {
         name[..name.len()-1].to_string()
     } else {
         name
@@ -1084,8 +1084,15 @@ impl SchemaInferrer {
         }
 
         // Analyze nested object fields - collect all non-null objects for each field
-        // and create schemas if they're uniform across all array items
+        // and create schemas if they're uniform across all array items.
+        // Skip fields whose singularized name collides with this array's schema
+        // name — otherwise the inner schema would be overwritten and a
+        // self-referencing field type created (e.g., @struct root (root: root)).
         for field_name in &field_names {
+            if singularize(field_name) == schema_name {
+                continue;
+            }
+
             let nested_objects: Vec<&IndexMap<String, Value>> = arr
                 .iter()
                 .filter_map(|item| {
@@ -1102,6 +1109,15 @@ impl SchemaInferrer {
             if !nested_objects.is_empty() {
                 self.analyze_nested_objects(field_name, &nested_objects);
             }
+        }
+
+        // Re-check: recursive nested analysis (both arrays and objects) may have
+        // claimed this schema name. This happens when the same field name appears
+        // at multiple nesting levels (e.g., "nodes" containing "nodes"). The inner
+        // schema was created first (depth-first); preserve it to avoid overwriting
+        // with a different structure.
+        if self.schemas.contains_key(&schema_name) {
+            return;
         }
 
         // Build schema
@@ -1135,8 +1151,9 @@ impl SchemaInferrer {
                 }
 
                 // Check if there's a nested schema for object fields
+                // (skip self-references: field singularizing to the schema being built)
                 let nested_schema_name = singularize(field_name);
-                if self.schemas.contains_key(&nested_schema_name) {
+                if nested_schema_name != schema_name && self.schemas.contains_key(&nested_schema_name) {
                     if matches!(inferred, InferredType::Object(_)) {
                         field_type = FieldType {
                             base: nested_schema_name,
@@ -1373,8 +1390,19 @@ fn write_value_with_schemas(
             let schema = schema_name.as_ref().and_then(|n| schemas.get(n));
 
             if let Some(schema) = schema {
-                // Check if first element is an object matching the schema
-                if let Some(Value::Object(_)) = arr.first() {
+                // Verify the first element is an object whose fields match the schema.
+                // A name-only lookup isn't enough — if the same field name appears at
+                // multiple nesting levels with different shapes, the schema may belong
+                // to a different level. Applying the wrong schema drops unmatched keys.
+                let schema_matches = if let Some(Value::Object(first_obj)) = arr.first() {
+                    let schema_fields: HashSet<&str> = schema.fields.iter().map(|f| f.name.as_str()).collect();
+                    let obj_keys: HashSet<&str> = first_obj.keys().map(|k| k.as_str()).collect();
+                    schema_fields == obj_keys
+                } else {
+                    false
+                };
+
+                if schema_matches {
                     out.push_str("@table ");
                     out.push_str(&schema.name);
                     out.push_str(" [\n");
@@ -4351,4 +4379,327 @@ root: @table root [
         }
     }
 
+
+    /// Fuzz crash: singularize("s") → "" (empty string), producing invalid
+    /// @struct definitions with missing names.
+    #[test]
+    fn fuzz_repro_singularize_single_char_s() {
+        let input = r#"[{"s":{"b":1}}]"#;
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        let tl_text = tl.to_tl_with_schemas();
+
+        // Schema name must not be empty — singularize("s") should return "s"
+        assert!(
+            tl_text.contains("@struct s"),
+            "expected @struct s in TL text:\n{tl_text}"
+        );
+
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        assert_eq!(tl.data.len(), reparsed.data.len(), "key count mismatch");
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    #[test]
+    fn singularize_does_not_produce_empty_string() {
+        // All single-character inputs must pass through unchanged
+        for c in 'a'..='z' {
+            let s = String::from(c);
+            let result = super::singularize(&s);
+            assert!(!result.is_empty(), "singularize({s:?}) produced empty string");
+            assert_eq!(result, s, "singularize({s:?}) should return {s:?}, got {result:?}");
+        }
+    }
+
+    /// Fuzz crash: field name with dots causes value mismatch on roundtrip
+    #[test]
+    fn fuzz_repro_dots_in_field_name() {
+        // Fuzz regression: field "root" inside root-array wrapper both singularize to "root",
+        // causing analyze_nested_objects to create a correct inner schema that analyze_array
+        // then overwrites with a self-referencing @struct root (root: root).
+        let input = r#"[{"root":{"Z.lll.i0...A":44444440.0}}]"#;
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        let tl_text = tl.to_tl_with_schemas();
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        assert_eq!(tl.data.len(), reparsed.data.len(), "key count mismatch");
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    #[test]
+    fn schema_name_collision_field_matches_parent() {
+        // When an array field name singularizes to the same name as its parent schema,
+        // the inner schema should be preserved (not overwritten with a self-reference).
+        // This tests the general case, not just the root-array wrapper collision.
+        let input = r#"{"items": [{"items": {"a": 1, "b": 2}}]}"#;
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        let tl_text = tl.to_tl_with_schemas();
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    #[test]
+    fn analyze_node_nesting_stress_test() {
+        // Stress test: "node" appears at many nesting levels with different shapes.
+        // Schema inference should NOT create conflicting schemas or lose data.
+        let input = r#"{
+          "node": {
+            "id": 1,
+            "name": "root",
+            "active": true,
+            "node": {
+              "id": "child-1",
+              "metrics": {
+                "node": {
+                  "value": 42.7,
+                  "unit": "ms",
+                  "thresholds": [10, 20, 30]
+                }
+              },
+              "node": [
+                {
+                  "id": 2,
+                  "enabled": false
+                },
+                {
+                  "id": 3,
+                  "enabled": "sometimes",
+                  "node": {
+                    "status": null,
+                    "confidence": 0.93
+                  }
+                }
+              ]
+            }
+          },
+          "nodeMetadata": {
+            "node": {
+              "version": 5,
+              "checksum": "a94a8fe5ccb19ba61c4c0873d391e987",
+              "flags": {
+                "node": true
+              }
+            }
+          }
+        }"#;
+
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        eprintln!("=== schemas ({}) ===", tl.schemas.len());
+        for (name, schema) in &tl.schemas {
+            let fields: Vec<String> = schema.fields.iter()
+                .map(|f| format!("{}: {}{}{}", f.name, f.field_type.base,
+                    if f.field_type.is_array { "[]" } else { "" },
+                    if f.field_type.nullable { "?" } else { "" }))
+                .collect();
+            eprintln!("  @struct {name} ({})", fields.join(", "));
+        }
+        let tl_text = tl.to_tl_with_schemas();
+        eprintln!("=== TL text ===\n{tl_text}");
+
+        // Core correctness check: round-trip must preserve all data
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    #[test]
+    fn schema_collision_recursive_arrays() {
+        // "nodes" appears as arrays at two levels with different shapes.
+        // Inner: [{name, value}], Outer: [{name, nodes}]
+        // Both singularize to "node" — only one schema can exist.
+        let input = r#"{
+          "nodes": [
+            {
+              "name": "parent",
+              "nodes": [
+                {"name": "child", "value": 42}
+              ]
+            }
+          ]
+        }"#;
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        eprintln!("=== schemas ({}) ===", tl.schemas.len());
+        for (name, schema) in &tl.schemas {
+            let fields: Vec<String> = schema.fields.iter()
+                .map(|f| format!("{}: {}{}{}", f.name, f.field_type.base,
+                    if f.field_type.is_array { "[]" } else { "" },
+                    if f.field_type.nullable { "?" } else { "" }))
+                .collect();
+            eprintln!("  @struct {name} ({})", fields.join(", "));
+        }
+        let tl_text = tl.to_tl_with_schemas();
+        eprintln!("=== TL text ===\n{tl_text}");
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    #[test]
+    fn schema_collision_recursive_same_shape() {
+        // "nodes" appears at two levels but SAME shape [{id, name}].
+        // Schema "node" created for inner array should also work for outer.
+        let input = r#"{
+          "nodes": [
+            {
+              "id": 1,
+              "name": "parent",
+              "children": [
+                {"id": 10, "name": "child-a"},
+                {"id": 11, "name": "child-b"}
+              ]
+            },
+            {
+              "id": 2,
+              "name": "sibling",
+              "children": [
+                {"id": 20, "name": "child-c"}
+              ]
+            }
+          ]
+        }"#;
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        eprintln!("=== schemas ({}) ===", tl.schemas.len());
+        for (name, schema) in &tl.schemas {
+            let fields: Vec<String> = schema.fields.iter()
+                .map(|f| format!("{}: {}{}{}", f.name, f.field_type.base,
+                    if f.field_type.is_array { "[]" } else { "" },
+                    if f.field_type.nullable { "?" } else { "" }))
+                .collect();
+            eprintln!("  @struct {name} ({})", fields.join(", "));
+        }
+        let tl_text = tl.to_tl_with_schemas();
+        eprintln!("=== TL text ===\n{tl_text}");
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    #[test]
+    fn schema_collision_three_level_nesting() {
+        // "nodes" at 3 levels: L1 and L2 have same shape {name, nodes},
+        // L3 has different shape {name, score}. All singularize to "node".
+        // The deepest schema wins (depth-first); outer levels fall back to
+        // generic format. No data loss at any level.
+        let input = r#"{
+          "nodes": [
+            {
+              "name": "grandparent",
+              "nodes": [
+                {
+                  "name": "parent",
+                  "nodes": [
+                    {"name": "leaf-a", "score": 99.5},
+                    {"name": "leaf-b", "score": 42.0}
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "uncle",
+              "nodes": [
+                {
+                  "name": "cousin",
+                  "nodes": [
+                    {"name": "leaf-c", "score": 77.3}
+                  ]
+                }
+              ]
+            }
+          ]
+        }"#;
+
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        eprintln!("=== schemas ({}) ===", tl.schemas.len());
+        for (name, schema) in &tl.schemas {
+            let fields: Vec<String> = schema.fields.iter()
+                .map(|f| format!("{}: {}{}{}", f.name, f.field_type.base,
+                    if f.field_type.is_array { "[]" } else { "" },
+                    if f.field_type.nullable { "?" } else { "" }))
+                .collect();
+            eprintln!("  @struct {name} ({})", fields.join(", "));
+        }
+        let tl_text = tl.to_tl_with_schemas();
+        eprintln!("=== TL text ===\n{tl_text}");
+
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    #[test]
+    fn schema_collision_three_level_divergent_leaves() {
+        // L1: [{name, nodes}], L2: [{name, nodes}] (same shape),
+        // L3: [{id, value}] in one branch, [{identifier, points}] in another.
+        // The depth-first analysis only sees the first branch's L3 shape.
+        // The second branch's L3 must fall back to generic format.
+        let input = r#"{
+          "nodes": [
+            {
+              "name": "grandparent",
+              "nodes": [
+                {
+                  "name": "parent",
+                  "nodes": [
+                    {"id": "leaf-a", "value": 99.5},
+                    {"id": "leaf-b", "value": 42.0}
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "uncle",
+              "nodes": [
+                {
+                  "name": "cousin",
+                  "nodes": [
+                    {"identifier": "leaf-c", "points": 77.3}
+                  ]
+                }
+              ]
+            }
+          ]
+        }"#;
+
+        let tl = TeaLeaf::from_json_with_schemas(input).unwrap();
+        eprintln!("=== schemas ({}) ===", tl.schemas.len());
+        for (name, schema) in &tl.schemas {
+            let fields: Vec<String> = schema.fields.iter()
+                .map(|f| format!("{}: {}{}{}", f.name, f.field_type.base,
+                    if f.field_type.is_array { "[]" } else { "" },
+                    if f.field_type.nullable { "?" } else { "" }))
+                .collect();
+            eprintln!("  @struct {name} ({})", fields.join(", "));
+        }
+        let tl_text = tl.to_tl_with_schemas();
+        eprintln!("=== TL text ===\n{tl_text}");
+
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
+        for (key, orig_val) in &tl.data {
+            let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
+            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
 }
