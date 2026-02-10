@@ -1,6 +1,6 @@
 /*
  * TeaLeaf FFI - C bindings for the TeaLeaf format library
- * Version: 2.0.0-beta.7 (Request for Comments)
+ * Version: 2.0.0-beta.8 (Request for Comments)
  *
  * This header provides a C-compatible API for parsing and manipulating
  * TeaLeaf documents from languages like C# via FFI.

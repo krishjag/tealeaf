@@ -1,6 +1,19 @@
 # Changelog
 
-## v2.0.0-beta.7 (Current)
+## v2.0.0-beta.8 (Current)
+
+### .NET
+- **XML documentation in NuGet packages** — `TeaLeaf` and `TeaLeaf.Annotations` packages now include XML doc files (`TeaLeaf.xml`, `TeaLeaf.Annotations.xml`) for all target frameworks. Consumers get IntelliSense tooltips for all public APIs. Previously, `GenerateDocumentationFile` was not enabled and the `.xml` files were absent from the `.nupkg`.
+- Added XML doc comments to all undocumented public members: `TLType` enum values (13), `TLDocument.ToString`/`Dispose`, `TLReader.Dispose`, `TLField.ToString`, `TLSchema.ToString`, `TLException` constructors (3)
+- Enabled `TreatWarningsAsErrors` for `TeaLeaf` and `TeaLeaf.Annotations` — missing XML docs or other warnings are now compile errors, preventing regressions
+
+### Testing
+- Added `ToJson_PreservesSpecialCharacters_NoUnicodeEscaping` — verifies `+`, `<`, `>`, `'` survive binary round-trip without Unicode escaping in both `ToJson()` and `ToJsonCompact()` paths
+- Added `ToJson_PreservesFloatDecimalPoint_WholeNumbers` — verifies whole-number floats (`99.0`, `150.0`, `0.0`) retain `.0` suffix and non-whole floats (`4.5`, `3.75`) preserve decimal digits
+
+---
+
+## v2.0.0-beta.7
 
 ### .NET
 - Fixed `TLReader.ToJson()` escaping non-ASCII-safe characters — `+` in phone numbers rendered as `\u002B`, `<`/`>` as `\u003C`/`\u003E`, etc. `System.Text.Json`'s default `JavaScriptEncoder.Default` HTML-encodes these characters for XSS safety, which is inappropriate for a data serialization library. All three JSON serialization methods (`ToJson`, `ToJsonCompact`, `GetAsJson`) now use `JavaScriptEncoder.UnsafeRelaxedJsonEscaping` via shared `static readonly` options.
