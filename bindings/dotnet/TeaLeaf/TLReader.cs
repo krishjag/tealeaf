@@ -269,7 +269,7 @@ public sealed class TLReader : IDisposable
             TLType.Bool => JsonValue.Create(value.AsBool()),
             TLType.Int => JsonValue.Create(value.AsInt()),
             TLType.UInt => JsonValue.Create(value.AsUInt()),
-            TLType.Float => JsonValue.Create(value.AsFloat()),
+            TLType.Float => FloatToJsonNode(value.AsFloat()),
             TLType.String => JsonValue.Create(value.AsString()),
             TLType.Bytes => JsonValue.Create(BytesToHexString(value)),
             TLType.Timestamp => JsonValue.Create(TimestampToIso8601(value.AsTimestamp())),
@@ -280,6 +280,19 @@ public sealed class TLReader : IDisposable
             TLType.Tagged => TaggedToJsonObject(value),
             _ => null
         };
+    }
+
+    private static JsonNode? FloatToJsonNode(double? f)
+    {
+        if (!f.HasValue) return null;
+        var v = f.Value;
+        if (double.IsNaN(v) || double.IsInfinity(v))
+            return null;
+        // Whole-number doubles: preserve ".0" to match source JSON formatting
+        // (System.Text.Json's JsonValue.Create(double) drops it, e.g. 3582.0 → 3582)
+        if (v == Math.Truncate(v))
+            return JsonNode.Parse(v.ToString("F1"));
+        return JsonValue.Create(v);
     }
 
     private static string? BytesToHexString(TLValue value)

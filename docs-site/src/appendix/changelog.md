@@ -1,6 +1,14 @@
 # Changelog
 
-## v2.0.0-beta.6 (Current)
+## v2.0.0-beta.7 (Current)
+
+### .NET
+- Fixed `TLReader.ToJson()` escaping non-ASCII-safe characters — `+` in phone numbers rendered as `\u002B`, `<`/`>` as `\u003C`/`\u003E`, etc. `System.Text.Json`'s default `JavaScriptEncoder.Default` HTML-encodes these characters for XSS safety, which is inappropriate for a data serialization library. All three JSON serialization methods (`ToJson`, `ToJsonCompact`, `GetAsJson`) now use `JavaScriptEncoder.UnsafeRelaxedJsonEscaping` via shared `static readonly` options.
+- Fixed `TLReader.ToJson()` dropping `.0` suffix from whole-number floats — `3582.0` in source JSON became `3582` after binary round-trip because `System.Text.Json`'s `JsonValue.Create(double)` strips trailing `.0`. Added `FloatToJsonNode` helper that uses `F1` formatting for whole-number doubles, preserving formatting fidelity with the Rust CLI path.
+
+---
+
+## v2.0.0-beta.6
 
 ### Features
 - **Recursive array schema inference in JSON import** — `from_json_with_schemas` now discovers schemas for arrays nested inside objects at arbitrary depth (e.g., `items[].product.stock[]`). Previously, `analyze_nested_objects` only recursed into nested objects but not nested arrays, causing deeply nested arrays to fall back to `[]any`. The CLI and derive-macro paths now produce equivalent schema coverage.

@@ -942,6 +942,112 @@ public class TLReaderTests
         }
     }
 
+    [Fact]
+    public void ToJson_PreservesSpecialCharacters_NoUnicodeEscaping()
+    {
+        // Regression: System.Text.Json's default JavaScriptEncoder.Default HTML-encodes
+        // characters like + (U+002B) as \u002B, < as \u003C, > as \u003E, etc.
+        // TLReader.ToJson() must use UnsafeRelaxedJsonEscaping for data fidelity.
+        var tlbxPath = Path.Combine(_tempDir, "test_special_chars.tlbx");
+
+        try
+        {
+            const string json = @"{
+                ""contacts"": [
+                    { ""name"": ""Alice"", ""phone"": ""+1-555-123-4567"" },
+                    { ""name"": ""Bob"", ""email"": ""bob@example.com"" }
+                ],
+                ""note"": ""x < y && y > z"",
+                ""tag"": ""it's a 'test'""
+            }";
+
+            using (var doc = TLDocument.FromJson(json))
+            {
+                doc.Compile(tlbxPath);
+            }
+
+            using var reader = TLReader.Open(tlbxPath);
+            var resultJson = reader.ToJson();
+
+            // + must not be escaped
+            Assert.Contains("+1-555-123-4567", resultJson);
+            Assert.DoesNotContain("\\u002B", resultJson);
+
+            // < and > must not be escaped
+            Assert.Contains("x < y", resultJson);
+            Assert.DoesNotContain("\\u003C", resultJson);
+
+            // Single quotes must not be escaped
+            Assert.Contains("it's a 'test'", resultJson);
+            Assert.DoesNotContain("\\u0027", resultJson);
+
+            // Also verify compact path
+            var compactJson = reader.ToJsonCompact();
+            Assert.Contains("+1-555-123-4567", compactJson);
+            Assert.DoesNotContain("\\u002B", compactJson);
+        }
+        finally
+        {
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
+        }
+    }
+
+    [Fact]
+    public void ToJson_PreservesFloatDecimalPoint_WholeNumbers()
+    {
+        // Regression: System.Text.Json's JsonValue.Create(double) serializes 3582.0
+        // as 3582 (dropping .0). TLReader.ToJson() must preserve the decimal for
+        // whole-number floats to match source JSON and Rust CLI output.
+        var tlbxPath = Path.Combine(_tempDir, "test_float_decimal.tlbx");
+
+        try
+        {
+            const string json = @"{
+                ""products"": [
+                    { ""name"": ""Widget A"", ""price"": 99.0, ""rating"": 4.5 },
+                    { ""name"": ""Widget B"", ""price"": 150.0, ""rating"": 3.75 },
+                    { ""name"": ""Widget C"", ""price"": 0.0, ""rating"": 5.0 }
+                ]
+            }";
+
+            using (var doc = TLDocument.FromJson(json))
+            {
+                doc.Compile(tlbxPath);
+            }
+
+            using var reader = TLReader.Open(tlbxPath);
+            var resultJson = reader.ToJson();
+            using var jsonDoc = JsonDocument.Parse(resultJson);
+            var root = jsonDoc.RootElement;
+
+            var products = root.GetProperty("products");
+            var p1 = products[0];
+            var p2 = products[1];
+            var p3 = products[2];
+
+            // Whole-number floats must retain .0 in raw JSON text
+            Assert.Contains("99.0", resultJson);
+            Assert.Contains("150.0", resultJson);
+            Assert.Contains("0.0", resultJson);
+            Assert.Contains("5.0", resultJson);
+
+            // Non-whole floats must preserve their decimal digits
+            Assert.Equal(4.5, p1.GetProperty("rating").GetDouble());
+            Assert.Equal(3.75, p2.GetProperty("rating").GetDouble());
+
+            // Values must still parse as correct doubles
+            Assert.Equal(99.0, p1.GetProperty("price").GetDouble());
+            Assert.Equal(150.0, p2.GetProperty("price").GetDouble());
+            Assert.Equal(0.0, p3.GetProperty("price").GetDouble());
+        }
+        finally
+        {
+            if (File.Exists(tlbxPath))
+                File.Delete(tlbxPath);
+        }
+    }
+
     // ==========================================================================
     // Fixture-Based Tests (for types that can't be created from text)
     // ==========================================================================
