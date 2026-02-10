@@ -33,6 +33,7 @@ public sealed class TLField
         IsArray = isArray;
     }
 
+    /// <inheritdoc/>
     public override string ToString() =>
         $"{Name}: {Type}{(IsArray ? "[]" : "")}{(IsNullable ? "?" : "")}";
 }
@@ -70,6 +71,7 @@ public sealed class TLSchema
     public bool HasField(string name) =>
         Fields.Any(f => f.Name == name);
 
+    /// <inheritdoc/>
     public override string ToString() =>
         $"@struct {Name} ({string.Join(", ", Fields)})";
 }

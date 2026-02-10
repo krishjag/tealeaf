@@ -198,6 +198,7 @@ public sealed class TLDocument : IDisposable
         return Get(key) != null;
     }
 
+    /// <inheritdoc/>
     public override string ToString() => ToText();
 
     private void ThrowIfDisposed()
@@ -206,6 +207,7 @@ public sealed class TLDocument : IDisposable
             throw new ObjectDisposedException(nameof(TLDocument));
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         if (!_disposed && _handle != IntPtr.Zero)

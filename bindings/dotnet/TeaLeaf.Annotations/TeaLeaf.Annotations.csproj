@@ -5,6 +5,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
+    <!-- Build settings -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
     <!-- Package metadata -->
     <PackageId>TeaLeaf.Annotations</PackageId>
     <Version>2.0.0-beta.7</Version>

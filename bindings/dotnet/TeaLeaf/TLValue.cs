@@ -373,17 +373,30 @@ public sealed class TLValue : IDisposable
 /// </summary>
 public enum TLType
 {
+    /// <summary>Null value (~).</summary>
     Null = 0,
+    /// <summary>Boolean (true/false).</summary>
     Bool = 1,
+    /// <summary>Signed 64-bit integer.</summary>
     Int = 2,
+    /// <summary>Unsigned 64-bit integer.</summary>
     UInt = 3,
+    /// <summary>64-bit IEEE 754 floating-point number.</summary>
     Float = 4,
+    /// <summary>UTF-8 string.</summary>
     String = 5,
+    /// <summary>Raw byte data.</summary>
     Bytes = 6,
+    /// <summary>Ordered array of values.</summary>
     Array = 7,
+    /// <summary>Key-value object with string keys.</summary>
     Object = 8,
+    /// <summary>Ordered map with arbitrary key types.</summary>
     Map = 9,
+    /// <summary>Named reference (!name).</summary>
     Ref = 10,
+    /// <summary>Tagged value (:tag value).</summary>
     Tagged = 11,
+    /// <summary>ISO 8601 timestamp with optional timezone offset.</summary>
     Timestamp = 12,
 }

@@ -488,6 +488,7 @@ public sealed class TLReader : IDisposable
             throw new ObjectDisposedException(nameof(TLReader));
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         if (!_disposed && _handle != IntPtr.Zero)
