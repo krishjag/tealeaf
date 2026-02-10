@@ -1347,11 +1347,43 @@ pub fn dumps_with_schemas(
     for (key, value) in data {
         write_key(&mut out, key);
         out.push_str(": ");
-        write_value_with_schemas(&mut out, value, schemas, Some(key), 0);
+        write_value_with_schemas(&mut out, value, schemas, Some(key), 0, None);
         out.push('\n');
     }
 
     out
+}
+
+/// Resolve a schema for a value by trying three strategies in order:
+/// 1. Declared type from parent schema's field type (exact match)
+/// 2. Singularize the field key name (works for JSON-inference schemas)
+/// 3. Case-insensitive singularize (handles derive-macro PascalCase names)
+fn resolve_schema<'a>(
+    schemas: &'a IndexMap<String, Schema>,
+    declared_type: Option<&str>,
+    hint_name: Option<&str>,
+) -> Option<&'a Schema> {
+    // 1. Direct lookup by declared type from parent schema
+    if let Some(name) = declared_type {
+        if let Some(s) = schemas.get(name) {
+            return Some(s);
+        }
+    }
+    // 2. Singularize heuristic (existing behavior for JSON-inference schemas)
+    if let Some(hint) = hint_name {
+        let singular = singularize(hint);
+        if let Some(s) = schemas.get(&singular) {
+            return Some(s);
+        }
+        // 3. Case-insensitive singularize (for derive-macro PascalCase names)
+        let singular_lower = singular.to_ascii_lowercase();
+        for (name, schema) in schemas {
+            if name.to_ascii_lowercase() == singular_lower {
+                return Some(schema);
+            }
+        }
+    }
+    None
 }
 
 fn write_value_with_schemas(
@@ -1360,6 +1392,7 @@ fn write_value_with_schemas(
     schemas: &IndexMap<String, Schema>,
     hint_name: Option<&str>,
     indent: usize,
+    declared_type: Option<&str>,
 ) {
     match value {
         Value::Null => out.push('~'),
@@ -1385,9 +1418,26 @@ fn write_value_with_schemas(
             out.push('"');
         }
         Value::Array(arr) => {
-            // Check if this array can use @table format
-            let schema_name = hint_name.map(singularize);
-            let schema = schema_name.as_ref().and_then(|n| schemas.get(n));
+            // Check if this array can use @table format.
+            // Try name-based resolution first, then structural matching as fallback.
+            let mut schema = resolve_schema(schemas, declared_type, hint_name);
+
+            // Structural fallback: if name-based resolution failed, find a schema
+            // whose fields exactly match the first element's object keys.
+            // This handles Builder-path documents where the top-level key name
+            // (e.g., "orders") doesn't match the schema name (e.g., "SalesOrder").
+            if schema.is_none() {
+                if let Some(Value::Object(first_obj)) = arr.first() {
+                    let obj_keys: HashSet<&str> = first_obj.keys().map(|k| k.as_str()).collect();
+                    for (_, candidate) in schemas {
+                        let schema_fields: HashSet<&str> = candidate.fields.iter().map(|f| f.name.as_str()).collect();
+                        if schema_fields == obj_keys {
+                            schema = Some(candidate);
+                            break;
+                        }
+                    }
+                }
+            }
 
             if let Some(schema) = schema {
                 // Verify the first element is an object whose fields match the schema.
@@ -1433,11 +1483,26 @@ fn write_value_with_schemas(
                 if i > 0 {
                     out.push_str(", ");
                 }
-                write_value_with_schemas(out, v, schemas, None, indent);
+                write_value_with_schemas(out, v, schemas, None, indent, None);
             }
             out.push(']');
         }
         Value::Object(obj) => {
+            // Find the schema for this object so we can propagate field types to children.
+            // Try name-based resolution first, then structural matching as fallback.
+            let mut obj_schema = resolve_schema(schemas, declared_type, hint_name);
+
+            if obj_schema.is_none() {
+                let obj_keys: HashSet<&str> = obj.keys().map(|k| k.as_str()).collect();
+                for (_, candidate) in schemas {
+                    let schema_fields: HashSet<&str> = candidate.fields.iter().map(|f| f.name.as_str()).collect();
+                    if schema_fields == obj_keys {
+                        obj_schema = Some(candidate);
+                        break;
+                    }
+                }
+            }
+
             out.push('{');
             for (i, (k, v)) in obj.iter().enumerate() {
                 if i > 0 {
@@ -1445,7 +1510,13 @@ fn write_value_with_schemas(
                 }
                 write_key(out, k);
                 out.push_str(": ");
-                write_value_with_schemas(out, v, schemas, Some(k), indent);
+                // Look up this field's declared type from the parent schema
+                let field_type = obj_schema.and_then(|s| {
+                    s.fields.iter()
+                        .find(|f| f.name == *k)
+                        .map(|f| f.field_type.base.as_str())
+                });
+                write_value_with_schemas(out, v, schemas, Some(k), indent, field_type);
             }
             out.push('}');
         }
@@ -1459,7 +1530,7 @@ fn write_value_with_schemas(
                 first = false;
                 write_map_key(out, k);
                 out.push_str(": ");
-                write_value_with_schemas(out, v, schemas, None, indent);
+                write_value_with_schemas(out, v, schemas, None, indent, None);
             }
             out.push('}');
         }
@@ -1471,7 +1542,7 @@ fn write_value_with_schemas(
             out.push(':');
             out.push_str(tag);
             out.push(' ');
-            write_value_with_schemas(out, inner, schemas, None, indent);
+            write_value_with_schemas(out, inner, schemas, None, indent, None);
         }
         Value::Timestamp(ts, tz) => {
             out.push_str(&format_timestamp_millis(*ts, *tz));
@@ -1493,24 +1564,22 @@ fn write_tuple(
                 out.push_str(", ");
             }
             if let Some(v) = obj.get(&field.name) {
+                let type_base = field.field_type.base.as_str();
                 // For array fields with a known schema type, write tuples directly without @table
                 if field.field_type.is_array {
-                    if let Some(item_schema) = schemas.get(&field.field_type.base) {
+                    if let Some(item_schema) = resolve_schema(schemas, Some(type_base), None) {
                         // The schema defines the element type - write array with tuples directly
                         write_schema_array(out, v, item_schema, schemas, indent);
                     } else {
                         // No schema for element type - use regular array format
-                        write_value_with_schemas(out, v, schemas, None, indent);
+                        write_value_with_schemas(out, v, schemas, None, indent, None);
                     }
-                } else if schemas.contains_key(&field.field_type.base) {
+                } else if resolve_schema(schemas, Some(type_base), None).is_some() {
                     // Non-array field with schema type - write as nested tuple
-                    if let Some(nested_schema) = schemas.get(&field.field_type.base) {
-                        write_tuple(out, v, nested_schema, schemas, indent);
-                    } else {
-                        write_value_with_schemas(out, v, schemas, None, indent);
-                    }
+                    let nested_schema = resolve_schema(schemas, Some(type_base), None).unwrap();
+                    write_tuple(out, v, nested_schema, schemas, indent);
                 } else {
-                    write_value_with_schemas(out, v, schemas, None, indent);
+                    write_value_with_schemas(out, v, schemas, None, indent, None);
                 }
             } else {
                 out.push('~');
@@ -1518,7 +1587,7 @@ fn write_tuple(
         }
         out.push(')');
     } else {
-        write_value_with_schemas(out, value, schemas, None, indent);
+        write_value_with_schemas(out, value, schemas, None, indent, None);
     }
 }
 
@@ -1554,7 +1623,7 @@ fn write_schema_array(
         out.push(']');
     } else {
         // Not an array - fall back to regular value writing
-        write_value_with_schemas(out, value, schemas, None, indent);
+        write_value_with_schemas(out, value, schemas, None, indent, None);
     }
 }
 

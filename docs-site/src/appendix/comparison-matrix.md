@@ -98,4 +98,4 @@ How TeaLeaf compares to other data formats.
 | Specification maturity | RFC 8259 | Stable (proto3) | Apache spec | Beta |
 | IDE support | Universal | Plugins | Plugins | Planned |
 
-TeaLeaf is a young format (v2.0.0-beta.4). It fills a specific niche that existing formats don't serve well -- but it doesn't aim to replace established formats in their core use cases.
+TeaLeaf is a young format (v2.0.0-beta.5). It fills a specific niche that existing formats don't serve well -- but it doesn't aim to replace established formats in their core use cases.

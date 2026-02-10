@@ -1,13 +1,27 @@
 # Changelog
 
-## v2.0.0-beta.4 (Current)
+## v2.0.0-beta.5 (Current)
+
+### Features
+- **Schema-aware serialization for Builder API** — `to_tl_with_schemas()` now produces compact `@table` output for documents built via `TeaLeafBuilder` with derive-macro schemas. Previously, PascalCase schema names from `#[derive(ToTeaLeaf)]` (e.g., `SalesOrder`) didn't match the serializer's `singularize()` heuristic (e.g., `"orders"` → `"order"`), causing all arrays to fall back to verbose `[{k: v}]` format. The serializer now resolves schemas via a 4-step chain: declared type from parent schema → singularize → case-insensitive singularize → structural field matching.
+
+### Bug Fixes
+- Fixed schema inference name collision when a field singularizes to the same name as its parent array's schema — prevented self-referencing schemas (e.g., `@struct root (root: root)`) and data loss during round-trip (found via fuzzing)
+- Fixed `@table` serializer applying wrong schema when the same field name appears at multiple nesting levels with different object shapes — serializer now validates schema fields match the actual object keys before using positional tuple encoding
+
+### Testing
+- Added 8 Rust regression tests for schema name collisions: `fuzz_repro_dots_in_field_name`, `schema_name_collision_field_matches_parent`, `analyze_node_nesting_stress_test`, `schema_collision_recursive_arrays`, `schema_collision_recursive_same_shape`, `schema_collision_three_level_nesting`, `schema_collision_three_level_divergent_leaves`, `all_orders_cli_vs_api_roundtrip`
+- Added derive integration test `test_builder_schema_aware_table_output` — verifies Builder API with 5 nested PascalCase schemas produces `@table` encoding and round-trips correctly
+- Verified all 7 fuzz targets pass (~445K total runs, zero crashes)
+
+---
+
+## v2.0.0-beta.4
 
 ### Bug Fixes
 - Fixed binary encoding crash when compiling JSON with heterogeneous nested objects — `from_json_with_schemas` infers `any` pseudo-type for fields whose nested objects have varying shapes; the binary encoder now falls back to generic encoding instead of erroring with "schema-typed field 'any' requires a schema"
 - Fixed parser failing to resolve schema names that shadow built-in type keywords — schemas named `bool`, `int`, `string`, etc. now correctly resolve via LParen lookahead disambiguation (struct tuples always start with `(`, primitives never do)
 - Fixed `singularize()` producing empty string for single-character field names (e.g., `"s"` → `""`) — caused `@struct` definitions with missing names and unparseable TL text output
-- Fixed schema inference name collision when a field singularizes to the same name as its parent array's schema — prevented self-referencing schemas (e.g., `@struct root (root: root)`) and data loss during round-trip (found via fuzzing)
-- Fixed `@table` serializer applying wrong schema when the same field name appears at multiple nesting levels with different object shapes — serializer now validates schema fields match the actual object keys before using positional tuple encoding
 - Fixed `validate_tokens.py` token comparison by converting API input to `int` for safety
 
 ### .NET

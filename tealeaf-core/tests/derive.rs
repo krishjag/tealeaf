@@ -1442,3 +1442,135 @@ fn test_flatten_optional_schema() {
     assert!(schemas.get("PersonWithOptionalAddress").is_some());
     assert!(schemas.get("OptionalAddress").is_some());
 }
+
+// =============================================================================
+// Builder + schema-aware serialization: @table output with PascalCase schemas
+// =============================================================================
+
+use tealeaf::convert::NotU8;
+
+#[derive(Debug, Clone, ToTeaLeaf, FromTeaLeaf)]
+struct StockEntry {
+    warehouse: String,
+    qty: i32,
+    backordered: bool,
+}
+impl NotU8 for StockEntry {}
+
+#[derive(Debug, Clone, ToTeaLeaf, FromTeaLeaf)]
+struct Pricing {
+    base_price: f64,
+    currency: String,
+}
+
+#[derive(Debug, Clone, ToTeaLeaf, FromTeaLeaf)]
+struct ProductInfo {
+    id: String,
+    name: String,
+    pricing: Pricing,
+    stock: Vec<StockEntry>,
+}
+
+#[derive(Debug, Clone, ToTeaLeaf, FromTeaLeaf)]
+struct LineItem {
+    line: i32,
+    product: ProductInfo,
+    quantity: i32,
+}
+impl NotU8 for LineItem {}
+
+#[derive(Debug, Clone, ToTeaLeaf, FromTeaLeaf)]
+struct SalesOrder {
+    order_id: String,
+    items: Vec<LineItem>,
+    total: f64,
+}
+impl NotU8 for SalesOrder {}
+
+#[test]
+fn test_builder_schema_aware_table_output() {
+    // Build a document via the Builder API with derive-generated PascalCase schemas.
+    // The serializer must produce @table annotations even though the schema names
+    // (SalesOrder, LineItem, ProductInfo, etc.) don't match singularize("orders") = "order".
+    let orders = vec![
+        SalesOrder {
+            order_id: "ORD-001".into(),
+            items: vec![
+                LineItem {
+                    line: 1,
+                    product: ProductInfo {
+                        id: "P-100".into(),
+                        name: "Widget".into(),
+                        pricing: Pricing { base_price: 9.99, currency: "USD".into() },
+                        stock: vec![
+                            StockEntry { warehouse: "W1".into(), qty: 100, backordered: false },
+                        ],
+                    },
+                    quantity: 2,
+                },
+            ],
+            total: 19.98,
+        },
+        SalesOrder {
+            order_id: "ORD-002".into(),
+            items: vec![
+                LineItem {
+                    line: 1,
+                    product: ProductInfo {
+                        id: "P-200".into(),
+                        name: "Gadget".into(),
+                        pricing: Pricing { base_price: 24.50, currency: "USD".into() },
+                        stock: vec![
+                            StockEntry { warehouse: "W1".into(), qty: 50, backordered: false },
+                            StockEntry { warehouse: "W2".into(), qty: 0, backordered: true },
+                        ],
+                    },
+                    quantity: 1,
+                },
+            ],
+            total: 24.50,
+        },
+    ];
+
+    let doc = TeaLeafBuilder::new()
+        .add_vec("orders", &orders)
+        .build();
+
+    let tl = doc.to_tl_with_schemas();
+
+    // Must contain @table annotation — the whole point of this fix
+    assert!(tl.contains("@table SalesOrder"), "Missing @table SalesOrder:\n{tl}");
+
+    // Must contain @struct declarations for all schemas
+    assert!(tl.contains("@struct SalesOrder"), "Missing @struct SalesOrder:\n{tl}");
+    assert!(tl.contains("@struct LineItem"), "Missing @struct LineItem:\n{tl}");
+    assert!(tl.contains("@struct ProductInfo"), "Missing @struct ProductInfo:\n{tl}");
+    assert!(tl.contains("@struct Pricing"), "Missing @struct Pricing:\n{tl}");
+    assert!(tl.contains("@struct StockEntry"), "Missing @struct StockEntry:\n{tl}");
+
+    // Must use tuple encoding inside @table (parentheses, not braces)
+    assert!(tl.contains("(ORD-001,"), "Missing tuple encoding for ORD-001:\n{tl}");
+    assert!(tl.contains("(ORD-002,"), "Missing tuple encoding for ORD-002:\n{tl}");
+
+    // Round-trip: parse TL back and verify data integrity
+    let reparsed = TeaLeaf::parse(&tl)
+        .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL:\n{tl}"));
+    let orders_val = reparsed.get("orders").expect("missing 'orders' key");
+    let arr = orders_val.as_array().expect("orders should be array");
+    assert_eq!(arr.len(), 2, "should have 2 orders");
+
+    // Verify first order round-trips correctly
+    let first = arr[0].as_object().unwrap();
+    assert_eq!(first.get("order_id").unwrap().as_str(), Some("ORD-001"));
+    assert_eq!(first.get("total").unwrap().as_float(), Some(19.98));
+    let items = first.get("items").unwrap().as_array().unwrap();
+    assert_eq!(items.len(), 1);
+    let item = items[0].as_object().unwrap();
+    let product = item.get("product").unwrap().as_object().unwrap();
+    assert_eq!(product.get("name").unwrap().as_str(), Some("Widget"));
+    let pricing = product.get("pricing").unwrap().as_object().unwrap();
+    assert_eq!(pricing.get("base_price").unwrap().as_float(), Some(9.99));
+    let stock = product.get("stock").unwrap().as_array().unwrap();
+    assert_eq!(stock.len(), 1);
+    assert_eq!(stock[0].as_object().unwrap().get("warehouse").unwrap().as_str(), Some("W1"));
+}

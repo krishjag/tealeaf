@@ -3,15 +3,15 @@ members = ["tealeaf-core", "tealeaf-derive", "tealeaf-ffi", "accuracy-benchmark"
 resolver = "2"
 
 [workspace.package]
-version = "2.0.0-beta.4"
+version = "2.0.0-beta.5"
 edition = "2021"
 authors = ["TeaLeaf Contributors"]
 license = "MIT"
 repository = "https://github.com/krishjag/tealeaf"
 
 [workspace.dependencies]
-tealeaf-core = { path = "tealeaf-core", version = "2.0.0-beta.4" }
-tealeaf-derive = { path = "tealeaf-derive", version = "2.0.0-beta.4" }
+tealeaf-core = { path = "tealeaf-core", version = "2.0.0-beta.5" }
+tealeaf-derive = { path = "tealeaf-derive", version = "2.0.0-beta.5" }
 thiserror = "1.0"
 memmap2 = "0.9"
 crc32fast = "1.3"
