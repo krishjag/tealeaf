@@ -355,6 +355,8 @@ pub enum DataFormat {
     TL,
     /// JSON format (raw)
     Json,
+    /// TOON format (Token-Oriented Object Notation)
+    Toon,
 }
 
 impl DataFormat {
@@ -362,11 +364,21 @@ impl DataFormat {
         match self {
             DataFormat::TL => "tl",
             DataFormat::Json => "json",
+            DataFormat::Toon => "toon",
+        }
+    }
+
+    /// Human-readable name for use in prompt templates (e.g., "TeaLeaf", "JSON", "TOON")
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            DataFormat::TL => "TeaLeaf",
+            DataFormat::Json => "JSON",
+            DataFormat::Toon => "TOON",
         }
     }
 
     pub fn all() -> Vec<DataFormat> {
-        vec![DataFormat::TL, DataFormat::Json]
+        vec![DataFormat::TL, DataFormat::Json, DataFormat::Toon]
     }
 }
 

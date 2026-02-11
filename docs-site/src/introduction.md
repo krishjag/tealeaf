@@ -2,7 +2,7 @@
 
 **A schema-aware data format with human-readable text and compact binary representation.**
 
-**~36% fewer data tokens than JSON for LLM applications, with zero accuracy loss.**
+**~42% fewer data tokens than JSON for LLM applications, with zero accuracy loss.**
 
 <span class="version-badge">v2.0.0-beta.8</span>
 
@@ -118,8 +118,9 @@ TeaLeaf unifies these concerns:
 TeaLeaf is well-suited for assembling and managing context for large language models -- sending business data, analytics, and structured payloads to LLM APIs where token efficiency directly impacts API costs.
 
 **Why TeaLeaf for LLM context:**
-- **~36% fewer data tokens** — verified across Claude Sonnet 4.5 and GPT-5.2 (12 tasks, 10 domains; savings increase with larger datasets)
-- **Zero accuracy loss** — [benchmark scores](https://github.com/krishjag/tealeaf/tree/main/accuracy-benchmark) within noise (0.988 vs 0.978 Anthropic, 0.901 vs 0.899 OpenAI)
+- **~42% fewer input tokens** on real-world data (SEC EDGAR 10-K filings, 4 companies, ~196KB JSON) — verified across Claude Sonnet 4.5 and GPT-5.2
+- **~30% fewer input tokens** on synthetic data (12 tasks, 10 domains; smaller datasets dilute savings)
+- **Zero accuracy loss** — [benchmark scores](https://github.com/krishjag/tealeaf/tree/main/accuracy-benchmark) within noise across TeaLeaf, JSON, and TOON formats
 - Binary format for fast cached context retrieval
 - String deduplication (roles, field names, common values stored once)
 - Human-readable text for prompt authoring

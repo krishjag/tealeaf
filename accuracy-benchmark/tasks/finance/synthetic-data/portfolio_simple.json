@@ -1,0 +1,11 @@
+{
+  "portfolio": {
+    "owner": "John Smith",
+    "holdings": [
+      {"symbol": "AAPL", "shares": 100, "purchase_price": 150.00, "current_price": 175.00, "dividend_yield": 0.005},
+      {"symbol": "GOOGL", "shares": 50, "purchase_price": 2500.00, "current_price": 2800.00},
+      {"symbol": "MSFT", "shares": 75, "purchase_price": 300.00, "current_price": 350.00, "dividend_yield": 0.008}
+    ],
+    "cash_balance": 10000.00
+  }
+}

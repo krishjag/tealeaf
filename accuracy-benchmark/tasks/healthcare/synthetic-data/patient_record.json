@@ -1,0 +1,24 @@
+{
+  "patient": {
+    "name": "John Doe",
+    "age": 45,
+    "gender": "Male",
+    "blood_type": "O+"
+  },
+  "conditions": [
+    {"name": "Type 2 Diabetes", "diagnosed": "2019-03-15", "status": "active"},
+    {"name": "Hypertension", "diagnosed": "2020-08-22", "status": "active"}
+  ],
+  "medications": [
+    {"name": "Metformin", "dosage": "500mg", "frequency": "twice daily"},
+    {"name": "Lisinopril", "dosage": "10mg", "frequency": "daily"}
+  ],
+  "allergies": [
+    {"allergen": "Penicillin", "severity": "severe"},
+    {"allergen": "Sulfa drugs", "severity": "moderate"}
+  ],
+  "vitals": {
+    "blood_pressure": "135/85",
+    "blood_glucose": 145
+  }
+}

@@ -4,7 +4,7 @@ pub mod categories;
 pub mod loader;
 
 pub use categories::{Complexity, Domain, OutputType};
-pub use loader::{load_tasks_from_directory, load_tasks_from_file, load_tasks_from_string, LoadError};
+pub use loader::{load_tasks_from_directory, load_tasks_from_file, load_tasks_from_json_file, load_tasks_from_string, LoadError};
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -119,17 +119,19 @@ impl BenchmarkTask {
         self.prepare_prompt_with_format(DataFormat::TL)
     }
 
-    /// Prepare the prompt with a specific data format (TeaLeaf or JSON)
+    /// Prepare the prompt with a specific data format (TeaLeaf, JSON, or TOON)
     pub fn prepare_prompt_with_format(&mut self, format: DataFormat) -> Result<(), String> {
         let data = match format {
             DataFormat::TL => self.get_data_as_tl()?,
             DataFormat::Json => self.get_data_as_json()?,
+            DataFormat::Toon => self.get_data_as_toon()?,
         };
 
-        // Replace {tl_data} or {data} placeholder in template
+        // Replace placeholders in template
         self.prompt = self.prompt_template
             .replace("{tl_data}", &data)
-            .replace("{data}", &data);
+            .replace("{data}", &data)
+            .replace("{format_name}", format.display_name());
         Ok(())
     }
 
@@ -169,6 +171,24 @@ impl BenchmarkTask {
                 // (alternative: could try to convert TeaLeaf to JSON, but complex)
                 Ok(tl.clone())
             }
+            DataSource::None => Ok(String::new()),
+        }
+    }
+
+    /// Get data in TOON format
+    fn get_data_as_toon(&self) -> Result<String, String> {
+        match &self.data_source {
+            DataSource::InlineJson(json) => {
+                convert_json_to_toon(json)
+            }
+            DataSource::JsonFile(path) => {
+                let json_str = std::fs::read_to_string(path)
+                    .map_err(|e| format!("Failed to read JSON file {}: {}", path, e))?;
+                let json: serde_json::Value = serde_json::from_str(&json_str)
+                    .map_err(|e| format!("Failed to parse JSON: {}", e))?;
+                convert_json_to_toon(&json)
+            }
+            DataSource::RawTL(tl) => Ok(tl.clone()),
             DataSource::None => Ok(String::new()),
         }
     }
@@ -355,8 +375,8 @@ pub fn convert_json_to_tl(json_str: &str) -> Result<String, String> {
     let tl = tealeaf::TeaLeaf::from_json_with_schemas(json_str)
         .map_err(|e| format!("Failed to convert JSON to TeaLeaf: {}", e))?;
 
-    // Convert back to TeaLeaf text format
-    let tl_text = tl.to_tl_with_schemas();
+    // Convert to compact TeaLeaf text format (minimal whitespace for token efficiency)
+    let tl_text = tl.to_tl_with_schemas_compact();
 
     Ok(tl_text)
 }
@@ -366,4 +386,10 @@ pub fn convert_json_file_to_tl(path: &str) -> Result<String, String> {
     let json_str = std::fs::read_to_string(path)
         .map_err(|e| format!("Failed to read file {}: {}", path, e))?;
     convert_json_to_tl(&json_str)
+}
+
+/// Convert JSON value to TOON format using toon-format
+pub fn convert_json_to_toon(json: &serde_json::Value) -> Result<String, String> {
+    toon_format::encode_default(json)
+        .map_err(|e| format!("Failed to convert JSON to TOON: {}", e))
 }

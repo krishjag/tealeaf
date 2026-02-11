@@ -1,6 +1,7 @@
-//! Task loading from TeaLeaf files
+//! Task loading from TeaLeaf and JSON files
 
 use std::path::Path;
+use serde::Deserialize;
 
 use super::{BenchmarkTask, DataSource, ExpectedElement, TaskMetadata};
 use super::categories::{Complexity, OutputType};
@@ -277,6 +278,111 @@ fn parse_expected_element(value: &tealeaf::Value) -> Result<ExpectedElement, Str
     }
 }
 
+// ── JSON task definition loading ──────────────────────────────────────────
+
+/// Top-level JSON task definition file
+#[derive(Debug, Deserialize)]
+struct TaskDefinitionFile {
+    #[allow(dead_code)]
+    #[serde(default)]
+    version: Option<String>,
+    #[allow(dead_code)]
+    #[serde(default)]
+    description: Option<String>,
+    tasks: Vec<TaskDefinition>,
+}
+
+/// A single task definition in the JSON file (flat, human-friendly schema)
+#[derive(Debug, Deserialize)]
+struct TaskDefinition {
+    id: String,
+    category: String,
+    #[serde(default)]
+    subcategory: Option<String>,
+    #[serde(default = "default_complexity")]
+    complexity: Complexity,
+    #[serde(default = "default_output_type")]
+    output_type: OutputType,
+    prompt_template: String,
+    /// Path to data file, relative to the task definition file's directory
+    #[serde(default)]
+    data_file: Option<String>,
+    #[serde(default = "default_max_tokens")]
+    max_tokens: u32,
+    #[serde(default = "default_temperature")]
+    temperature: Option<f32>,
+    #[serde(default)]
+    expected_elements: Vec<ExpectedElement>,
+    #[serde(default)]
+    grading_rubric: Option<String>,
+}
+
+fn default_complexity() -> Complexity { Complexity::Moderate }
+fn default_output_type() -> OutputType { OutputType::Analysis }
+fn default_max_tokens() -> u32 { 2048 }
+fn default_temperature() -> Option<f32> { Some(0.3) }
+
+impl TaskDefinition {
+    /// Convert to a `BenchmarkTask`, resolving `data_file` relative to `base_dir`.
+    fn into_benchmark_task(self, base_dir: &Path) -> BenchmarkTask {
+        let data_source = match self.data_file {
+            Some(relative) => {
+                let full = base_dir.join(&relative);
+                DataSource::JsonFile(full.to_string_lossy().to_string())
+            }
+            None => DataSource::None,
+        };
+
+        let template = self.prompt_template;
+        BenchmarkTask {
+            metadata: TaskMetadata {
+                id: self.id,
+                category: self.category,
+                subcategory: self.subcategory,
+                complexity: self.complexity,
+                output_type: self.output_type,
+                version: "1.0".to_string(),
+            },
+            prompt_template: template.clone(),
+            prompt: template,
+            max_tokens: self.max_tokens,
+            temperature: self.temperature,
+            expected_elements: self.expected_elements,
+            data_context: Vec::new(),
+            grading_rubric: self.grading_rubric,
+            data_source,
+        }
+    }
+}
+
+/// Load task definitions from a JSON file.
+///
+/// Data file paths in the definitions are resolved relative to the JSON file's
+/// parent directory.
+pub fn load_tasks_from_json_file(path: impl AsRef<Path>) -> Result<Vec<BenchmarkTask>, LoadError> {
+    let path = path.as_ref();
+    let content = std::fs::read_to_string(path)?;
+    let base_dir = path.parent().unwrap_or(Path::new("."));
+    load_tasks_from_json_str(&content, base_dir)
+}
+
+/// Load task definitions from a JSON string.
+///
+/// `base_dir` is used to resolve relative `data_file` paths.
+pub fn load_tasks_from_json_str(
+    content: &str,
+    base_dir: &Path,
+) -> Result<Vec<BenchmarkTask>, LoadError> {
+    let file: TaskDefinitionFile = serde_json::from_str(content)
+        .map_err(|e| LoadError::Parse(format!("JSON parse error: {}", e)))?;
+
+    Ok(file
+        .tasks
+        .into_iter()
+        .map(|td| td.into_benchmark_task(base_dir))
+        .collect())
+}
+
 /// Load all tasks from a directory
 pub fn load_tasks_from_directory(dir: impl AsRef<Path>) -> Result<Vec<BenchmarkTask>, LoadError> {
     let mut all_tasks = Vec::new();
@@ -284,13 +390,18 @@ pub fn load_tasks_from_directory(dir: impl AsRef<Path>) -> Result<Vec<BenchmarkT
     for entry in std::fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();
+        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
-        if path.extension().map(|e| e == "tl").unwrap_or(false) {
-            match load_tasks_from_file(&path) {
-                Ok(tasks) => all_tasks.extend(tasks),
-                Err(e) => {
-                    tracing::warn!("Failed to load tasks from {:?}: {}", path, e);
-                }
+        let result = match ext {
+            "tl" => load_tasks_from_file(&path),
+            "json" => load_tasks_from_json_file(&path),
+            _ => continue,
+        };
+
+        match result {
+            Ok(tasks) => all_tasks.extend(tasks),
+            Err(e) => {
+                tracing::warn!("Failed to load tasks from {:?}: {}", path, e);
             }
         }
     }
@@ -315,5 +426,83 @@ mod tests {
         assert_eq!("finance".parse::<Domain>().unwrap(), Domain::Finance);
         assert_eq!("Healthcare".parse::<Domain>().unwrap(), Domain::Healthcare);
         assert_eq!("RETAIL".parse::<Domain>().unwrap(), Domain::Retail);
+    }
+
+    #[test]
+    fn test_load_json_basic() {
+        let json = r#"{
+            "version": "1.0",
+            "tasks": [
+                {
+                    "id": "TEST-001",
+                    "category": "test",
+                    "complexity": "simple",
+                    "output_type": "calculation",
+                    "prompt_template": "Analyze {data}",
+                    "data_file": "test/data.json",
+                    "expected_elements": [
+                        {"element_type": "metric", "description": "Result", "required": true}
+                    ]
+                }
+            ]
+        }"#;
+
+        let tasks = load_tasks_from_json_str(json, Path::new("/base")).unwrap();
+        assert_eq!(tasks.len(), 1);
+        let t = &tasks[0];
+        assert_eq!(t.metadata.id, "TEST-001");
+        assert_eq!(t.metadata.category, "test");
+        assert_eq!(t.metadata.complexity, Complexity::Simple);
+        assert_eq!(t.metadata.output_type, OutputType::Calculation);
+        assert_eq!(t.prompt_template, "Analyze {data}");
+        assert_eq!(t.max_tokens, 2048);
+        assert_eq!(t.temperature, Some(0.3));
+        assert_eq!(t.expected_elements.len(), 1);
+        assert!(t.expected_elements[0].required);
+        // data_file resolved relative to base_dir
+        match &t.data_source {
+            DataSource::JsonFile(p) => assert!(p.contains("test") && p.contains("data.json")),
+            _ => panic!("Expected JsonFile data source"),
+        }
+    }
+
+    #[test]
+    fn test_load_json_defaults() {
+        let json = r#"{
+            "tasks": [
+                {
+                    "id": "MIN-001",
+                    "category": "minimal",
+                    "prompt_template": "Do something"
+                }
+            ]
+        }"#;
+
+        let tasks = load_tasks_from_json_str(json, Path::new(".")).unwrap();
+        assert_eq!(tasks.len(), 1);
+        let t = &tasks[0];
+        assert_eq!(t.metadata.complexity, Complexity::Moderate);
+        assert_eq!(t.metadata.output_type, OutputType::Analysis);
+        assert_eq!(t.max_tokens, 2048);
+        assert_eq!(t.temperature, Some(0.3));
+        assert!(t.expected_elements.is_empty());
+        assert!(matches!(t.data_source, DataSource::None));
+    }
+
+    #[test]
+    fn test_load_json_with_validation_pattern() {
+        let json = r#"{
+            "tasks": [{
+                "id": "PAT-001",
+                "category": "test",
+                "prompt_template": "test",
+                "expected_elements": [
+                    {"element_type": "metric", "description": "pct", "required": true, "validation_pattern": "\\d+%"}
+                ]
+            }]
+        }"#;
+
+        let tasks = load_tasks_from_json_str(json, Path::new(".")).unwrap();
+        assert_eq!(tasks[0].expected_elements[0].validation_pattern.as_deref(), Some("\\d+%"));
     }
 }

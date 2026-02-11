@@ -63,6 +63,9 @@ throwaway/
 !canonical/binary/*.tlbx
 !canonical/errors/*.tlbx
 
+# Raw data downloads (large, not committed)
+accuracy-benchmark/raw_data/
+
 # Adversarial test files
 adversarial-tests/**/bin/
 adversarial-tests/**/obj/

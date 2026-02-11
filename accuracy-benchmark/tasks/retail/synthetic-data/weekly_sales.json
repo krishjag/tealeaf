@@ -1,0 +1,12 @@
+{
+  "period": "2024-W03",
+  "daily_sales": [
+    {"day": "Monday", "orders": 150, "revenue": 12500},
+    {"day": "Tuesday", "orders": 175, "revenue": 15200},
+    {"day": "Wednesday", "orders": 140, "revenue": 11800},
+    {"day": "Thursday", "orders": 190, "revenue": 18500},
+    {"day": "Friday", "orders": 220, "revenue": 22000},
+    {"day": "Saturday", "orders": 280, "revenue": 28500},
+    {"day": "Sunday", "orders": 195, "revenue": 19200}
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "customers": [
+    {"id": "A", "orders": 12, "total_spend": 2400, "days_since_last_order": 5},
+    {"id": "B", "orders": 2, "total_spend": 150, "days_since_last_order": 90},
+    {"id": "C", "orders": 8, "total_spend": 1800, "days_since_last_order": 15},
+    {"id": "D", "orders": 1, "total_spend": 50, "days_since_last_order": 180},
+    {"id": "E", "orders": 20, "total_spend": 5500, "days_since_last_order": 2}
+  ]
+}

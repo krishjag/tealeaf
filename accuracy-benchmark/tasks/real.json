@@ -1,0 +1,37 @@
+{
+  "version": "1.0",
+  "description": "Real-world data benchmark task definitions (SEC EDGAR 10-K filings)",
+  "tasks": [
+    {
+      "id": "FIN-001",
+      "category": "finance",
+      "complexity": "complex",
+      "output_type": "calculation",
+      "max_tokens": 4096,
+      "prompt_template": "You are a financial analyst reviewing annual 10-K filings from SEC EDGAR.\nThe data contains balance sheet, income statement, cash flow, and other financial statement items for multiple public companies.\n\n{data}\n\nFor each company in the dataset:\n1. Calculate total current assets and total current liabilities from the Balance Sheet\n2. Compute the current ratio (current assets / current liabilities)\n3. Identify total revenue and net income from the Income Statement\n4. Calculate the net profit margin (net income / revenue)\n5. Extract operating cash flow from Cash Flows\n\nThen compare across all companies:\n6. Rank companies by current ratio (strongest liquidity first)\n7. Rank companies by net profit margin\n8. Which company has the highest operating cash flow?",
+      "data_file": "finance/data/sec_edgar_2025_q4.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "Current ratio per company", "required": true, "validation_pattern": "\\d+\\.\\d+"},
+        {"element_type": "metric", "description": "Net profit margin per company", "required": true, "validation_pattern": "\\d+\\.?\\d*%"},
+        {"element_type": "metric", "description": "Operating cash flow extraction", "required": true},
+        {"element_type": "analysis", "description": "Cross-company liquidity ranking", "required": true},
+        {"element_type": "analysis", "description": "Cross-company profitability ranking", "required": true}
+      ]
+    },
+    {
+      "id": "FIN-002",
+      "category": "finance",
+      "complexity": "complex",
+      "output_type": "analysis",
+      "max_tokens": 4096,
+      "prompt_template": "You are a credit analyst evaluating the financial health of public companies using their SEC EDGAR 10-K filing data.\n\n{data}\n\nFor each company:\n1. From the Balance Sheet, compute total debt (short-term + long-term borrowings) and total stockholders' equity\n2. Calculate the debt-to-equity ratio\n3. From Cash Flows, identify cash from operations, investing, and financing activities\n4. Determine free cash flow (operating cash flow minus capital expenditures)\n5. From the Income Statement, find interest expense and compute the interest coverage ratio (operating income / interest expense)\n\nSummarize:\n6. Which company has the strongest balance sheet (lowest leverage)?\n7. Which company generates the most free cash flow?\n8. Flag any companies with concerning debt levels or negative free cash flow",
+      "data_file": "finance/data/sec_edgar_2025_q4.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "Debt-to-equity ratio", "required": true, "validation_pattern": "\\d+\\.?\\d*"},
+        {"element_type": "metric", "description": "Free cash flow calculation", "required": true},
+        {"element_type": "analysis", "description": "Balance sheet strength ranking", "required": true},
+        {"element_type": "analysis", "description": "Risk flags for concerning debt levels", "required": false}
+      ]
+    }
+  ]
+}

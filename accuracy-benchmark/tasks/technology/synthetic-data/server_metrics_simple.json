@@ -1,0 +1,19 @@
+{
+  "server": {
+    "hostname": "web-prod-01",
+    "metrics": {
+      "cpu_avg": 85,
+      "cpu_peak": 98,
+      "memory_pct": 78,
+      "disk_pct": 92,
+      "network_mbps": 450,
+      "network_capacity_mbps": 1000
+    },
+    "performance": {
+      "requests_per_min": 15000,
+      "error_rate_pct": 2.5,
+      "latency_p99_ms": 850,
+      "latency_target_ms": 500
+    }
+  }
+}

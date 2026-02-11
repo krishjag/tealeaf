@@ -1,0 +1,30 @@
+{
+  "company": "TechCorp Inc",
+  "period": "Q3 2024",
+  "currency": "USD",
+  "income_statement": {
+    "revenue": [
+      {"account": "Product Sales", "amount": 4200000},
+      {"account": "Service Revenue", "amount": 800000}
+    ],
+    "expenses": [
+      {"account": "Cost of Goods Sold", "amount": 2000000},
+      {"account": "Operating Expenses", "amount": 1500000},
+      {"account": "Tax Expense", "amount": 387500}
+    ],
+    "other_income": [
+      {"account": "Interest Income", "amount": 50000}
+    ]
+  },
+  "balance_sheet": {
+    "assets": [
+      {"account": "Cash", "amount": 2000000},
+      {"account": "Accounts Receivable", "amount": 1500000},
+      {"account": "Inventory", "amount": 800000}
+    ],
+    "liabilities": [
+      {"account": "Accounts Payable", "amount": 600000},
+      {"account": "Long-term Debt", "amount": 1000000}
+    ]
+  }
+}
