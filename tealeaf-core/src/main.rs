@@ -43,14 +43,14 @@ fn print_usage() {
     println!("Usage: tealeaf <command> [options]");
     println!();
     println!("Commands:");
-    println!("  compile <input.tl> -o <output.tlbx>       Compile text to binary");
-    println!("  decompile <input.tlbx> -o <output.tl>     Decompile binary to text");
-    println!("  info <file.tl|file.tlbx>                  Show file info (auto-detects format)");
-    println!("  validate <file.tl>                        Validate text format");
+    println!("  compile <input.tl> -o <output.tlbx>              Compile text to binary");
+    println!("  decompile <input.tlbx> -o <output.tl> [--compact] Decompile binary to text");
+    println!("  info <file.tl|file.tlbx>                         Show file info (auto-detects format)");
+    println!("  validate <file.tl>                               Validate text format");
     println!();
     println!("JSON Conversion:");
-    println!("  to-json <input.tl> [-o <output.json>]     Convert TeaLeaf text to JSON");
-    println!("  from-json <input.json> -o <output.tl>     Convert JSON to TeaLeaf text");
+    println!("  to-json <input.tl> [-o <output.json>]            Convert TeaLeaf text to JSON");
+    println!("  from-json <input.json> -o <output.tl> [--compact] Convert JSON to TeaLeaf text");
     println!("  tlbx-to-json <input.tlbx> [-o <out.json>] Convert TeaLeaf binary to JSON");
     println!("  json-to-tlbx <input.json> -o <out.tlbx>   Convert JSON to TeaLeaf binary");
     println!();
@@ -81,18 +81,23 @@ fn cmd_compile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
 fn cmd_decompile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: tealeaf decompile <input.tlbx> -o <output.tl>");
+        eprintln!("Usage: tealeaf decompile <input.tlbx> -o <output.tl> [--compact]");
         process::exit(1);
     }
 
     let input = &args[0];
     let output = &args[2];
+    let compact = args.get(3).map_or(false, |a| a == "--compact");
 
-    println!("Decompiling {} -> {}", input, output);
+    println!("Decompiling {} -> {}{}", input, output, if compact { " (compact)" } else { "" });
 
     let reader = Reader::open(input)?;
     let doc = TeaLeaf::from_reader(&reader)?;
-    let tl_text = doc.to_tl_with_schemas();
+    let tl_text = if compact {
+        doc.to_tl_with_schemas_compact()
+    } else {
+        doc.to_tl_with_schemas()
+    };
 
     std::fs::write(output, tl_text)?;
     println!("Done");
@@ -230,14 +235,15 @@ fn cmd_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
 fn cmd_from_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: tealeaf from-json <input.json> -o <output.tl>");
+        eprintln!("Usage: tealeaf from-json <input.json> -o <output.tl> [--compact]");
         process::exit(1);
     }
 
     let input = &args[0];
     let output = &args[2];
+    let compact = args.get(3).map_or(false, |a| a == "--compact");
 
-    println!("Converting {} -> {}", input, output);
+    println!("Converting {} -> {}{}", input, output, if compact { " (compact)" } else { "" });
 
     let json_content = std::fs::read_to_string(input)?;
 
@@ -248,7 +254,11 @@ fn cmd_from_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
             println!("  @struct {} ({} fields)", name, schema.fields.len());
         }
     }
-    let tl_text = doc.to_tl_with_schemas();
+    let tl_text = if compact {
+        doc.to_tl_with_schemas_compact()
+    } else {
+        doc.to_tl_with_schemas()
+    };
 
     std::fs::write(output, tl_text)?;
     println!("Done");

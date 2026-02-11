@@ -70,6 +70,12 @@ internal static class NativeMethods
     public static extern IntPtr tl_document_to_text_data_only(IntPtr doc);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_document_to_text_compact(IntPtr doc);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_document_to_text_compact_data_only(IntPtr doc);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     public static extern TLResult tl_document_compile(
         IntPtr doc,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string path,

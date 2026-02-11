@@ -95,6 +95,7 @@ using var value = doc["name"];
 
 // Output
 string text = doc.ToText();
+string compact = doc.ToTextCompact();  // removes insignificant whitespace
 string json = doc.ToJson();
 doc.Compile("output.tlbx", compress: true);
 ```

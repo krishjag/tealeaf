@@ -88,20 +88,26 @@ let cached = tealeaf::Reader::open("context_cache.tlbx")?;
 
 ### Sending to LLM
 
-Convert to text for LLM consumption:
+Convert to compact text for maximum token efficiency:
 
 ```rust
 let doc = TeaLeaf::load("context.tl")?;
-let context_text = doc.to_tl_with_schemas();
-// Send context_text as part of the prompt
+let context_text = doc.to_tl_with_schemas_compact();
+// Send context_text as part of the prompt -- minimal whitespace, same data
 ```
 
-Or convert specific sections:
+The compact format removes insignificant whitespace (spaces after `:` in key-value pairs, spaces after `,` in collections, indentation, and blank lines) while preserving all data. This typically saves an additional 10-12% over the pretty-printed format.
+
+For readable debugging, use the pretty-printed variant:
 
 ```rust
-let doc = TeaLeaf::load("context.tl")?;
+let pretty_text = doc.to_tl_with_schemas();
+```
+
+Or convert to JSON for APIs that expect it:
+
+```rust
 let json = doc.to_json()?;
-// Use JSON for APIs that expect it
 ```
 
 ## Size Comparison: Real-World Context
@@ -111,7 +117,8 @@ For a typical LLM context with 50 messages, 10 tools, and a user profile:
 | Format | Approximate Size |
 |--------|-----------------|
 | JSON | ~15 KB |
-| TeaLeaf Text | ~8 KB |
+| TeaLeaf Text (pretty) | ~8 KB |
+| TeaLeaf Text (compact) | ~7 KB |
 | TeaLeaf Binary | ~4 KB |
 | TeaLeaf Binary (compressed) | ~3 KB |
 
@@ -155,8 +162,8 @@ if let Some(Value::Array(insights)) = response.get("analysis") {
 
 1. **Define schemas for all structured context** -- tool definitions, messages, profiles
 2. **Use `@table` for arrays of uniform objects** -- conversation history, search results
-3. **Cache compiled binary** for frequently-used context segments
-4. **Use text format for LLM input** -- models understand the schema notation
+3. **Use compact text for LLM input** -- `to_tl_with_schemas_compact()` removes insignificant whitespace for maximum token savings
+4. **Cache compiled binary** for frequently-used context segments
 5. **String deduplication** helps when context has repetitive strings (roles, tool names)
 6. **Separate static and dynamic context** -- compile static context once, merge at runtime
 

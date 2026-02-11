@@ -1093,4 +1093,144 @@ public partial class NamespacedModel
         Assert.Contains(result.GeneratedTrees,
             t => t.FilePath.Contains("NamespacedModel.TeaLeaf.g.cs"));
     }
+
+    // =========================================================================
+    // ResolveStructName: nested type honors [TeaLeaf(StructName = "...")]
+    // =========================================================================
+
+    [Fact]
+    public void Generator_NestedType_UsesStructNameOverride()
+    {
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(StructName = ""price"")]
+public partial class ProductPrice
+{
+    public double BasePrice { get; set; }
+    public string Currency { get; set; } = """";
+}
+
+[TeaLeaf]
+public partial class Product
+{
+    public string Name { get; set; } = """";
+    public ProductPrice Price { get; set; } = new();
+}
+";
+        var result = RunGenerator(source);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var gen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("Product.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Should use "price" from StructName, not "product_price" from ToSnakeCase
+        Assert.Contains("price: price", gen);
+        Assert.DoesNotContain("product_price", gen);
+    }
+
+    [Fact]
+    public void Generator_ListOfNestedType_UsesStructNameOverride()
+    {
+        var source = @"
+using System.Collections.Generic;
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(StructName = ""stock"")]
+public partial class StockInfo
+{
+    public string Warehouse { get; set; } = """";
+    public int Quantity { get; set; }
+}
+
+[TeaLeaf]
+public partial class Inventory
+{
+    public string Name { get; set; } = """";
+    public List<StockInfo> Locations { get; set; } = new();
+}
+";
+        var result = RunGenerator(source);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var gen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("Inventory.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Should use "stock" from StructName, not "stock_info" from ToSnakeCase
+        Assert.Contains("locations: []stock", gen);
+        Assert.DoesNotContain("stock_info", gen);
+    }
+
+    [Fact]
+    public void Generator_ArrayOfNestedType_UsesStructNameOverride()
+    {
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(StructName = ""item"")]
+public partial class OrderItem
+{
+    public string Sku { get; set; } = """";
+    public int Quantity { get; set; }
+}
+
+[TeaLeaf]
+public partial class Order
+{
+    public string OrderId { get; set; } = """";
+    public OrderItem[] Items { get; set; } = System.Array.Empty<OrderItem>();
+}
+";
+        var result = RunGenerator(source);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var gen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("Order.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Should use "item" from StructName, not "order_item" from ToSnakeCase
+        Assert.Contains("items: []item", gen);
+        Assert.DoesNotContain("order_item", gen);
+    }
+
+    [Fact]
+    public void Generator_NestedTypeWithoutStructName_UsesSnakeCase()
+    {
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf]
+public partial class ShippingAddress
+{
+    public string Street { get; set; } = """";
+    public string City { get; set; } = """";
+}
+
+[TeaLeaf]
+public partial class Customer
+{
+    public string Name { get; set; } = """";
+    public ShippingAddress Address { get; set; } = new();
+}
+";
+        var result = RunGenerator(source);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var gen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("Customer.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Without StructName override, should use default snake_case
+        Assert.Contains("address: shipping_address", gen);
+    }
 }

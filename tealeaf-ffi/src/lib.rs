@@ -3,7 +3,7 @@
 //! This crate provides a C-compatible API for use from other languages
 //! like C#, Python, and Node.js.
 
-use tealeaf::{TeaLeaf, Value, Reader, Writer, dumps};
+use tealeaf::{TeaLeaf, Value, Reader, Writer, dumps, dumps_compact};
 use std::cell::RefCell;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -268,6 +268,45 @@ pub unsafe extern "C" fn tl_document_to_text_data_only(doc: *const TLDocument) -
     }
 
     let text = dumps(&(*doc).inner.data);
+    match CString::new(text) {
+        Ok(s) => s.into_raw(),
+        Err(_) => ptr::null_mut(),
+    }
+}
+
+/// Convert document to compact TeaLeaf text format with schema definitions.
+/// Removes insignificant whitespace for token-efficient LLM input.
+/// Caller must free the returned string with tl_string_free.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_to_text_compact(doc: *const TLDocument) -> *mut c_char {
+    if doc.is_null() {
+        return ptr::null_mut();
+    }
+
+    let text = (*doc).inner.to_tl_with_schemas_compact();
+    match CString::new(text) {
+        Ok(s) => s.into_raw(),
+        Err(_) => ptr::null_mut(),
+    }
+}
+
+/// Convert document to compact TeaLeaf text format without schema definitions.
+/// Caller must free the returned string with tl_string_free.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_to_text_compact_data_only(doc: *const TLDocument) -> *mut c_char {
+    if doc.is_null() {
+        return ptr::null_mut();
+    }
+
+    let text = dumps_compact(&(*doc).inner.data);
     match CString::new(text) {
         Ok(s) => s.into_raw(),
         Err(_) => ptr::null_mut(),

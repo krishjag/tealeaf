@@ -273,6 +273,31 @@ impl TeaLeaf {
         output
     }
 
+    /// Serialize to compact TeaLeaf text format with schema definitions.
+    /// Removes insignificant whitespace (spaces after `:` and `,`, indentation,
+    /// blank lines) while keeping the format parseable. Table rows remain one
+    /// per line for readability.
+    pub fn to_tl_with_schemas_compact(&self) -> String {
+        let mut output = String::new();
+
+        if self.is_root_array {
+            output.push_str("@root-array\n");
+        }
+
+        if self.schemas.is_empty() && self.unions.is_empty() {
+            output.push_str(&dumps_compact(&self.data));
+        } else {
+            let schema_order: Vec<String> = self.schemas.keys().cloned().collect();
+            let union_order: Vec<String> = self.unions.keys().cloned().collect();
+            output.push_str(&dumps_with_schemas_compact(
+                &self.data, &self.schemas, &schema_order,
+                &self.unions, &union_order,
+            ));
+        }
+
+        output
+    }
+
     /// Convert to JSON string (pretty-printed).
     ///
     /// # Stability Policy - TeaLeaf→JSON Fixed Representations
@@ -620,14 +645,36 @@ fn write_map_key(out: &mut String, key: &Value) {
 }
 
 pub fn dumps(data: &IndexMap<String, Value>) -> String {
+    dumps_inner(data, false)
+}
+
+/// Serialize data to compact TeaLeaf text format (no schemas).
+/// Removes insignificant whitespace for token-efficient output.
+pub fn dumps_compact(data: &IndexMap<String, Value>) -> String {
+    dumps_inner(data, true)
+}
+
+fn dumps_inner(data: &IndexMap<String, Value>, compact: bool) -> String {
     let mut out = String::new();
     for (key, value) in data {
         write_key(&mut out, key);
-        out.push_str(": ");
-        write_value(&mut out, value, 0);
+        out.push_str(kv_sep(compact));
+        write_value(&mut out, value, 0, compact);
         out.push('\n');
     }
     out
+}
+
+/// Returns ", " in pretty mode, "," in compact mode
+#[inline]
+fn sep(compact: bool) -> &'static str {
+    if compact { "," } else { ", " }
+}
+
+/// Returns ": " in pretty mode, ":" in compact mode.
+#[inline]
+fn kv_sep(compact: bool) -> &'static str {
+    if compact { ":" } else { ": " }
 }
 
 /// Escape a string for TeaLeaf text output.
@@ -685,7 +732,7 @@ fn format_float(f: f64) -> String {
     }
 }
 
-fn write_value(out: &mut String, value: &Value, indent: usize) {
+fn write_value(out: &mut String, value: &Value, indent: usize, compact: bool) {
     match value {
         Value::Null => out.push('~'),
         Value::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
@@ -712,32 +759,32 @@ fn write_value(out: &mut String, value: &Value, indent: usize) {
         Value::Array(arr) => {
             out.push('[');
             for (i, v) in arr.iter().enumerate() {
-                if i > 0 { out.push_str(", "); }
-                write_value(out, v, indent);
+                if i > 0 { out.push_str(sep(compact)); }
+                write_value(out, v, indent, compact);
             }
             out.push(']');
         }
         Value::Object(obj) => {
             out.push('{');
             for (i, (k, v)) in obj.iter().enumerate() {
-                if i > 0 { out.push_str(", "); }
+                if i > 0 { out.push_str(sep(compact)); }
                 write_key(out, k);
-                out.push_str(": ");
-                write_value(out, v, indent);
+                out.push_str(kv_sep(compact));
+                write_value(out, v, indent, compact);
             }
             out.push('}');
         }
         Value::Map(pairs) => {
-            out.push_str("@map {");
+            out.push_str(if compact { "@map{" } else { "@map {" });
             let mut first = true;
             for (k, v) in pairs {
-                if !first { out.push_str(", "); }
+                if !first { out.push_str(sep(compact)); }
                 first = false;
                 // Map keys are restricted to string | name | integer per spec.
                 // Write Int/UInt directly; convert other types to quoted strings.
                 write_map_key(out, k);
-                out.push_str(": ");
-                write_value(out, v, indent);
+                out.push_str(kv_sep(compact));
+                write_value(out, v, indent, compact);
             }
             out.push('}');
         }
@@ -749,7 +796,7 @@ fn write_value(out: &mut String, value: &Value, indent: usize) {
             out.push(':');
             out.push_str(tag);
             out.push(' ');
-            write_value(out, inner, indent);
+            write_value(out, inner, indent, compact);
         }
         Value::Timestamp(ts, tz) => {
             out.push_str(&format_timestamp_millis(*ts, *tz));
@@ -1312,6 +1359,29 @@ pub fn dumps_with_schemas(
     unions: &IndexMap<String, Union>,
     union_order: &[String],
 ) -> String {
+    dumps_with_schemas_inner(data, schemas, schema_order, unions, union_order, false)
+}
+
+/// Serialize data to compact TeaLeaf text format with schemas.
+/// Removes insignificant whitespace for token-efficient output.
+pub fn dumps_with_schemas_compact(
+    data: &IndexMap<String, Value>,
+    schemas: &IndexMap<String, Schema>,
+    schema_order: &[String],
+    unions: &IndexMap<String, Union>,
+    union_order: &[String],
+) -> String {
+    dumps_with_schemas_inner(data, schemas, schema_order, unions, union_order, true)
+}
+
+fn dumps_with_schemas_inner(
+    data: &IndexMap<String, Value>,
+    schemas: &IndexMap<String, Schema>,
+    schema_order: &[String],
+    unions: &IndexMap<String, Union>,
+    union_order: &[String],
+    compact: bool,
+) -> String {
     let mut out = String::new();
     let mut has_definitions = false;
 
@@ -1320,17 +1390,17 @@ pub fn dumps_with_schemas(
         if let Some(union) = unions.get(name) {
             out.push_str("@union ");
             out.push_str(&union.name);
-            out.push_str(" {\n");
+            out.push_str(if compact { "{\n" } else { " {\n" });
             for (vi, variant) in union.variants.iter().enumerate() {
-                out.push_str("  ");
+                if !compact { out.push_str("  "); }
                 out.push_str(&variant.name);
-                out.push_str(" (");
+                out.push_str(if compact { "(" } else { " (" });
                 for (fi, field) in variant.fields.iter().enumerate() {
                     if fi > 0 {
-                        out.push_str(", ");
+                        out.push_str(sep(compact));
                     }
                     out.push_str(&field.name);
-                    out.push_str(": ");
+                    out.push_str(kv_sep(compact));
                     out.push_str(&field.field_type.to_string());
                 }
                 out.push(')');
@@ -1349,13 +1419,13 @@ pub fn dumps_with_schemas(
         if let Some(schema) = schemas.get(name) {
             out.push_str("@struct ");
             out.push_str(&schema.name);
-            out.push_str(" (");
+            out.push_str(if compact { "(" } else { " (" });
             for (i, field) in schema.fields.iter().enumerate() {
                 if i > 0 {
-                    out.push_str(", ");
+                    out.push_str(sep(compact));
                 }
                 write_key(&mut out, &field.name);
-                out.push_str(": ");
+                out.push_str(kv_sep(compact));
                 out.push_str(&field.field_type.to_string());
             }
             out.push_str(")\n");
@@ -1363,15 +1433,15 @@ pub fn dumps_with_schemas(
         }
     }
 
-    if has_definitions {
+    if has_definitions && !compact {
         out.push('\n');
     }
 
     // Write data (preserves insertion order)
     for (key, value) in data {
         write_key(&mut out, key);
-        out.push_str(": ");
-        write_value_with_schemas(&mut out, value, schemas, Some(key), 0, None);
+        out.push_str(kv_sep(compact));
+        write_value_with_schemas(&mut out, value, schemas, Some(key), 0, None, compact);
         out.push('\n');
     }
 
@@ -1417,6 +1487,7 @@ fn write_value_with_schemas(
     hint_name: Option<&str>,
     indent: usize,
     declared_type: Option<&str>,
+    compact: bool,
 ) {
     match value {
         Value::Null => out.push('~'),
@@ -1479,22 +1550,26 @@ fn write_value_with_schemas(
                 if schema_matches {
                     out.push_str("@table ");
                     out.push_str(&schema.name);
-                    out.push_str(" [\n");
+                    out.push_str(if compact { "[\n" } else { " [\n" });
 
-                    let inner_indent = indent + 2;
+                    let inner_indent = if compact { 0 } else { indent + 2 };
                     for (i, item) in arr.iter().enumerate() {
-                        for _ in 0..inner_indent {
-                            out.push(' ');
+                        if !compact {
+                            for _ in 0..inner_indent {
+                                out.push(' ');
+                            }
                         }
-                        write_tuple(out, item, schema, schemas, inner_indent);
+                        write_tuple(out, item, schema, schemas, inner_indent, compact);
                         if i < arr.len() - 1 {
                             out.push(',');
                         }
                         out.push('\n');
                     }
 
-                    for _ in 0..indent {
-                        out.push(' ');
+                    if !compact {
+                        for _ in 0..indent {
+                            out.push(' ');
+                        }
                     }
                     out.push(']');
                     return;
@@ -1505,9 +1580,9 @@ fn write_value_with_schemas(
             out.push('[');
             for (i, v) in arr.iter().enumerate() {
                 if i > 0 {
-                    out.push_str(", ");
+                    out.push_str(sep(compact));
                 }
-                write_value_with_schemas(out, v, schemas, None, indent, None);
+                write_value_with_schemas(out, v, schemas, None, indent, None, compact);
             }
             out.push(']');
         }
@@ -1530,31 +1605,31 @@ fn write_value_with_schemas(
             out.push('{');
             for (i, (k, v)) in obj.iter().enumerate() {
                 if i > 0 {
-                    out.push_str(", ");
+                    out.push_str(sep(compact));
                 }
                 write_key(out, k);
-                out.push_str(": ");
+                out.push_str(kv_sep(compact));
                 // Look up this field's declared type from the parent schema
                 let field_type = obj_schema.and_then(|s| {
                     s.fields.iter()
                         .find(|f| f.name == *k)
                         .map(|f| f.field_type.base.as_str())
                 });
-                write_value_with_schemas(out, v, schemas, Some(k), indent, field_type);
+                write_value_with_schemas(out, v, schemas, Some(k), indent, field_type, compact);
             }
             out.push('}');
         }
         Value::Map(pairs) => {
-            out.push_str("@map {");
+            out.push_str(if compact { "@map{" } else { "@map {" });
             let mut first = true;
             for (k, v) in pairs {
                 if !first {
-                    out.push_str(", ");
+                    out.push_str(sep(compact));
                 }
                 first = false;
                 write_map_key(out, k);
-                out.push_str(": ");
-                write_value_with_schemas(out, v, schemas, None, indent, None);
+                out.push_str(kv_sep(compact));
+                write_value_with_schemas(out, v, schemas, None, indent, None, compact);
             }
             out.push('}');
         }
@@ -1566,7 +1641,7 @@ fn write_value_with_schemas(
             out.push(':');
             out.push_str(tag);
             out.push(' ');
-            write_value_with_schemas(out, inner, schemas, None, indent, None);
+            write_value_with_schemas(out, inner, schemas, None, indent, None, compact);
         }
         Value::Timestamp(ts, tz) => {
             out.push_str(&format_timestamp_millis(*ts, *tz));
@@ -1580,12 +1655,13 @@ fn write_tuple(
     schema: &Schema,
     schemas: &IndexMap<String, Schema>,
     indent: usize,
+    compact: bool,
 ) {
     if let Value::Object(obj) = value {
         out.push('(');
         for (i, field) in schema.fields.iter().enumerate() {
             if i > 0 {
-                out.push_str(", ");
+                out.push_str(sep(compact));
             }
             if let Some(v) = obj.get(&field.name) {
                 let type_base = field.field_type.base.as_str();
@@ -1593,17 +1669,17 @@ fn write_tuple(
                 if field.field_type.is_array {
                     if let Some(item_schema) = resolve_schema(schemas, Some(type_base), None) {
                         // The schema defines the element type - write array with tuples directly
-                        write_schema_array(out, v, item_schema, schemas, indent);
+                        write_schema_array(out, v, item_schema, schemas, indent, compact);
                     } else {
                         // No schema for element type - use regular array format
-                        write_value_with_schemas(out, v, schemas, None, indent, None);
+                        write_value_with_schemas(out, v, schemas, None, indent, None, compact);
                     }
                 } else if resolve_schema(schemas, Some(type_base), None).is_some() {
                     // Non-array field with schema type - write as nested tuple
                     let nested_schema = resolve_schema(schemas, Some(type_base), None).unwrap();
-                    write_tuple(out, v, nested_schema, schemas, indent);
+                    write_tuple(out, v, nested_schema, schemas, indent, compact);
                 } else {
-                    write_value_with_schemas(out, v, schemas, None, indent, None);
+                    write_value_with_schemas(out, v, schemas, None, indent, None, compact);
                 }
             } else {
                 out.push('~');
@@ -1611,7 +1687,7 @@ fn write_tuple(
         }
         out.push(')');
     } else {
-        write_value_with_schemas(out, value, schemas, None, indent, None);
+        write_value_with_schemas(out, value, schemas, None, indent, None, compact);
     }
 }
 
@@ -1622,6 +1698,7 @@ fn write_schema_array(
     schema: &Schema,
     schemas: &IndexMap<String, Schema>,
     indent: usize,
+    compact: bool,
 ) {
     if let Value::Array(arr) = value {
         if arr.is_empty() {
@@ -1630,24 +1707,28 @@ fn write_schema_array(
         }
 
         out.push_str("[\n");
-        let inner_indent = indent + 2;
+        let inner_indent = if compact { 0 } else { indent + 2 };
         for (i, item) in arr.iter().enumerate() {
-            for _ in 0..inner_indent {
-                out.push(' ');
+            if !compact {
+                for _ in 0..inner_indent {
+                    out.push(' ');
+                }
             }
-            write_tuple(out, item, schema, schemas, inner_indent);
+            write_tuple(out, item, schema, schemas, inner_indent, compact);
             if i < arr.len() - 1 {
                 out.push(',');
             }
             out.push('\n');
         }
-        for _ in 0..indent {
-            out.push(' ');
+        if !compact {
+            for _ in 0..indent {
+                out.push(' ');
+            }
         }
         out.push(']');
     } else {
         // Not an array - fall back to regular value writing
-        write_value_with_schemas(out, value, schemas, None, indent, None);
+        write_value_with_schemas(out, value, schemas, None, indent, None, compact);
     }
 }
 
@@ -3334,7 +3415,7 @@ mod tests {
         let schemas = IndexMap::new();
         let schema = Schema::new("empty");
         let mut out = String::new();
-        write_schema_array(&mut out, &Value::Array(vec![]), &schema, &schemas, 0);
+        write_schema_array(&mut out, &Value::Array(vec![]), &schema, &schemas, 0, false);
         assert_eq!(out, "[]");
     }
 
@@ -3343,7 +3424,7 @@ mod tests {
         let schemas = IndexMap::new();
         let schema = Schema::new("test");
         let mut out = String::new();
-        write_schema_array(&mut out, &Value::Int(42), &schema, &schemas, 0);
+        write_schema_array(&mut out, &Value::Int(42), &schema, &schemas, 0, false);
         assert_eq!(out, "42");
     }
 
@@ -3360,7 +3441,7 @@ mod tests {
         );
 
         let mut out = String::new();
-        write_tuple(&mut out, &value, &schema, &schemas, 0);
+        write_tuple(&mut out, &value, &schema, &schemas, 0, false);
         assert!(out.contains("42"), "Present field should be written");
         assert!(out.contains("~"), "Missing field should be ~");
     }
@@ -3372,7 +3453,7 @@ mod tests {
         let schema = Schema::new("test");
 
         let mut out = String::new();
-        write_tuple(&mut out, &Value::Int(42), &schema, &schemas, 0);
+        write_tuple(&mut out, &Value::Int(42), &schema, &schemas, 0, false);
         assert_eq!(out, "42");
     }
 
@@ -4943,6 +5024,177 @@ root: @table root [
         for (key, orig_val) in &tl.data {
             let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
             assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+        }
+    }
+
+    // ── Compact formatting tests ──────────────────────────────────────
+
+    #[test]
+    fn test_dumps_compact_basic() {
+        let mut data = IndexMap::new();
+        data.insert("name".to_string(), Value::String("alice".to_string()));
+        data.insert("age".to_string(), Value::Int(30));
+        let output = dumps_compact(&data);
+        assert!(output.contains("name:alice\n"), "got: {output}");
+        assert!(output.contains("age:30\n"), "got: {output}");
+    }
+
+    #[test]
+    fn test_dumps_compact_array() {
+        let mut data = IndexMap::new();
+        data.insert("items".to_string(), Value::Array(vec![
+            Value::Int(1), Value::Int(2), Value::Int(3),
+        ]));
+        let output = dumps_compact(&data);
+        assert!(output.contains("[1,2,3]"), "got: {output}");
+    }
+
+    #[test]
+    fn test_dumps_compact_object() {
+        let mut data = IndexMap::new();
+        let obj: IndexMap<String, Value> = vec![
+            ("host".to_string(), Value::String("localhost".to_string())),
+            ("port".to_string(), Value::Int(8080)),
+        ].into_iter().collect();
+        data.insert("config".to_string(), Value::Object(obj));
+        let output = dumps_compact(&data);
+        assert!(output.contains("{host:localhost,port:8080}"), "got: {output}");
+    }
+
+    #[test]
+    fn test_dumps_compact_map() {
+        let mut data = IndexMap::new();
+        data.insert("m".to_string(), Value::Map(vec![
+            (Value::Int(1), Value::String("one".to_string())),
+            (Value::Int(2), Value::String("two".to_string())),
+        ]));
+        let output = dumps_compact(&data);
+        assert!(output.contains("@map{1:one,2:two}"), "got: {output}");
+    }
+
+    #[test]
+    fn test_dumps_compact_tagged_keeps_space() {
+        let mut data = IndexMap::new();
+        data.insert("val".to_string(), Value::Tagged(
+            "ok".to_string(), Box::new(Value::Int(200)),
+        ));
+        let output = dumps_compact(&data);
+        assert!(output.contains(":ok 200"), "Space after :tag must be kept (tag/value would merge), got: {output}");
+    }
+
+    #[test]
+    fn test_compact_struct_definition() {
+        let json = r#"{"users": [{"id": 1, "name": "alice"}, {"id": 2, "name": "bob"}]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let compact = doc.to_tl_with_schemas_compact();
+        // Struct def should have no space before ( and no spaces after ,
+        assert!(compact.contains("@struct user("), "got: {compact}");
+        assert!(compact.contains("id:int"), "got: {compact}");
+        // Table should have no space before [
+        assert!(compact.contains("@table user["), "got: {compact}");
+        // No indentation on table rows
+        assert!(compact.contains("\n("), "rows should start at column 0, got: {compact}");
+        assert!(!compact.contains("  ("), "no indentation in compact, got: {compact}");
+        // No blank line between definitions and data
+        assert!(!compact.contains(")\n\n"), "no blank line after struct def, got: {compact}");
+    }
+
+    #[test]
+    fn test_compact_is_smaller_than_pretty() {
+        let json = r#"{"users": [{"id": 1, "name": "alice"}, {"id": 2, "name": "bob"}]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let pretty = doc.to_tl_with_schemas();
+        let compact = doc.to_tl_with_schemas_compact();
+        assert!(
+            compact.len() < pretty.len(),
+            "Compact ({}) should be smaller than pretty ({})\nCompact:\n{compact}\nPretty:\n{pretty}",
+            compact.len(), pretty.len()
+        );
+    }
+
+    #[test]
+    fn test_compact_roundtrip() {
+        // Compact output must re-parse to the same data
+        let json = r#"{
+            "company": "FastTrack Logistics",
+            "shipments": [
+                {"id": "S1", "origin": "Los Angeles, CA", "weight": 250, "cost": 450.0, "delivered": true},
+                {"id": "S2", "origin": "Chicago, IL", "weight": 180, "cost": 320.0, "delivered": false}
+            ]
+        }"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let compact = doc.to_tl_with_schemas_compact();
+        let reparsed = TeaLeaf::parse(&compact)
+            .unwrap_or_else(|e| panic!("Failed to re-parse compact: {e}\nCompact:\n{compact}"));
+
+        let json1 = doc.to_json().unwrap();
+        let json2 = reparsed.to_json().unwrap();
+        let v1: serde_json::Value = serde_json::from_str(&json1).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json2).unwrap();
+        assert_eq!(v1, v2, "Compact round-trip data mismatch");
+    }
+
+    #[test]
+    fn test_compact_preserves_quoted_strings() {
+        // Strings with spaces must keep their quotes and content intact
+        let json = r#"{"items": [{"city": "New York, NY", "name": "Alice Smith"}]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let compact = doc.to_tl_with_schemas_compact();
+        assert!(compact.contains("\"New York, NY\""), "Quoted string must be preserved, got: {compact}");
+        assert!(compact.contains("\"Alice Smith\""), "Quoted string must be preserved, got: {compact}");
+    }
+
+    #[test]
+    fn test_compact_root_array_single_newline() {
+        let json = r#"[1, 2, 3]"#;
+        let doc = TeaLeaf::from_json(json).unwrap();
+        let compact = doc.to_tl_with_schemas_compact();
+        assert!(compact.starts_with("@root-array\n"), "got: {compact}");
+        assert!(!compact.starts_with("@root-array\n\n"), "Should not have double newline in compact, got: {compact}");
+    }
+
+    #[test]
+    fn test_compact_no_schemas_path() {
+        // Documents without schemas should also compact correctly
+        let mut data = IndexMap::new();
+        let obj: IndexMap<String, Value> = vec![
+            ("x".to_string(), Value::Int(1)),
+            ("y".to_string(), Value::Int(2)),
+        ].into_iter().collect();
+        data.insert("point".to_string(), Value::Object(obj));
+        data.insert("label".to_string(), Value::String("origin".to_string()));
+        let doc = TeaLeaf {
+            schemas: IndexMap::new(),
+            unions: IndexMap::new(),
+            data,
+            is_root_array: false,
+        };
+        let compact = doc.to_tl_with_schemas_compact();
+        assert!(compact.contains("point:{x:1,y:2}"), "got: {compact}");
+        assert!(compact.contains("label:origin"), "got: {compact}");
+    }
+
+    #[test]
+    fn test_compact_canonical_roundtrip() {
+        // Verify compact output round-trips for all canonical samples
+        let canonical_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../canonical/samples");
+        let samples = [
+            "primitives", "arrays", "objects", "schemas", "timestamps",
+            "unicode_escaping", "numbers_extended", "refs_tags_maps",
+            "special_types", "unions", "mixed_schemas", "large_data",
+        ];
+        for name in &samples {
+            let path = canonical_dir.join(format!("{}.tl", name));
+            if !path.exists() { continue; }
+            let doc = TeaLeaf::load(&path).unwrap();
+            let compact = doc.to_tl_with_schemas_compact();
+            let reparsed = TeaLeaf::parse(&compact)
+                .unwrap_or_else(|e| panic!("Failed to re-parse compact {name}: {e}\nCompact:\n{compact}"));
+            let json1 = doc.to_json().unwrap();
+            let json2 = reparsed.to_json().unwrap();
+            let v1: serde_json::Value = serde_json::from_str(&json1).unwrap();
+            let v2: serde_json::Value = serde_json::from_str(&json2).unwrap();
+            assert_eq!(v1, v2, "Compact round-trip failed for {name}");
         }
     }
 }

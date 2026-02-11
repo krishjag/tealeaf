@@ -30,7 +30,6 @@ pub enum TokenKind {
 
     // Special
     Directive(String),
-    Tag(String),
     Ref(String),
 
     Eof,
@@ -107,22 +106,13 @@ impl<'a> Lexer<'a> {
                 '=' => Some(TokenKind::Eq),
                 '~' => Some(TokenKind::Null),
                 '?' => Some(TokenKind::Question),
+                ':' => Some(TokenKind::Colon),
                 _ => None,
             };
 
             if let Some(kind) = simple {
                 self.advance();
                 return Ok(Token::new(kind, line, col));
-            }
-
-            // Colon - might be a tag
-            if c == ':' {
-                self.advance();
-                if self.current_char().map(|c| c.is_alphabetic() || c == '_').unwrap_or(false) {
-                    let word = self.read_word();
-                    return Ok(Token::new(TokenKind::Tag(word), line, col));
-                }
-                return Ok(Token::new(TokenKind::Colon, line, col));
             }
 
             // Directive
@@ -956,10 +946,12 @@ mod tests {
     // -------------------------------------------------------------------------
 
     #[test]
-    fn test_tag_token() {
+    fn test_colon_then_word() {
+        // `:Circle` is now lexed as Colon + Word("Circle"), not Tag("Circle")
         let mut lexer = Lexer::new(":Circle {radius: 5.0}");
         let tokens = lexer.tokenize().unwrap();
-        assert!(matches!(&tokens[0].kind, TokenKind::Tag(s) if s == "Circle"));
+        assert!(matches!(tokens[0].kind, TokenKind::Colon));
+        assert!(matches!(&tokens[1].kind, TokenKind::Word(s) if s == "Circle"));
     }
 
     #[test]

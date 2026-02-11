@@ -244,7 +244,7 @@ internal static class ModelAnalyzer
         {
             string elemType = GetTLTypeForElement(arrayType.ElementType);
             bool isNestedElement = HasTeaLeafAttribute(arrayType.ElementType);
-            string? nestedName = isNestedElement ? ToSnakeCase(arrayType.ElementType.Name) : null;
+            string? nestedName = isNestedElement ? ResolveStructName(arrayType.ElementType) : null;
             return (PropertyKind.List, $"[]{elemType}", true, arrayType.ElementType.ToDisplayString(),
                 false, isNestedElement, nestedName);
         }
@@ -257,7 +257,7 @@ internal static class ModelAnalyzer
                 var elemSymbol = namedType.TypeArguments[0];
                 string elemType = GetTLTypeForElement(elemSymbol);
                 bool isNestedElement = HasTeaLeafAttribute(elemSymbol);
-                string? nestedName = isNestedElement ? ToSnakeCase(elemSymbol.Name) : null;
+                string? nestedName = isNestedElement ? ResolveStructName(elemSymbol) : null;
                 return (PropertyKind.List, $"[]{elemType}", true, elemSymbol.ToDisplayString(),
                     false, isNestedElement, nestedName);
             }
@@ -272,7 +272,7 @@ internal static class ModelAnalyzer
             // Nested [TeaLeaf] type
             if (HasTeaLeafAttribute(namedType))
             {
-                string structName = ToSnakeCase(namedType.Name);
+                string structName = ResolveStructName(namedType);
                 return (PropertyKind.NestedObject, structName, false, null, false, true, structName);
             }
         }
@@ -303,6 +303,25 @@ internal static class ModelAnalyzer
         return type.GetAttributes().Any(a => a.AttributeClass?.Name == "TeaLeafAttribute");
     }
 
+    /// <summary>
+    /// Resolves the TeaLeaf struct name for a type by checking [TeaLeaf(StructName = "...")] first,
+    /// falling back to ToSnakeCase(type.Name).
+    /// </summary>
+    private static string ResolveStructName(ITypeSymbol type)
+    {
+        var attr = type.GetAttributes()
+            .FirstOrDefault(a => a.AttributeClass?.Name == "TeaLeafAttribute");
+        if (attr != null)
+        {
+            foreach (var namedArg in attr.NamedArguments)
+            {
+                if (namedArg.Key == "StructName" && namedArg.Value.Value is string sn)
+                    return sn;
+            }
+        }
+        return ToSnakeCase(type.Name);
+    }
+
     private static string GetTLTypeForElement(ITypeSymbol type)
     {
         return type.SpecialType switch
@@ -312,7 +331,7 @@ internal static class ModelAnalyzer
             SpecialType.System_Int64 => "int64",
             SpecialType.System_Double => "float",
             SpecialType.System_String => "string",
-            _ => HasTeaLeafAttribute(type) ? ToSnakeCase(type.Name) : "string"
+            _ => HasTeaLeafAttribute(type) ? ResolveStructName(type) : "string"
         };
     }
 

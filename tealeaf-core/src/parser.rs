@@ -340,11 +340,20 @@ impl Parser {
             TokenKind::Word(w) => { let w = w.clone(); self.advance(); Ok(Value::String(w)) }
             TokenKind::Ref(r) => { let r = r.clone(); self.advance(); Ok(Value::Ref(r)) }
             TokenKind::Timestamp(ts, tz) => { let ts = *ts; let tz = *tz; self.advance(); Ok(Value::Timestamp(ts, tz)) }
-            TokenKind::Tag(t) => {
-                let tag = t.clone();
-                self.advance();
-                let inner = self.parse_value(depth + 1)?;
-                Ok(Value::Tagged(tag, Box::new(inner)))
+            TokenKind::Colon => {
+                self.advance(); // consume ':'
+                match self.current_kind() {
+                    TokenKind::Word(w) => {
+                        let tag = w.clone();
+                        self.advance(); // consume tag name
+                        let inner = self.parse_value(depth + 1)?;
+                        Ok(Value::Tagged(tag, Box::new(inner)))
+                    }
+                    _ => Err(Error::UnexpectedToken {
+                        expected: "tag name after ':'".to_string(),
+                        got: format!("{:?}", self.current_kind()),
+                    })
+                }
             }
             TokenKind::Directive(d) => {
                 let directive = d.clone();
@@ -390,7 +399,7 @@ impl Parser {
                 | TokenKind::Ref(_)
                 | TokenKind::Timestamp(_, _)
                 | TokenKind::JsonNumber(_)
-                | TokenKind::Tag(_)
+                | TokenKind::Colon
                 | TokenKind::Directive(_)
                 | TokenKind::LBrace
                 | TokenKind::LBracket
@@ -750,6 +759,23 @@ mod tests {
         let (tag, inner) = data.get("status").unwrap().as_tagged().unwrap();
         assert_eq!(tag, "none");
         assert!(inner.is_null());
+    }
+
+    #[test]
+    fn test_tagged_value_no_space_after_colon() {
+        // key::tag without spaces — works because lexer emits Colon Colon Word
+        let data = parse("status::ok 200").unwrap();
+        let (tag, inner) = data.get("status").unwrap().as_tagged().unwrap();
+        assert_eq!(tag, "ok");
+        assert_eq!(inner.as_int(), Some(200));
+    }
+
+    #[test]
+    fn test_key_value_no_space_after_colon() {
+        // key:value without space — works because lexer emits Word Colon Word
+        let data = parse("name:alice\nage:30").unwrap();
+        assert_eq!(data.get("name").unwrap().as_str(), Some("alice"));
+        assert_eq!(data.get("age").unwrap().as_int(), Some(30));
     }
 
     // -------------------------------------------------------------------------

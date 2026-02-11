@@ -5,7 +5,7 @@ Convert a TeaLeaf binary file (`.tlbx`) back to the human-readable text format (
 ## Usage
 
 ```bash
-tealeaf decompile <input.tlbx> -o <output.tl>
+tealeaf decompile <input.tlbx> -o <output.tl> [--compact]
 ```
 
 ## Arguments
@@ -14,6 +14,7 @@ tealeaf decompile <input.tlbx> -o <output.tl>
 |----------|----------|-------------|
 | `<input.tlbx>` | Yes | Path to the TeaLeaf binary file |
 | `-o <output.tl>` | Yes | Path for the output text file |
+| `--compact` | No | Remove insignificant whitespace for token-efficient output |
 
 ## Description
 
@@ -33,11 +34,24 @@ The `decompile` command:
 - **Data is lossless** -- all values, schemas, and structure are preserved
 - **Bytes are lossless** -- bytes values are written as `b"..."` hex literals, which round-trip correctly
 
+## Compact Mode
+
+The `--compact` flag removes insignificant whitespace from the output: no spaces after `:` in key-value pairs, no spaces after `,` in arrays and objects, no indentation, and no blank lines between sections. This produces a token-efficient format ideal for LLM context windows.
+
+```bash
+tealeaf decompile data.tlbx -o data_compact.tl --compact
+```
+
+The compact output is semantically identical to the pretty-printed output and round-trips without data loss.
+
 ## Examples
 
 ```bash
 # Decompile a binary file
 tealeaf decompile data.tlbx -o data_recovered.tl
+
+# Decompile with compact output (fewer tokens for LLM input)
+tealeaf decompile data.tlbx -o data_compact.tl --compact
 
 # Round-trip verification
 tealeaf compile original.tl -o compiled.tlbx

@@ -45,7 +45,7 @@ Convert a JSON file to TeaLeaf text format with automatic schema inference.
 ### Usage
 
 ```bash
-tealeaf from-json <input.json> -o <output.tl>
+tealeaf from-json <input.json> -o <output.tl> [--compact]
 ```
 
 ### Arguments
@@ -54,6 +54,7 @@ tealeaf from-json <input.json> -o <output.tl>
 |----------|----------|-------------|
 | `<input.json>` | Yes | Path to the JSON file |
 | `-o <output.tl>` | Yes | Path for the output TeaLeaf text file |
+| `--compact` | No | Remove insignificant whitespace for token-efficient output |
 
 ### Schema Inference
 
@@ -70,6 +71,9 @@ tealeaf from-json <input.json> -o <output.tl>
 ```bash
 # Convert with schema inference
 tealeaf from-json api_data.json -o structured.tl
+
+# Convert with compact output (fewer tokens for LLM input)
+tealeaf from-json api_data.json -o structured_compact.tl --compact
 
 # Full pipeline: JSON → TeaLeaf text → Binary
 tealeaf from-json data.json -o data.tl

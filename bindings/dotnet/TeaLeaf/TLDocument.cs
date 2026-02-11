@@ -156,6 +156,28 @@ public sealed class TLDocument : IDisposable
     }
 
     /// <summary>
+    /// Convert the document to compact TeaLeaf text format with schema definitions.
+    /// Removes insignificant whitespace for token-efficient LLM input.
+    /// </summary>
+    public string ToTextCompact()
+    {
+        ThrowIfDisposed();
+        var ptr = NativeMethods.tl_document_to_text_compact(_handle);
+        return NativeMethods.PtrToStringAndFree(ptr) ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Convert the document to compact TeaLeaf text format without schema definitions (data only).
+    /// Removes insignificant whitespace for token-efficient LLM input.
+    /// </summary>
+    public string ToTextCompactDataOnly()
+    {
+        ThrowIfDisposed();
+        var ptr = NativeMethods.tl_document_to_text_compact_data_only(_handle);
+        return NativeMethods.PtrToStringAndFree(ptr) ?? string.Empty;
+    }
+
+    /// <summary>
     /// Convert the document to pretty-printed JSON.
     /// </summary>
     /// <returns>A JSON string representation of the document.</returns>

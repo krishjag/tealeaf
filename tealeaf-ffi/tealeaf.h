@@ -151,6 +151,27 @@ char *tl_document_to_text(const struct TLDocument *doc);
 char *tl_document_to_text_data_only(const struct TLDocument *doc);
 
 /**
+ * Convert document to compact TeaLeaf text format with schema definitions.
+ * Removes insignificant whitespace for token-efficient LLM input.
+ * Caller must free the returned string with tl_string_free.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+char *tl_document_to_text_compact(const struct TLDocument *doc);
+
+/**
+ * Convert document to compact TeaLeaf text format without schema definitions.
+ * Caller must free the returned string with tl_string_free.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+char *tl_document_to_text_compact_data_only(const struct TLDocument *doc);
+
+/**
  * Compile document to binary format and write to file.
  *
  * # Safety

@@ -38,6 +38,10 @@ string[] keys = doc.Keys;
 string text = doc.ToText();               // full document (schemas + data)
 string data = doc.ToTextDataOnly();       // data only (no schemas)
 
+// Compact text (removes insignificant whitespace, ideal for LLM input)
+string compact = doc.ToTextCompact();              // schemas + data, compact
+string compactData = doc.ToTextCompactDataOnly();  // data only, compact
+
 // To JSON
 string json = doc.ToJson();               // pretty-printed
 string json = doc.ToJsonCompact();        // minified

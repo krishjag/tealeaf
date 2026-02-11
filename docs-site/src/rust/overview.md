@@ -117,6 +117,9 @@ let json = doc.to_json_compact()?;  // minified
 
 // Convert to TeaLeaf text (with schemas)
 let text = doc.to_tl_with_schemas();
+
+// Compact text (removes insignificant whitespace, ideal for LLM input)
+let compact = doc.to_tl_with_schemas_compact();
 ```
 
 ## Conversion Traits
