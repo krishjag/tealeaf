@@ -16,8 +16,7 @@
     {
       "address": {
         "city": "Portland",
-        "country": "USA",
-        "zip": null
+        "country": "USA"
       },
       "department": "Marketing",
       "id": 102,
@@ -57,7 +56,6 @@
       "name": "alice"
     },
     {
-      "email": null,
       "id": 2,
       "name": "bob"
     },

@@ -35,7 +35,6 @@
       },
       {
         "age": 32,
-        "email": null,
         "name": "Eve"
       }
     ]
@@ -85,12 +84,10 @@
       "salary": 85000.0
     },
     {
-      "address": null,
       "department": "Marketing",
       "id": 2,
       "person": {
         "age": 25,
-        "email": null,
         "name": "Bob Jones"
       },
       "salary": 65000.0
@@ -173,7 +170,6 @@
     },
     {
       "age": 25,
-      "email": null,
       "name": "Bob"
     },
     {

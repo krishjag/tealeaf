@@ -31,8 +31,7 @@
     },
     {
       "#text": "Goodbye",
-      "tag": "span",
-      "#comment": null
+      "tag": "span"
     }
   ],
   "namespaced": [

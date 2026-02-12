@@ -1,6 +1,44 @@
 # Changelog
 
-## v2.0.0-beta.10 (Current)
+## v2.0.0-beta.11 (Current)
+
+### Features
+- **Optional/nullable field support in schema inference** — `analyze_array()` and `analyze_nested_objects()` no longer require strict field uniformity across all objects. Fields not present in every object are automatically marked nullable (`?`), enabling schema inference for real-world datasets where records share most fields but differ in optional ones (e.g., DCAT metadata, API responses). Requires at least 1 field present in all objects.
+  - Union-based field collection: computes union of all field names across objects in an array, tracks per-field presence counts, marks fields below 100% presence as nullable
+  - New `object_matches_schema()` helper allows nullable fields to be absent when matching objects to schemas — used in `write_value_with_schemas()` verification and `InferredType::to_field_type()` schema lookup
+  - `InferredType::Object::merge()` now keeps intersection of common fields instead of returning `Mixed` when field counts differ
+  - Nested array analysis collects ALL items from ALL parent objects (not just first representative), discovering the full field union across nested structures
+  - Structural `@table` fallback guarded with `hint_name.is_some() || declared_type.is_some()` to prevent matching inside tuple values
+- **Absent-field preservation** — Nullable fields with null/absent values (`~` in text, null-bit in binary) are omitted from the reconstructed object instead of being inserted as explicit `null`. This preserves the semantic distinction between "field absent" and "field explicitly null", ensuring JSON → TL → JSON roundtrip does not add spurious `"field": null` entries for fields that were simply missing in the original.
+  - Text parser: `parse_tuple_with_schema()` skips inserting null for nullable fields
+  - Binary reader: both bitmap decode paths skip inserting null for nullable fields
+- **Most-complete object field ordering** — Schema inference now uses the field ordering from the object with the most fields (the "most representative" object) as the canonical schema field order, instead of first-seen ordering across all objects. Fields present only in other objects are appended at the end. This preserves the original JSON field ordering for the majority of records during roundtrip.
+
+### Bug Fixes
+- Fixed JSON → TL → JSON roundtrip adding extra `"field": null` entries for nullable fields that were absent in the original data
+- Fixed field ordering loss during schema inference — first (often smallest) object determined schema field order, which didn't match the majority of objects
+
+### Canonical Fixtures
+- Updated `schemas.json`, `mixed_schemas.json`, `quoted_keys.json` — nullable fields with `~` in source now produce absent fields (no `"field": null`) in expected JSON output
+- Recompiled `mixed_schemas.tlbx` to match updated binary reader behavior
+
+### Testing
+- Added `test_schema_inference_optional_fields` — array with optional field `c` marked as `int?`
+- Added `test_schema_inference_optional_fields_roundtrip` — JSON → TL → JSON with absent optional fields preserved
+- Added `test_schema_inference_no_common_fields_skipped` — `[{x:1}, {y:2}]` produces no schema (zero common fields)
+- Added `test_schema_inference_single_common_field` — `[{id:1,a:2}, {id:3,b:4}]` infers schema with `id` common
+- Added `test_schema_inference_optional_nested_array` — nested array field marked nullable when absent from some objects
+- Added `test_schema_inference_optional_nested_object` — nested object field marked nullable when absent
+- Added `test_schema_inference_wa_health_data_pattern` — pattern matching the WA health DCAT dataset structure
+- Added `test_write_schemas_nullable_field_matching` — `@table` applied correctly when objects are missing nullable fields
+- Added `test_schema_field_ordering_uses_most_complete_object` — most-fields object determines schema field order
+- Added `test_schema_field_ordering_appends_extra_fields` — fields from smaller objects appended after representative
+- Added `test_schema_field_ordering_roundtrip_preserves_order` — roundtrip preserves field ordering from most-complete object
+- Updated `test_struct_with_nullable_field` — expects absent field instead of explicit null
+
+---
+
+## v2.0.0-beta.10
 
 ### Features
 - **Quoted field names in `@struct` definitions** — Schema inference no longer skips arrays of objects when field names contain special characters (`@`, `$`, `#`, `:`, `/`, spaces, etc.). Previously, `needs_quoting(field_name)` in `analyze_array()` and `analyze_nested_objects()` rejected the entire array, falling back to verbose inline map notation. Now the guard only checks the **schema name** (which appears unquoted in `@struct name(...)` and `@table name [...]`); field names that need quoting are emitted with quotes in the definition (e.g., `@struct record("@type":string, name:string)`).

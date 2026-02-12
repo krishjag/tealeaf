@@ -472,7 +472,12 @@ impl Parser {
         let mut obj = ObjectMap::new();
         for field in &schema.fields {
             let value = self.parse_value_for_field(&field.field_type, depth)?;
-            obj.insert(field.name.clone(), value);
+            // For nullable fields, omit null values from the object to preserve
+            // absent-field semantics: original JSON without the key roundtrips
+            // correctly instead of gaining an explicit "field": null.
+            if !(field.field_type.nullable && value == Value::Null) {
+                obj.insert(field.name.clone(), value);
+            }
             if self.check(TokenKind::Comma) {
                 self.advance();
             }
@@ -838,7 +843,7 @@ mod tests {
 
         let users = data.get("users").unwrap().as_array().unwrap();
         assert_eq!(users.len(), 2);
-        assert!(users[1].as_object().unwrap().get("email").unwrap().is_null());
+        assert!(users[1].as_object().unwrap().get("email").is_none());
     }
 
     #[test]

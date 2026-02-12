@@ -674,7 +674,9 @@ impl Reader {
                 for (i, field) in schema.fields.iter().enumerate() {
                     let is_null = i / 8 < bitmap.len() && (bitmap[i / 8] & (1 << (i % 8))) != 0;
                     if is_null {
-                        obj.insert(field.name.clone(), Value::Null);
+                        if !field.field_type.nullable {
+                            obj.insert(field.name.clone(), Value::Null);
+                        }
                     } else {
                         // Resolve union types: if the base name is in union_map, decode as Tagged
                         let tl_type = if self.union_map.contains_key(&field.field_type.base) {
@@ -765,7 +767,11 @@ impl Reader {
         for (i, field) in schema.fields.iter().enumerate() {
             let is_null = i / 8 < bitmap.len() && (bitmap[i / 8] & (1 << (i % 8))) != 0;
             if is_null {
-                obj.insert(field.name.clone(), Value::Null);
+                // For nullable fields, omit null values to preserve absent-field semantics.
+                // For non-nullable fields with null (shouldn't happen but be safe), include it.
+                if !field.field_type.nullable {
+                    obj.insert(field.name.clone(), Value::Null);
+                }
             } else {
                 // Resolve union types: if the base name is in union_map, decode as Tagged
                 let tl_type = if self.union_map.contains_key(&field.field_type.base) {

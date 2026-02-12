@@ -930,7 +930,10 @@ impl InferredType {
                 InferredType::Array(Box::new(a.merge(b)))
             }
             (InferredType::Object(a), InferredType::Object(b)) => {
-                // Merge objects: keep fields present in both, track nullability
+                // Merge objects: keep fields present in both (intersection).
+                // Fields only in one side are dropped — the schema inference
+                // uses union across all objects separately, so the type merge
+                // only needs the common fields to identify the schema.
                 let mut merged = Vec::new();
                 let b_map: IndexMap<&str, &InferredType> = b.iter().map(|(k, v)| (k.as_str(), v)).collect();
 
@@ -938,14 +941,12 @@ impl InferredType {
                     if let Some(b_type) = b_map.get(key.as_str()) {
                         merged.push((key.clone(), a_type.merge(b_type)));
                     }
-                    // Fields only in a are dropped (not uniform)
                 }
 
-                // Check if structures are compatible (same fields)
-                if merged.len() == a.len() && merged.len() == b.len() {
-                    InferredType::Object(merged)
-                } else {
+                if merged.is_empty() {
                     InferredType::Mixed
+                } else {
+                    InferredType::Object(merged)
                 }
             }
             _ => InferredType::Mixed,
@@ -968,15 +969,13 @@ impl InferredType {
                 }
             }
             InferredType::Object(fields) => {
-                // Check if this matches an existing schema
+                // Check if this matches an existing schema.
+                // Allow nullable schema fields to be absent (union-based inference
+                // may produce schemas with more fields than the type intersection).
+                let field_names: HashSet<&str> = fields.iter().map(|(n, _)| n.as_str()).collect();
                 for (name, schema) in schemas {
-                    if schema.fields.len() == fields.len() {
-                        let all_match = schema.fields.iter().all(|sf| {
-                            fields.iter().any(|(k, _)| k == &sf.name)
-                        });
-                        if all_match {
-                            return FieldType::new(name.clone());
-                        }
+                    if object_matches_schema(&field_names, schema) {
+                        return FieldType::new(name.clone());
                     }
                 }
                 // No matching schema — use "any" (not "object", which is a
@@ -1056,6 +1055,14 @@ fn array_matches_schema(arr: &[Value], schema: &Schema) -> bool {
     overlap > required_overlap || overlap == schema_fields.len()
 }
 
+/// Check if an object's keys match a schema, allowing nullable fields to be absent.
+fn object_matches_schema(obj_keys: &HashSet<&str>, schema: &Schema) -> bool {
+    // Every non-nullable schema field must be present
+    schema.fields.iter().all(|f| f.field_type.nullable || obj_keys.contains(f.name.as_str()))
+    // Every object key must be a schema field
+    && obj_keys.iter().all(|k| schema.fields.iter().any(|f| f.name == *k))
+}
+
 /// Schema inferrer that analyzes data and generates schemas
 pub struct SchemaInferrer {
     schemas: IndexMap<String, Schema>,
@@ -1093,14 +1100,41 @@ impl SchemaInferrer {
             return;
         }
 
-        // Check if all elements are objects with the same structure
-        let first = match &arr[0] {
-            Value::Object(obj) => obj,
-            _ => return,
-        };
+        // Collect field names as union across all objects.
+        // Fields not present in every object will be marked nullable.
+        // Use the most-complete object's field ordering as canonical schema order.
+        let mut field_count: IndexMap<String, usize> = IndexMap::new();
+        let total_objects = arr.len();
+        let mut most_fields_idx = 0;
+        let mut most_fields_len = 0;
 
-        // Collect field names from first object (preserving insertion order)
-        let field_names: Vec<String> = first.keys().cloned().collect();
+        for (i, item) in arr.iter().enumerate() {
+            if let Value::Object(obj) = item {
+                for key in obj.keys() {
+                    *field_count.entry(key.clone()).or_insert(0) += 1;
+                }
+                if obj.len() > most_fields_len {
+                    most_fields_len = obj.len();
+                    most_fields_idx = i;
+                }
+            } else {
+                return; // Not all objects
+            }
+        }
+
+        // Use the most-complete object's field ordering, then append any remaining
+        // fields from other objects (preserves the representative object's key order)
+        let field_names: Vec<String> = if let Value::Object(repr) = &arr[most_fields_idx] {
+            let mut names: Vec<String> = repr.keys().cloned().collect();
+            for key in field_count.keys() {
+                if !repr.contains_key(key) {
+                    names.push(key.clone());
+                }
+            }
+            names
+        } else {
+            field_count.keys().cloned().collect()
+        };
 
         // Skip schema inference if fields are empty, any field name is empty,
         // or the schema name itself needs quoting (it appears unquoted in
@@ -1114,18 +1148,10 @@ impl SchemaInferrer {
             return;
         }
 
-        let field_set: std::collections::BTreeSet<&str> = first.keys().map(|k| k.as_str()).collect();
-
-        // Verify all objects have the same fields
-        for item in arr.iter().skip(1) {
-            if let Value::Object(obj) = item {
-                let item_set: std::collections::BTreeSet<&str> = obj.keys().map(|k| k.as_str()).collect();
-                if item_set != field_set {
-                    return;  // Not uniform
-                }
-            } else {
-                return;  // Not all objects
-            }
+        // Require at least 1 field present in ALL objects (shared structure)
+        let common_count = field_count.values().filter(|&&c| c == total_objects).count();
+        if common_count == 0 {
+            return;
         }
 
         // Infer types for each field across all objects
@@ -1148,6 +1174,13 @@ impl SchemaInferrer {
             }
         }
 
+        // Mark fields not present in all objects as nullable
+        for (field, count) in &field_count {
+            if *count < total_objects {
+                *has_null.entry(field.clone()).or_insert(false) = true;
+            }
+        }
+
         // Generate schema name from hint
         let schema_name = singularize(hint_name);
 
@@ -1159,42 +1192,62 @@ impl SchemaInferrer {
         // Recursively analyze nested fields in field order (depth-first).
         // Single pass processes arrays and objects as encountered, matching
         // the derive path's field-declaration-order traversal.
+        // Use representative values from any object (not just first) since
+        // optional fields may be absent from some objects.
         for field_name in &field_names {
-            // Check the first object's value for this field
-            if let Value::Object(first_obj) = &arr[0] {
-                match first_obj.get(field_name) {
-                    Some(Value::Array(nested)) => {
-                        // Arrays are always analyzed — same-name recursion
-                        // (e.g., nodes[].nodes[]) is safe because depth-first
-                        // ensures the inner schema is created first.
-                        self.analyze_array(field_name, nested);
-                    }
-                    Some(Value::Object(_)) => {
-                        // Skip object fields whose singularized name collides
-                        // with this array's schema name — prevents
-                        // self-referencing schemas (e.g., @struct root (root: root)).
-                        if singularize(field_name) == schema_name {
-                            continue;
-                        }
-
-                        let nested_objects: Vec<&IndexMap<String, Value>> = arr
-                            .iter()
-                            .filter_map(|item| {
-                                if let Value::Object(obj) = item {
-                                    if let Some(Value::Object(nested)) = obj.get(field_name) {
-                                        return Some(nested);
-                                    }
-                                }
-                                None
-                            })
-                            .collect();
-
-                        if !nested_objects.is_empty() {
-                            self.analyze_nested_objects(field_name, &nested_objects);
-                        }
-                    }
-                    _ => {}
+            let representative = arr.iter().find_map(|item| {
+                if let Value::Object(obj) = item {
+                    obj.get(field_name)
+                } else {
+                    None
                 }
+            });
+            match representative {
+                Some(Value::Array(_)) => {
+                    // Collect ALL nested array items from ALL parent objects.
+                    // A single representative's array may not have all field
+                    // variations (e.g., distribution objects differ across datasets).
+                    let all_nested: Vec<Value> = arr.iter()
+                        .filter_map(|item| {
+                            if let Value::Object(obj) = item {
+                                obj.get(field_name)
+                            } else {
+                                None
+                            }
+                        })
+                        .filter_map(|v| if let Value::Array(a) = v { Some(a) } else { None })
+                        .flatten()
+                        .cloned()
+                        .collect();
+                    if !all_nested.is_empty() {
+                        self.analyze_array(field_name, &all_nested);
+                    }
+                }
+                Some(Value::Object(_)) => {
+                    // Skip object fields whose singularized name collides
+                    // with this array's schema name — prevents
+                    // self-referencing schemas (e.g., @struct root (root: root)).
+                    if singularize(field_name) == schema_name {
+                        continue;
+                    }
+
+                    let nested_objects: Vec<&IndexMap<String, Value>> = arr
+                        .iter()
+                        .filter_map(|item| {
+                            if let Value::Object(obj) = item {
+                                if let Some(Value::Object(nested)) = obj.get(field_name) {
+                                    return Some(nested);
+                                }
+                            }
+                            None
+                        })
+                        .collect();
+
+                    if !nested_objects.is_empty() {
+                        self.analyze_nested_objects(field_name, &nested_objects);
+                    }
+                }
+                _ => {}
             }
         }
 
@@ -1210,29 +1263,39 @@ impl SchemaInferrer {
         // Build schema
         let mut schema = Schema::new(&schema_name);
 
-        // Use insertion order from first object
+        // Use union field order (first-seen across all objects)
         for field_name in &field_names {
             if let Some(inferred) = field_types.get(field_name) {
                 let mut field_type = inferred.to_field_type(&self.schemas);
 
-                // Mark as nullable if any null values seen
+                // Mark as nullable if any null values seen or field missing from some objects
                 if has_null.get(field_name).copied().unwrap_or(false) {
                     field_type.nullable = true;
                 }
 
                 // Check if there's a nested schema for array fields
-                if let Value::Object(first_obj) = &arr[0] {
-                    if let Some(Value::Array(nested_arr)) = first_obj.get(field_name) {
-                        let nested_schema_name = singularize(field_name);
-                        if let Some(nested_schema) = self.schemas.get(&nested_schema_name) {
-                            // Verify array elements are objects matching the schema structure
-                            if array_matches_schema(nested_arr, nested_schema) {
-                                field_type = FieldType {
-                                    base: nested_schema_name,
-                                    nullable: field_type.nullable,
-                                    is_array: true,
-                                };
-                            }
+                // Use representative from any object (field may be optional)
+                let representative_arr = arr.iter().find_map(|item| {
+                    if let Value::Object(obj) = item {
+                        if let Some(Value::Array(nested)) = obj.get(field_name) {
+                            Some(nested.as_slice())
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                });
+                if let Some(nested_arr) = representative_arr {
+                    let nested_schema_name = singularize(field_name);
+                    if let Some(nested_schema) = self.schemas.get(&nested_schema_name) {
+                        // Verify array elements are objects matching the schema structure
+                        if array_matches_schema(nested_arr, nested_schema) {
+                            field_type = FieldType {
+                                base: nested_schema_name,
+                                nullable: field_type.nullable,
+                                is_array: true,
+                            };
                         }
                     }
                 }
@@ -1259,15 +1322,41 @@ impl SchemaInferrer {
     }
 
     /// Analyze a collection of nested objects (from the same field across array items)
-    /// and create a schema if they have uniform structure
+    /// and create a schema if they share common structure (fields not present in all
+    /// objects are marked nullable).
     fn analyze_nested_objects(&mut self, field_name: &str, objects: &[&IndexMap<String, Value>]) {
         if objects.is_empty() {
             return;
         }
 
-        // Get field names from first object (preserving insertion order)
-        let first = objects[0];
-        let nested_field_names: Vec<String> = first.keys().cloned().collect();
+        // Collect field names as union across all objects.
+        // Use the most-complete object's field ordering as canonical schema order.
+        let mut field_count: IndexMap<String, usize> = IndexMap::new();
+        let total_objects = objects.len();
+        let mut most_fields_idx = 0;
+        let mut most_fields_len = 0;
+
+        for (i, obj) in objects.iter().enumerate() {
+            for key in obj.keys() {
+                *field_count.entry(key.clone()).or_insert(0) += 1;
+            }
+            if obj.len() > most_fields_len {
+                most_fields_len = obj.len();
+                most_fields_idx = i;
+            }
+        }
+
+        // Use the most-complete object's field ordering, then append remaining
+        let nested_field_names: Vec<String> = {
+            let repr = objects[most_fields_idx];
+            let mut names: Vec<String> = repr.keys().cloned().collect();
+            for key in field_count.keys() {
+                if !repr.contains_key(key) {
+                    names.push(key.clone());
+                }
+            }
+            names
+        };
 
         // Compute schema name early so we can check if it needs quoting
         let schema_name = singularize(field_name);
@@ -1282,14 +1371,10 @@ impl SchemaInferrer {
             return;
         }
 
-        let field_set: std::collections::BTreeSet<&str> = first.keys().map(|k| k.as_str()).collect();
-
-        // Check if all objects have the same fields
-        for obj in objects.iter().skip(1) {
-            let obj_set: std::collections::BTreeSet<&str> = obj.keys().map(|k| k.as_str()).collect();
-            if obj_set != field_set {
-                return; // Not uniform
-            }
+        // Require at least 1 field present in ALL objects (shared structure)
+        let common_count = field_count.values().filter(|&&c| c == total_objects).count();
+        if common_count == 0 {
+            return;
         }
 
         // Skip if schema already exists
@@ -1315,27 +1400,50 @@ impl SchemaInferrer {
             }
         }
 
+        // Mark fields not present in all objects as nullable
+        for (field, count) in &field_count {
+            if *count < total_objects {
+                *has_null.entry(field.clone()).or_insert(false) = true;
+            }
+        }
+
         // Recursively analyze nested fields in field order (depth-first).
         // Single pass mirrors the derive path's field-declaration-order traversal,
         // so CLI and Builder API produce schemas in the same order.
+        // Use representative values from any object since optional fields
+        // may be absent from some objects.
         for nested_field in &nested_field_names {
-            if let Some(Value::Array(nested_arr)) = objects[0].get(nested_field) {
-                self.analyze_array(nested_field, nested_arr);
-            } else {
-                let deeper_objects: Vec<&IndexMap<String, Value>> = objects
-                    .iter()
-                    .filter_map(|obj| {
-                        if let Some(Value::Object(nested)) = obj.get(nested_field) {
-                            Some(nested)
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-
-                if !deeper_objects.is_empty() {
-                    self.analyze_nested_objects(nested_field, &deeper_objects);
+            let representative = objects.iter().find_map(|obj| obj.get(nested_field));
+            match representative {
+                Some(Value::Array(_)) => {
+                    // Collect ALL nested array items from ALL parent objects
+                    let all_nested: Vec<Value> = objects.iter()
+                        .filter_map(|obj| obj.get(nested_field))
+                        .filter_map(|v| if let Value::Array(a) = v { Some(a) } else { None })
+                        .flatten()
+                        .cloned()
+                        .collect();
+                    if !all_nested.is_empty() {
+                        self.analyze_array(nested_field, &all_nested);
+                    }
                 }
+                Some(Value::Object(_)) => {
+                    let deeper_objects: Vec<&IndexMap<String, Value>> = objects
+                        .iter()
+                        .filter_map(|obj| {
+                            if let Some(Value::Object(nested)) = obj.get(nested_field) {
+                                Some(nested)
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
+
+                    if !deeper_objects.is_empty() {
+                        self.analyze_nested_objects(nested_field, &deeper_objects);
+                    }
+                }
+                _ => {}
             }
         }
 
@@ -1351,8 +1459,16 @@ impl SchemaInferrer {
                 }
 
                 // Check if this field has a nested array schema
+                // Use representative from any object (field may be optional)
                 if matches!(inferred, InferredType::Array(_)) {
-                    if let Some(Value::Array(nested_arr)) = objects[0].get(nested_field) {
+                    let representative_arr = objects.iter().find_map(|obj| {
+                        if let Some(Value::Array(nested)) = obj.get(nested_field) {
+                            Some(nested.as_slice())
+                        } else {
+                            None
+                        }
+                    });
+                    if let Some(nested_arr) = representative_arr {
                         let nested_schema_name = singularize(nested_field);
                         if let Some(nested_schema) = self.schemas.get(&nested_schema_name) {
                             if array_matches_schema(nested_arr, nested_schema) {
@@ -1571,15 +1687,18 @@ fn write_value_with_schemas(
             let mut schema = resolve_schema(schemas, declared_type, hint_name);
 
             // Structural fallback: if name-based resolution failed, find a schema
-            // whose fields exactly match the first element's object keys.
+            // that matches the first element's object keys (allowing nullable fields
+            // to be absent).
             // This handles Builder-path documents where the top-level key name
             // (e.g., "orders") doesn't match the schema name (e.g., "SalesOrder").
-            if schema.is_none() {
+            // Only apply when we have context (hint_name or declared_type) — inside
+            // tuple values (both None), structural matching can pick the wrong schema
+            // and produce @table where the parser doesn't expect it.
+            if schema.is_none() && (hint_name.is_some() || declared_type.is_some()) {
                 if let Some(Value::Object(first_obj)) = arr.first() {
                     let obj_keys: HashSet<&str> = first_obj.keys().map(|k| k.as_str()).collect();
                     for (_, candidate) in schemas {
-                        let schema_fields: HashSet<&str> = candidate.fields.iter().map(|f| f.name.as_str()).collect();
-                        if schema_fields == obj_keys {
+                        if object_matches_schema(&obj_keys, candidate) {
                             schema = Some(candidate);
                             break;
                         }
@@ -1592,10 +1711,10 @@ fn write_value_with_schemas(
                 // A name-only lookup isn't enough — if the same field name appears at
                 // multiple nesting levels with different shapes, the schema may belong
                 // to a different level. Applying the wrong schema drops unmatched keys.
+                // Nullable fields are allowed to be absent.
                 let schema_matches = if let Some(Value::Object(first_obj)) = arr.first() {
-                    let schema_fields: HashSet<&str> = schema.fields.iter().map(|f| f.name.as_str()).collect();
                     let obj_keys: HashSet<&str> = first_obj.keys().map(|k| k.as_str()).collect();
-                    schema_fields == obj_keys
+                    object_matches_schema(&obj_keys, schema)
                 } else {
                     false
                 };
@@ -1647,8 +1766,7 @@ fn write_value_with_schemas(
             if obj_schema.is_none() {
                 let obj_keys: HashSet<&str> = obj.keys().map(|k| k.as_str()).collect();
                 for (_, candidate) in schemas {
-                    let schema_fields: HashSet<&str> = candidate.fields.iter().map(|f| f.name.as_str()).collect();
-                    if schema_fields == obj_keys {
+                    if object_matches_schema(&obj_keys, candidate) {
                         obj_schema = Some(candidate);
                         break;
                     }
@@ -1788,6 +1906,35 @@ fn write_schema_array(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Compare two Values treating absent keys as equivalent to null.
+    /// With union-based schema inference, optional fields absent in the
+    /// original appear as explicit nulls after roundtrip through @table.
+    fn values_eq_with_optional_nulls(a: &Value, b: &Value) -> bool {
+        match (a, b) {
+            (Value::Object(oa), Value::Object(ob)) => {
+                // All keys in a must be in b with matching values
+                for (k, va) in oa {
+                    match ob.get(k) {
+                        Some(vb) => if !values_eq_with_optional_nulls(va, vb) { return false; }
+                        None => if *va != Value::Null { return false; }
+                    }
+                }
+                // Extra keys in b must have null values
+                for (k, vb) in ob {
+                    if !oa.contains_key(k) && *vb != Value::Null {
+                        return false;
+                    }
+                }
+                true
+            }
+            (Value::Array(aa), Value::Array(ab)) => {
+                aa.len() == ab.len()
+                    && aa.iter().zip(ab).all(|(a, b)| values_eq_with_optional_nulls(a, b))
+            }
+            _ => a == b,
+        }
+    }
 
     #[test]
     fn test_serde_json_number_behavior() {
@@ -4869,12 +5016,15 @@ root: @table root [
         let tl_text = tl.to_tl_with_schemas();
         eprintln!("=== TL text ===\n{tl_text}");
 
-        // Core correctness check: round-trip must preserve all data
+        // Core correctness check: round-trip must preserve all data.
+        // With union-based schema inference, optional fields absent in the
+        // original may appear as null after roundtrip (schema adds ~).
         let reparsed = TeaLeaf::parse(&tl_text)
             .unwrap_or_else(|e| panic!("Re-parse failed: {e}\nTL text:\n{tl_text}"));
         for (key, orig_val) in &tl.data {
             let re_val = reparsed.data.get(key).unwrap_or_else(|| panic!("lost key '{key}'"));
-            assert_eq!(orig_val, re_val, "value mismatch for key '{key}'");
+            assert!(values_eq_with_optional_nulls(orig_val, re_val),
+                "value mismatch for key '{key}':\n  orig: {:?}\n  rt:   {:?}", orig_val, re_val);
         }
     }
 
@@ -5525,5 +5675,234 @@ root: @table root [
         let v1: serde_json::Value = serde_json::from_str(json).unwrap();
         let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
         assert_eq!(v1, v2, "Roundtrip failed for mixed special keys");
+    }
+
+    // ---- Optional/nullable field inference tests ----
+
+    #[test]
+    fn test_schema_inference_optional_fields() {
+        // Objects with different field sets — 'c' only in first object
+        let json = r#"{"items": [
+            {"a": 1, "b": 2, "c": 3},
+            {"a": 4, "b": 5}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema: {}", tl_text);
+        // 'c' should be nullable since it's missing from second object
+        assert!(tl_text.contains("c: int?"), "Field 'c' should be nullable: {}", tl_text);
+        // 'a' and 'b' should NOT be nullable (check they are NOT followed by ?)
+        assert!(tl_text.contains("a: int,") || tl_text.contains("a: int)"), "'a' should not be nullable: {}", tl_text);
+        assert!(tl_text.contains("b: int,") || tl_text.contains("b: int)"), "'b' should not be nullable: {}", tl_text);
+        // Should use @table format
+        assert!(tl_text.contains("@table"), "Should use @table: {}", tl_text);
+        // Second row should have ~ for missing 'c'
+        assert!(tl_text.contains("~"), "Missing field should produce ~: {}", tl_text);
+    }
+
+    #[test]
+    fn test_schema_inference_optional_fields_roundtrip() {
+        let json = r#"{"items": [
+            {"a": 1, "b": "hello", "c": true},
+            {"a": 2, "b": "world"},
+            {"a": 3, "b": "foo", "c": false}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        // Roundtrip: TL -> JSON should reconstruct missing fields as null
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v_out: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+
+        // Original items
+        let v_in: serde_json::Value = serde_json::from_str(json).unwrap();
+        let items_in = v_in["items"].as_array().unwrap();
+        let items_out = v_out["items"].as_array().unwrap();
+
+        assert_eq!(items_in.len(), items_out.len(), "Array length mismatch");
+
+        // First and third items should match exactly
+        assert_eq!(items_in[0]["a"], items_out[0]["a"]);
+        assert_eq!(items_in[0]["b"], items_out[0]["b"]);
+        assert_eq!(items_in[0]["c"], items_out[0]["c"]);
+        assert_eq!(items_in[2]["c"], items_out[2]["c"]);
+
+        // Second item: 'a' and 'b' match, 'c' should be absent (was missing)
+        assert_eq!(items_in[1]["a"], items_out[1]["a"]);
+        assert_eq!(items_in[1]["b"], items_out[1]["b"]);
+        assert!(items_out[1].get("c").is_none(), "Missing field should remain absent after roundtrip");
+    }
+
+    #[test]
+    fn test_schema_inference_no_common_fields_skipped() {
+        // No fields in common — should NOT infer a schema
+        let json = r#"{"items": [
+            {"x": 1},
+            {"y": 2}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(!tl_text.contains("@struct"), "Should NOT infer schema when no common fields: {}", tl_text);
+        assert!(!tl_text.contains("@table"), "Should NOT use @table: {}", tl_text);
+    }
+
+    #[test]
+    fn test_schema_inference_single_common_field() {
+        // Only 'id' is shared — should infer schema with optional fields
+        let json = r#"{"items": [
+            {"id": 1, "a": "x"},
+            {"id": 2, "b": "y"}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema with 1 common field: {}", tl_text);
+        assert!(tl_text.contains("@table"), "Should use @table: {}", tl_text);
+        // 'a' and 'b' should be nullable
+        assert!(tl_text.contains("a: string?"), "'a' should be nullable: {}", tl_text);
+        assert!(tl_text.contains("b: string?"), "'b' should be nullable: {}", tl_text);
+    }
+
+    #[test]
+    fn test_schema_inference_optional_nested_array() {
+        // Nested array field present in some objects but not others
+        let json = r#"{"records": [
+            {"name": "Alice", "tags": ["a", "b"]},
+            {"name": "Bob"},
+            {"name": "Carol", "tags": ["c"]}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema: {}", tl_text);
+        assert!(tl_text.contains("tags: []string?"), "Optional array field should be nullable: {}", tl_text);
+    }
+
+    #[test]
+    fn test_schema_inference_optional_nested_object() {
+        // Nested object field present in some objects but not others
+        let json = r#"{"people": [
+            {"name": "Alice", "address": {"city": "Seattle", "state": "WA"}},
+            {"name": "Bob"},
+            {"name": "Carol", "address": {"city": "Portland", "state": "OR"}}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema: {}", tl_text);
+        // The address field should be nullable
+        assert!(tl_text.contains("?"), "Optional nested object should be nullable: {}", tl_text);
+
+        // Roundtrip
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v_out: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        let people = v_out["people"].as_array().unwrap();
+        assert_eq!(people[0]["address"]["city"], "Seattle");
+        assert!(people[1].get("address").is_none(),
+            "Missing address should be absent: {:?}", people[1]);
+        assert_eq!(people[2]["address"]["city"], "Portland");
+    }
+
+    #[test]
+    fn test_schema_inference_wa_health_data_pattern() {
+        // Pattern matching the WA health dataset: many shared fields, some optional
+        let json = r#"{"dataset": [
+            {"@type": "dcat:Dataset", "accessLevel": "public", "identifier": "d1", "modified": "2024-01-01", "title": "Dataset A", "temporal": "2020/2024"},
+            {"@type": "dcat:Dataset", "accessLevel": "public", "identifier": "d2", "modified": "2024-02-01", "title": "Dataset B", "theme": ["health"]},
+            {"@type": "dcat:Dataset", "accessLevel": "public", "identifier": "d3", "modified": "2024-03-01", "title": "Dataset C", "temporal": "2021/2024", "theme": ["education"]}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema for DCAT-like data: {}", tl_text);
+        assert!(tl_text.contains("@table"), "Should use @table: {}", tl_text);
+        // Common fields should not be nullable
+        assert!(tl_text.contains("\"@type\": string,"), "@type should be non-nullable: {}", tl_text);
+        assert!(tl_text.contains("accessLevel: string,"), "accessLevel should be non-nullable: {}", tl_text);
+        // Optional fields should be nullable
+        assert!(tl_text.contains("temporal: string?"), "temporal should be nullable: {}", tl_text);
+    }
+
+    #[test]
+    fn test_write_schemas_nullable_field_matching() {
+        // Verify that write_value_with_schemas correctly applies @table
+        // when objects are missing nullable fields
+        let json = r#"{"users": [
+            {"id": 1, "name": "Alice", "email": "alice@test.com"},
+            {"id": 2, "name": "Bob"},
+            {"id": 3, "name": "Carol", "email": "carol@test.com"}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        // Should produce @table, not inline objects
+        assert!(tl_text.contains("@table"), "Should use @table with nullable fields: {}", tl_text);
+        assert!(!tl_text.contains("{id:"), "Should NOT fall back to inline objects: {}", tl_text);
+
+        // Verify compact mode too
+        let compact = doc.to_tl_with_schemas_compact();
+        assert!(compact.contains("@table"), "Compact should also use @table: {}", compact);
+    }
+
+    #[test]
+    fn test_schema_field_ordering_uses_most_complete_object() {
+        // The most-complete object (most fields) should determine schema field order
+        let json = r#"{"items": [
+            {"a": 1, "b": 2},
+            {"c": 3, "b": 4, "a": 5}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        // The second object has 3 fields (most), so its order should be used: c, b, a
+        assert!(tl_text.contains("@struct item (c: int?, b: int, a: int)"),
+            "Schema should use most-complete object's field order: {}", tl_text);
+    }
+
+    #[test]
+    fn test_schema_field_ordering_appends_extra_fields() {
+        // Fields not in the most-complete object are appended at the end
+        let json = r#"{"items": [
+            {"x": 1, "y": 2, "z": 3},
+            {"y": 4, "x": 5},
+            {"x": 6, "y": 7, "w": 8}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        // First and third objects tie at 3 fields; first encountered wins: x, y, z
+        // Then 'w' is appended from the third object
+        assert!(tl_text.contains("@struct item (x: int, y: int, z: int?, w: int?)"),
+            "Schema should use first most-complete object's order with extras appended: {}", tl_text);
+    }
+
+    #[test]
+    fn test_schema_field_ordering_roundtrip_preserves_order() {
+        // Roundtrip should preserve the most-complete object's field ordering
+        let json = r#"{"records": [
+            {"name": "Alice", "age": 30, "email": "a@test.com"},
+            {"age": 25, "name": "Bob"}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        // Most-complete object (first, 3 fields): name, age, email
+        let reparsed = TeaLeaf::parse(&tl_text).unwrap();
+        let json_str = reparsed.to_json().unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json_str).unwrap();
+
+        let records = parsed["records"].as_array().unwrap();
+        let first_keys: Vec<&str> = records[0].as_object().unwrap().keys().map(|k| k.as_str()).collect();
+        assert_eq!(first_keys, vec!["name", "age", "email"],
+            "Roundtripped first record should preserve field order");
+        let second_keys: Vec<&str> = records[1].as_object().unwrap().keys().map(|k| k.as_str()).collect();
+        assert_eq!(second_keys, vec!["name", "age"],
+            "Roundtripped second record should preserve field order (minus absent nullable)");
     }
 }
