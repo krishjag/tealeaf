@@ -35,6 +35,7 @@
 - Added `test_schema_field_ordering_appends_extra_fields` — fields from smaller objects appended after representative
 - Added `test_schema_field_ordering_roundtrip_preserves_order` — roundtrip preserves field ordering from most-complete object
 - Updated `test_struct_with_nullable_field` — expects absent field instead of explicit null
+- Updated .NET `StructArray_Table_BinaryRoundTrip_PreservesData` — expects `null` (absent) instead of `TLType.Null` for nullable fields in binary roundtrip
 
 ---
 

@@ -327,15 +327,14 @@ public class SpecConformanceTests
             using var email0 = row0?["email"];
             Assert.Equal("a@test.com", email0?.AsString());
 
-            // Row 1: email is null
+            // Row 1: email is nullable and absent (omitted from object)
             using var row1 = team[1];
             using var name1 = row1?["name"];
             Assert.Equal("bob", name1?.AsString());
             using var age1 = row1?["age"];
             Assert.Equal(25, age1?.AsInt());
             using var email1 = row1?["email"];
-            Assert.NotNull(email1);
-            Assert.Equal(TLType.Null, email1.Type);
+            Assert.Null(email1);
 
             // Row 2: all fields present
             using var row2 = team[2];
