@@ -1,6 +1,46 @@
 # Changelog
 
-## v2.0.0-beta.9 (Current)
+## v2.0.0-beta.10 (Current)
+
+### Features
+- **Quoted field names in `@struct` definitions** — Schema inference no longer skips arrays of objects when field names contain special characters (`@`, `$`, `#`, `:`, `/`, spaces, etc.). Previously, `needs_quoting(field_name)` in `analyze_array()` and `analyze_nested_objects()` rejected the entire array, falling back to verbose inline map notation. Now the guard only checks the **schema name** (which appears unquoted in `@struct name(...)` and `@table name [...]`); field names that need quoting are emitted with quotes in the definition (e.g., `@struct record("@type":string, name:string)`).
+  - Affects JSON-LD (`@type`, `@id`, `@context`), JSON Schema/OpenAPI (`$ref`, `$id`), OData (`@odata.type`, `@odata.id`), XML-to-JSON (`#text`, `#comment`), XML namespaces (`xsi:type`, `dc:title`), RDF/JSON (URI keys), and spreadsheet exports (space-separated keys)
+  - Parser (`parse_struct_def()`) now accepts `TokenKind::String` in addition to `TokenKind::Word` for field names
+  - Serialization required no changes — `write_key()` already quoted field names via `needs_quoting()`
+- **Token counting script** (`accuracy-benchmark/scripts/count_tokens.py`) — Python script that uses Anthropic's `messages.count_tokens()` API to measure exact token usage for benchmark prompts across TL, JSON, and TOON formats without incurring completion costs. Generates per-task comparison table with TL vs JSON, TOON vs JSON, and TL vs TOON percentage columns, plus data-only token estimates (subtracting shared instruction overhead).
+
+### Canonical Fixtures
+- **New: `quoted_keys`** (15th canonical sample) — 8 schemas covering all special-character key patterns:
+  - `jsonld_record` — `"@type"`, `"@id"` (JSON-LD)
+  - `schema_def` — `"$ref"`, `"$id"` (JSON Schema / OpenAPI)
+  - `xml_node` — `"#text"`, `"#comment"` (XML-to-JSON)
+  - `ns_element` — `"xsi:type"`, `"dc:title"` (XML namespaces)
+  - `odata_entity` — `"@odata.type"`, `"@odata.id"` (OData)
+  - `rdf_triple` — `"http://schema.org/name"`, `"http://schema.org/age"` (RDF/JSON URIs)
+  - `contact` — `"First Name"`, `"Last Name"` (space-separated keys)
+  - `catalog_item` — mixed quoted (`"@type"`, `"$id"`, `"sku:code"`) and unquoted (`name`) fields
+
+### Testing
+- Added `test_schema_inference_with_at_prefixed_keys` — verifies JSON-LD `@type` fields trigger schema inference with quoted field names in `@struct` output
+- Added `test_schema_inference_quoted_field_roundtrip` — full JSON → TL → JSON roundtrip with `@type` keys
+- Added `test_schema_inference_skips_when_schema_name_needs_quoting` — confirms `@items` array key (which would produce schema name `@item`) correctly skips inference
+- Added `test_schema_inference_root_array_with_at_keys` — root-level `@root-array` with `@type` keys
+- Added `test_schema_inference_dollar_prefixed_keys` — `$ref`, `$id` (JSON Schema / OpenAPI)
+- Added `test_schema_inference_hash_prefixed_keys` — `#text`, `#comment` (XML-to-JSON)
+- Added `test_schema_inference_colon_in_keys` — `xsi:type`, `dc:title` (XML namespaces)
+- Added `test_schema_inference_odata_keys` — `@odata.type`, `@odata.id` (OData)
+- Added `test_schema_inference_uri_keys` — `http://schema.org/name` (RDF/JSON full URIs)
+- Added `test_schema_inference_space_in_keys` — `First Name`, `Last Name` (spreadsheet exports)
+- Added `test_schema_inference_mixed_special_keys` — `@type` + `$id` + `sku:code` + unquoted `name` in one schema, verifying only special-character fields are quoted
+- Added `test_parse_struct_with_quoted_fields` — parser accepts `@struct foo("@type":string, name:string)` and correctly deserializes `@table` rows
+- Added 5 canonical tests: `quoted_keys` text-to-JSON, binary roundtrip, full roundtrip (text → binary → JSON), compact roundtrip, compact-is-not-larger
+
+### Known Limitations (Resolved)
+- ~~JSON import does not recognize `$ref`, `$tag`, or timestamp strings~~ — `$ref` and other special-character keys now get full schema inference and positional compression (timestamps and `$tag` remain unrecognized)
+
+---
+
+## v2.0.0-beta.9
 
 ### Features
 - **`FormatOptions` struct with `compact_floats`** — new `FormatOptions` struct replaces bare `compact: bool` throughout the serialization pipeline, adding `compact_floats` to strip `.0` from whole-number floats (e.g., `35934000000.0` → `35934000000`). Saves additional characters/tokens for financial and scientific datasets. Trade-off: re-parsing produces `Int` instead of `Float` for whole-number values.
