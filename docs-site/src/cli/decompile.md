@@ -5,7 +5,7 @@ Convert a TeaLeaf binary file (`.tlbx`) back to the human-readable text format (
 ## Usage
 
 ```bash
-tealeaf decompile <input.tlbx> -o <output.tl> [--compact]
+tealeaf decompile <input.tlbx> -o <output.tl> [--compact] [--compact-floats]
 ```
 
 ## Arguments
@@ -15,6 +15,7 @@ tealeaf decompile <input.tlbx> -o <output.tl> [--compact]
 | `<input.tlbx>` | Yes | Path to the TeaLeaf binary file |
 | `-o <output.tl>` | Yes | Path for the output text file |
 | `--compact` | No | Remove insignificant whitespace for token-efficient output |
+| `--compact-floats` | No | Strip `.0` from whole-number floats (e.g., `42.0` → `42`). Re-parsing will produce Int instead of Float for these values |
 
 ## Description
 
@@ -44,6 +45,17 @@ tealeaf decompile data.tlbx -o data_compact.tl --compact
 
 The compact output is semantically identical to the pretty-printed output and round-trips without data loss.
 
+## Compact Floats
+
+The `--compact-floats` flag strips `.0` from whole-number floats for additional character savings. This is useful for financial datasets where values like `35934000000.0` become `35934000000`.
+
+```bash
+# Maximum token savings: compact whitespace + compact floats
+tealeaf decompile data.tlbx -o data.tl --compact --compact-floats
+```
+
+**Trade-off:** Re-parsing the output will produce `Int` instead of `Float` for whole-number values. See [Round-Trip Fidelity](../guides/round-trip.md#compact-floats-intentional-lossy-optimization) for details.
+
 ## Examples
 
 ```bash
@@ -52,6 +64,9 @@ tealeaf decompile data.tlbx -o data_recovered.tl
 
 # Decompile with compact output (fewer tokens for LLM input)
 tealeaf decompile data.tlbx -o data_compact.tl --compact
+
+# Maximum token savings (compact whitespace + compact floats)
+tealeaf decompile data.tlbx -o data_max.tl --compact --compact-floats
 
 # Round-trip verification
 tealeaf compile original.tl -o compiled.tlbx

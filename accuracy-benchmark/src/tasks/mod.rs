@@ -375,8 +375,9 @@ pub fn convert_json_to_tl(json_str: &str) -> Result<String, String> {
     let tl = tealeaf::TeaLeaf::from_json_with_schemas(json_str)
         .map_err(|e| format!("Failed to convert JSON to TeaLeaf: {}", e))?;
 
-    // Convert to compact TeaLeaf text format (minimal whitespace for token efficiency)
-    let tl_text = tl.to_tl_with_schemas_compact();
+    // Convert with compact whitespace and compact floats for maximum token savings
+    let opts = tealeaf::FormatOptions::compact().with_compact_floats();
+    let tl_text = tl.to_tl_with_options(&opts);
 
     Ok(tl_text)
 }

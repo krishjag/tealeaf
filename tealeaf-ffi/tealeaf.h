@@ -1,6 +1,6 @@
 /*
  * TeaLeaf FFI - C bindings for the TeaLeaf format library
- * Version: 2.0.0-beta.8 (Request for Comments)
+ * Version: 2.0.0-beta.9 (Request for Comments)
  *
  * This header provides a C-compatible API for parsing and manipulating
  * TeaLeaf documents from languages like C# via FFI.
@@ -151,6 +151,20 @@ char *tl_document_to_text(const struct TLDocument *doc);
 char *tl_document_to_text_data_only(const struct TLDocument *doc);
 
 /**
+ * Convert document to TeaLeaf text format without schema definitions, with custom options.
+ * Set `compact` to remove insignificant whitespace.
+ * Set `compact_floats` to strip `.0` from whole-number floats.
+ * Caller must free the returned string with tl_string_free.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+char *tl_document_to_text_data_only_with_options(const struct TLDocument *doc,
+                                                 bool compact,
+                                                 bool compact_floats);
+
+/**
  * Convert document to compact TeaLeaf text format with schema definitions.
  * Removes insignificant whitespace for token-efficient LLM input.
  * Caller must free the returned string with tl_string_free.
@@ -170,6 +184,20 @@ char *tl_document_to_text_compact(const struct TLDocument *doc);
  * `doc` must be a valid `TLDocument` pointer or null.
  */
 char *tl_document_to_text_compact_data_only(const struct TLDocument *doc);
+
+/**
+ * Convert document to TeaLeaf text format with custom options.
+ * Set `compact` to remove insignificant whitespace.
+ * Set `compact_floats` to strip `.0` from whole-number floats (e.g., `42.0` → `42`).
+ * Caller must free the returned string with tl_string_free.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+char *tl_document_to_text_with_options(const struct TLDocument *doc,
+                                       bool compact,
+                                       bool compact_floats);
 
 /**
  * Compile document to binary format and write to file.

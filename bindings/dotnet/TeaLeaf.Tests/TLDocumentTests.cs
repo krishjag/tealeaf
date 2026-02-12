@@ -206,10 +206,10 @@ public class TLDocumentTests
     }
 
     [Fact]
-    public void ToTextCompact_RemovesInsignificantWhitespace()
+    public void ToText_Compact_RemovesInsignificantWhitespace()
     {
         using var doc = TLDocument.Parse("name: alice\nage: 30");
-        var compact = doc.ToTextCompact();
+        var compact = doc.ToText(compact: true, compactFloats: false);
 
         Assert.NotNull(compact);
         Assert.Contains("name:alice", compact);
@@ -217,25 +217,25 @@ public class TLDocumentTests
     }
 
     [Fact]
-    public void ToTextCompact_WithSchemas_IsSmallerThanPretty()
+    public void ToText_Compact_WithSchemas_IsSmallerThanPretty()
     {
         const string json = @"{""users"": [{""id"": 1, ""name"": ""alice""}, {""id"": 2, ""name"": ""bob""}]}";
         using var doc = TLDocument.FromJson(json);
 
         var pretty = doc.ToText();
-        var compact = doc.ToTextCompact();
+        var compact = doc.ToText(compact: true, compactFloats: false);
 
         Assert.True(compact.Length < pretty.Length,
             $"Compact ({compact.Length}) should be smaller than pretty ({pretty.Length})");
     }
 
     [Fact]
-    public void ToTextCompact_RoundTrips()
+    public void ToText_Compact_RoundTrips()
     {
         const string json = @"{""name"": ""Alice Smith"", ""items"": [1, 2, 3]}";
         using var doc = TLDocument.FromJson(json);
 
-        var compact = doc.ToTextCompact();
+        var compact = doc.ToText(compact: true, compactFloats: false);
         using var reparsed = TLDocument.Parse(compact);
 
         var json1 = doc.ToJson();
@@ -244,16 +244,16 @@ public class TLDocumentTests
     }
 
     [Fact]
-    public void ToTextCompactDataOnly_ExcludesSchemas()
+    public void ToText_IgnoreSchemas_ExcludesSchemas()
     {
         const string json = @"{""users"": [{""id"": 1, ""name"": ""alice""}, {""id"": 2, ""name"": ""bob""}]}";
         using var doc = TLDocument.FromJson(json);
 
-        var compact = doc.ToTextCompactDataOnly();
+        var dataOnly = doc.ToText(ignoreSchemas: true);
 
-        Assert.DoesNotContain("@struct", compact);
-        Assert.NotNull(compact);
-        Assert.True(compact.Length > 0);
+        Assert.DoesNotContain("@struct", dataOnly);
+        Assert.NotNull(dataOnly);
+        Assert.True(dataOnly.Length > 0);
     }
 
     // ==========================================================================

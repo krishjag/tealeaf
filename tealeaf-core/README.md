@@ -2,7 +2,7 @@
 
 Schema-aware data format with human-readable text and compact binary representation.
 
-**~36% fewer data tokens than JSON for LLM applications, with zero accuracy loss.**
+**~43% fewer input tokens than JSON for LLM applications, with zero accuracy loss.**
 
 ## Features
 
@@ -17,7 +17,7 @@ Schema-aware data format with human-readable text and compact binary representat
 
 ```toml
 [dependencies]
-tealeaf-core = "2.0.0-beta.8"
+tealeaf-core = "2.0.0-beta.9"
 ```
 
 ### Parse and convert
@@ -36,6 +36,11 @@ let doc = TeaLeaf::from_json(r#"{"name": "Alice", "age": 30}"#)?;
 
 // Get the TeaLeaf text (with inferred schemas)
 let text = doc.to_tl_with_schemas();
+
+// Compact output (fewer tokens for LLM context)
+use tealeaf::FormatOptions;
+let opts = FormatOptions::compact().with_compact_floats();
+let compact = doc.to_tl_with_options(&opts);
 ```
 
 ### Derive macros
@@ -44,7 +49,7 @@ Enable the `derive` feature for DTO conversion:
 
 ```toml
 [dependencies]
-tealeaf-core = { version = "2.0.0-beta.8", features = ["derive"] }
+tealeaf-core = { version = "2.0.0-beta.9", features = ["derive"] }
 ```
 
 ```rust

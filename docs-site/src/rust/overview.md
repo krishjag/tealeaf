@@ -16,7 +16,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tealeaf-core = { version = "2.0.0-beta.8", features = ["derive"] }
+tealeaf-core = { version = "2.0.0-beta.9", features = ["derive"] }
 ```
 
 The `derive` feature pulls in `tealeaf-derive` for proc-macro support.
@@ -106,6 +106,8 @@ if let Some(schema) = doc.schema("user") {
 ## Output Operations
 
 ```rust
+use tealeaf::FormatOptions;
+
 let doc = TeaLeaf::load("data.tl")?;
 
 // Compile to binary
@@ -120,7 +122,30 @@ let text = doc.to_tl_with_schemas();
 
 // Compact text (removes insignificant whitespace, ideal for LLM input)
 let compact = doc.to_tl_with_schemas_compact();
+
+// Custom formatting options for maximum token savings
+let opts = FormatOptions::compact().with_compact_floats();
+let max_compact = doc.to_tl_with_options(&opts);
 ```
+
+### `FormatOptions`
+
+Controls text output formatting:
+
+```rust
+use tealeaf::FormatOptions;
+
+// Pretty-printed (default)
+FormatOptions::default()          // compact: false, compact_floats: false
+
+// Compact whitespace only
+FormatOptions::compact()          // compact: true,  compact_floats: false
+
+// Maximum token savings (compact + strip .0 from whole-number floats)
+FormatOptions::compact().with_compact_floats()
+```
+
+The `compact_floats` option strips `.0` from whole-number floats (e.g., `42.0` → `42`) for additional character savings. The trade-off is that re-parsing produces `Int` instead of `Float` for those values. See [Round-Trip Fidelity](../guides/round-trip.md#compact-floats-intentional-lossy-optimization).
 
 ## Conversion Traits
 

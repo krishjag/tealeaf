@@ -91,12 +91,24 @@ let cached = tealeaf::Reader::open("context_cache.tlbx")?;
 Convert to compact text for maximum token efficiency:
 
 ```rust
+use tealeaf::FormatOptions;
+
 let doc = TeaLeaf::load("context.tl")?;
-let context_text = doc.to_tl_with_schemas_compact();
-// Send context_text as part of the prompt -- minimal whitespace, same data
+
+// Maximum token savings: compact whitespace + compact floats
+let opts = FormatOptions::compact().with_compact_floats();
+let context_text = doc.to_tl_with_options(&opts);
+// Send context_text as part of the prompt
 ```
 
-The compact format removes insignificant whitespace (spaces after `:` in key-value pairs, spaces after `,` in collections, indentation, and blank lines) while preserving all data. This typically saves an additional 10-12% over the pretty-printed format.
+Two levels of compaction are available:
+
+| Option | What it does | Savings |
+|--------|-------------|---------|
+| `compact` | Removes insignificant whitespace (spaces after `:` and `,`, indentation, blank lines) | ~10-12% over pretty |
+| `compact_floats` | Strips `.0` from whole-number floats (`35934000000.0` → `35934000000`) | Additional savings on numeric data |
+
+The `compact_floats` option is especially effective for financial and scientific datasets with many whole-number float values. The trade-off is that re-parsing produces `Int` instead of `Float` for those values -- see [Round-Trip Fidelity](./round-trip.md#compact-floats-intentional-lossy-optimization).
 
 For readable debugging, use the pretty-printed variant:
 
@@ -122,7 +134,7 @@ For a typical LLM context with 50 messages, 10 tools, and a user profile:
 | TeaLeaf Binary | ~4 KB |
 | TeaLeaf Binary (compressed) | ~3 KB |
 
-Token savings are significant but less than byte savings. BPE tokenizers partially compress repeated JSON field names, so byte savings overstate token savings by 5-18 percentage points depending on data repetitiveness. For typical structured data, expect **~36% fewer data tokens** (median), with savings increasing for larger and more structured datasets.
+Token savings are significant but less than byte savings. BPE tokenizers partially compress repeated JSON field names, so byte savings overstate token savings by 5-18 percentage points depending on data repetitiveness. On real-world data (SEC EDGAR 10-K filings), expect **~42% fewer data tokens**. On synthetic benchmarks (12 tasks, 10 domains), expect **~30% fewer data tokens** (smaller datasets dilute savings).
 
 ### Token Comparison (verified via OpenAI tokenizer)
 
@@ -162,15 +174,24 @@ if let Some(Value::Array(insights)) = response.get("analysis") {
 
 1. **Define schemas for all structured context** -- tool definitions, messages, profiles
 2. **Use `@table` for arrays of uniform objects** -- conversation history, search results
-3. **Use compact text for LLM input** -- `to_tl_with_schemas_compact()` removes insignificant whitespace for maximum token savings
+3. **Use compact text for LLM input** -- `FormatOptions::compact().with_compact_floats()` for maximum token savings
 4. **Cache compiled binary** for frequently-used context segments
 5. **String deduplication** helps when context has repetitive strings (roles, tool names)
 6. **Separate static and dynamic context** -- compile static context once, merge at runtime
 
 ## Benchmark Results
 
-The [accuracy-benchmark](../internals/accuracy-benchmark.md) suite tests 12 tasks across 10 business domains on Claude Sonnet 4.5 and GPT-5.2:
+The [accuracy-benchmark](../internals/accuracy-benchmark.md) suite compares TeaLeaf vs JSON vs TOON on Claude Sonnet 4.5 and GPT-5.2:
 
-- **~36% fewer data tokens** compared to JSON (savings increase with larger datasets)
-- **No accuracy loss** -- scores within noise across all providers
+**Real-world results (SEC EDGAR 10-K data):**
+
+| Metric | TeaLeaf | JSON | TOON |
+|--------|---------|------|------|
+| Anthropic accuracy | 0.952 | 0.960 | 0.935 |
+| OpenAI accuracy | 0.927 | 0.933 | 0.886 |
+| Input token savings | **-43%** | baseline | **-43%** |
+
+- **No accuracy loss** -- scores within noise across all three formats
+- **~30% savings** on synthetic benchmarks (smaller datasets dilute savings)
+- Results are captured in `analysis.tl` with `@struct` schema definitions and `@table` format comparison data
 - See the [benchmark README](https://github.com/krishjag/tealeaf/tree/main/accuracy-benchmark) for full methodology and results.

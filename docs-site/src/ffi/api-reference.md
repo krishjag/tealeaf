@@ -22,7 +22,7 @@ Clears the thread-local error state.
 ```c
 const char* tl_version(void);
 ```
-Returns the library version string (e.g., `"2.0.0-beta.8"`). The returned pointer is static -- do **not** free it.
+Returns the library version string (e.g., `"2.0.0-beta.9"`). The returned pointer is static -- do **not** free it.
 
 ## Document API
 
@@ -67,6 +67,18 @@ Convert document to TeaLeaf text (with schemas). Caller must free with `tl_strin
 char* tl_document_to_text_data_only(const TLDocument* doc);
 ```
 Convert document to TeaLeaf text (data only, no schemas). Caller must free with `tl_string_free`.
+
+### `tl_document_to_text_with_options`
+```c
+char* tl_document_to_text_with_options(const TLDocument* doc, bool compact, bool compact_floats);
+```
+Convert document to TeaLeaf text with custom formatting options (with schemas). Set `compact` to remove insignificant whitespace. Set `compact_floats` to strip `.0` from whole-number floats (e.g., `42.0` → `42`). Caller must free with `tl_string_free`.
+
+### `tl_document_to_text_data_only_with_options`
+```c
+char* tl_document_to_text_data_only_with_options(const TLDocument* doc, bool compact, bool compact_floats);
+```
+Convert document to TeaLeaf text with custom formatting options (data only, no schemas). Same options as `tl_document_to_text_with_options`. Caller must free with `tl_string_free`.
 
 ### `tl_document_compile`
 ```c

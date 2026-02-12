@@ -1,6 +1,51 @@
 # Changelog
 
-## v2.0.0-beta.8 (Current)
+## v2.0.0-beta.9 (Current)
+
+### Features
+- **`FormatOptions` struct with `compact_floats`** — new `FormatOptions` struct replaces bare `compact: bool` throughout the serialization pipeline, adding `compact_floats` to strip `.0` from whole-number floats (e.g., `35934000000.0` → `35934000000`). Saves additional characters/tokens for financial and scientific datasets. Trade-off: re-parsing produces `Int` instead of `Float` for whole-number values.
+  - Rust: `FormatOptions::compact().with_compact_floats()` via `doc.to_tl_with_options(&opts)`
+  - CLI: `--compact-floats` flag on `from-json` and `decompile` commands
+  - FFI: `tl_document_to_text_with_options(doc, compact, compact_floats)` and `tl_document_to_text_data_only_with_options(doc, compact, compact_floats)`
+  - .NET: unified `doc.ToText(compact, compactFloats, ignoreSchemas)` with all-optional parameters
+- **Lexer/parser refactor for colon handling** — removed `Tag(String)` token kind from lexer; colon now always emits as `Colon` token. Tags (`:name value`) are parsed in the parser as `Colon + Word` sequence. This enables no-space syntax: `key:value` and `key::tag` now parse correctly without requiring a space after the colon.
+
+### .NET
+- Source generator: `ResolveStructName()` — nested types now honor `[TeaLeaf(StructName = "...")]` attribute when resolving struct names for arrays, lists, and nested objects. Previously always used `ToSnakeCase(type.Name)`, ignoring the override.
+- Unified `ToText()` and `ToTextDataOnly()` into a single `ToText(bool compact = false, bool compactFloats = false, bool ignoreSchemas = false)` method with all-optional parameters. Replaces the previous 4-method API (`ToText`, `ToTextDataOnly`, `ToTextCompact`, `ToTextCompactDataOnly`) with named-parameter calling style (e.g., `doc.ToText(compact: true)`, `doc.ToText(ignoreSchemas: true)`).
+
+### Accuracy Benchmark
+- **Real dataset support** — benchmark now supports real-world datasets alongside synthetic data. Starting with finance domain using SEC EDGAR 2025 Q4 10-K filings (AAPL, MSFT, GOOGL, AMZN, NVDA).
+- **Three-format comparison in `analysis.tl`** — `TLWriter` now emits `@struct` schema definitions for all table types (`api_response`, `analysis_result`, `comparison_result`) and two new format comparison tables (`format_accuracy`, `format_tokens`) when `--compare-formats` is used. String values in table rows are properly quoted for valid TeaLeaf parsing.
+- Reorganized task data into `synthetic-data/` subdirectories to separate from real datasets.
+- Added task configuration files (`real.json`, `synthetic.json`) for independent benchmark runs.
+- Added utility examples: `convert_formats.rs`, `tl_roundtrip.rs`, `toon_roundtrip.rs`.
+- `convert_json_to_tl()` now uses `FormatOptions::compact().with_compact_floats()` for maximum token savings.
+
+### Testing
+- Added `test_format_float_compact_floats` — verifies whole-number stripping, non-whole preservation, special value handling (NaN/inf), and scientific notation passthrough
+- Added `test_dumps_with_compact_floats` — integration test for `FormatOptions` with mixed int/float data
+- Added `test_colon_then_word` — verifies lexer emits `Colon + Word` instead of `Tag` for `:Circle` syntax
+- Added `test_tagged_value_no_space_after_colon` — verifies `key::tag value` parsing
+- Added `test_key_value_no_space_after_colon` — verifies `key:value` parsing without spaces
+- Added 4 source generator tests for `ResolveStructName`: nested type with `StructName` override, list/array of nested type with override, and default snake_case fallback
+- Added 4 .NET tests for compact text and unified `ToText` API: `ToTextCompact_RemovesInsignificantWhitespace`, `ToTextCompact_WithSchemas_IsSmallerThanPretty`, `ToTextCompact_RoundTrips`, `ToText_IgnoreSchemas_ExcludesSchemas`
+- Updated 4 fuzz targets (`fuzz_serialize`, `fuzz_parse`, `fuzz_structured`, `fuzz_json_schemas`) with compact and `compact_floats` roundtrip coverage and `values_numeric_equal` comparator for Float↔Int/UInt coercion
+
+### Documentation
+- Added [Compact Floats: Intentional Lossy Optimization](../guides/round-trip.md#compact-floats-intentional-lossy-optimization) section to round-trip fidelity guide
+- Updated CLI docs for `--compact-floats` flag on `decompile` and `from-json`
+- Updated Rust overview with `FormatOptions` section and `to_tl_with_options` API
+- Updated FFI API reference with `tl_document_to_text_with_options` and `tl_document_to_text_data_only_with_options`
+- Updated .NET overview with new `ToText`/`ToTextDataOnly` overloads
+- Updated LLM context guide with `FormatOptions` examples and compaction options table
+- Updated crates.io and NuGet README files
+- Updated accuracy benchmark documentation with `analysis.tl` structure, three-format comparison tables, and latest benchmark results (~43% input token savings on real-world data)
+- Updated token savings claims across README.md, tealeaf-core/README.md, introduction.md, and CLAUDE.md to reflect latest benchmark data
+
+---
+
+## v2.0.0-beta.8
 
 ### .NET
 - **XML documentation in NuGet packages** — `TeaLeaf` and `TeaLeaf.Annotations` packages now include XML doc files (`TeaLeaf.xml`, `TeaLeaf.Annotations.xml`) for all target frameworks. Consumers get IntelliSense tooltips for all public APIs. Previously, `GenerateDocumentationFile` was not enabled and the `.xml` files were absent from the `.nupkg`.

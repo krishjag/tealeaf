@@ -3,7 +3,7 @@
 use std::env;
 use std::process;
 
-use tealeaf::{TeaLeaf, Reader};
+use tealeaf::{TeaLeaf, Reader, FormatOptions};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -44,13 +44,15 @@ fn print_usage() {
     println!();
     println!("Commands:");
     println!("  compile <input.tl> -o <output.tlbx>              Compile text to binary");
-    println!("  decompile <input.tlbx> -o <output.tl> [--compact] Decompile binary to text");
+    println!("  decompile <input.tlbx> -o <output.tl> [--compact] [--compact-floats]");
+    println!("                                                     Decompile binary to text");
     println!("  info <file.tl|file.tlbx>                         Show file info (auto-detects format)");
     println!("  validate <file.tl>                               Validate text format");
     println!();
     println!("JSON Conversion:");
     println!("  to-json <input.tl> [-o <output.json>]            Convert TeaLeaf text to JSON");
-    println!("  from-json <input.json> -o <output.tl> [--compact] Convert JSON to TeaLeaf text");
+    println!("  from-json <input.json> -o <output.tl> [--compact] [--compact-floats]");
+    println!("                                                     Convert JSON to TeaLeaf text");
     println!("  tlbx-to-json <input.tlbx> [-o <out.json>] Convert TeaLeaf binary to JSON");
     println!("  json-to-tlbx <input.json> -o <out.tlbx>   Convert JSON to TeaLeaf binary");
     println!();
@@ -87,17 +89,21 @@ fn cmd_decompile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
     let input = &args[0];
     let output = &args[2];
-    let compact = args.get(3).map_or(false, |a| a == "--compact");
+    let remaining = &args[3..];
+    let compact = remaining.iter().any(|a| a == "--compact");
+    let compact_floats = remaining.iter().any(|a| a == "--compact-floats");
 
-    println!("Decompiling {} -> {}{}", input, output, if compact { " (compact)" } else { "" });
+    let mut flags = Vec::new();
+    if compact { flags.push("compact"); }
+    if compact_floats { flags.push("compact-floats"); }
+    let flag_str = if flags.is_empty() { String::new() } else { format!(" ({})", flags.join(", ")) };
+    println!("Decompiling {} -> {}{}", input, output, flag_str);
 
     let reader = Reader::open(input)?;
     let doc = TeaLeaf::from_reader(&reader)?;
-    let tl_text = if compact {
-        doc.to_tl_with_schemas_compact()
-    } else {
-        doc.to_tl_with_schemas()
-    };
+    let mut opts = if compact { FormatOptions::compact() } else { FormatOptions::default() };
+    if compact_floats { opts = opts.with_compact_floats(); }
+    let tl_text = doc.to_tl_with_options(&opts);
 
     std::fs::write(output, tl_text)?;
     println!("Done");
@@ -241,9 +247,15 @@ fn cmd_from_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
 
     let input = &args[0];
     let output = &args[2];
-    let compact = args.get(3).map_or(false, |a| a == "--compact");
+    let remaining = &args[3..];
+    let compact = remaining.iter().any(|a| a == "--compact");
+    let compact_floats = remaining.iter().any(|a| a == "--compact-floats");
 
-    println!("Converting {} -> {}{}", input, output, if compact { " (compact)" } else { "" });
+    let mut flags = Vec::new();
+    if compact { flags.push("compact"); }
+    if compact_floats { flags.push("compact-floats"); }
+    let flag_str = if flags.is_empty() { String::new() } else { format!(" ({})", flags.join(", ")) };
+    println!("Converting {} -> {}{}", input, output, flag_str);
 
     let json_content = std::fs::read_to_string(input)?;
 
@@ -254,11 +266,9 @@ fn cmd_from_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
             println!("  @struct {} ({} fields)", name, schema.fields.len());
         }
     }
-    let tl_text = if compact {
-        doc.to_tl_with_schemas_compact()
-    } else {
-        doc.to_tl_with_schemas()
-    };
+    let mut opts = if compact { FormatOptions::compact() } else { FormatOptions::default() };
+    if compact_floats { opts = opts.with_compact_floats(); }
+    let tl_text = doc.to_tl_with_options(&opts);
 
     std::fs::write(output, tl_text)?;
     println!("Done");

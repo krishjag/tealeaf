@@ -3,7 +3,7 @@
 //! This crate provides a C-compatible API for use from other languages
 //! like C#, Python, and Node.js.
 
-use tealeaf::{TeaLeaf, Value, Reader, Writer, dumps, dumps_compact};
+use tealeaf::{TeaLeaf, Value, Reader, Writer, dumps, dumps_compact, FormatOptions};
 use std::cell::RefCell;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -274,6 +274,33 @@ pub unsafe extern "C" fn tl_document_to_text_data_only(doc: *const TLDocument) -
     }
 }
 
+/// Convert document to TeaLeaf text format without schema definitions, with custom options.
+/// Set `compact` to remove insignificant whitespace.
+/// Set `compact_floats` to strip `.0` from whole-number floats.
+/// Caller must free the returned string with tl_string_free.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_to_text_data_only_with_options(
+    doc: *const TLDocument,
+    compact: bool,
+    compact_floats: bool,
+) -> *mut c_char {
+    if doc.is_null() {
+        return ptr::null_mut();
+    }
+
+    let mut opts = if compact { FormatOptions::compact() } else { FormatOptions::default() };
+    if compact_floats { opts = opts.with_compact_floats(); }
+    let text = tealeaf::dumps_with_options(&(*doc).inner.data, &opts);
+    match CString::new(text) {
+        Ok(s) => s.into_raw(),
+        Err(_) => ptr::null_mut(),
+    }
+}
+
 /// Convert document to compact TeaLeaf text format with schema definitions.
 /// Removes insignificant whitespace for token-efficient LLM input.
 /// Caller must free the returned string with tl_string_free.
@@ -307,6 +334,33 @@ pub unsafe extern "C" fn tl_document_to_text_compact_data_only(doc: *const TLDoc
     }
 
     let text = dumps_compact(&(*doc).inner.data);
+    match CString::new(text) {
+        Ok(s) => s.into_raw(),
+        Err(_) => ptr::null_mut(),
+    }
+}
+
+/// Convert document to TeaLeaf text format with custom options.
+/// Set `compact` to remove insignificant whitespace.
+/// Set `compact_floats` to strip `.0` from whole-number floats (e.g., `42.0` → `42`).
+/// Caller must free the returned string with tl_string_free.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_to_text_with_options(
+    doc: *const TLDocument,
+    compact: bool,
+    compact_floats: bool,
+) -> *mut c_char {
+    if doc.is_null() {
+        return ptr::null_mut();
+    }
+
+    let mut opts = if compact { FormatOptions::compact() } else { FormatOptions::default() };
+    if compact_floats { opts = opts.with_compact_floats(); }
+    let text = (*doc).inner.to_tl_with_options(&opts);
     match CString::new(text) {
         Ok(s) => s.into_raw(),
         Err(_) => ptr::null_mut(),
@@ -1177,7 +1231,7 @@ pub unsafe extern "C" fn tl_result_free(result: *mut TLResult) {
 /// Get the library version string.
 #[no_mangle]
 pub extern "C" fn tl_version() -> *const c_char {
-    static VERSION: &[u8] = b"2.0.0-beta.8\0";
+    static VERSION: &[u8] = b"2.0.0-beta.9\0";
     VERSION.as_ptr() as *const c_char
 }
 
@@ -2429,7 +2483,7 @@ headers: @map {"Content-Type": "application/json", "Accept": "*/*"}
         let v = tl_version();
         assert!(!v.is_null());
         let version = unsafe { CStr::from_ptr(v) }.to_str().unwrap();
-        assert_eq!(version, "2.0.0-beta.8");
+        assert_eq!(version, "2.0.0-beta.9");
         // Note: do NOT free this - it's a static string
     }
 

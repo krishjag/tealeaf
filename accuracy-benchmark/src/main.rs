@@ -9,7 +9,7 @@ use clap::{Parser, Subcommand};
 use tracing_subscriber::EnvFilter;
 
 use accuracy_benchmark::{
-    analysis::{ComparisonEngine, AnalysisResult},
+    analysis::{ComparisonEngine, ComparisonResult, AnalysisResult},
     config::{Config, DataFormat},
     providers::{create_all_providers_with_config, create_providers_with_config, LLMProvider},
     reporting::{print_console_report, JsonSummary, TLWriter},
@@ -312,10 +312,17 @@ async fn run_benchmark(
 
     // If format comparison enabled, analyze results for each format
     let all_formats = DataFormat::all();
-    let format_aggregated: HashMap<DataFormat, _> = if let Some(ref format_results) = format_comparison_results {
+    let (format_aggregated, format_analysis_map, format_comparisons_map): (
+        HashMap<DataFormat, _>,
+        HashMap<DataFormat, Vec<HashMap<String, AnalysisResult>>>,
+        HashMap<DataFormat, Vec<ComparisonResult>>,
+    ) = if let Some(ref format_results) = format_comparison_results {
         let mut agg_map = HashMap::new();
+        let mut analysis_map: HashMap<DataFormat, Vec<HashMap<String, AnalysisResult>>> = HashMap::new();
+        let mut comparisons_map: HashMap<DataFormat, Vec<ComparisonResult>> = HashMap::new();
         for &fmt in &all_formats {
             let mut fmt_comparisons = Vec::new();
+            let mut fmt_analysis: Vec<HashMap<String, AnalysisResult>> = Vec::new();
             for task in &tasks {
                 let mut task_analysis: HashMap<String, AnalysisResult> = HashMap::new();
                 for provider in &providers {
@@ -334,12 +341,15 @@ async fn run_benchmark(
                     let comparison = engine.compare_responses(task, &task_analysis);
                     fmt_comparisons.push(comparison);
                 }
+                fmt_analysis.push(task_analysis);
             }
             agg_map.insert(fmt, engine.aggregate_with_tasks(&fmt_comparisons, &tasks));
+            comparisons_map.insert(fmt, fmt_comparisons);
+            analysis_map.insert(fmt, fmt_analysis);
         }
-        agg_map
+        (agg_map, analysis_map, comparisons_map)
     } else {
-        HashMap::new()
+        (HashMap::new(), HashMap::new(), HashMap::new())
     };
 
     // Print per-format results
@@ -353,6 +363,37 @@ async fn run_benchmark(
     } else {
         print_console_report(&aggregated);
     }
+
+    // Compute format comparison data (used for both console and file output)
+    let format_token_usage: Option<HashMap<(String, DataFormat), (u32, u32)>> = if compare_formats {
+        if let Some(ref format_results) = format_comparison_results {
+            let successful: std::collections::HashSet<_> = format_results
+                .iter()
+                .filter(|(_, r)| r.response.is_some())
+                .map(|(k, _)| (k.task_id.clone(), k.provider.clone(), k.format))
+                .collect();
+            let mut usage: HashMap<(String, DataFormat), (u32, u32)> = HashMap::new();
+            for (key, result) in format_results {
+                if let Some(ref response) = result.response {
+                    let all_succeeded = all_formats.iter().all(|&fmt| {
+                        successful.contains(&(key.task_id.clone(), key.provider.clone(), fmt))
+                    });
+                    if all_succeeded {
+                        let entry = usage
+                            .entry((key.provider.clone(), key.format))
+                            .or_insert((0, 0));
+                        entry.0 += response.input_tokens;
+                        entry.1 += response.output_tokens;
+                    }
+                }
+            }
+            Some(usage)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
 
     // Print format comparison if enabled
     if compare_formats {
@@ -375,22 +416,7 @@ async fn run_benchmark(
                 paired_task_counts.insert(provider.clone(), count);
             }
 
-            // Calculate token usage — only count tasks where ALL formats succeeded
-            let mut token_usage: HashMap<(String, DataFormat), (u32, u32)> = HashMap::new();
-            for (key, result) in format_results {
-                if let Some(ref response) = result.response {
-                    let all_succeeded = all_formats.iter().all(|&fmt| {
-                        successful.contains(&(key.task_id.clone(), key.provider.clone(), fmt))
-                    });
-                    if all_succeeded {
-                        let entry = token_usage
-                            .entry((key.provider.clone(), key.format))
-                            .or_insert((0, 0));
-                        entry.0 += response.input_tokens;
-                        entry.1 += response.output_tokens;
-                    }
-                }
-            }
+            let token_usage = format_token_usage.as_ref().unwrap();
 
             let num_tasks = tasks.len();
 
@@ -564,6 +590,11 @@ async fn run_benchmark(
 
     // Write TeaLeaf results
     let tl_path = run_dir.join("analysis.tl");
+    let fmt_agg_ref = if format_aggregated.is_empty() { None } else { Some(&format_aggregated) };
+    let fmt_tokens_ref = format_token_usage.as_ref();
+    let fmt_task_results_ref = format_comparison_results.as_ref();
+    let fmt_analysis_ref = if format_analysis_map.is_empty() { None } else { Some(&format_analysis_map) };
+    let fmt_comparisons_ref = if format_comparisons_map.is_empty() { None } else { Some(&format_comparisons_map) };
     TLWriter::write_run_results(
         &tl_path,
         &run_id,
@@ -574,6 +605,11 @@ async fn run_benchmark(
         &analysis_results,
         &comparisons,
         &aggregated,
+        fmt_agg_ref,
+        fmt_tokens_ref,
+        fmt_task_results_ref,
+        fmt_analysis_ref,
+        fmt_comparisons_ref,
     )?;
     println!("\nTeaLeaf results written to: {}", tl_path.display());
 

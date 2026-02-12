@@ -34,13 +34,11 @@ string[] keys = doc.Keys;
 ### Output
 
 ```csharp
-// To text
-string text = doc.ToText();               // full document (schemas + data)
-string data = doc.ToTextDataOnly();       // data only (no schemas)
-
-// Compact text (removes insignificant whitespace, ideal for LLM input)
-string compact = doc.ToTextCompact();              // schemas + data, compact
-string compactData = doc.ToTextCompactDataOnly();  // data only, compact
+// To text (all parameters optional, default to false)
+string text = doc.ToText();                                          // pretty, with schemas
+string compact = doc.ToText(compact: true);                          // compact whitespace, with schemas
+string maxCompact = doc.ToText(compact: true, compactFloats: true);  // maximum token savings
+string dataOnly = doc.ToText(ignoreSchemas: true);                   // pretty, no schemas
 
 // To JSON
 string json = doc.ToJson();               // pretty-printed

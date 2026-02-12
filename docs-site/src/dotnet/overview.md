@@ -93,9 +93,11 @@ using var doc = TLDocument.FromJson(jsonString);
 string[] keys = doc.Keys;
 using var value = doc["name"];
 
-// Output
-string text = doc.ToText();
-string compact = doc.ToTextCompact();  // removes insignificant whitespace
+// Output (all parameters optional, default to false)
+string text = doc.ToText();                                          // pretty, with schemas
+string compact = doc.ToText(compact: true);                          // compact whitespace
+string maxCompact = doc.ToText(compact: true, compactFloats: true);  // maximum token savings
+string dataOnly = doc.ToText(ignoreSchemas: true);                   // pretty, no schemas
 string json = doc.ToJson();
 doc.Compile("output.tlbx", compress: true);
 ```

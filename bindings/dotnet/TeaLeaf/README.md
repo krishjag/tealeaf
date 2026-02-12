@@ -169,7 +169,8 @@ For working with TeaLeaf text format (.tl):
 | `TLDocument.Parse(string text)` | Parse TeaLeaf text |
 | `TLDocument.ParseFile(string path)` | Parse from .tl file |
 | `TLDocument.FromJson(string json)` | Create from JSON with schema inference |
-| `doc.ToText()` | Convert to TeaLeaf text (with schemas) |
+| `doc.ToText()` | Convert to TeaLeaf text (with schemas, pretty-printed) |
+| `doc.ToText(compact, compactFloats, ignoreSchemas)` | Text with formatting and schema options |
 | `doc.ToJson()` | Convert to pretty JSON |
 | `doc.ToJsonCompact()` | Convert to compact JSON |
 | `doc.Compile(path, compress)` | Write to binary .tlbx file |

@@ -491,7 +491,7 @@ public class TLDocumentEdgeCaseTests
     }
 
     [Fact]
-    public void ToTextDataOnly_OmitsSchemas()
+    public void ToText_IgnoreSchemas_OmitsSchemas()
     {
         using var doc = TLDocument.Parse(@"
             @struct Person (name: string, age: int)
@@ -499,7 +499,7 @@ public class TLDocumentEdgeCaseTests
                 (alice, 30)
             ]
         ");
-        var dataOnly = doc.ToTextDataOnly();
+        var dataOnly = doc.ToText(ignoreSchemas: true);
         Assert.DoesNotContain("@struct", dataOnly);
     }
 }

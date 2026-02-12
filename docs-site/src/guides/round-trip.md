@@ -158,6 +158,58 @@ tealeaf tlbx-to-json data.tlbx -o from_binary.json
 # from_text.json and from_binary.json should be identical
 ```
 
+## Compact Floats: Intentional Lossy Optimization
+
+The `--compact-floats` option (or `FormatOptions::compact().with_compact_floats()` in Rust) strips the `.0` suffix from whole-number floats to save characters and tokens:
+
+```
+# Default: preserves float type
+revenue: 35934000000.0
+
+# With compact_floats: saves 2 characters per whole-number float
+revenue: 35934000000
+```
+
+**Trade-off:** Re-parsing the compact output produces `Value::Int` instead of `Value::Float` for these values. The numeric value is identical, but the type changes.
+
+**When to use:**
+- LLM context payloads where token savings matter more than type fidelity
+- Financial datasets with many whole-number values (e.g., SEC EDGAR filings with `35934000000.0` → `35934000000`)
+- Any scenario where downstream consumers treat int and float interchangeably
+
+**When NOT to use:**
+- When the distinction between `42` (int) and `42.0` (float) is semantically meaningful
+- When data must survive multiple round-trips with identical types
+
+**What's affected:**
+- Only whole-number floats with ≤15 significant digits (e.g., `42.0`, `17164000000.0`)
+- Non-whole floats are unaffected (`3.14` stays `3.14`)
+- Special values are unaffected (`NaN`, `inf`, `-inf`)
+- Very large floats using scientific notation are unaffected (`1e20` stays `1e20`)
+
+### CLI Usage
+
+```bash
+# Compact whitespace + compact floats for maximum token savings
+tealeaf from-json data.json -o data.tl --compact --compact-floats
+tealeaf decompile data.tlbx -o data.tl --compact --compact-floats
+```
+
+### Rust API
+
+```rust
+use tealeaf::FormatOptions;
+
+let opts = FormatOptions::compact().with_compact_floats();
+let text = doc.to_tl_with_options(&opts);
+```
+
+### .NET API
+
+```csharp
+string text = doc.ToText(compact: true, compactFloats: true);
+```
+
 ## Type Preservation Summary
 
 | TeaLeaf Type | Binary Round-Trip | JSON Round-Trip |
@@ -167,6 +219,7 @@ tealeaf tlbx-to-json data.tlbx -o from_binary.json
 | Int | Lossless | Lossless |
 | UInt | Lossless | Lossless (as number) |
 | Float | Lossless | Lossless |
+| Float (with `compact_floats`) | Lossless | Lossy (whole numbers → Int) |
 | String | Lossless | Lossless |
 | Bytes | Lossless | Lossy (→ hex string) |
 | Array | Lossless | Lossless |

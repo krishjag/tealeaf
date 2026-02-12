@@ -175,10 +175,10 @@ Run with `--compare-formats` to compare TeaLeaf vs JSON vs TOON input efficiency
 
 | | TL | JSON | TOON |
 |---|---|---|---|
-| **Anthropic accuracy** | 0.943 | 0.960 | 0.952 |
-| **OpenAI accuracy** | 0.935 | 0.935 | 0.892 |
-| **Input savings (Anthropic)** | -41.9% | baseline | -43.0% |
-| **Input savings (OpenAI)** | -41.5% | baseline | -42.3% |
+| **Anthropic accuracy** | 0.952 | 0.960 | 0.935 |
+| **OpenAI accuracy** | 0.927 | 0.933 | 0.886 |
+| **Input savings (Anthropic)** | -43.5% | baseline | -43.0% |
+| **Input savings (OpenAI)** | -43.4% | baseline | -42.3% |
 
 ### Synthetic Results (12 Tasks, 10 Domains)
 
@@ -191,11 +191,12 @@ Run with `--compare-formats` to compare TeaLeaf vs JSON vs TOON input efficiency
 
 ### Key Findings
 
-- **~42% input token savings** on real-world data (TL and TOON both vs JSON)
+- **~43% input token savings** on real-world data (TL and TOON both vs JSON)
 - **~30% input token savings** on synthetic data (smaller datasets dilute savings)
 - **No accuracy loss** -- scores within noise across all three formats
 - TeaLeaf's advantage increases with nesting depth (schema inference + positional encoding)
-- TOON edges out TL by ~1% on tokenization despite being larger in bytes
+- TOON achieves similar byte-level savings to TL via different notation trade-offs
+- All results are captured in `analysis.tl` with `@struct` schemas and `@table` format comparison tables
 
 > **Sample Results:** Reference benchmark results are available in [`accuracy-benchmark/results/`](https://github.com/krishjag/tealeaf/tree/main/accuracy-benchmark/results) in the repository.
 
@@ -205,11 +206,47 @@ Results are saved to `accuracy-benchmark/results/runs/{run-id}/`:
 
 | File | Description |
 |------|-------------|
-| `analysis.tl` | Full results in TeaLeaf format |
+| `analysis.tl` | Full results in TeaLeaf format with schema definitions |
 | `summary.json` | Aggregated scores and rankings |
 | `responses/` | Raw API responses (with `--save-responses`) |
 
 Response files are named `{task-id}-{provider}-{format}.txt` in format comparison mode, or `{task-id}-{provider}.txt` in single-format mode.
+
+### analysis.tl Structure
+
+The `analysis.tl` output uses `@struct` schema definitions for self-documenting positional tables:
+
+```tl
+# Schema definitions
+@struct api_response (task_id: string, provider: string, model: string?,
+    input_tokens: int, output_tokens: int, latency_ms: int,
+    timestamp: timestamp, status: string)
+@struct analysis_result (task_id: string, provider: string,
+    completeness: float, relevance: float, coherence: float,
+    factual_accuracy: float)
+@struct comparison_result (task_id: string, providers_ranked: []string,
+    winner: string?, margin: float?)
+
+# When --compare-formats is used, format comparison schemas are also included:
+@struct format_accuracy (provider: string, format: string,
+    avg_score: float, wins: int)
+@struct format_tokens (provider: string, format: string,
+    input_tokens: int, output_tokens: int, total_tokens: int)
+```
+
+The file contains these sections:
+
+| Section | Description |
+|---------|-------------|
+| `run_metadata` | Run ID, timestamps, task count, providers |
+| `responses` | `@table api_response` -- per-task API response details |
+| `analysis_results` | `@table analysis_result` -- per-task accuracy metrics |
+| `comparisons` | `@table comparison_result` -- provider rankings per task |
+| `summary` | Aggregated wins, scores, category/complexity breakdowns |
+| `format_accuracy` | `@table format_accuracy` -- per-provider accuracy by format (TL/JSON/TOON) |
+| `format_tokens` | `@table format_tokens` -- per-provider token usage by format (TL/JSON/TOON) |
+
+The last two tables (`format_accuracy` and `format_tokens`) are only present when `--compare-formats` is used. They capture the full three-format comparison (TeaLeaf vs JSON vs TOON) in structured form, enabling downstream analysis of format trade-offs.
 
 ## Adding Custom Tasks
 

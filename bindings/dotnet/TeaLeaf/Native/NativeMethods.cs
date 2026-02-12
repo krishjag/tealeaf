@@ -70,10 +70,22 @@ internal static class NativeMethods
     public static extern IntPtr tl_document_to_text_data_only(IntPtr doc);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_document_to_text_data_only_with_options(
+        IntPtr doc,
+        [MarshalAs(UnmanagedType.I1)] bool compact,
+        [MarshalAs(UnmanagedType.I1)] bool compactFloats);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr tl_document_to_text_compact(IntPtr doc);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr tl_document_to_text_compact_data_only(IntPtr doc);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_document_to_text_with_options(
+        IntPtr doc,
+        [MarshalAs(UnmanagedType.I1)] bool compact,
+        [MarshalAs(UnmanagedType.I1)] bool compactFloats);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     public static extern TLResult tl_document_compile(

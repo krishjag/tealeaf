@@ -77,3 +77,5 @@ tealeaf-core/fuzz/target/
 tealeaf-core/fuzz/corpus/
 tealeaf-core/fuzz/artifacts/
 tealeaf-core/fuzz/coverage/
+accuracy-benchmark/tasks/finance/data/compact_test/
+

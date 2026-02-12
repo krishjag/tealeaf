@@ -134,46 +134,18 @@ public sealed class TLDocument : IDisposable
     public TLValue? this[string key] => Get(key);
 
     /// <summary>
-    /// Convert the document to TeaLeaf text format with schema definitions.
-    /// This is the default format that includes @struct definitions at the top.
+    /// Convert the document to TeaLeaf text format.
     /// </summary>
-    public string ToText()
+    /// <param name="compact">If true, removes insignificant whitespace for token-efficient output.</param>
+    /// <param name="compactFloats">If true, strips .0 from whole-number floats (e.g., 42.0 becomes 42).
+    /// Note: re-parsing will produce Int instead of Float for these values.</param>
+    /// <param name="ignoreSchemas">If true, omits @struct definitions and outputs data only.</param>
+    public string ToText(bool compact = false, bool compactFloats = false, bool ignoreSchemas = false)
     {
         ThrowIfDisposed();
-        var ptr = NativeMethods.tl_document_to_text(_handle);
-        return NativeMethods.PtrToStringAndFree(ptr) ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Convert the document to TeaLeaf text format without schema definitions (data only).
-    /// Use this when you only want the data portion without @struct definitions.
-    /// </summary>
-    public string ToTextDataOnly()
-    {
-        ThrowIfDisposed();
-        var ptr = NativeMethods.tl_document_to_text_data_only(_handle);
-        return NativeMethods.PtrToStringAndFree(ptr) ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Convert the document to compact TeaLeaf text format with schema definitions.
-    /// Removes insignificant whitespace for token-efficient LLM input.
-    /// </summary>
-    public string ToTextCompact()
-    {
-        ThrowIfDisposed();
-        var ptr = NativeMethods.tl_document_to_text_compact(_handle);
-        return NativeMethods.PtrToStringAndFree(ptr) ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Convert the document to compact TeaLeaf text format without schema definitions (data only).
-    /// Removes insignificant whitespace for token-efficient LLM input.
-    /// </summary>
-    public string ToTextCompactDataOnly()
-    {
-        ThrowIfDisposed();
-        var ptr = NativeMethods.tl_document_to_text_compact_data_only(_handle);
+        var ptr = ignoreSchemas
+            ? NativeMethods.tl_document_to_text_data_only_with_options(_handle, compact, compactFloats)
+            : NativeMethods.tl_document_to_text_with_options(_handle, compact, compactFloats);
         return NativeMethods.PtrToStringAndFree(ptr) ?? string.Empty;
     }
 

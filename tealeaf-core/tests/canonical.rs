@@ -647,6 +647,219 @@ fn canonical_cyclic_refs_full_roundtrip() {
     assert_eq!(actual, expected, "cyclic_refs: text → binary → JSON mismatch");
 }
 
+// =============================================================================
+// Compact Text Roundtrip Tests
+// =============================================================================
+// Verifies that compact formatting (FormatOptions::compact()) is lossless:
+// parse .tl → compact text → re-parse → JSON matches expected.
+
+fn compact_roundtrip(name: &str) {
+    let path = samples_dir().join(format!("{}.tl", name));
+    let doc = TeaLeaf::load(&path)
+        .unwrap_or_else(|e| panic!("Failed to parse {:?}: {}", path, e));
+
+    let opts = tealeaf::FormatOptions::compact();
+    let compact_text = doc.to_tl_with_options(&opts);
+
+    // Compact text must be parseable
+    let reparsed = TeaLeaf::parse(&compact_text)
+        .unwrap_or_else(|e| panic!("{}: compact text failed to re-parse: {}", name, e));
+
+    let json_str = reparsed.to_json()
+        .unwrap_or_else(|e| panic!("{}: failed to convert reparsed to JSON: {}", name, e));
+    let actual: serde_json::Value = serde_json::from_str(&json_str)
+        .unwrap_or_else(|e| panic!("{}: failed to parse reparsed JSON: {}", name, e));
+
+    let expected = load_expected_json(name);
+    assert_eq!(actual, expected, "{}: compact roundtrip JSON mismatch", name);
+}
+
+fn compact_is_not_larger(name: &str) {
+    let path = samples_dir().join(format!("{}.tl", name));
+    let doc = TeaLeaf::load(&path).expect("Failed to parse");
+
+    let pretty = doc.to_tl_with_schemas();
+    let compact = doc.to_tl_with_options(&tealeaf::FormatOptions::compact());
+
+    assert!(compact.len() <= pretty.len(),
+        "{}: compact ({}) should not be larger than pretty ({})", name, compact.len(), pretty.len());
+}
+
+#[test]
+fn canonical_compact_roundtrip_primitives() { compact_roundtrip("primitives"); }
+#[test]
+fn canonical_compact_roundtrip_arrays() { compact_roundtrip("arrays"); }
+#[test]
+fn canonical_compact_roundtrip_objects() { compact_roundtrip("objects"); }
+#[test]
+fn canonical_compact_roundtrip_schemas() { compact_roundtrip("schemas"); }
+#[test]
+fn canonical_compact_roundtrip_special_types() { compact_roundtrip("special_types"); }
+#[test]
+fn canonical_compact_roundtrip_timestamps() { compact_roundtrip("timestamps"); }
+#[test]
+fn canonical_compact_roundtrip_numbers_extended() { compact_roundtrip("numbers_extended"); }
+#[test]
+fn canonical_compact_roundtrip_unions() { compact_roundtrip("unions"); }
+#[test]
+fn canonical_compact_roundtrip_multiline_strings() { compact_roundtrip("multiline_strings"); }
+#[test]
+fn canonical_compact_roundtrip_unicode_escaping() { compact_roundtrip("unicode_escaping"); }
+#[test]
+fn canonical_compact_roundtrip_refs_tags_maps() { compact_roundtrip("refs_tags_maps"); }
+#[test]
+fn canonical_compact_roundtrip_mixed_schemas() { compact_roundtrip("mixed_schemas"); }
+#[test]
+fn canonical_compact_roundtrip_large_data() { compact_roundtrip("large_data"); }
+#[test]
+fn canonical_compact_roundtrip_cyclic_refs() { compact_roundtrip("cyclic_refs"); }
+
+#[test]
+fn canonical_compact_is_not_larger_primitives() { compact_is_not_larger("primitives"); }
+#[test]
+fn canonical_compact_is_not_larger_schemas() { compact_is_not_larger("schemas"); }
+#[test]
+fn canonical_compact_is_not_larger_large_data() { compact_is_not_larger("large_data"); }
+#[test]
+fn canonical_compact_is_not_larger_mixed_schemas() { compact_is_not_larger("mixed_schemas"); }
+
+// =============================================================================
+// Compact Floats Tests
+// =============================================================================
+// Verifies compact_floats behavior: whole-number floats lose `.0` suffix,
+// re-parsing produces Int instead of Float (documented lossy behavior),
+// but numeric values are preserved.
+
+/// Compare two JSON values treating whole-number floats and ints as equivalent.
+fn json_numeric_equal(a: &serde_json::Value, b: &serde_json::Value) -> bool {
+    match (a, b) {
+        (serde_json::Value::Number(na), serde_json::Value::Number(nb)) => {
+            // Compare as f64 to handle int/float equivalence
+            let fa = na.as_f64().unwrap_or(f64::NAN);
+            let fb = nb.as_f64().unwrap_or(f64::NAN);
+            (fa - fb).abs() < 1e-10 || (fa.is_nan() && fb.is_nan())
+        }
+        (serde_json::Value::Array(a), serde_json::Value::Array(b)) => {
+            a.len() == b.len() && a.iter().zip(b.iter()).all(|(x, y)| json_numeric_equal(x, y))
+        }
+        (serde_json::Value::Object(a), serde_json::Value::Object(b)) => {
+            a.len() == b.len() && a.iter().all(|(k, v)| {
+                b.get(k).map_or(false, |bv| json_numeric_equal(v, bv))
+            })
+        }
+        _ => a == b,
+    }
+}
+
+#[test]
+fn canonical_compact_floats_schemas() {
+    // schemas.tl has whole-number floats: 0.0, 1.0, 2.0, 95000.0, 75000.0, 88000.0
+    // and non-whole floats: 3.5, -4.2
+    let path = samples_dir().join("schemas.tl");
+    let doc = TeaLeaf::load(&path).expect("Failed to parse");
+
+    let opts = tealeaf::FormatOptions::compact().with_compact_floats();
+    let compact_text = doc.to_tl_with_options(&opts);
+
+    // Whole-number floats should NOT have .0 suffix
+    assert!(!compact_text.contains("95000.0"), "95000.0 should be stripped to 95000");
+    assert!(!compact_text.contains("75000.0"), "75000.0 should be stripped to 75000");
+    assert!(!compact_text.contains("88000.0"), "88000.0 should be stripped to 88000");
+
+    // Non-whole floats should be preserved
+    assert!(compact_text.contains("3.5"), "3.5 should be preserved");
+    assert!(compact_text.contains("-4.2"), "-4.2 should be preserved");
+
+    // Re-parse and compare numerically
+    let reparsed = TeaLeaf::parse(&compact_text).expect("Failed to re-parse compact_floats text");
+    let json_str = reparsed.to_json().expect("Failed to convert to JSON");
+    let actual: serde_json::Value = serde_json::from_str(&json_str).expect("Failed to parse JSON");
+    let expected = load_expected_json("schemas");
+
+    assert!(json_numeric_equal(&actual, &expected),
+        "schemas: compact_floats roundtrip should be numerically equivalent\nactual: {}\nexpected: {}",
+        serde_json::to_string_pretty(&actual).unwrap(),
+        serde_json::to_string_pretty(&expected).unwrap());
+}
+
+#[test]
+fn canonical_compact_floats_large_data() {
+    // large_data.tl has whole-number floats: 0.0, 10.0, 20.0, 3.0
+    // and non-whole floats: 1.1, 2.2, 3.3, ..., 9.9, 11.1, ..., 29.9
+    let path = samples_dir().join("large_data.tl");
+    let doc = TeaLeaf::load(&path).expect("Failed to parse");
+
+    let opts = tealeaf::FormatOptions::compact().with_compact_floats();
+    let compact_text = doc.to_tl_with_options(&opts);
+
+    // Non-whole floats should be preserved
+    assert!(compact_text.contains("1.1"), "1.1 should be preserved");
+    assert!(compact_text.contains("9.9"), "9.9 should be preserved");
+
+    // Re-parse and compare numerically
+    let reparsed = TeaLeaf::parse(&compact_text).expect("Failed to re-parse compact_floats text");
+    let json_str = reparsed.to_json().expect("Failed to convert to JSON");
+    let actual: serde_json::Value = serde_json::from_str(&json_str).expect("Failed to parse JSON");
+    let expected = load_expected_json("large_data");
+
+    assert!(json_numeric_equal(&actual, &expected),
+        "large_data: compact_floats roundtrip should be numerically equivalent");
+}
+
+#[test]
+fn canonical_compact_floats_primitives() {
+    // primitives.tl has non-whole floats only: 3.14159, -273.15
+    // compact_floats should not alter these
+    let path = samples_dir().join("primitives.tl");
+    let doc = TeaLeaf::load(&path).expect("Failed to parse");
+
+    let opts = tealeaf::FormatOptions::compact().with_compact_floats();
+    let compact_text = doc.to_tl_with_options(&opts);
+
+    assert!(compact_text.contains("3.14159"), "3.14159 should be preserved");
+    assert!(compact_text.contains("-273.15"), "-273.15 should be preserved");
+
+    // Since no whole-number floats, output should be exactly equivalent
+    let reparsed = TeaLeaf::parse(&compact_text).expect("Failed to re-parse");
+    let json_str = reparsed.to_json().expect("Failed to convert to JSON");
+    let actual: serde_json::Value = serde_json::from_str(&json_str).expect("Failed to parse JSON");
+    let expected = load_expected_json("primitives");
+    assert_eq!(actual, expected, "primitives: compact_floats should be identical (no whole-number floats)");
+}
+
+#[test]
+fn canonical_compact_floats_numbers_extended() {
+    // numbers_extended.tl has scientific notation floats
+    let path = samples_dir().join("numbers_extended.tl");
+    let doc = TeaLeaf::load(&path).expect("Failed to parse");
+
+    let opts = tealeaf::FormatOptions::compact().with_compact_floats();
+    let compact_text = doc.to_tl_with_options(&opts);
+
+    // Must re-parse without errors
+    let reparsed = TeaLeaf::parse(&compact_text).expect("Failed to re-parse compact_floats text");
+    let json_str = reparsed.to_json().expect("Failed to convert to JSON");
+    let actual: serde_json::Value = serde_json::from_str(&json_str).expect("Failed to parse JSON");
+    let expected = load_expected_json("numbers_extended");
+
+    assert!(json_numeric_equal(&actual, &expected),
+        "numbers_extended: compact_floats roundtrip should be numerically equivalent");
+}
+
+#[test]
+fn canonical_compact_floats_is_smaller_than_compact() {
+    // For schemas.tl which has many whole-number floats, compact_floats should save chars
+    let path = samples_dir().join("schemas.tl");
+    let doc = TeaLeaf::load(&path).expect("Failed to parse");
+
+    let compact = doc.to_tl_with_options(&tealeaf::FormatOptions::compact());
+    let compact_floats = doc.to_tl_with_options(&tealeaf::FormatOptions::compact().with_compact_floats());
+
+    assert!(compact_floats.len() < compact.len(),
+        "schemas: compact_floats ({}) should be smaller than compact ({}) due to whole-number floats",
+        compact_floats.len(), compact.len());
+}
+
 fn read_binary_to_json_from_reader(reader: &Reader) -> serde_json::Value {
     let mut obj = serde_json::Map::new();
     for key in reader.keys() {
