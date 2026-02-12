@@ -584,6 +584,38 @@ fn canonical_mixed_schemas_full_roundtrip() {
 }
 
 // =============================================================================
+// Quoted Keys Tests (JSON-LD, JSON Schema, XML, OData, RDF, spaces)
+// =============================================================================
+
+#[test]
+fn canonical_quoted_keys_text_to_json() {
+    let actual = parse_to_json("quoted_keys");
+    let expected = load_expected_json("quoted_keys");
+    assert_eq!(actual, expected, "quoted_keys.tl → JSON mismatch");
+}
+
+#[test]
+fn canonical_quoted_keys_binary_roundtrip() {
+    let actual = read_binary_to_json("quoted_keys");
+    let expected = load_expected_json("quoted_keys");
+    assert_eq!(actual, expected, "quoted_keys.tlbx → JSON mismatch");
+}
+
+#[test]
+fn canonical_quoted_keys_full_roundtrip() {
+    let path = samples_dir().join("quoted_keys.tl");
+    let doc = TeaLeaf::load(&path).expect("Failed to parse");
+
+    let temp = tempfile::NamedTempFile::new().expect("Failed to create temp file");
+    doc.compile(temp.path(), false).expect("Failed to compile");
+
+    let reader = Reader::open(temp.path()).expect("Failed to read");
+    let actual = read_binary_to_json_from_reader(&reader);
+    let expected = load_expected_json("quoted_keys");
+    assert_eq!(actual, expected, "quoted_keys: text → binary → JSON mismatch");
+}
+
+// =============================================================================
 // Large Data Stress Tests
 // =============================================================================
 
@@ -713,6 +745,8 @@ fn canonical_compact_roundtrip_mixed_schemas() { compact_roundtrip("mixed_schema
 fn canonical_compact_roundtrip_large_data() { compact_roundtrip("large_data"); }
 #[test]
 fn canonical_compact_roundtrip_cyclic_refs() { compact_roundtrip("cyclic_refs"); }
+#[test]
+fn canonical_compact_roundtrip_quoted_keys() { compact_roundtrip("quoted_keys"); }
 
 #[test]
 fn canonical_compact_is_not_larger_primitives() { compact_is_not_larger("primitives"); }
@@ -722,6 +756,8 @@ fn canonical_compact_is_not_larger_schemas() { compact_is_not_larger("schemas");
 fn canonical_compact_is_not_larger_large_data() { compact_is_not_larger("large_data"); }
 #[test]
 fn canonical_compact_is_not_larger_mixed_schemas() { compact_is_not_larger("mixed_schemas"); }
+#[test]
+fn canonical_compact_is_not_larger_quoted_keys() { compact_is_not_larger("quoted_keys"); }
 
 // =============================================================================
 // Compact Floats Tests

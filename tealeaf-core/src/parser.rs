@@ -124,12 +124,18 @@ impl Parser {
         let mut schema = Schema::new(&name);
 
         while !self.check(TokenKind::RParen) {
-            // Field names must be unquoted names per spec grammar
+            // Field names can be unquoted words or quoted strings (for names
+            // that contain special characters like @type, $ref, etc.)
             let field_name = match self.current_kind() {
                 TokenKind::Word(w) => {
                     let w = w.clone();
                     self.advance();
                     w
+                }
+                TokenKind::String(s) => {
+                    let s = s.clone();
+                    self.advance();
+                    s
                 }
                 _ => return Err(Error::UnexpectedToken {
                     expected: "field name".to_string(),
@@ -1213,5 +1219,22 @@ mod tests {
             let input = format!("@struct Good (field: {})\n", good_type);
             assert!(crate::TeaLeaf::parse(&input).is_ok(), "'{}' should be accepted", good_type);
         }
+    }
+
+    #[test]
+    fn test_parse_struct_with_quoted_fields() {
+        // Quoted field names in @struct definitions (e.g. JSON-LD @type)
+        let input = "@struct foo(\"@type\":string, name:string)\ndata:@table foo[(A,x),(B,y)]\n";
+        let doc = crate::TeaLeaf::parse(input).unwrap();
+        let arr = doc.get("data").unwrap().as_array().unwrap();
+        assert_eq!(arr.len(), 2);
+
+        let first = arr[0].as_object().unwrap();
+        assert_eq!(first.get("@type").unwrap().as_str(), Some("A"));
+        assert_eq!(first.get("name").unwrap().as_str(), Some("x"));
+
+        let second = arr[1].as_object().unwrap();
+        assert_eq!(second.get("@type").unwrap().as_str(), Some("B"));
+        assert_eq!(second.get("name").unwrap().as_str(), Some("y"));
     }
 }

@@ -1102,10 +1102,14 @@ impl SchemaInferrer {
         // Collect field names from first object (preserving insertion order)
         let field_names: Vec<String> = first.keys().cloned().collect();
 
-        // Skip schema inference if fields are empty, or any field name is empty
-        // or needs quoting — such names can't round-trip through @struct definitions.
+        // Skip schema inference if fields are empty, any field name is empty,
+        // or the schema name itself needs quoting (it appears unquoted in
+        // `@struct name(...)` and `@table name [...]`).
+        // Field names that need quoting are fine — they get quoted in the
+        // @struct definition, e.g. `@struct root("@type":string, name:string)`.
         if field_names.is_empty()
-            || field_names.iter().any(|n| n.is_empty() || needs_quoting(n))
+            || field_names.iter().any(|n| n.is_empty())
+            || needs_quoting(hint_name)
         {
             return;
         }
@@ -1265,9 +1269,15 @@ impl SchemaInferrer {
         let first = objects[0];
         let nested_field_names: Vec<String> = first.keys().cloned().collect();
 
-        // Skip empty objects and objects with field names that can't round-trip
+        // Compute schema name early so we can check if it needs quoting
+        let schema_name = singularize(field_name);
+
+        // Skip empty objects, empty field names, or when the schema name itself
+        // needs quoting (it appears unquoted in `@struct name(...)` and `@table name [...]`).
+        // Field names that need quoting are fine — they get quoted in the definition.
         if nested_field_names.is_empty()
-            || nested_field_names.iter().any(|n| n.is_empty() || needs_quoting(n))
+            || nested_field_names.iter().any(|n| n.is_empty())
+            || needs_quoting(&schema_name)
         {
             return;
         }
@@ -1281,9 +1291,6 @@ impl SchemaInferrer {
                 return; // Not uniform
             }
         }
-
-        // They're uniform - create a schema
-        let schema_name = singularize(field_name);
 
         // Skip if schema already exists
         if self.schemas.contains_key(&schema_name) {
@@ -5270,7 +5277,7 @@ root: @table root [
         let samples = [
             "primitives", "arrays", "objects", "schemas", "timestamps",
             "unicode_escaping", "numbers_extended", "refs_tags_maps",
-            "special_types", "unions", "mixed_schemas", "large_data",
+            "special_types", "unions", "mixed_schemas", "large_data", "quoted_keys",
         ];
         for name in &samples {
             let path = canonical_dir.join(format!("{}.tl", name));
@@ -5285,5 +5292,238 @@ root: @table root [
             let v2: serde_json::Value = serde_json::from_str(&json2).unwrap();
             assert_eq!(v1, v2, "Compact round-trip failed for {name}");
         }
+    }
+
+    #[test]
+    fn test_schema_inference_with_at_prefixed_keys() {
+        // JSON-LD style @type keys should trigger schema inference with quoted field names
+        let json = r#"{"records": [
+            {"@type": "MCAP", "name": "alpha"},
+            {"@type": "DCAT", "name": "beta"}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        // Should have inferred a schema with "@type" quoted
+        assert!(tl_text.contains("@struct"), "Should infer a schema: {}", tl_text);
+        assert!(tl_text.contains("\"@type\""), "Field @type should be quoted in schema: {}", tl_text);
+        assert!(tl_text.contains("@table"), "Should use @table encoding: {}", tl_text);
+    }
+
+    #[test]
+    fn test_schema_inference_quoted_field_roundtrip() {
+        // Full JSON -> TL -> JSON roundtrip with @type keys
+        let json = r#"{"records": [
+            {"@type": "MCAP", "accessLevel": "public"},
+            {"@type": "DCAT", "accessLevel": "restricted"}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        // Parse TL back and convert to JSON
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse TL with quoted fields: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+
+        let v1: serde_json::Value = serde_json::from_str(json).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v1, v2, "Roundtrip failed.\nTL:\n{tl_text}\nJSON out:\n{json_out}");
+    }
+
+    #[test]
+    fn test_schema_inference_skips_when_schema_name_needs_quoting() {
+        // When the inferred schema name itself would need quoting, skip inference
+        let json = r#"{"@items": [{"name": "x"}, {"name": "y"}]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        // Should NOT have inferred a schema because "@items" -> "@item" needs quoting
+        assert!(!tl_text.contains("@struct"), "Should NOT infer schema when name needs quoting: {}", tl_text);
+        assert!(!tl_text.contains("@table"), "Should NOT use @table when name needs quoting: {}", tl_text);
+    }
+
+    #[test]
+    fn test_schema_inference_root_array_with_at_keys() {
+        // Root-level array with @type keys should also get schema inference
+        let json = r#"[
+            {"@type": "MCAP", "issued": "2026-01-27"},
+            {"@type": "DCAT", "issued": "2026-02-01"}
+        ]"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Root array should infer schema: {}", tl_text);
+        assert!(tl_text.contains("\"@type\""), "Field @type should be quoted: {}", tl_text);
+
+        // Roundtrip
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v1: serde_json::Value = serde_json::from_str(json).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v1, v2, "Root array roundtrip failed");
+    }
+
+    #[test]
+    fn test_schema_inference_dollar_prefixed_keys() {
+        // JSON Schema / OpenAPI style $ref, $id, $schema keys
+        let json = r##"{"definitions": [
+            {"$ref": "#/components/User", "$id": "def1", "name": "UserRef"},
+            {"$ref": "#/components/Order", "$id": "def2", "name": "OrderRef"}
+        ]}"##;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema with $-prefixed keys: {}", tl_text);
+        assert!(tl_text.contains("\"$ref\""), "$ref should be quoted: {}", tl_text);
+        assert!(tl_text.contains("\"$id\""), "$id should be quoted: {}", tl_text);
+
+        // Roundtrip
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v1: serde_json::Value = serde_json::from_str(json).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v1, v2, "Roundtrip failed for $-prefixed keys");
+    }
+
+    #[test]
+    fn test_schema_inference_hash_prefixed_keys() {
+        // XML-to-JSON style #text, #cdata keys
+        let json = r##"{"nodes": [
+            {"#text": "Hello world", "tag": "p", "#comment": "intro"},
+            {"#text": "Goodbye", "tag": "span", "#comment": "outro"}
+        ]}"##;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema with #-prefixed keys: {}", tl_text);
+        assert!(tl_text.contains("\"#text\""), "#text should be quoted: {}", tl_text);
+        assert!(tl_text.contains("\"#comment\""), "#comment should be quoted: {}", tl_text);
+
+        // Roundtrip
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v1: serde_json::Value = serde_json::from_str(json).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v1, v2, "Roundtrip failed for #-prefixed keys");
+    }
+
+    #[test]
+    fn test_schema_inference_colon_in_keys() {
+        // XML namespace style keys like xsi:type, dc:title
+        let json = r#"{"elements": [
+            {"xsi:type": "string", "dc:title": "Document A", "id": 1},
+            {"xsi:type": "int", "dc:title": "Document B", "id": 2}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema with colon keys: {}", tl_text);
+        assert!(tl_text.contains("\"xsi:type\""), "xsi:type should be quoted: {}", tl_text);
+        assert!(tl_text.contains("\"dc:title\""), "dc:title should be quoted: {}", tl_text);
+
+        // Roundtrip
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v1: serde_json::Value = serde_json::from_str(json).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v1, v2, "Roundtrip failed for colon keys");
+    }
+
+    #[test]
+    fn test_schema_inference_odata_keys() {
+        // OData style @odata.type, @odata.id keys
+        let json = r##"{"results": [
+            {"@odata.type": "#Microsoft.Graph.User", "@odata.id": "users/1", "displayName": "Alice"},
+            {"@odata.type": "#Microsoft.Graph.User", "@odata.id": "users/2", "displayName": "Bob"}
+        ]}"##;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema with OData keys: {}", tl_text);
+        assert!(tl_text.contains("\"@odata.type\""), "@odata.type should be quoted: {}", tl_text);
+        assert!(tl_text.contains("\"@odata.id\""), "@odata.id should be quoted: {}", tl_text);
+
+        // Roundtrip
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v1: serde_json::Value = serde_json::from_str(json).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v1, v2, "Roundtrip failed for OData keys");
+    }
+
+    #[test]
+    fn test_schema_inference_uri_keys() {
+        // RDF/JSON style with full URI keys
+        let json = r#"{"triples": [
+            {"http://schema.org/name": "Alice", "http://schema.org/age": "30", "id": "s1"},
+            {"http://schema.org/name": "Bob", "http://schema.org/age": "25", "id": "s2"}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema with URI keys: {}", tl_text);
+        assert!(tl_text.contains("\"http://schema.org/name\""), "URI key should be quoted: {}", tl_text);
+
+        // Roundtrip
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v1: serde_json::Value = serde_json::from_str(json).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v1, v2, "Roundtrip failed for URI keys");
+    }
+
+    #[test]
+    fn test_schema_inference_space_in_keys() {
+        // Keys with spaces (common in human-friendly exports, spreadsheet-to-JSON)
+        let json = r#"{"rows": [
+            {"First Name": "Alice", "Last Name": "Smith", "age": 30},
+            {"First Name": "Bob", "Last Name": "Jones", "age": 25}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema with space keys: {}", tl_text);
+        assert!(tl_text.contains("\"First Name\""), "Space key should be quoted: {}", tl_text);
+        assert!(tl_text.contains("\"Last Name\""), "Space key should be quoted: {}", tl_text);
+
+        // Roundtrip
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v1: serde_json::Value = serde_json::from_str(json).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v1, v2, "Roundtrip failed for space keys");
+    }
+
+    #[test]
+    fn test_schema_inference_mixed_special_keys() {
+        // Mix of regular and special-character keys in one schema
+        let json = r#"{"catalog": [
+            {"@type": "Product", "$id": "p1", "name": "Widget", "sku:code": "W-100"},
+            {"@type": "Product", "$id": "p2", "name": "Gadget", "sku:code": "G-200"}
+        ]}"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+        let tl_text = doc.to_tl_with_schemas();
+
+        assert!(tl_text.contains("@struct"), "Should infer schema with mixed keys: {}", tl_text);
+        assert!(tl_text.contains("\"@type\""), "@type should be quoted: {}", tl_text);
+        assert!(tl_text.contains("\"$id\""), "$id should be quoted: {}", tl_text);
+        assert!(tl_text.contains("\"sku:code\""), "sku:code should be quoted: {}", tl_text);
+        // Regular key should NOT be quoted
+        assert!(!tl_text.contains("\"name\""), "Regular key should not be quoted: {}", tl_text);
+
+        // Roundtrip
+        let reparsed = TeaLeaf::parse(&tl_text)
+            .unwrap_or_else(|e| panic!("Failed to re-parse: {e}\nTL:\n{tl_text}"));
+        let json_out = reparsed.to_json().unwrap();
+        let v1: serde_json::Value = serde_json::from_str(json).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v1, v2, "Roundtrip failed for mixed special keys");
     }
 }

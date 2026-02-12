@@ -17,7 +17,7 @@ Schema-aware data format with human-readable text and compact binary representat
 
 ```toml
 [dependencies]
-tealeaf-core = "2.0.0-beta.9"
+tealeaf-core = "2.0.0-beta.10"
 ```
 
 ### Parse and convert
@@ -49,7 +49,7 @@ Enable the `derive` feature for DTO conversion:
 
 ```toml
 [dependencies]
-tealeaf-core = { version = "2.0.0-beta.9", features = ["derive"] }
+tealeaf-core = { version = "2.0.0-beta.10", features = ["derive"] }
 ```
 
 ```rust

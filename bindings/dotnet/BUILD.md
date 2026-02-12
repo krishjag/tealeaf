@@ -156,7 +156,7 @@ You can manually trigger the workflow with the "Publish to NuGet" option from th
 The final NuGet package includes native libraries for all platforms:
 
 ```
-TeaLeaf.2.0.0-beta.9.nupkg
+TeaLeaf.2.0.0-beta.10.nupkg
 ├── lib/
 │   ├── net8.0/
 │   │   └── TeaLeaf.dll

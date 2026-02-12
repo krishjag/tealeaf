@@ -1,0 +1,100 @@
+{
+  "jsonld": [
+    {
+      "@type": "Dataset",
+      "@id": "urn:dataset:1",
+      "name": "Climate Data"
+    },
+    {
+      "@type": "Distribution",
+      "@id": "urn:dist:1",
+      "name": "CSV Download"
+    }
+  ],
+  "definitions": [
+    {
+      "$ref": "/components/User",
+      "$id": "def-001",
+      "description": "User schema reference"
+    },
+    {
+      "$ref": "/components/Order",
+      "$id": "def-002",
+      "description": "Order schema reference"
+    }
+  ],
+  "xml_nodes": [
+    {
+      "#text": "Hello world",
+      "tag": "p",
+      "#comment": "intro paragraph"
+    },
+    {
+      "#text": "Goodbye",
+      "tag": "span",
+      "#comment": null
+    }
+  ],
+  "namespaced": [
+    {
+      "xsi:type": "string",
+      "dc:title": "Document A",
+      "id": 1
+    },
+    {
+      "xsi:type": "int",
+      "dc:title": "Document B",
+      "id": 2
+    }
+  ],
+  "odata_results": [
+    {
+      "@odata.type": "Microsoft.Graph.User",
+      "@odata.id": "users/1",
+      "displayName": "Alice"
+    },
+    {
+      "@odata.type": "Microsoft.Graph.User",
+      "@odata.id": "users/2",
+      "displayName": "Bob"
+    }
+  ],
+  "triples": [
+    {
+      "http://schema.org/name": "Alice",
+      "http://schema.org/age": "30",
+      "id": "s1"
+    },
+    {
+      "http://schema.org/name": "Bob",
+      "http://schema.org/age": "25",
+      "id": "s2"
+    }
+  ],
+  "contacts": [
+    {
+      "First Name": "Alice",
+      "Last Name": "Smith",
+      "age": 30
+    },
+    {
+      "First Name": "Bob",
+      "Last Name": "Jones",
+      "age": 25
+    }
+  ],
+  "catalog": [
+    {
+      "@type": "Product",
+      "$id": "p1",
+      "name": "Widget",
+      "sku:code": "W-100"
+    },
+    {
+      "@type": "Product",
+      "$id": "p2",
+      "name": "Gadget",
+      "sku:code": "G-200"
+    }
+  ]
+}
