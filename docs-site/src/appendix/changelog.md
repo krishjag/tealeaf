@@ -1,6 +1,28 @@
 # Changelog
 
-## v2.0.0-beta.12 (Current)
+## v2.0.0-beta.13 (Current)
+
+### .NET
+
+- **`@table` positional encoding for nested object arrays** — Serializer (both reflection-based and source generator) now emits `@table struct_name [(v1, v2), ...]` for `List<NestedType>` instead of `[{field: val, ...}]`. Eliminates repeated field names, conforming to the TeaLeaf spec for schema-bound data.
+  - Reflection serializer: new `WriteTupleValue()`, `WriteTupleList()`, `WriteTupleDictionary()` methods; modified `WriteList()` and `ToText<T>(IEnumerable<T>)`
+  - Source generator: emits `WriteTeaLeafTupleValue()` on each `[TeaLeaf(Generate = true)]` class; modified list property emission to use `@table` format
+  - Handles all field types in tuples: primitives, strings, enums, nested objects (recursive tuples), lists, dictionaries, DateTime, byte[], Guid, TimeSpan
+  - Deserialization unaffected — Rust parser handles `@table` to objects transparently
+- **Parameterized constructor deserialization** — Both reflection serializer and source generator now support types without parameterless constructors (e.g., records, immutable DTOs).
+  - Matches constructor parameter names to property names (case-insensitive)
+  - Supports constructor default values (`int score = 100`)
+  - Sets remaining settable properties after construction
+  - Removed `new()` constraint from `FromDocument<T>`, `FromValue<T>`, `FromText<T>`, `FromList<T>`
+- **Unmatched constructor fallback** — When a parameterized constructor has parameters that don't match any serialized property and have no default value, uses `RuntimeHelpers.GetUninitializedObject()` to bypass the constructor entirely and set properties via setters. Prevents NullReferenceException for types like `SecurityGroupAttributes(string groupName)` where the constructor parameter serves initialization logic unrelated to serialized fields.
+
+### Testing
+- Added 11 reflection serializer tests for parameterized constructor deserialization: basic immutable types, list properties, mixed constructor + setter, default values, nested objects, enums, round-trip, FromDocument, FromList
+- Added 4 source generator tests: parameterized constructor code generation, mixed constructor/setter, constructor defaults, parameterless constructor backward compatibility
+
+---
+
+## v2.0.0-beta.12
 
 ### Features
 - **Clap CLI migration** — Replaced hand-rolled `env::args()` parsing with `clap` v4 derive macros. Provides auto-generated colored help, typo suggestions (e.g., `compil` → "did you mean 'compile'?"), `--help`/`-h` on every subcommand, and `--version`/`-V` flag — all derived from annotated structs with zero manual usage text.
