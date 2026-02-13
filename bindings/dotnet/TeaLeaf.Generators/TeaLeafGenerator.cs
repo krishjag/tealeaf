@@ -87,6 +87,22 @@ public class TeaLeafGenerator : IIncrementalGenerator
         if (context.TargetSymbol is not INamedTypeSymbol typeSymbol)
             return default;
 
+        // Check Generate property — skip if not opted in to source generation.
+        // [TeaLeaf] alone is for reflection-based serialization; [TeaLeaf(Generate = true)] opts in.
+        var tealeafAttr = typeSymbol.GetAttributes()
+            .FirstOrDefault(a => a.AttributeClass?.Name == "TeaLeafAttribute");
+        bool generate = false;
+        if (tealeafAttr != null)
+        {
+            foreach (var namedArg in tealeafAttr.NamedArguments)
+            {
+                if (namedArg.Key == "Generate" && namedArg.Value.Value is bool g)
+                    generate = g;
+            }
+        }
+        if (!generate)
+            return default;
+
         var location = new DiagnosticLocationInfo(
             typeSymbol.Name,
             context.TargetNode.GetLocation());

@@ -50,7 +50,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public class NotPartial
 {
     public string Name { get; set; } = """";
@@ -72,7 +72,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class IsPartial
 {
     public string Name { get; set; } = """";
@@ -96,7 +96,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithInvalidType
 {
     [TLType(""bogus_type"")]
@@ -119,7 +119,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithValidType
 {
     [TLType(""timestamp"")]
@@ -144,7 +144,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Container<T>
 {
     public string Label { get; set; } = """";
@@ -180,7 +180,7 @@ public class PlainAddress
     public string City { get; set; } = """";
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class PersonWithPlainAddress
 {
     public string Name { get; set; } = """";
@@ -207,7 +207,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Event
 {
     public string Name { get; set; } = """";
@@ -236,7 +236,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithNullableList
 {
     public string Name { get; set; } = """";
@@ -262,7 +262,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class BinaryData
 {
     public string Label { get; set; } = """";
@@ -288,7 +288,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf(StructName = ""my_config"")]
+[TeaLeaf(Generate = true, StructName = ""my_config"")]
 [TLKey(""app_config"")]
 public partial class Config
 {

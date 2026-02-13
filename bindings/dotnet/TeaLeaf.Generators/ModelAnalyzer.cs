@@ -18,6 +18,15 @@ internal sealed class TeaLeafModel
     /// that lack CollectTeaLeafSchemas (compiled with older generator). These need fallback to GetTeaLeafSchema().
     /// </summary>
     public HashSet<string> CrossAssemblyFallbackTypes { get; set; } = new();
+    /// <summary>True when the type has no public parameterless constructor and must be constructed via a parameterized one.</summary>
+    public bool HasParameterizedConstructor { get; set; }
+    /// <summary>Constructor parameter mappings, in declaration order. Only set when <see cref="HasParameterizedConstructor"/> is true.</summary>
+    public List<ConstructorParam>? ConstructorParams { get; set; }
+    /// <summary>
+    /// True when the type has no parameterless constructor AND the parameterized constructor has
+    /// unmatched parameters. Use RuntimeHelpers.GetUninitializedObject() + property setters.
+    /// </summary>
+    public bool UseUninitializedObject { get; set; }
 }
 
 internal sealed class TeaLeafProperty
@@ -40,6 +49,10 @@ internal sealed class TeaLeafProperty
     public string? TLTypeOverride { get; set; }
     /// <summary>True if the property type is a class/interface (not primitive, not enum, not collection).</summary>
     public bool IsClassType { get; set; }
+    /// <summary>True if this property is matched to a constructor parameter.</summary>
+    public bool IsConstructorParam { get; set; }
+    /// <summary>True if the property has a public setter (or init setter). False for get-only properties.</summary>
+    public bool HasSetter { get; set; } = true;
 }
 
 internal enum PropertyKind
@@ -56,6 +69,16 @@ internal enum PropertyKind
     Guid,
     TimeSpan,
     Unknown,
+}
+
+/// <summary>Metadata for a single constructor parameter, mapped to a TeaLeaf field.</summary>
+internal sealed class ConstructorParam
+{
+    public string ParameterName { get; set; } = "";
+    public string CSharpType { get; set; } = "";
+    public string? MatchedPropertyCSharpName { get; set; }
+    public bool HasDefaultValue { get; set; }
+    public string? DefaultValueExpression { get; set; }
 }
 
 internal static class ModelAnalyzer
@@ -114,7 +137,7 @@ internal static class ModelAnalyzer
             : "";
         string fqn = typeSymbol.ToDisplayString();
 
-        return new TeaLeafModel
+        var model = new TeaLeafModel
         {
             Namespace = ns,
             TypeName = typeName,
@@ -127,6 +150,64 @@ internal static class ModelAnalyzer
             NestedTeaLeafTypeNames = nestedTypes,
             CrossAssemblyFallbackTypes = crossAssemblyFallbacks,
         };
+
+        // Detect parameterized constructor when no public parameterless constructor exists
+        bool hasParameterlessCtor = typeSymbol.InstanceConstructors
+            .Any(c => c.Parameters.Length == 0 && c.DeclaredAccessibility == Accessibility.Public);
+
+        if (!hasParameterlessCtor)
+        {
+            var bestCtor = typeSymbol.InstanceConstructors
+                .Where(c => c.DeclaredAccessibility == Accessibility.Public && c.Parameters.Length > 0)
+                .OrderByDescending(c => c.Parameters.Length)
+                .FirstOrDefault();
+
+            if (bestCtor != null)
+            {
+                model.HasParameterizedConstructor = true;
+                model.ConstructorParams = new List<ConstructorParam>();
+
+                foreach (var param in bestCtor.Parameters)
+                {
+                    var matchedProp = properties.FirstOrDefault(p =>
+                        string.Equals(p.CSharpName, param.Name, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchedProp != null)
+                        matchedProp.IsConstructorParam = true;
+
+                    model.ConstructorParams.Add(new ConstructorParam
+                    {
+                        ParameterName = param.Name,
+                        CSharpType = param.Type.ToDisplayString(),
+                        MatchedPropertyCSharpName = matchedProp?.CSharpName,
+                        HasDefaultValue = param.HasExplicitDefaultValue,
+                        DefaultValueExpression = param.HasExplicitDefaultValue
+                            ? FormatDefaultValue(param)
+                            : null,
+                    });
+                }
+
+                // Reject constructor if any parameter is unmatched AND has no default value.
+                bool allParamsSatisfiable = model.ConstructorParams.All(p =>
+                    p.MatchedPropertyCSharpName != null || p.HasDefaultValue);
+                if (!allParamsSatisfiable)
+                {
+                    model.HasParameterizedConstructor = false;
+                    model.ConstructorParams = null;
+                    // Revert IsConstructorParam flags
+                    foreach (var p in properties)
+                        p.IsConstructorParam = false;
+                    model.UseUninitializedObject = true;
+                }
+            }
+            else
+            {
+                // No public constructor at all — use uninitialized object
+                model.UseUninitializedObject = true;
+            }
+        }
+
+        return model;
     }
 
     private static TeaLeafProperty? AnalyzeProperty(IPropertySymbol prop, List<string> nestedTypes, HashSet<string> crossAssemblyFallbacks)
@@ -197,6 +278,7 @@ internal static class ModelAnalyzer
             Kind = kind,
             TLTypeOverride = typeOverride,
             IsClassType = prop.Type.TypeKind == TypeKind.Class || prop.Type.TypeKind == TypeKind.Interface,
+            HasSetter = prop.SetMethod != null,
         };
     }
 
@@ -405,4 +487,41 @@ internal static class ModelAnalyzer
     }
 
     internal static bool IsValidTLType(string typeName) => ValidTLTypes.Contains(typeName);
+
+    private static string FormatDefaultValue(IParameterSymbol param)
+    {
+        if (!param.HasExplicitDefaultValue) return "default!";
+        var value = param.ExplicitDefaultValue;
+        if (value == null) return "null";
+        if (value is bool b) return b ? "true" : "false";
+        if (value is string s) return $"\"{s.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
+        if (value is char c) return $"'{c}'";
+        if (value is float f) return $"{f}f";
+        if (value is double d) return d.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        if (value is decimal m) return $"{m}m";
+        if (value is long l) return $"{l}L";
+        return value.ToString()!;
+    }
+
+    internal static string GetTypeDefaultExpression(string csharpType)
+    {
+        string baseType = csharpType.TrimEnd('?');
+        if (csharpType.EndsWith("?")) return "default";
+
+        return baseType switch
+        {
+            "string" => "\"\"",
+            "bool" or "System.Boolean" => "false",
+            "byte" or "System.Byte" or "sbyte" or "System.SByte" or
+            "short" or "System.Int16" or "ushort" or "System.UInt16" or
+            "int" or "System.Int32" or "uint" or "System.UInt32" => "0",
+            "long" or "System.Int64" or "ulong" or "System.UInt64" => "0L",
+            "float" or "System.Single" => "0f",
+            "double" or "System.Double" => "0.0",
+            "decimal" or "System.Decimal" => "0m",
+            _ when baseType.StartsWith("System.Collections.Generic.List<") => $"new {baseType}()",
+            _ when baseType.StartsWith("System.Collections.Generic.Dictionary<") => $"new {baseType}()",
+            _ => "default!",
+        };
+    }
 }

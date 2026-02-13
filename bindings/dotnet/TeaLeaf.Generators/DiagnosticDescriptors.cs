@@ -7,7 +7,7 @@ internal static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor TypeMustBePartial = new(
         id: "TL001",
         title: "TeaLeaf type must be partial",
-        messageFormat: "Type '{0}' is annotated with [TeaLeaf] but is not declared as partial",
+        messageFormat: "Type '{0}' is annotated with [TeaLeaf(Generate = true)] but is not declared as partial",
         category: "TeaLeaf",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);

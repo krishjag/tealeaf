@@ -47,7 +47,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class User
 {
     public string Name { get; set; } = """";
@@ -88,7 +88,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Simple
 {
     public string Value { get; set; } = """";
@@ -117,7 +117,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class TypedModel
 {
     public string Name { get; set; } = """";
@@ -150,7 +150,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf(StructName = ""my_user"")]
+[TeaLeaf(Generate = true, StructName = ""my_user"")]
 public partial class UserRecord
 {
     [TLRename(""user_name"")]
@@ -179,7 +179,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithSkipped
 {
     public string Name { get; set; } = """";
@@ -210,7 +210,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithNullable
 {
     public string Name { get; set; } = """";
@@ -239,7 +239,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithOptional
 {
     public string Name { get; set; } = """";
@@ -265,7 +265,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 [TLKey(""my_data"")]
 public partial class CustomKey
 {
@@ -291,7 +291,7 @@ namespace TestModels;
 
 public enum Status { Active, Inactive, Pending }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithEnum
 {
     public string Name { get; set; } = """";
@@ -317,7 +317,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithList
 {
     public string Name { get; set; } = """";
@@ -349,7 +349,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithDict
 {
     public string Name { get; set; } = """";
@@ -374,7 +374,7 @@ using TeaLeaf.Annotations;
 
 namespace My.App.Models;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Config
 {
     public string Value { get; set; } = """";
@@ -397,7 +397,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class BoolModel
 {
     public bool Enabled { get; set; }
@@ -422,13 +422,13 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class ModelA
 {
     public string Name { get; set; } = """";
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class ModelB
 {
     public int Value { get; set; }
@@ -448,7 +448,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class CamelCaseModel
 {
     public string FirstName { get; set; } = """";
@@ -475,7 +475,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Wrapper<T>
 {
     public string Label { get; set; } = """";
@@ -502,7 +502,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class ConcreteModel
 {
     public string Name { get; set; } = """";
@@ -528,7 +528,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithDates
 {
     public string Name { get; set; } = """";
@@ -557,7 +557,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class TimestampModel
 {
     [TLType(""timestamp"")]
@@ -592,7 +592,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithTimeSpan
 {
     public string Name { get; set; } = """";
@@ -622,7 +622,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithGuid
 {
     public string Name { get; set; } = """";
@@ -651,13 +651,13 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Inner
 {
     public string Val { get; set; } = """";
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Outer
 {
     public string Name { get; set; } = """";
@@ -688,7 +688,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class ExoticPrims
 {
     public byte SmallByte { get; set; }
@@ -728,7 +728,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class MultiList
 {
     public List<int> Ints { get; set; } = new();
@@ -766,7 +766,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class MultiDict
 {
     public Dictionary<string, int> IntMap { get; set; } = new();
@@ -800,7 +800,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class NullableStrings
 {
     public string Required { get; set; } = """";
@@ -828,7 +828,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf(EmitSchema = false)]
+[TeaLeaf(Generate = true, EmitSchema = false)]
 public partial class NoSchema
 {
     public string Name { get; set; } = """";
@@ -859,7 +859,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithIndexer
 {
     public string Name { get; set; } = """";
@@ -891,7 +891,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithArrays
 {
     public string[] Names { get; set; } = System.Array.Empty<string>();
@@ -922,7 +922,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithListInterfaces
 {
     public IList<string> Items { get; set; } = new List<string>();
@@ -959,7 +959,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithIDictionary
 {
     public IDictionary<string, string> Config { get; set; } = new Dictionary<string, string>();
@@ -990,7 +990,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithUnknownType
 {
     public string Name { get; set; } = """";
@@ -1022,7 +1022,7 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithDecimalList
 {
     public List<decimal> Prices { get; set; } = new();
@@ -1050,7 +1050,7 @@ public partial class WithDecimalList
         var source = @"
 using TeaLeaf.Annotations;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class GlobalModel
 {
     public string Name { get; set; } = """";
@@ -1078,7 +1078,7 @@ using TeaLeaf.Annotations;
 
 namespace MyApp.Models;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class NamespacedModel
 {
     public string Name { get; set; } = """";
@@ -1107,14 +1107,14 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf(StructName = ""price"")]
+[TeaLeaf(Generate = true, StructName = ""price"")]
 public partial class ProductPrice
 {
     public double BasePrice { get; set; }
     public string Currency { get; set; } = """";
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Product
 {
     public string Name { get; set; } = """";
@@ -1142,14 +1142,14 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf(StructName = ""stock"")]
+[TeaLeaf(Generate = true, StructName = ""stock"")]
 public partial class StockInfo
 {
     public string Warehouse { get; set; } = """";
     public int Quantity { get; set; }
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Inventory
 {
     public string Name { get; set; } = """";
@@ -1176,14 +1176,14 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf(StructName = ""item"")]
+[TeaLeaf(Generate = true, StructName = ""item"")]
 public partial class OrderItem
 {
     public string Sku { get; set; } = """";
     public int Quantity { get; set; }
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Order
 {
     public string OrderId { get; set; } = """";
@@ -1213,10 +1213,10 @@ public partial class Order
 using TeaLeaf.Annotations;
 namespace TestModels;
 
-[TeaLeaf] public partial class SharedLeaf { public string Value { get; set; } = """"; public int Code { get; set; } }
-[TeaLeaf] public partial class BranchOne { public string Label { get; set; } = """"; public SharedLeaf Leaf { get; set; } = new(); }
-[TeaLeaf] public partial class BranchTwo { public string Tag { get; set; } = """"; public SharedLeaf Leaf { get; set; } = new(); }
-[TeaLeaf] public partial class DiamondRoot { public string Name { get; set; } = """"; public BranchOne Left { get; set; } = new(); public BranchTwo Right { get; set; } = new(); }
+[TeaLeaf(Generate = true)] public partial class SharedLeaf { public string Value { get; set; } = """"; public int Code { get; set; } }
+[TeaLeaf(Generate = true)] public partial class BranchOne { public string Label { get; set; } = """"; public SharedLeaf Leaf { get; set; } = new(); }
+[TeaLeaf(Generate = true)] public partial class BranchTwo { public string Tag { get; set; } = """"; public SharedLeaf Leaf { get; set; } = new(); }
+[TeaLeaf(Generate = true)] public partial class DiamondRoot { public string Name { get; set; } = """"; public BranchOne Left { get; set; } = new(); public BranchTwo Right { get; set; } = new(); }
 ";
         var result = RunGenerator(source);
         Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
@@ -1244,10 +1244,10 @@ namespace TestModels;
 using TeaLeaf.Annotations;
 namespace TestModels;
 
-[TeaLeaf] public partial class DeepLeaf { public string Data { get; set; } = """"; }
-[TeaLeaf] public partial class MidLeft { public string Info { get; set; } = """"; public DeepLeaf Inner { get; set; } = new(); }
-[TeaLeaf] public partial class MidRight { public string Info { get; set; } = """"; public DeepLeaf Inner { get; set; } = new(); }
-[TeaLeaf] public partial class TopLevel { public string Name { get; set; } = """"; public MidLeft Left { get; set; } = new(); public MidRight Right { get; set; } = new(); }
+[TeaLeaf(Generate = true)] public partial class DeepLeaf { public string Data { get; set; } = """"; }
+[TeaLeaf(Generate = true)] public partial class MidLeft { public string Info { get; set; } = """"; public DeepLeaf Inner { get; set; } = new(); }
+[TeaLeaf(Generate = true)] public partial class MidRight { public string Info { get; set; } = """"; public DeepLeaf Inner { get; set; } = new(); }
+[TeaLeaf(Generate = true)] public partial class TopLevel { public string Name { get; set; } = """"; public MidLeft Left { get; set; } = new(); public MidRight Right { get; set; } = new(); }
 ";
         var result = RunGenerator(source);
         Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
@@ -1277,14 +1277,14 @@ using TeaLeaf.Annotations;
 
 namespace TestModels;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class ShippingAddress
 {
     public string Street { get; set; } = """";
     public string City { get; set; } = """";
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Customer
 {
     public string Name { get; set; } = """";
@@ -1300,5 +1300,262 @@ public partial class Customer
 
         // Without StructName override, should use default snake_case
         Assert.Contains("address: shipping_address", gen);
+    }
+
+    // =========================================================================
+    // Generate property: opt-in source generation
+    // =========================================================================
+
+    [Fact]
+    public void Generator_WithoutGenerate_SkipsCodeGeneration()
+    {
+        // [TeaLeaf] without Generate = true should not produce generated source
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf]
+public partial class ReflectionOnly
+{
+    public string Name { get; set; } = """";
+    public int Age { get; set; }
+}
+";
+        var result = RunGenerator(source);
+
+        // No generated source for this type
+        Assert.DoesNotContain(result.GeneratedTrees,
+            t => t.FilePath.Contains("ReflectionOnly.TeaLeaf.g.cs"));
+
+        // No diagnostics either
+        Assert.Empty(result.Diagnostics.Where(d => d.Id == "TL001"));
+    }
+
+    [Fact]
+    public void Generator_WithoutGenerate_NoTL001ForNonPartial()
+    {
+        // [TeaLeaf] without Generate = true on a non-partial class should NOT trigger TL001
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf]
+public class NonPartialReflection
+{
+    public string Name { get; set; } = """";
+}
+";
+        var result = RunGenerator(source);
+
+        // No TL001 since Generate is not set
+        Assert.Empty(result.Diagnostics.Where(d => d.Id == "TL001"));
+
+        // No generated source
+        Assert.DoesNotContain(result.GeneratedTrees,
+            t => t.FilePath.Contains("NonPartialReflection.TeaLeaf.g.cs"));
+    }
+
+    [Fact]
+    public void Generator_GenerateTrue_NonPartial_ReportsTL001()
+    {
+        // [TeaLeaf(Generate = true)] on a non-partial class SHOULD trigger TL001
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(Generate = true)]
+public class NonPartialGenerate
+{
+    public string Name { get; set; } = """";
+}
+";
+        var result = RunGenerator(source);
+
+        var tl001 = result.Diagnostics.FirstOrDefault(d => d.Id == "TL001");
+        Assert.NotNull(tl001);
+        Assert.Equal(DiagnosticSeverity.Error, tl001!.Severity);
+        Assert.Contains("NonPartialGenerate", tl001.GetMessage());
+    }
+
+    [Fact]
+    public void Generator_GenerateTrue_Partial_GeneratesCode()
+    {
+        // [TeaLeaf(Generate = true)] on a partial class should generate code
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(Generate = true)]
+public partial class GenerateEnabled
+{
+    public string Name { get; set; } = """";
+    public int Count { get; set; }
+}
+";
+        var result = RunGenerator(source);
+
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Single(result.GeneratedTrees.Where(t => t.FilePath.Contains("GenerateEnabled.TeaLeaf.g.cs")));
+
+        var gen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("GenerateEnabled.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        Assert.Contains("ToTeaLeafText()", gen);
+        Assert.Contains("FromTeaLeaf(", gen);
+    }
+
+    // ================================================================
+    // Parameterized Constructor Tests
+    // ================================================================
+
+    [Fact]
+    public void Generator_ParameterizedConstructor_GeneratesConstructorDeserialization()
+    {
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(Generate = true)]
+public partial class ImmutableItem
+{
+    public string Name { get; }
+    public int Count { get; }
+
+    public ImmutableItem(string name, int count)
+    {
+        Name = name;
+        Count = count;
+    }
+}
+";
+        var result = RunGenerator(source);
+
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Single(result.GeneratedTrees.Where(t => t.FilePath.Contains("ImmutableItem.TeaLeaf.g.cs")));
+
+        var gen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("ImmutableItem.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Should declare local variables for constructor parameters
+        Assert.Contains("_p_name", gen);
+        Assert.Contains("_p_count", gen);
+        // Should call the parameterized constructor
+        Assert.Contains("new ImmutableItem(_p_name, _p_count)", gen);
+        // Should NOT contain "new ImmutableItem()" (parameterless)
+        Assert.DoesNotContain("new ImmutableItem();", gen);
+        // Should contain schema and serialization methods
+        Assert.Contains("GetTeaLeafSchema()", gen);
+        Assert.Contains("ToTeaLeafText()", gen);
+        Assert.Contains("FromTeaLeaf(", gen);
+    }
+
+    [Fact]
+    public void Generator_MixedConstructorAndSetter_GeneratesCorrectCode()
+    {
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(Generate = true)]
+public partial class MixedItem
+{
+    public string Name { get; }
+    public int Id { get; }
+    public string? Notes { get; set; }
+
+    public MixedItem(string name, int id)
+    {
+        Name = name;
+        Id = id;
+    }
+}
+";
+        var result = RunGenerator(source);
+
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var gen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("MixedItem.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Constructor params read into locals
+        Assert.Contains("_p_name", gen);
+        Assert.Contains("_p_id", gen);
+        // Constructor call
+        Assert.Contains("new MixedItem(_p_name, _p_id)", gen);
+        // Remaining setter property assigned via result
+        Assert.Contains("result.Notes", gen);
+    }
+
+    [Fact]
+    public void Generator_ConstructorWithDefaults_GeneratesDefaultValues()
+    {
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(Generate = true)]
+public partial class DefaultsItem
+{
+    public string Name { get; }
+    public int Score { get; }
+
+    public DefaultsItem(string name, int score = 100)
+    {
+        Name = name;
+        Score = score;
+    }
+}
+";
+        var result = RunGenerator(source);
+
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var gen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("DefaultsItem.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Constructor param with default value should use it
+        Assert.Contains("_p_score = 100", gen);
+        Assert.Contains("new DefaultsItem(_p_name, _p_score)", gen);
+    }
+
+    [Fact]
+    public void Generator_ParameterlessConstructor_StillUsesNewPattern()
+    {
+        // Existing types with parameterless constructors should still use `new Type()`
+        var source = @"
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(Generate = true)]
+public partial class MutableItem
+{
+    public string Name { get; set; } = """";
+    public int Count { get; set; }
+}
+";
+        var result = RunGenerator(source);
+
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var gen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("MutableItem.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Should use parameterless constructor pattern
+        Assert.Contains("new MutableItem();", gen);
+        // Should NOT contain constructor local variables pattern
+        Assert.DoesNotContain("_p_", gen);
     }
 }

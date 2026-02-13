@@ -14,12 +14,25 @@ internal sealed class TeaLeafTypeInfo
     public string StructName { get; }
     public string Key { get; }
     public TeaLeafPropertyInfo[] Properties { get; }
+    public ConstructorInfo? ParameterizedConstructor { get; }
+    public ConstructorParamMapping[]? ConstructorParamMappings { get; }
+    /// <summary>
+    /// True when the type has no parameterless constructor AND the parameterized constructor
+    /// has unmatched parameters (no corresponding property and no default value).
+    /// In this case, use RuntimeHelpers.GetUninitializedObject() + property setters.
+    /// </summary>
+    public bool UseUninitializedObject { get; }
 
-    private TeaLeafTypeInfo(string structName, string key, TeaLeafPropertyInfo[] properties)
+    private TeaLeafTypeInfo(string structName, string key, TeaLeafPropertyInfo[] properties,
+        ConstructorInfo? parameterizedConstructor = null, ConstructorParamMapping[]? constructorParamMappings = null,
+        bool useUninitializedObject = false)
     {
         StructName = structName;
         Key = key;
         Properties = properties;
+        ParameterizedConstructor = parameterizedConstructor;
+        ConstructorParamMappings = constructorParamMappings;
+        UseUninitializedObject = useUninitializedObject;
     }
 
     /// <summary>
@@ -42,14 +55,81 @@ internal sealed class TeaLeafTypeInfo
         var keyAttr = type.GetCustomAttribute<TLKeyAttribute>();
         var key = keyAttr?.Key ?? structName;
 
-        var props = new List<TeaLeafPropertyInfo>();
+        // Check for parameterless constructor
+        bool hasParameterlessCtor = type.GetConstructor(
+            BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null) != null;
+
+        // Collect all readable public non-skipped properties
+        var allReadableProps = new List<PropertyInfo>();
         foreach (var pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
-            if (!pi.CanRead || !pi.CanWrite) continue;
+            if (!pi.CanRead) continue;
             if (pi.GetIndexParameters().Length > 0) continue; // skip indexers
+            if (pi.GetCustomAttribute<TLSkipAttribute>() != null) continue;
+            allReadableProps.Add(pi);
+        }
 
-            var skipAttr = pi.GetCustomAttribute<TLSkipAttribute>();
-            if (skipAttr != null) continue;
+        // Resolve parameterized constructor when no parameterless one exists
+        ConstructorInfo? parameterizedCtor = null;
+        ConstructorParamMapping[]? ctorMappings = null;
+        var ctorParamPropertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (!hasParameterlessCtor)
+        {
+            var ctors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+            parameterizedCtor = ctors.OrderByDescending(c => c.GetParameters().Length).FirstOrDefault();
+
+            if (parameterizedCtor != null)
+            {
+                var ctorParams = parameterizedCtor.GetParameters();
+                ctorMappings = new ConstructorParamMapping[ctorParams.Length];
+
+                for (int i = 0; i < ctorParams.Length; i++)
+                {
+                    var param = ctorParams[i];
+                    // Match constructor param name to property name (case-insensitive)
+                    var matchedProp = allReadableProps.FirstOrDefault(p =>
+                        string.Equals(p.Name, param.Name, StringComparison.OrdinalIgnoreCase));
+
+                    string tlName;
+                    if (matchedProp != null)
+                    {
+                        var renameAttr = matchedProp.GetCustomAttribute<TLRenameAttribute>();
+                        tlName = renameAttr?.Name ?? TeaLeafTextHelper.ToSnakeCase(matchedProp.Name);
+                        ctorParamPropertyNames.Add(matchedProp.Name);
+                    }
+                    else
+                    {
+                        tlName = TeaLeafTextHelper.ToSnakeCase(param.Name!);
+                    }
+
+                    ctorMappings[i] = new ConstructorParamMapping(
+                        tlName, param.ParameterType, matchedProp?.Name,
+                        param.HasDefaultValue, param.HasDefaultValue ? param.DefaultValue : null);
+                }
+
+                // Reject constructor if any parameter is unmatched AND has no default value.
+                // Such constructors have logic that can't be reproduced from serialized data alone.
+                bool allParamsSatisfiable = ctorMappings.All(m =>
+                    m.MatchedPropertyName != null || m.HasDefaultValue);
+                if (!allParamsSatisfiable)
+                {
+                    parameterizedCtor = null;
+                    ctorMappings = null;
+                    ctorParamPropertyNames.Clear();
+                }
+            }
+        }
+
+        bool useUninitializedObject = !hasParameterlessCtor && parameterizedCtor == null;
+
+        // Build property list
+        var props = new List<TeaLeafPropertyInfo>();
+        foreach (var pi in allReadableProps)
+        {
+            // Include property if it has a setter OR if it matches a constructor parameter
+            bool isCtorParam = ctorParamPropertyNames.Contains(pi.Name);
+            if (!pi.CanWrite && !isCtorParam) continue;
 
             var renameAttr = pi.GetCustomAttribute<TLRenameAttribute>();
             var tlName = renameAttr?.Name ?? TeaLeafTextHelper.ToSnakeCase(pi.Name);
@@ -97,7 +177,7 @@ internal sealed class TeaLeafTypeInfo
             }
 
             var getter = CreateGetter(pi);
-            var setter = CreateSetter(pi);
+            var setter = pi.CanWrite ? CreateSetter(pi) : null;
 
             props.Add(new TeaLeafPropertyInfo(
                 cSharpName: pi.Name,
@@ -114,7 +194,7 @@ internal sealed class TeaLeafTypeInfo
                 setter: setter));
         }
 
-        return new TeaLeafTypeInfo(structName, key, props.ToArray());
+        return new TeaLeafTypeInfo(structName, key, props.ToArray(), parameterizedCtor, ctorMappings, useUninitializedObject);
     }
 
     private static string InferTLType(Type type, bool isNullable)
@@ -197,7 +277,7 @@ internal sealed class TeaLeafPropertyInfo
     public bool IsNestedTeaLeaf { get; }
     public Type? ElementType { get; }
     public Func<object, object?> Getter { get; }
-    public Action<object, object?> Setter { get; }
+    public Action<object, object?>? Setter { get; }
 
     public TeaLeafPropertyInfo(
         string cSharpName,
@@ -211,7 +291,7 @@ internal sealed class TeaLeafPropertyInfo
         bool isNestedTeaLeaf,
         Type? elementType,
         Func<object, object?> getter,
-        Action<object, object?> setter)
+        Action<object, object?>? setter)
     {
         CSharpName = cSharpName;
         TLName = tlName;
@@ -225,5 +305,27 @@ internal sealed class TeaLeafPropertyInfo
         ElementType = elementType;
         Getter = getter;
         Setter = setter;
+    }
+}
+
+/// <summary>
+/// Maps a constructor parameter to its TeaLeaf field name and type.
+/// </summary>
+internal sealed class ConstructorParamMapping
+{
+    public string TLName { get; }
+    public Type ParameterType { get; }
+    public string? MatchedPropertyName { get; }
+    public bool HasDefaultValue { get; }
+    public object? DefaultValue { get; }
+
+    public ConstructorParamMapping(string tlName, Type parameterType, string? matchedPropertyName,
+        bool hasDefaultValue, object? defaultValue)
+    {
+        TLName = tlName;
+        ParameterType = parameterType;
+        MatchedPropertyName = matchedPropertyName;
+        HasDefaultValue = hasDefaultValue;
+        DefaultValue = defaultValue;
     }
 }

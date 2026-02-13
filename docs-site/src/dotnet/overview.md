@@ -41,7 +41,7 @@ The single package bundles everything:
 Zero-reflection, compile-time code generation:
 
 ```csharp
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class User
 {
     public int Id { get; set; }
@@ -58,8 +58,8 @@ var loaded = User.FromTeaLeaf(doc);
 ```
 
 **Requirements:**
+- Annotated with `[TeaLeaf(Generate = true)]`
 - Class must be `partial`
-- Annotated with `[TeaLeaf]`
 - Properties must have public getters (and setters for deserialization)
 
 ### 2. Reflection Serializer

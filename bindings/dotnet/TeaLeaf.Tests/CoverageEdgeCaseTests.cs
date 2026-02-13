@@ -9,7 +9,7 @@ namespace TeaLeaf.Tests;
 // Additional DTO Models for edge-case coverage
 // ========================================================================
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class NumericModel
 {
     public short SmallInt { get; set; }
@@ -20,7 +20,7 @@ public partial class NumericModel
     public decimal Money { get; set; }
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class NullableNumericModel
 {
     public string Name { get; set; } = "";
@@ -34,21 +34,21 @@ public partial class NullableNumericModel
 // Multi-word enum for ParseEnumFromSnakeCase coverage
 public enum OrderStatus { Pending, InProgress, CompletedSuccessfully }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithOrderStatus
 {
     public string Name { get; set; } = "";
     public OrderStatus Status { get; set; }
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithDictionary
 {
     public string Name { get; set; } = "";
     public Dictionary<string, string> Metadata { get; set; } = new();
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithTimestamps
 {
     public string Label { get; set; } = "";
@@ -95,11 +95,100 @@ public class WithObjectDict
     public Dictionary<string, object> Extra { get; set; } = new();
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithNullableAddress
 {
     public string Name { get; set; } = "";
     public Address? HomeAddress { get; set; }
+}
+
+// ========================================================================
+// Parameterized Constructor DTOs (no parameterless constructor)
+// ========================================================================
+
+[TeaLeaf]
+public class ImmutableUser
+{
+    public string Name { get; }
+    public int Age { get; }
+    public bool Active { get; }
+
+    public ImmutableUser(string name, int age, bool active)
+    {
+        Name = name;
+        Age = age;
+        Active = active;
+    }
+}
+
+[TeaLeaf(StructName = "security_group_attributes")]
+public class SecurityGroupAttributes
+{
+    public string GroupName { get; }
+    public string Description { get; }
+    public List<string> Permissions { get; }
+
+    public SecurityGroupAttributes(string groupName, string description, List<string> permissions)
+    {
+        GroupName = groupName;
+        Description = description;
+        Permissions = permissions;
+    }
+}
+
+[TeaLeaf]
+public class MixedCtorModel
+{
+    public string Name { get; }
+    public int Id { get; }
+    public string? Notes { get; set; }
+
+    public MixedCtorModel(string name, int id)
+    {
+        Name = name;
+        Id = id;
+    }
+}
+
+[TeaLeaf]
+public class CtorWithDefaults
+{
+    public string Name { get; }
+    public int Score { get; }
+    public bool Active { get; }
+
+    public CtorWithDefaults(string name, int score = 100, bool active = true)
+    {
+        Name = name;
+        Score = score;
+        Active = active;
+    }
+}
+
+[TeaLeaf]
+public class ImmutableWithNested
+{
+    public string Label { get; }
+    public Address HomeAddress { get; }
+
+    public ImmutableWithNested(string label, Address homeAddress)
+    {
+        Label = label;
+        HomeAddress = homeAddress;
+    }
+}
+
+[TeaLeaf]
+public class ImmutableWithEnum
+{
+    public string Name { get; }
+    public UserRole Role { get; }
+
+    public ImmutableWithEnum(string name, UserRole role)
+    {
+        Name = name;
+        Role = role;
+    }
 }
 
 // ========================================================================
@@ -2690,5 +2779,192 @@ public class TeaLeafTextHelperEdgeCaseTests
         var json = doc.ToJson();
         Assert.Contains("first", json);
         Assert.Contains("second", json);
+    }
+}
+
+// ========================================================================
+// Parameterized Constructor Deserialization Tests
+// ========================================================================
+
+public class ParameterizedConstructorTests
+{
+    [Fact]
+    public void FromText_ImmutableUser_DeserializesViaConstructor()
+    {
+        var tl = @"
+@struct immutable_user (name: string, age: int, active: bool)
+immutable_user: {
+    name: alice
+    age: 30
+    active: true
+}";
+        var result = TeaLeafSerializer.FromText<ImmutableUser>(tl);
+        Assert.Equal("alice", result.Name);
+        Assert.Equal(30, result.Age);
+        Assert.True(result.Active);
+    }
+
+    [Fact]
+    public void FromText_SecurityGroupAttributes_WithList()
+    {
+        var tl = @"
+@struct security_group_attributes (group_name: string, description: string, permissions: []string)
+security_group_attributes: {
+    group_name: Admins
+    description: ""Administrators Group""
+    permissions: [Read, Write, Execute]
+}";
+        var result = TeaLeafSerializer.FromText<SecurityGroupAttributes>(tl);
+        Assert.Equal("Admins", result.GroupName);
+        Assert.Equal("Administrators Group", result.Description);
+        Assert.Equal(3, result.Permissions.Count);
+        Assert.Equal("Read", result.Permissions[0]);
+        Assert.Equal("Write", result.Permissions[1]);
+        Assert.Equal("Execute", result.Permissions[2]);
+    }
+
+    [Fact]
+    public void FromText_MixedCtorModel_CtorAndSetterProperties()
+    {
+        var tl = @"
+@struct mixed_ctor_model (name: string, id: int, notes: string?)
+mixed_ctor_model: {
+    name: bob
+    id: 42
+    notes: ""some notes""
+}";
+        var result = TeaLeafSerializer.FromText<MixedCtorModel>(tl);
+        Assert.Equal("bob", result.Name);
+        Assert.Equal(42, result.Id);
+        Assert.Equal("some notes", result.Notes);
+    }
+
+    [Fact]
+    public void FromText_MixedCtorModel_MissingSetter_LeavesNull()
+    {
+        var tl = @"
+@struct mixed_ctor_model (name: string, id: int, notes: string?)
+mixed_ctor_model: {
+    name: carol
+    id: 7
+}";
+        var result = TeaLeafSerializer.FromText<MixedCtorModel>(tl);
+        Assert.Equal("carol", result.Name);
+        Assert.Equal(7, result.Id);
+        Assert.Null(result.Notes);
+    }
+
+    [Fact]
+    public void FromText_CtorWithDefaults_UsesDefaultValues()
+    {
+        var tl = @"
+@struct ctor_with_defaults (name: string, score: int, active: bool)
+ctor_with_defaults: {
+    name: diana
+}";
+        var result = TeaLeafSerializer.FromText<CtorWithDefaults>(tl);
+        Assert.Equal("diana", result.Name);
+        Assert.Equal(100, result.Score);
+        Assert.True(result.Active);
+    }
+
+    [Fact]
+    public void FromText_CtorWithDefaults_OverridesDefaults()
+    {
+        var tl = @"
+@struct ctor_with_defaults (name: string, score: int, active: bool)
+ctor_with_defaults: {
+    name: eve
+    score: 50
+    active: false
+}";
+        var result = TeaLeafSerializer.FromText<CtorWithDefaults>(tl);
+        Assert.Equal("eve", result.Name);
+        Assert.Equal(50, result.Score);
+        Assert.False(result.Active);
+    }
+
+    [Fact]
+    public void FromText_ImmutableWithNested_DeserializesNestedObject()
+    {
+        var tl = @"
+@struct address (street: string, city: string, zip: string)
+@struct immutable_with_nested (label: string, home_address: address)
+immutable_with_nested: {
+    label: office
+    home_address: {
+        street: ""123 Main St""
+        city: Boston
+        zip: ""02101""
+    }
+}";
+        var result = TeaLeafSerializer.FromText<ImmutableWithNested>(tl);
+        Assert.Equal("office", result.Label);
+        Assert.Equal("123 Main St", result.HomeAddress.Street);
+        Assert.Equal("Boston", result.HomeAddress.City);
+        Assert.Equal("02101", result.HomeAddress.Zip);
+    }
+
+    [Fact]
+    public void FromText_ImmutableWithEnum_DeserializesEnum()
+    {
+        var tl = @"
+@struct immutable_with_enum (name: string, role: string)
+immutable_with_enum: {
+    name: frank
+    role: admin
+}";
+        var result = TeaLeafSerializer.FromText<ImmutableWithEnum>(tl);
+        Assert.Equal("frank", result.Name);
+        Assert.Equal(UserRole.Admin, result.Role);
+    }
+
+    [Fact]
+    public void Serializer_RoundTrip_ImmutableUser()
+    {
+        // Serialize a parameterless-constructor type, then deserialize into immutable type
+        var original = new SimpleUser { Name = "grace", Age = 28, Active = true };
+        var text = TeaLeafSerializer.ToDocument(original, "immutable_user");
+        var restored = TeaLeafSerializer.FromText<ImmutableUser>(text, "immutable_user");
+        Assert.Equal("grace", restored.Name);
+        Assert.Equal(28, restored.Age);
+        Assert.True(restored.Active);
+    }
+
+    [Fact]
+    public void FromDocument_ImmutableUser_ViaDocument()
+    {
+        var tl = @"
+@struct immutable_user (name: string, age: int, active: bool)
+immutable_user: {
+    name: hank
+    age: 55
+    active: false
+}";
+        using var doc = TLDocument.Parse(tl);
+        var result = TeaLeafSerializer.FromDocument<ImmutableUser>(doc);
+        Assert.Equal("hank", result.Name);
+        Assert.Equal(55, result.Age);
+        Assert.False(result.Active);
+    }
+
+    [Fact]
+    public void FromList_ImmutableUser_DeserializesList()
+    {
+        var tl = @"
+@struct immutable_user (name: string, age: int, active: bool)
+users: @table immutable_user [
+    (iris, 22, true),
+    (jack, 35, false),
+]";
+        using var doc = TLDocument.Parse(tl);
+        var result = TeaLeafSerializer.FromList<ImmutableUser>(doc, "users");
+        Assert.Equal(2, result.Count);
+        Assert.Equal("iris", result[0].Name);
+        Assert.Equal(22, result[0].Age);
+        Assert.True(result[0].Active);
+        Assert.Equal("jack", result[1].Name);
+        Assert.Equal(35, result[1].Age);
+        Assert.False(result[1].Active);
     }
 }

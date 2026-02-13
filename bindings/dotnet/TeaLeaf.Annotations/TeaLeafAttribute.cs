@@ -1,9 +1,10 @@
 namespace TeaLeaf.Annotations;
 
 /// <summary>
-/// Marks a class or record for TeaLeaf source generation.
-/// The generator will create serialization (ToTeaLeaf*) and
-/// deserialization (FromTeaLeaf) methods as partial extensions.
+/// Marks a class or record for TeaLeaf serialization.
+/// Used by the reflection-based TeaLeafSerializer for runtime serialization.
+/// Set <see cref="Generate"/> to true to enable compile-time source generation
+/// (requires the class to be declared as partial).
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
 public sealed class TeaLeafAttribute : Attribute
@@ -19,4 +20,10 @@ public sealed class TeaLeafAttribute : Attribute
     /// Defaults to true.
     /// </summary>
     public bool EmitSchema { get; set; } = true;
+
+    /// <summary>
+    /// If true, the source generator will generate serialization and deserialization methods.
+    /// Requires the class to be declared as partial. Defaults to false (reflection-only).
+    /// </summary>
+    public bool Generate { get; set; } = false;
 }

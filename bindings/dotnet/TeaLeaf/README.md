@@ -134,6 +134,7 @@ var fromDoc = TeaLeafSerializer.FromDocument<Employee>(doc);
 | Attribute | Description |
 |-----------|-------------|
 | `[TeaLeaf]` | Marks a class for TeaLeaf serialization |
+| `[TeaLeaf(Generate = true)]` | Enables compile-time source generation (requires `partial`) |
 | `[TLKey("name")]` | Sets the top-level document key |
 | `[TLRename("name")]` | Overrides the field name in output |
 | `[TLType("float64")]` | Overrides the TeaLeaf type in schema |
@@ -142,13 +143,18 @@ var fromDoc = TeaLeafSerializer.FromDocument<Employee>(doc);
 
 ### Source Generator
 
-For compile-time code generation (better performance than reflection), add the `TeaLeaf.Generators` package:
+For compile-time code generation (better performance than reflection), add `Generate = true` and mark the class as `partial`:
 
-```bash
-dotnet add package TeaLeaf.Generators
+```csharp
+[TeaLeaf(Generate = true)]
+public partial class Employee
+{
+    public string Name { get; set; } = "";
+    public int Age { get; set; }
+}
 ```
 
-This generates `ToTeaLeafText()`, `FromTeaLeaf()`, and other methods at compile time for classes annotated with `[TeaLeaf]`.
+This generates `ToTeaLeafText()`, `FromTeaLeaf()`, and other methods at compile time.
 
 ## Supported Platforms
 

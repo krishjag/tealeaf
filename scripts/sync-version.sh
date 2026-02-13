@@ -101,6 +101,8 @@ update_file "$README_FILE" "README.md (footer)" \
 SPEC_FILE="$REPO_ROOT/spec/TEALEAF_SPEC.md"
 update_file "$SPEC_FILE" "spec/TEALEAF_SPEC.md (title)" \
     "(# TeaLeaf Format Specification v)[^ ]+" "\1$VERSION"
+update_file "$SPEC_FILE" "spec/TEALEAF_SPEC.md (footer)" \
+    "(\*TeaLeaf Format Specification v)[^*]+(\*)" "\1$VERSION\2"
 
 # Update Rust source version constants
 update_file "$REPO_ROOT/tealeaf-core/src/types.rs" "tealeaf-core/src/types.rs (VERSION)" \

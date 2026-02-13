@@ -33,20 +33,75 @@ internal static class DeserializerEmitter
         sb.AppendLine($"            throw new TeaLeaf.TLException(");
         sb.AppendLine($"                $\"Expected Object, got {{value.Type}} when deserializing {model.TypeName}\");");
         sb.AppendLine();
-        sb.AppendLine($"        var result = new {model.TypeName}();");
-        sb.AppendLine();
 
-        foreach (var prop in model.Properties)
+        if (model.HasParameterizedConstructor)
         {
-            if (prop.IsSkipped) continue;
-            EmitPropertyRead(sb, prop, model.TypeName);
+            EmitConstructorDeserialization(sb, model);
+        }
+        else
+        {
+            if (model.UseUninitializedObject)
+            {
+                sb.AppendLine($"        var result = ({model.TypeName})System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof({model.TypeName}));");
+            }
+            else
+            {
+                sb.AppendLine($"        var result = new {model.TypeName}();");
+            }
+            sb.AppendLine();
+
+            foreach (var prop in model.Properties)
+            {
+                if (prop.IsSkipped) continue;
+                EmitPropertyRead(sb, prop, model.TypeName, $"result.{prop.CSharpName}");
+            }
+
+            sb.AppendLine("        return result;");
         }
 
-        sb.AppendLine("        return result;");
         sb.AppendLine("    }");
     }
 
-    private static void EmitPropertyRead(StringBuilder sb, TeaLeafProperty prop, string typeName)
+    private static void EmitConstructorDeserialization(StringBuilder sb, TeaLeafModel model)
+    {
+        var ctorParams = model.ConstructorParams!;
+
+        // Declare local variables for constructor parameters
+        foreach (var param in ctorParams)
+        {
+            string defaultExpr = param.DefaultValueExpression
+                ?? ModelAnalyzer.GetTypeDefaultExpression(param.CSharpType);
+            sb.AppendLine($"        {param.CSharpType} _p_{param.ParameterName} = {defaultExpr};");
+        }
+        sb.AppendLine();
+
+        // Read constructor parameter fields into locals
+        foreach (var param in ctorParams)
+        {
+            if (param.MatchedPropertyCSharpName == null) continue;
+            var prop = model.Properties.FirstOrDefault(p => p.CSharpName == param.MatchedPropertyCSharpName);
+            if (prop == null || prop.IsSkipped) continue;
+            EmitPropertyRead(sb, prop, model.TypeName, $"_p_{param.ParameterName}");
+        }
+
+        // Construct object via parameterized constructor
+        var argList = string.Join(", ", ctorParams.Select(p => $"_p_{p.ParameterName}"));
+        sb.AppendLine($"        var result = new {model.TypeName}({argList});");
+        sb.AppendLine();
+
+        // Set remaining settable properties that are NOT constructor parameters
+        foreach (var prop in model.Properties)
+        {
+            if (prop.IsSkipped) continue;
+            if (prop.IsConstructorParam) continue;
+            if (!prop.HasSetter) continue;
+            EmitPropertyRead(sb, prop, model.TypeName, $"result.{prop.CSharpName}");
+        }
+
+        sb.AppendLine("        return result;");
+    }
+
+    private static void EmitPropertyRead(StringBuilder sb, TeaLeafProperty prop, string typeName, string assignTarget)
     {
         string tlName = prop.TLName;
         string csharpName = prop.CSharpName;
@@ -57,19 +112,19 @@ internal static class DeserializerEmitter
         switch (prop.Kind)
         {
             case PropertyKind.Primitive:
-                EmitPrimitiveRead(sb, prop);
+                EmitPrimitiveRead(sb, prop, assignTarget);
                 break;
 
             case PropertyKind.String:
                 if (prop.IsNullable)
                 {
                     sb.AppendLine($"            if (f_{csharpName} is not null && !f_{csharpName}.IsNull)");
-                    sb.AppendLine($"                result.{csharpName} = f_{csharpName}.AsString();");
+                    sb.AppendLine($"                {assignTarget} = f_{csharpName}.AsString();");
                 }
                 else
                 {
                     sb.AppendLine($"            if (f_{csharpName} is not null)");
-                    sb.AppendLine($"                result.{csharpName} = f_{csharpName}.AsString() ?? \"\";");
+                    sb.AppendLine($"                {assignTarget} = f_{csharpName}.AsString() ?? \"\";");
                 }
                 break;
 
@@ -79,31 +134,31 @@ internal static class DeserializerEmitter
                 {
                     // long with [TLType("timestamp")]
                     sb.AppendLine($"            if (f_{csharpName} is not null)");
-                    sb.AppendLine($"                result.{csharpName} = f_{csharpName}.AsTimestamp() ?? f_{csharpName}.AsInt() ?? 0;");
+                    sb.AppendLine($"                {assignTarget} = f_{csharpName}.AsTimestamp() ?? f_{csharpName}.AsInt() ?? 0;");
                 }
                 else if (prop.TLType == "timestamp" && (prop.CSharpType.Contains("Int32") || prop.CSharpType == "int"))
                 {
                     // int with [TLType("timestamp")]
                     sb.AppendLine($"            if (f_{csharpName} is not null)");
-                    sb.AppendLine($"                result.{csharpName} = (int)(f_{csharpName}.AsTimestamp() ?? f_{csharpName}.AsInt() ?? 0);");
+                    sb.AppendLine($"                {assignTarget} = (int)(f_{csharpName}.AsTimestamp() ?? f_{csharpName}.AsInt() ?? 0);");
                 }
                 else
                 {
                     sb.AppendLine($"            if (f_{csharpName} is not null && !f_{csharpName}.IsNull)");
-                    sb.AppendLine($"                result.{csharpName} = f_{csharpName}.AsDateTime() ?? System.DateTimeOffset.MinValue;");
+                    sb.AppendLine($"                {assignTarget} = f_{csharpName}.AsDateTime() ?? System.DateTimeOffset.MinValue;");
                 }
                 break;
 
             case PropertyKind.TimeSpan:
                 sb.AppendLine($"            if (f_{csharpName} is not null)");
-                sb.AppendLine($"                result.{csharpName} = System.TimeSpan.FromMilliseconds(f_{csharpName}.AsInt() ?? 0);");
+                sb.AppendLine($"                {assignTarget} = System.TimeSpan.FromMilliseconds(f_{csharpName}.AsInt() ?? 0);");
                 break;
 
             case PropertyKind.Guid:
                 sb.AppendLine($"            if (f_{csharpName} is not null)");
                 sb.AppendLine($"            {{");
                 sb.AppendLine($"                var str = f_{csharpName}.AsString();");
-                sb.AppendLine($"                if (str != null) result.{csharpName} = System.Guid.Parse(str);");
+                sb.AppendLine($"                if (str != null) {assignTarget} = System.Guid.Parse(str);");
                 sb.AppendLine($"            }}");
                 break;
 
@@ -116,7 +171,7 @@ internal static class DeserializerEmitter
                 // Convert snake_case to PascalCase for enum parsing
                 sb.AppendLine($"                    var pascalCase = TeaLeaf.Generators.Runtime.TLTextHelper.FromSnakeCase(enumStr);");
                 sb.AppendLine($"                    if (System.Enum.TryParse<{prop.CSharpType}>(pascalCase, true, out var enumVal))");
-                sb.AppendLine($"                        result.{csharpName} = enumVal;");
+                sb.AppendLine($"                        {assignTarget} = enumVal;");
                 sb.AppendLine($"                }}");
                 sb.AppendLine($"            }}");
                 break;
@@ -125,27 +180,27 @@ internal static class DeserializerEmitter
                 if (prop.IsNullable)
                 {
                     sb.AppendLine($"            if (f_{csharpName} is not null && !f_{csharpName}.IsNull)");
-                    sb.AppendLine($"                result.{csharpName} = {prop.CSharpType.TrimEnd('?')}.FromTeaLeaf(f_{csharpName});");
+                    sb.AppendLine($"                {assignTarget} = {prop.CSharpType.TrimEnd('?')}.FromTeaLeaf(f_{csharpName});");
                 }
                 else
                 {
                     sb.AppendLine($"            if (f_{csharpName} is not null)");
-                    sb.AppendLine($"                result.{csharpName} = {prop.CSharpType}.FromTeaLeaf(f_{csharpName});");
+                    sb.AppendLine($"                {assignTarget} = {prop.CSharpType}.FromTeaLeaf(f_{csharpName});");
                 }
                 break;
 
             case PropertyKind.List:
-                EmitListRead(sb, prop);
+                EmitListRead(sb, prop, assignTarget);
                 break;
 
             case PropertyKind.Dictionary:
-                EmitDictionaryRead(sb, prop);
+                EmitDictionaryRead(sb, prop, assignTarget);
                 break;
 
             default:
                 // Fallback: try string
                 sb.AppendLine($"            if (f_{csharpName} is not null)");
-                sb.AppendLine($"                result.{csharpName} = f_{csharpName}.AsString() ?? \"\";");
+                sb.AppendLine($"                {assignTarget} = f_{csharpName}.AsString() ?? \"\";");
                 break;
         }
 
@@ -153,7 +208,7 @@ internal static class DeserializerEmitter
         sb.AppendLine();
     }
 
-    private static void EmitPrimitiveRead(StringBuilder sb, TeaLeafProperty prop)
+    private static void EmitPrimitiveRead(StringBuilder sb, TeaLeafProperty prop, string assignTarget)
     {
         string csharpName = prop.CSharpName;
         string baseType = prop.CSharpType.TrimEnd('?');
@@ -185,17 +240,17 @@ internal static class DeserializerEmitter
         {
             // C# type is nullable (int?, bool?, etc.) — assign nullable accessor directly
             sb.AppendLine($"            if (f_{csharpName} is not null && !f_{csharpName}.IsNull)");
-            sb.AppendLine($"                result.{csharpName} = {accessor};");
+            sb.AppendLine($"                {assignTarget} = {accessor};");
         }
         else
         {
             // C# type is non-nullable — use default value fallback
             sb.AppendLine($"            if (f_{csharpName} is not null)");
-            sb.AppendLine($"                result.{csharpName} = {accessor} ?? {defaultVal};");
+            sb.AppendLine($"                {assignTarget} = {accessor} ?? {defaultVal};");
         }
     }
 
-    private static void EmitListRead(StringBuilder sb, TeaLeafProperty prop)
+    private static void EmitListRead(StringBuilder sb, TeaLeafProperty prop, string assignTarget)
     {
         string csharpName = prop.CSharpName;
         string elemType = prop.CollectionElementType ?? "string";
@@ -222,7 +277,7 @@ internal static class DeserializerEmitter
 
         sb.AppendLine("                    }");
         sb.AppendLine("                }");
-        sb.AppendLine($"                result.{csharpName} = list;");
+        sb.AppendLine($"                {assignTarget} = list;");
         sb.AppendLine("            }");
     }
 
@@ -240,7 +295,7 @@ internal static class DeserializerEmitter
         };
     }
 
-    private static void EmitDictionaryRead(StringBuilder sb, TeaLeafProperty prop)
+    private static void EmitDictionaryRead(StringBuilder sb, TeaLeafProperty prop, string assignTarget)
     {
         string csharpName = prop.CSharpName;
         string valueType = prop.CollectionElementType ?? "string";
@@ -257,7 +312,7 @@ internal static class DeserializerEmitter
         sb.AppendLine($"                    {valueRead}");
 
         sb.AppendLine("                }");
-        sb.AppendLine($"                result.{csharpName} = dict;");
+        sb.AppendLine($"                {assignTarget} = dict;");
         sb.AppendLine("            }");
     }
 

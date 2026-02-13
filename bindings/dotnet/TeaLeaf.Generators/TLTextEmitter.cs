@@ -20,6 +20,10 @@ internal static class TLTextEmitter
         EmitWriteObjectBody(sb, model);
         sb.AppendLine();
 
+        // WriteTeaLeafTupleValue()
+        EmitWriteTupleValue(sb, model);
+        sb.AppendLine();
+
         // ToTeaLeafDocument()
         sb.AppendLine($"    /// <summary>Serializes to a complete .tl document string with schema.</summary>");
         sb.AppendLine($"    /// <param name=\"key\">The top-level key name. Defaults to the struct name.</param>");
@@ -173,6 +177,174 @@ internal static class TLTextEmitter
         sb.AppendLine("    }");
     }
 
+    private static void EmitWriteTupleValue(StringBuilder sb, TeaLeafModel model)
+    {
+        sb.AppendLine("    /// <summary>Writes this object as a positional tuple value for @table encoding.</summary>");
+        sb.AppendLine("    /// <param name=\"sb\">The StringBuilder to append the tuple to.</param>");
+        sb.AppendLine("    public void WriteTeaLeafTupleValue(System.Text.StringBuilder sb)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        sb.Append('(');");
+
+        bool firstProp = true;
+        foreach (var prop in model.Properties)
+        {
+            if (prop.IsSkipped) continue;
+
+            if (!firstProp)
+                sb.AppendLine("        sb.Append(\", \");");
+            firstProp = false;
+
+            string access = prop.CSharpName;
+
+            if (prop.IsCSharpNullable)
+            {
+                if (prop.Kind == PropertyKind.Primitive)
+                {
+                    sb.AppendLine($"        if ({access}.HasValue)");
+                    sb.AppendLine("        {");
+                    EmitTupleValueExpression(sb, prop, "            ", $"{access}.Value");
+                    sb.AppendLine("        }");
+                    sb.AppendLine("        else");
+                    sb.AppendLine("        {");
+                    sb.AppendLine("            sb.Append('~');");
+                    sb.AppendLine("        }");
+                }
+                else
+                {
+                    sb.AppendLine($"        if ({access} is not null)");
+                    sb.AppendLine("        {");
+                    EmitTupleValueExpression(sb, prop, "            ", access);
+                    sb.AppendLine("        }");
+                    sb.AppendLine("        else");
+                    sb.AppendLine("        {");
+                    sb.AppendLine("            sb.Append('~');");
+                    sb.AppendLine("        }");
+                }
+            }
+            else
+            {
+                EmitTupleValueExpression(sb, prop, "        ", access);
+            }
+        }
+
+        sb.AppendLine("        sb.Append(')');");
+        sb.AppendLine("    }");
+    }
+
+    private static void EmitTupleValueExpression(StringBuilder sb, TeaLeafProperty prop, string indent, string access)
+    {
+        switch (prop.Kind)
+        {
+            case PropertyKind.Primitive:
+                if (prop.CSharpType.Contains("bool") || prop.CSharpType == "bool" || prop.CSharpType == "System.Boolean")
+                {
+                    sb.AppendLine($"{indent}sb.Append({access} ? \"true\" : \"false\");");
+                }
+                else if (prop.CSharpType.Contains("float") || prop.CSharpType.Contains("double") ||
+                         prop.CSharpType.Contains("decimal") || prop.CSharpType.Contains("Single") ||
+                         prop.CSharpType.Contains("Double") || prop.CSharpType.Contains("Decimal"))
+                {
+                    sb.AppendLine($"{indent}sb.Append({access}.ToString(System.Globalization.CultureInfo.InvariantCulture));");
+                }
+                else
+                {
+                    sb.AppendLine($"{indent}sb.Append({access}.ToString(System.Globalization.CultureInfo.InvariantCulture));");
+                }
+                break;
+
+            case PropertyKind.String:
+                sb.AppendLine($"{indent}TeaLeaf.Generators.Runtime.TLTextHelper.AppendString(sb, {access});");
+                break;
+
+            case PropertyKind.DateTime:
+            case PropertyKind.DateTimeOffset:
+                if (prop.TLType == "timestamp")
+                {
+                    if (prop.CSharpType.Contains("Int64") || prop.CSharpType == "long")
+                    {
+                        sb.AppendLine($"{indent}sb.Append(System.DateTimeOffset.FromUnixTimeMilliseconds({access}).ToUniversalTime().ToString(\"yyyy-MM-ddTHH:mm:ss.fffZ\"));");
+                    }
+                    else if (prop.CSharpType.Contains("Int32") || prop.CSharpType == "int")
+                    {
+                        sb.AppendLine($"{indent}sb.Append(System.DateTimeOffset.FromUnixTimeMilliseconds((long){access}).ToUniversalTime().ToString(\"yyyy-MM-ddTHH:mm:ss.fffZ\"));");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"{indent}sb.Append(((System.DateTimeOffset){access}).ToUniversalTime().ToString(\"yyyy-MM-ddTHH:mm:ss.fffZ\"));");
+                    }
+                }
+                else
+                {
+                    sb.AppendLine($"{indent}sb.Append(((System.DateTimeOffset){access}).ToUniversalTime().ToString(\"yyyy-MM-ddTHH:mm:ss.fffZ\"));");
+                }
+                break;
+
+            case PropertyKind.TimeSpan:
+                sb.AppendLine($"{indent}sb.Append(((long){access}.TotalMilliseconds).ToString(System.Globalization.CultureInfo.InvariantCulture));");
+                break;
+
+            case PropertyKind.Guid:
+                sb.AppendLine($"{indent}TeaLeaf.Generators.Runtime.TLTextHelper.AppendString(sb, {access}.ToString());");
+                break;
+
+            case PropertyKind.Enum:
+                sb.AppendLine($"{indent}sb.Append(TeaLeaf.Generators.Runtime.TLTextHelper.ToSnakeCase({access}.ToString()));");
+                break;
+
+            case PropertyKind.NestedObject:
+                sb.AppendLine($"{indent}{access}.WriteTeaLeafTupleValue(sb);");
+                break;
+
+            case PropertyKind.List:
+                sb.AppendLine($"{indent}sb.Append('[');");
+                sb.AppendLine($"{indent}var tupleFirst_{prop.CSharpName} = true;");
+                sb.AppendLine($"{indent}foreach (var tupleItem in {access})");
+                sb.AppendLine($"{indent}{{");
+                if (prop.IsNestedTeaLeafType || IsReferenceElementType(prop.CollectionElementType))
+                {
+                    sb.AppendLine($"{indent}    if (tupleItem is null) continue;");
+                }
+                sb.AppendLine($"{indent}    if (!tupleFirst_{prop.CSharpName}) sb.Append(\", \");");
+                sb.AppendLine($"{indent}    tupleFirst_{prop.CSharpName} = false;");
+                if (prop.IsNestedTeaLeafType)
+                {
+                    sb.AppendLine($"{indent}    tupleItem.WriteTeaLeafTupleValue(sb);");
+                }
+                else
+                {
+                    sb.AppendLine($"{indent}    TeaLeaf.Generators.Runtime.TLTextHelper.AppendValue(sb, tupleItem);");
+                }
+                sb.AppendLine($"{indent}}}");
+                sb.AppendLine($"{indent}sb.Append(']');");
+                break;
+
+            case PropertyKind.Dictionary:
+                sb.AppendLine($"{indent}sb.Append('{{');");
+                sb.AppendLine($"{indent}var tupleFirst_{prop.CSharpName} = true;");
+                sb.AppendLine($"{indent}foreach (var kvp in {access})");
+                sb.AppendLine($"{indent}{{");
+                sb.AppendLine($"{indent}    if (!tupleFirst_{prop.CSharpName}) sb.Append(\", \");");
+                sb.AppendLine($"{indent}    tupleFirst_{prop.CSharpName} = false;");
+                sb.AppendLine($"{indent}    TeaLeaf.Generators.Runtime.TLTextHelper.AppendString(sb, kvp.Key.ToString()!);");
+                sb.AppendLine($"{indent}    sb.Append(\": \");");
+                sb.AppendLine($"{indent}    TeaLeaf.Generators.Runtime.TLTextHelper.AppendValue(sb, kvp.Value);");
+                sb.AppendLine($"{indent}}}");
+                sb.AppendLine($"{indent}sb.Append('}}');");
+                break;
+
+            case PropertyKind.ByteArray:
+                sb.AppendLine($"{indent}sb.Append(\"b\\\"\");");
+                sb.AppendLine($"{indent}foreach (var b in {access})");
+                sb.AppendLine($"{indent}    sb.Append(b.ToString(\"x2\"));");
+                sb.AppendLine($"{indent}sb.Append('\"');");
+                break;
+
+            default:
+                sb.AppendLine($"{indent}TeaLeaf.Generators.Runtime.TLTextHelper.AppendString(sb, {access}?.ToString() ?? \"~\");");
+                break;
+        }
+    }
+
     private static void EmitPropertyWrite(StringBuilder sb, TeaLeafProperty prop)
     {
         string name = prop.TLName;
@@ -314,30 +486,45 @@ internal static class TLTextEmitter
                 break;
 
             case PropertyKind.List:
-                sb.AppendLine($"{indent}sb.Append(\"{name}: [\");");
-                sb.AppendLine($"{indent}var first_{prop.CSharpName} = true;");
-                sb.AppendLine($"{indent}foreach (var item in {access})");
-                sb.AppendLine($"{indent}{{");
-                // Null guard: only for reference-type elements (nested objects, strings)
-                if (prop.IsNestedTeaLeafType || IsReferenceElementType(prop.CollectionElementType))
-                {
-                    sb.AppendLine($"{indent}    if (item is null) continue;");
-                }
-                sb.AppendLine($"{indent}    if (!first_{prop.CSharpName}) sb.Append(\", \");");
-                sb.AppendLine($"{indent}    first_{prop.CSharpName} = false;");
                 if (prop.IsNestedTeaLeafType)
                 {
-                    sb.AppendLine($"{indent}    sb.Append(\"{{\\n\");");
-                    sb.AppendLine($"{indent}    item.WriteTeaLeafObjectBody(sb, indent + \"        \");");
+                    string structName = prop.NestedTeaLeafStructName ?? "object";
+                    sb.AppendLine($"{indent}sb.Append(\"{name}: @table {structName} [\");");
+                    sb.AppendLine($"{indent}if ({access}.Count == 0)");
+                    sb.AppendLine($"{indent}{{");
+                    sb.AppendLine($"{indent}    sb.AppendLine(\"]\");");
+                    sb.AppendLine($"{indent}}}");
+                    sb.AppendLine($"{indent}else");
+                    sb.AppendLine($"{indent}{{");
+                    sb.AppendLine($"{indent}    sb.AppendLine();");
+                    sb.AppendLine($"{indent}    foreach (var item in {access})");
+                    sb.AppendLine($"{indent}    {{");
+                    sb.AppendLine($"{indent}        if (item is null) continue;");
+                    sb.AppendLine($"{indent}        sb.Append(indent);");
+                    sb.AppendLine($"{indent}        sb.Append(\"    \");");
+                    sb.AppendLine($"{indent}        item.WriteTeaLeafTupleValue(sb);");
+                    sb.AppendLine($"{indent}        sb.AppendLine(\",\");");
+                    sb.AppendLine($"{indent}    }}");
                     sb.AppendLine($"{indent}    sb.Append(indent);");
-                    sb.AppendLine($"{indent}    sb.Append(\"    }}\");");
+                    sb.AppendLine($"{indent}    sb.AppendLine(\"]\");");
+                    sb.AppendLine($"{indent}}}");
                 }
                 else
                 {
+                    sb.AppendLine($"{indent}sb.Append(\"{name}: [\");");
+                    sb.AppendLine($"{indent}var first_{prop.CSharpName} = true;");
+                    sb.AppendLine($"{indent}foreach (var item in {access})");
+                    sb.AppendLine($"{indent}{{");
+                    if (IsReferenceElementType(prop.CollectionElementType))
+                    {
+                        sb.AppendLine($"{indent}    if (item is null) continue;");
+                    }
+                    sb.AppendLine($"{indent}    if (!first_{prop.CSharpName}) sb.Append(\", \");");
+                    sb.AppendLine($"{indent}    first_{prop.CSharpName} = false;");
                     sb.AppendLine($"{indent}    TeaLeaf.Generators.Runtime.TLTextHelper.AppendValue(sb, item);");
+                    sb.AppendLine($"{indent}}}");
+                    sb.AppendLine($"{indent}sb.AppendLine(\"]\");");
                 }
-                sb.AppendLine($"{indent}}}");
-                sb.AppendLine($"{indent}sb.AppendLine(\"]\");");
                 break;
 
             case PropertyKind.Dictionary:

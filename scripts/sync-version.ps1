@@ -134,6 +134,7 @@ $SpecPath = Join-Path $RepoRoot "spec/TEALEAF_SPEC.md"
 Update-File -Path $SpecPath -Description "spec/TEALEAF_SPEC.md (title)" -Transform {
     param($content)
     $content = $content -replace '(# TeaLeaf Format Specification v)[^\s]+', "`${1}$Version"
+    $content = $content -replace '(\*TeaLeaf Format Specification v)[^\*]+(\*)', "`${1}$Version`${2}"
     return $content
 }
 

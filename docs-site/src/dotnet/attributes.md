@@ -4,24 +4,33 @@ All TeaLeaf annotations are in the `TeaLeaf.Annotations` namespace.
 
 ## Type-Level Attributes
 
-### `[TeaLeaf]` / `[TeaLeaf("struct_name")]`
+### `[TeaLeaf]`
 
-Marks a class for source generator processing:
+Marks a class for TeaLeaf serialization. Used by both the reflection-based `TeaLeafSerializer` (runtime) and the source generator (compile-time).
 
 ```csharp
-[TeaLeaf]           // Schema name: "my_class" (auto snake_case)
-public partial class MyClass { }
+[TeaLeaf]                                 // Reflection-only, no partial needed
+public class MyClass { }
 
-[TeaLeaf("config")] // Schema name: "config" (explicit)
-public partial class AppConfiguration { }
+[TeaLeaf(StructName = "config")]          // Override schema name (default: snake_case of class name)
+public class AppConfiguration { }
 ```
 
-The optional string parameter sets the struct name used in the TeaLeaf schema. If omitted, the class name is converted to snake_case.
+#### `Generate` property
 
-The attribute also has an `EmitSchema` property (defaults to `true`). When set to `false`, the source generator skips `@struct` and `@table` output for arrays of this type:
+Set `Generate = true` to enable compile-time source generation. Requires the class to be declared as `partial`:
 
 ```csharp
-[TeaLeaf(EmitSchema = false)]  // Data only, no @struct definition
+[TeaLeaf(Generate = true)]               // Source generation enabled
+public partial class MyClass { }
+```
+
+#### `EmitSchema` property
+
+Defaults to `true`. When set to `false`, the source generator skips `@struct` and `@table` output for arrays of this type:
+
+```csharp
+[TeaLeaf(Generate = true, EmitSchema = false)]  // Data only, no @struct definition
 public partial class RawData { }
 ```
 
@@ -30,7 +39,7 @@ public partial class RawData { }
 Overrides the top-level key used when serializing as a document entry:
 
 ```csharp
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 [TLKey("app_settings")]
 public partial class Config
 {
@@ -50,7 +59,7 @@ Exclude a property from serialization and deserialization:
 
 ```csharp
 [TeaLeaf]
-public partial class User
+public class User
 {
     public int Id { get; set; }
     public string Name { get; set; } = "";
@@ -66,7 +75,7 @@ Mark a property as nullable in the schema:
 
 ```csharp
 [TeaLeaf]
-public partial class User
+public class User
 {
     public string Name { get; set; } = "";
 
@@ -87,7 +96,7 @@ Override the field name in the TeaLeaf schema:
 
 ```csharp
 [TeaLeaf]
-public partial class User
+public class User
 {
     [TLRename("user_name")]
     public string Name { get; set; } = "";
@@ -106,7 +115,7 @@ Override the TeaLeaf type for a field:
 
 ```csharp
 [TeaLeaf]
-public partial class Event
+public class Event
 {
     public string Name { get; set; } = "";
 
@@ -124,7 +133,8 @@ Valid type names: `bool`, `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uin
 
 | Attribute | Level | Description |
 |-----------|-------|-------------|
-| `[TeaLeaf]` / `[TeaLeaf("name")]` | Class | Enable source generation, optional struct name |
+| `[TeaLeaf]` | Class | Mark for TeaLeaf serialization, optional struct name via `StructName` |
+| `[TeaLeaf(Generate = true)]` | Class | Enable compile-time source generation (requires `partial`) |
 | `[TLKey("key")]` | Class | Override document key |
 | `[TLSkip]` | Property | Exclude from serialization |
 | `[TLOptional]` | Property | Mark as nullable in schema |
@@ -134,7 +144,7 @@ Valid type names: `bool`, `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uin
 ## Combining Attributes
 
 ```csharp
-[TeaLeaf("event_record")]
+[TeaLeaf(Generate = true, StructName = "event_record")]
 [TLKey("events")]
 public partial class EventRecord
 {

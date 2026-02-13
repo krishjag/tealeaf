@@ -111,12 +111,14 @@ public static class TeaLeafSerializer
     /// <summary>
     /// Deserializes an object from a TLDocument.
     /// </summary>
-    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/> with a parameterless constructor.</typeparam>
+    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/>.
+    /// May have a parameterless constructor or a parameterized constructor whose parameter names
+    /// match property names (case-insensitive).</typeparam>
     /// <param name="doc">The TLDocument to read from.</param>
     /// <param name="key">Optional top-level key to look up. Defaults to the type's struct name.</param>
     /// <returns>A deserialized instance of <typeparamref name="T"/>.</returns>
     /// <exception cref="TLException">Thrown if the key is not found in the document.</exception>
-    public static T FromDocument<T>(TLDocument doc, string? key = null) where T : class, new()
+    public static T FromDocument<T>(TLDocument doc, string? key = null) where T : class
     {
         var info = TeaLeafTypeInfo.GetOrCreate(typeof(T));
         var docKey = key ?? info.Key;
@@ -131,10 +133,12 @@ public static class TeaLeafSerializer
     /// <summary>
     /// Deserializes an object from a TLValue (object type).
     /// </summary>
-    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/> with a parameterless constructor.</typeparam>
+    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/>.
+    /// May have a parameterless constructor or a parameterized constructor whose parameter names
+    /// match property names (case-insensitive).</typeparam>
     /// <param name="value">A TLValue of type Object containing the serialized fields.</param>
     /// <returns>A deserialized instance of <typeparamref name="T"/>.</returns>
-    public static T FromValue<T>(TLValue value) where T : class, new()
+    public static T FromValue<T>(TLValue value) where T : class
     {
         return (T)FromValueInternal(value, typeof(T));
     }
@@ -142,12 +146,14 @@ public static class TeaLeafSerializer
     /// <summary>
     /// Deserializes an object from TeaLeaf text.
     /// </summary>
-    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/> with a parameterless constructor.</typeparam>
+    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/>.
+    /// May have a parameterless constructor or a parameterized constructor whose parameter names
+    /// match property names (case-insensitive).</typeparam>
     /// <param name="tlText">The TeaLeaf text to parse and deserialize.</param>
     /// <param name="key">Optional top-level key to look up. Defaults to the type's struct name.</param>
     /// <returns>A deserialized instance of <typeparamref name="T"/>.</returns>
     /// <exception cref="TLException">Thrown if the key is not found or the text cannot be parsed.</exception>
-    public static T FromText<T>(string tlText, string? key = null) where T : class, new()
+    public static T FromText<T>(string tlText, string? key = null) where T : class
     {
         using var doc = TLDocument.Parse(tlText);
         return FromDocument<T>(doc, key);
@@ -196,14 +202,26 @@ public static class TeaLeafSerializer
 
         // Table data
         sb.Append(key);
-        sb.AppendLine(": [");
-        foreach (var item in items)
+        sb.Append(": @table ");
+        sb.Append(info.StructName);
+        sb.Append(" [");
+
+        var itemList = items.ToList();
+        if (itemList.Count == 0)
         {
-            sb.AppendLine("    {");
-            WriteObjectBody(sb, item!, info, "        ");
-            sb.AppendLine("    }");
+            sb.AppendLine("]");
         }
-        sb.AppendLine("]");
+        else
+        {
+            sb.AppendLine();
+            foreach (var item in itemList)
+            {
+                sb.Append("    ");
+                WriteTupleValue(sb, item!, info);
+                sb.AppendLine(",");
+            }
+            sb.AppendLine("]");
+        }
 
         return sb.ToString();
     }
@@ -224,12 +242,12 @@ public static class TeaLeafSerializer
     /// <summary>
     /// Deserializes a list from a TLDocument.
     /// </summary>
-    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/> with a parameterless constructor.</typeparam>
+    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/>.</typeparam>
     /// <param name="doc">The TLDocument to read from.</param>
     /// <param name="key">The top-level key for the array in the document.</param>
     /// <returns>A list of deserialized <typeparamref name="T"/> instances.</returns>
     /// <exception cref="TLException">Thrown if the key is not found in the document.</exception>
-    public static List<T> FromList<T>(TLDocument doc, string key) where T : class, new()
+    public static List<T> FromList<T>(TLDocument doc, string key) where T : class
     {
         using var value = doc[key];
         if (value == null)
@@ -240,11 +258,11 @@ public static class TeaLeafSerializer
     /// <summary>
     /// Deserializes a list from a TLValue (array type).
     /// </summary>
-    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/> with a parameterless constructor.</typeparam>
+    /// <typeparam name="T">A class annotated with <see cref="Annotations.TeaLeafAttribute"/>.</typeparam>
     /// <param name="arrayValue">A TLValue of type Array containing the serialized elements.</param>
     /// <returns>A list of deserialized <typeparamref name="T"/> instances.</returns>
     /// <exception cref="TLException">Thrown if the value is not of type Array.</exception>
-    public static List<T> FromList<T>(TLValue arrayValue) where T : class, new()
+    public static List<T> FromList<T>(TLValue arrayValue) where T : class
     {
         if (arrayValue.Type != TLType.Array)
             throw new TLException($"Expected array value but got {arrayValue.Type}");
@@ -357,36 +375,40 @@ public static class TeaLeafSerializer
     {
         sb.Append(indent);
         sb.Append(prop.TLName);
-        sb.Append(": [");
-
-        if (list.Count == 0)
-        {
-            sb.AppendLine("]");
-            return;
-        }
+        sb.Append(": ");
 
         var elemType = prop.ElementType ?? typeof(object);
         bool isNestedTeaLeaf = elemType.GetCustomAttribute<Annotations.TeaLeafAttribute>() != null;
 
         if (isNestedTeaLeaf)
         {
-            bool firstItem = true;
+            var nestedInfo = TeaLeafTypeInfo.GetOrCreate(elemType);
+            sb.Append("@table ");
+            sb.Append(nestedInfo.StructName);
+            sb.Append(" [");
+
+            if (list.Count == 0)
+            {
+                sb.AppendLine("]");
+                return;
+            }
+
+            sb.AppendLine();
+            var tupleIndent = indent + "    ";
             foreach (var item in list)
             {
                 if (item == null) continue;
-                if (!firstItem)
-                    sb.Append(", ");
-                firstItem = false;
-                var nestedInfo = TeaLeafTypeInfo.GetOrCreate(item.GetType());
-                sb.AppendLine("{");
-                WriteObjectBody(sb, item, nestedInfo, indent + "        ");
-                sb.Append(indent);
-                sb.Append("    }");
+                sb.Append(tupleIndent);
+                var itemInfo = TeaLeafTypeInfo.GetOrCreate(item.GetType());
+                WriteTupleValue(sb, item, itemInfo);
+                sb.AppendLine(",");
             }
+            sb.Append(indent);
             sb.AppendLine("]");
         }
         else
         {
+            sb.Append('[');
             for (int i = 0; i < list.Count; i++)
             {
                 if (i > 0) sb.Append(", ");
@@ -394,6 +416,92 @@ public static class TeaLeafSerializer
             }
             sb.AppendLine("]");
         }
+    }
+
+    private static void WriteTupleValue(StringBuilder sb, object obj, TeaLeafTypeInfo info)
+    {
+        sb.Append('(');
+        bool first = true;
+        foreach (var prop in info.Properties)
+        {
+            if (!first) sb.Append(", ");
+            first = false;
+
+            var value = prop.Getter(obj);
+            if (value == null)
+            {
+                sb.Append('~');
+                continue;
+            }
+
+            if (prop.IsList)
+            {
+                WriteTupleList(sb, (IList)value, prop);
+            }
+            else if (prop.IsDictionary)
+            {
+                WriteTupleDictionary(sb, (IDictionary)value);
+            }
+            else if (prop.IsNestedTeaLeaf)
+            {
+                var nestedInfo = TeaLeafTypeInfo.GetOrCreate(value.GetType());
+                WriteTupleValue(sb, value, nestedInfo);
+            }
+            else if (prop.IsEnum)
+            {
+                sb.Append(TeaLeafTextHelper.ToSnakeCase(value.ToString()!));
+            }
+            else
+            {
+                TeaLeafTextHelper.AppendValue(sb, value, prop.PropertyType);
+            }
+        }
+        sb.Append(')');
+    }
+
+    private static void WriteTupleList(StringBuilder sb, IList list, TeaLeafPropertyInfo prop)
+    {
+        sb.Append('[');
+        var elemType = prop.ElementType ?? typeof(object);
+        bool isNestedTeaLeaf = elemType.GetCustomAttribute<Annotations.TeaLeafAttribute>() != null;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (i > 0) sb.Append(", ");
+            var item = list[i];
+            if (item == null)
+            {
+                sb.Append('~');
+            }
+            else if (isNestedTeaLeaf)
+            {
+                var nestedInfo = TeaLeafTypeInfo.GetOrCreate(item.GetType());
+                WriteTupleValue(sb, item, nestedInfo);
+            }
+            else
+            {
+                TeaLeafTextHelper.AppendValue(sb, item, elemType);
+            }
+        }
+        sb.Append(']');
+    }
+
+    private static void WriteTupleDictionary(StringBuilder sb, IDictionary dict)
+    {
+        sb.Append('{');
+        bool first = true;
+        foreach (DictionaryEntry entry in dict)
+        {
+            if (!first) sb.Append(", ");
+            first = false;
+            sb.Append(TeaLeafTextHelper.QuoteIfNeeded(entry.Key?.ToString() ?? ""));
+            sb.Append(": ");
+            if (entry.Value != null)
+                TeaLeafTextHelper.AppendValue(sb, entry.Value, entry.Value.GetType());
+            else
+                sb.Append('~');
+        }
+        sb.Append('}');
     }
 
     private static void WriteDictionary(StringBuilder sb, IDictionary dict, TeaLeafPropertyInfo prop, string indent)
@@ -433,7 +541,15 @@ public static class TeaLeafSerializer
     private static object FromValueInternal(TLValue value, Type targetType)
     {
         var info = TeaLeafTypeInfo.GetOrCreate(targetType);
-        var result = Activator.CreateInstance(targetType)!;
+
+        if (info.ParameterizedConstructor != null)
+            return FromValueWithConstructor(value, info);
+
+        // When no parameterless constructor AND no usable parameterized constructor,
+        // create instance without calling any constructor and set properties via setters.
+        var result = info.UseUninitializedObject
+            ? System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(targetType)
+            : Activator.CreateInstance(targetType)!;
 
         foreach (var prop in info.Properties)
         {
@@ -443,7 +559,67 @@ public static class TeaLeafSerializer
 
             var propValue = ReadProperty(field, prop);
             if (propValue != null)
-                prop.Setter(result, propValue);
+                prop.Setter?.Invoke(result, propValue);
+        }
+
+        return result;
+    }
+
+    private static object FromValueWithConstructor(TLValue value, TeaLeafTypeInfo info)
+    {
+        var ctorMappings = info.ConstructorParamMappings!;
+        var ctor = info.ParameterizedConstructor!;
+
+        // Read all fields into a dictionary for lookup
+        var fieldValues = new Dictionary<string, object?>();
+        foreach (var prop in info.Properties)
+        {
+            using var field = value.GetField(prop.TLName);
+            if (field == null || field.IsNull)
+                continue;
+
+            var propValue = ReadProperty(field, prop);
+            fieldValues[prop.TLName] = propValue;
+        }
+
+        // Build constructor arguments
+        var ctorArgs = new object?[ctorMappings.Length];
+        var ctorParamTLNames = new HashSet<string>(StringComparer.Ordinal);
+
+        for (int i = 0; i < ctorMappings.Length; i++)
+        {
+            var mapping = ctorMappings[i];
+            ctorParamTLNames.Add(mapping.TLName);
+
+            if (fieldValues.TryGetValue(mapping.TLName, out var val))
+            {
+                ctorArgs[i] = val;
+            }
+            else if (mapping.HasDefaultValue)
+            {
+                ctorArgs[i] = mapping.DefaultValue;
+            }
+            else
+            {
+                ctorArgs[i] = mapping.ParameterType.IsValueType
+                    ? Activator.CreateInstance(mapping.ParameterType)
+                    : null;
+            }
+        }
+
+        // Create instance via constructor
+        var result = ctor.Invoke(ctorArgs);
+
+        // Set remaining properties that were NOT constructor parameters
+        foreach (var prop in info.Properties)
+        {
+            if (ctorParamTLNames.Contains(prop.TLName)) continue;
+            if (prop.Setter == null) continue;
+
+            if (fieldValues.TryGetValue(prop.TLName, out var val) && val != null)
+            {
+                prop.Setter(result, val);
+            }
         }
 
         return result;

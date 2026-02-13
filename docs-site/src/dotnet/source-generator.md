@@ -4,7 +4,7 @@ The TeaLeaf source generator is a C# incremental source generator (`IIncremental
 
 ## How It Works
 
-1. **Roslyn detects** classes annotated with `[TeaLeaf]`
+1. **Roslyn detects** classes annotated with `[TeaLeaf(Generate = true)]`
 2. **ModelAnalyzer** examines the type's properties, attributes, and nested types
 3. **TLTextEmitter** generates serialization methods
 4. **DeserializerEmitter** generates deserialization methods
@@ -12,17 +12,19 @@ The TeaLeaf source generator is a C# incremental source generator (`IIncremental
 
 ## Requirements
 
+- Annotated with `[TeaLeaf(Generate = true)]` (from `TeaLeaf.Annotations`)
 - The class must be `partial`
-- Annotated with `[TeaLeaf]` (from `TeaLeaf.Annotations`)
 - Public properties with getters (and setters for deserialization)
 - .NET 8.0+ with incremental source generator support
+
+> **Note:** `[TeaLeaf]` without `Generate = true` is for reflection-based serialization only (`TeaLeafSerializer`) and does not require `partial`.
 
 ## Basic Example
 
 ```csharp
 using TeaLeaf.Annotations;
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class User
 {
     public int Id { get; set; }
@@ -34,7 +36,7 @@ public partial class User
 
 ## Generated Methods
 
-For each `[TeaLeaf]` class, the generator produces:
+For each `[TeaLeaf(Generate = true)]` class, the generator produces:
 
 ### `GetTeaLeafSchema()`
 
@@ -112,14 +114,14 @@ var loaded = User.FromTeaLeaf(val);
 Types referencing other `[TeaLeaf]` types are fully supported:
 
 ```csharp
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Address
 {
     public string Street { get; set; } = "";
     public string City { get; set; } = "";
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Person
 {
     public string Name { get; set; } = "";
@@ -137,7 +139,7 @@ Generated schema:
 ## Collections
 
 ```csharp
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Team
 {
     public string Name { get; set; } = "";
@@ -158,7 +160,7 @@ Enums are serialized as snake_case strings:
 ```csharp
 public enum Status { Active, Inactive, Suspended }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class User
 {
     public string Name { get; set; } = "";

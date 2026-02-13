@@ -15,24 +15,26 @@ The TeaLeaf source generator reports diagnostics (warnings and errors) through t
 
 ## TL001: Type Must Be Partial
 
-The source generator needs to add methods to your class. This requires the `partial` modifier.
+When `Generate = true` is set, the source generator needs to add methods to your class. This requires the `partial` modifier.
 
 ```csharp
 // ERROR: TL001
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public class User { }  // Missing 'partial'
 
 // FIXED
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class User { }
 ```
+
+> **Note:** `[TeaLeaf]` without `Generate = true` does **not** trigger TL001 and does not require `partial`. It is used for reflection-based serialization only.
 
 ## TL002: Unsupported Property Type
 
 A property type isn't directly mappable to a TeaLeaf type.
 
 ```csharp
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Config
 {
     public IntPtr NativeHandle { get; set; }  // WARNING: TL002
@@ -46,7 +48,7 @@ The property will be skipped. Supported types include all primitives, `string`, 
 The `[TLType]` attribute was given an unrecognized type name.
 
 ```csharp
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Event
 {
     [TLType("datetime")]   // ERROR: TL003 -- "datetime" is not a valid type
@@ -69,7 +71,7 @@ public class Address  // Missing [TeaLeaf]
     public string City { get; set; } = "";
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class User
 {
     public Address Home { get; set; } = new();  // WARNING: TL004
@@ -79,7 +81,7 @@ public partial class User
 Fix by adding `[TeaLeaf]` to the nested type:
 
 ```csharp
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Address
 {
     public string City { get; set; } = "";
@@ -91,7 +93,7 @@ public partial class Address
 A type references itself (directly or transitively), which may cause a stack overflow at runtime during serialization.
 
 ```csharp
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class TreeNode
 {
     public string Name { get; set; } = "";
@@ -107,7 +109,7 @@ Generic type parameters are not supported:
 
 ```csharp
 // ERROR: TL006
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Container<T>
 {
     public T Value { get; set; }

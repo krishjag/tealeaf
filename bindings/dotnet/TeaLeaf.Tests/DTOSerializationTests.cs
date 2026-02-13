@@ -7,7 +7,7 @@ namespace TeaLeaf.Tests;
 // Test DTO Models
 // ========================================================================
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class SimpleUser
 {
     public string Name { get; set; } = "";
@@ -15,7 +15,7 @@ public partial class SimpleUser
     public bool Active { get; set; }
 }
 
-[TeaLeaf(StructName = "custom_product")]
+[TeaLeaf(Generate = true, StructName = "custom_product")]
 public partial class Product
 {
     [TLRename("product_name")]
@@ -31,14 +31,14 @@ public partial class Product
 
 public enum UserRole { Admin, Editor, Viewer }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class UserWithEnum
 {
     public string Name { get; set; } = "";
     public UserRole Role { get; set; }
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class Address
 {
     public string Street { get; set; } = "";
@@ -46,14 +46,14 @@ public partial class Address
     public string Zip { get; set; } = "";
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class PersonWithAddress
 {
     public string Name { get; set; } = "";
     public Address HomeAddress { get; set; } = new();
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class WithCollections
 {
     public string Name { get; set; } = "";
@@ -61,7 +61,7 @@ public partial class WithCollections
     public List<int> Scores { get; set; } = new();
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 [TLKey("my_config")]
 public partial class AppConfig
 {
@@ -70,7 +70,7 @@ public partial class AppConfig
     public bool DebugMode { get; set; }
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class NullableFields
 {
     public string Name { get; set; } = "";
@@ -85,7 +85,7 @@ public partial class NullableFields
 // Test DTOs for Nested Struct Tests
 // ========================================================================
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 public partial class TestOrderItem
 {
     [TLRename("product_name")]
@@ -95,7 +95,7 @@ public partial class TestOrderItem
     public double UnitPrice { get; set; }
 }
 
-[TeaLeaf]
+[TeaLeaf(Generate = true)]
 [TLKey("test_order")]
 public partial class TestOrderWithItems
 {
