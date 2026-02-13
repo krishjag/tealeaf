@@ -73,6 +73,7 @@ public partial class User
         Assert.Contains("ToTeaLeafJson(", generatedSource);
         Assert.Contains("CompileToTeaLeaf(", generatedSource);
         Assert.Contains("GetTeaLeafSchema()", generatedSource);
+        Assert.Contains("public static void CollectTeaLeafSchemas", generatedSource);
 
         // Verify deserialization methods
         Assert.Contains("FromTeaLeaf(TeaLeaf.TLDocument", generatedSource);
@@ -1199,6 +1200,73 @@ public partial class Order
         // Should use "item" from StructName, not "order_item" from ToSnakeCase
         Assert.Contains("items: []item", gen);
         Assert.DoesNotContain("order_item", gen);
+    }
+
+    // =========================================================================
+    // Schema deduplication: diamond dependency
+    // =========================================================================
+
+    [Fact]
+    public void Generator_SharedNestedType_DeduplicatesSchemas()
+    {
+        var source = @"
+using TeaLeaf.Annotations;
+namespace TestModels;
+
+[TeaLeaf] public partial class SharedLeaf { public string Value { get; set; } = """"; public int Code { get; set; } }
+[TeaLeaf] public partial class BranchOne { public string Label { get; set; } = """"; public SharedLeaf Leaf { get; set; } = new(); }
+[TeaLeaf] public partial class BranchTwo { public string Tag { get; set; } = """"; public SharedLeaf Leaf { get; set; } = new(); }
+[TeaLeaf] public partial class DiamondRoot { public string Name { get; set; } = """"; public BranchOne Left { get; set; } = new(); public BranchTwo Right { get; set; } = new(); }
+";
+        var result = RunGenerator(source);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var allGen = string.Join("\n", result.GeneratedTrees
+            .Where(t => t.FilePath.Contains(".TeaLeaf.g.cs"))
+            .Select(t => t.GetText().ToString()));
+        var rootGen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("DiamondRoot.TeaLeaf.g.cs")).GetText().ToString();
+
+        Assert.Contains("CollectTeaLeafSchemas", rootGen);
+        Assert.Contains("BranchOne.CollectTeaLeafSchemas", rootGen);
+        Assert.Contains("BranchTwo.CollectTeaLeafSchemas", rootGen);
+        Assert.Contains("emitted.Add(\"diamond_root\")", rootGen);
+
+        // Each @struct appears exactly once — use Split to count occurrences
+        foreach (var name in new[] { "shared_leaf", "branch_one", "branch_two", "diamond_root" })
+            Assert.Equal(1, allGen.Split($"@struct {name} (").Length - 1);
+    }
+
+    [Fact]
+    public void Generator_DeepDiamondDependency_DeduplicatesSchemas()
+    {
+        var source = @"
+using TeaLeaf.Annotations;
+namespace TestModels;
+
+[TeaLeaf] public partial class DeepLeaf { public string Data { get; set; } = """"; }
+[TeaLeaf] public partial class MidLeft { public string Info { get; set; } = """"; public DeepLeaf Inner { get; set; } = new(); }
+[TeaLeaf] public partial class MidRight { public string Info { get; set; } = """"; public DeepLeaf Inner { get; set; } = new(); }
+[TeaLeaf] public partial class TopLevel { public string Name { get; set; } = """"; public MidLeft Left { get; set; } = new(); public MidRight Right { get; set; } = new(); }
+";
+        var result = RunGenerator(source);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var allGen = string.Join("\n", result.GeneratedTrees
+            .Where(t => t.FilePath.Contains(".TeaLeaf.g.cs"))
+            .Select(t => t.GetText().ToString()));
+
+        foreach (var name in new[] { "deep_leaf", "mid_left", "mid_right", "top_level" })
+            Assert.Equal(1, allGen.Split($"@struct {name} (").Length - 1);
+
+        var topGen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("TopLevel.TeaLeaf.g.cs")).GetText().ToString();
+        Assert.Contains("MidLeft.CollectTeaLeafSchemas", topGen);
+        Assert.Contains("MidRight.CollectTeaLeafSchemas", topGen);
+
+        var midLeftGen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("MidLeft.TeaLeaf.g.cs")).GetText().ToString();
+        Assert.Contains("DeepLeaf.CollectTeaLeafSchemas", midLeftGen);
     }
 
     [Fact]

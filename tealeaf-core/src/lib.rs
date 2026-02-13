@@ -102,6 +102,36 @@ impl TeaLeaf {
         self.data.get(key)
     }
 
+    /// Navigate a dot-path expression to reach a deeply nested value.
+    ///
+    /// The first segment is used as the top-level document key;
+    /// remaining segments are evaluated via [`Value::get_path`].
+    ///
+    /// Path syntax: `key.field[N].field`
+    pub fn get_path(&self, path: &str) -> Option<&Value> {
+        if path.is_empty() {
+            return None;
+        }
+        let bytes = path.as_bytes();
+        // Find end of first segment (document key)
+        let seg_end = bytes
+            .iter()
+            .position(|&b| b == b'.' || b == b'[')
+            .unwrap_or(bytes.len());
+        let first_key = &path[..seg_end];
+        let root = self.data.get(first_key)?;
+
+        if seg_end >= bytes.len() {
+            return Some(root);
+        }
+
+        let mut remaining = seg_end;
+        if bytes[remaining] == b'.' {
+            remaining += 1;
+        }
+        root.get_path(&path[remaining..])
+    }
+
     /// Get a schema by name
     pub fn schema(&self, name: &str) -> Option<&Schema> {
         self.schemas.get(name)

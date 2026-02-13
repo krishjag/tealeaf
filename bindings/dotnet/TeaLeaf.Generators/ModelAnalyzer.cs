@@ -13,6 +13,11 @@ internal sealed class TeaLeafModel
     public string DefaultKey { get; set; } = "";
     public List<TeaLeafProperty> Properties { get; set; } = new();
     public List<string> NestedTeaLeafTypeNames { get; set; } = new();
+    /// <summary>
+    /// Fully-qualified C# type names of nested [TeaLeaf] types from referenced assemblies
+    /// that lack CollectTeaLeafSchemas (compiled with older generator). These need fallback to GetTeaLeafSchema().
+    /// </summary>
+    public HashSet<string> CrossAssemblyFallbackTypes { get; set; } = new();
 }
 
 internal sealed class TeaLeafProperty
@@ -91,6 +96,7 @@ internal static class ModelAnalyzer
 
         var properties = new List<TeaLeafProperty>();
         var nestedTypes = new List<string>();
+        var crossAssemblyFallbacks = new HashSet<string>();
 
         foreach (var member in typeSymbol.GetMembers())
         {
@@ -98,7 +104,7 @@ internal static class ModelAnalyzer
             if (prop.IsStatic || prop.IsIndexer) continue;
             if (prop.DeclaredAccessibility != Accessibility.Public) continue;
 
-            var tlProp = AnalyzeProperty(prop, nestedTypes);
+            var tlProp = AnalyzeProperty(prop, nestedTypes, crossAssemblyFallbacks);
             if (tlProp != null)
                 properties.Add(tlProp);
         }
@@ -119,10 +125,11 @@ internal static class ModelAnalyzer
             DefaultKey = defaultKey,
             Properties = properties,
             NestedTeaLeafTypeNames = nestedTypes,
+            CrossAssemblyFallbackTypes = crossAssemblyFallbacks,
         };
     }
 
-    private static TeaLeafProperty? AnalyzeProperty(IPropertySymbol prop, List<string> nestedTypes)
+    private static TeaLeafProperty? AnalyzeProperty(IPropertySymbol prop, List<string> nestedTypes, HashSet<string> crossAssemblyFallbacks)
     {
         // Check for [TLSkip]
         bool isSkipped = prop.GetAttributes().Any(a => a.AttributeClass?.Name == "TLSkipAttribute");
@@ -156,6 +163,21 @@ internal static class ModelAnalyzer
 
         if (isNestedTL && nestedStructName != null && !nestedTypes.Contains(nestedStructName))
             nestedTypes.Add(nestedStructName);
+
+        // Detect nested types from referenced assemblies that lack CollectTeaLeafSchemas
+        if (isNestedTL)
+        {
+            var nestedSymbol = ResolveNestedTypeSymbol(prop.Type, kind);
+            if (nestedSymbol != null
+                && nestedSymbol.DeclaringSyntaxReferences.IsEmpty  // from referenced assembly
+                && !nestedSymbol.GetMembers("CollectTeaLeafSchemas")
+                    .OfType<IMethodSymbol>()
+                    .Any(m => m.IsStatic && m.Parameters.Length == 2
+                              && m.DeclaredAccessibility == Accessibility.Public))
+            {
+                crossAssemblyFallbacks.Add(nestedSymbol.ToDisplayString());
+            }
+        }
 
         return new TeaLeafProperty
         {
@@ -333,6 +355,33 @@ internal static class ModelAnalyzer
             SpecialType.System_String => "string",
             _ => HasTeaLeafAttribute(type) ? ResolveStructName(type) : "string"
         };
+    }
+
+    /// <summary>
+    /// Extracts the underlying INamedTypeSymbol for a nested [TeaLeaf] type,
+    /// handling nullable wrappers and list/array element types.
+    /// </summary>
+    private static INamedTypeSymbol? ResolveNestedTypeSymbol(ITypeSymbol type, PropertyKind kind)
+    {
+        // Unwrap Nullable<T>
+        if (type is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T } nullable)
+            type = nullable.TypeArguments[0];
+        // Strip nullable annotation
+        if (type.NullableAnnotation == NullableAnnotation.Annotated)
+            type = type.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+
+        if (kind == PropertyKind.NestedObject)
+            return type as INamedTypeSymbol;
+
+        if (kind == PropertyKind.List)
+        {
+            if (type is IArrayTypeSymbol arrayType)
+                return arrayType.ElementType as INamedTypeSymbol;
+            if (type is INamedTypeSymbol named && named.TypeArguments.Length > 0)
+                return named.TypeArguments[0] as INamedTypeSymbol;
+        }
+
+        return null;
     }
 
     internal static string ToSnakeCase(string name)

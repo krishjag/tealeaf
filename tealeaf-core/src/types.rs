@@ -18,7 +18,7 @@ pub const VERSION_MAJOR: u16 = 2;
 /// Binary format version (minor) - for compatibility checks
 pub const VERSION_MINOR: u16 = 0;
 /// Library version string (beta/RFC stage)
-pub const VERSION: &str = "2.0.0-beta.11";
+pub const VERSION: &str = "2.0.0-beta.12";
 pub const HEADER_SIZE: usize = 64;
 /// Maximum length of a string in the string table (u32 encoding limit)
 pub const MAX_STRING_LENGTH: usize = u32::MAX as usize;
@@ -459,6 +459,68 @@ impl Value {
 
     pub fn index(&self, idx: usize) -> Option<&Value> {
         self.as_array()?.get(idx)
+    }
+
+    /// Navigate a dot-path expression to reach a deeply nested value.
+    ///
+    /// Path syntax: `field.field[N].field` where field names are separated
+    /// by dots and `[N]` denotes array indexing.
+    ///
+    /// # Examples
+    /// ```
+    /// # use tealeaf::Value;
+    /// # use indexmap::IndexMap;
+    /// let mut price = IndexMap::new();
+    /// price.insert("base_price".into(), Value::Float(349.99));
+    /// let mut product = IndexMap::new();
+    /// product.insert("price".into(), Value::Object(price));
+    /// let items = Value::Array(vec![Value::Object(product)]);
+    /// let mut order = IndexMap::new();
+    /// order.insert("items".into(), items);
+    /// let root = Value::Object(order);
+    ///
+    /// assert_eq!(
+    ///     root.get_path("items[0].price.base_price").and_then(|v| v.as_float()),
+    ///     Some(349.99)
+    /// );
+    /// assert!(root.get_path("items[99].price").is_none());
+    /// ```
+    pub fn get_path(&self, path: &str) -> Option<&Value> {
+        if path.is_empty() {
+            return None;
+        }
+
+        let mut current = self;
+        let mut pos = 0;
+        let bytes = path.as_bytes();
+
+        while pos < bytes.len() {
+            if bytes[pos] == b'[' {
+                // Array index: [N]
+                let end = bytes[pos + 1..].iter().position(|&b| b == b']').map(|i| pos + 1 + i)?;
+                let idx_str = &path[pos + 1..end];
+                let idx: usize = idx_str.parse().ok()?;
+                current = current.index(idx)?;
+                pos = end + 1;
+                if pos < bytes.len() && bytes[pos] == b'.' {
+                    pos += 1;
+                }
+            } else {
+                // Field name: up to next '.' or '['
+                let seg_end = bytes[pos..]
+                    .iter()
+                    .position(|&b| b == b'.' || b == b'[')
+                    .map_or(bytes.len(), |i| pos + i);
+                let field = &path[pos..seg_end];
+                current = current.get(field)?;
+                pos = seg_end;
+                if pos < bytes.len() && bytes[pos] == b'.' {
+                    pos += 1;
+                }
+            }
+        }
+
+        Some(current)
     }
 
     pub fn tl_type(&self) -> TLType {

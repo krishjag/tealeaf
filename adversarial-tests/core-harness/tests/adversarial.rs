@@ -901,3 +901,174 @@ fn mmap_string_dedup() {
         assert_eq!(m.get("key_99").unwrap().as_str(), Some("shared_value"));
     } else { panic!("Expected object"); }
 }
+
+// =========================================================================
+// get_path edge cases
+// =========================================================================
+
+/// Helper: parse a document and return it for get_path testing
+fn make_nested_doc() -> TeaLeaf {
+    TeaLeaf::parse(r#"
+name: "Alice"
+age: 30
+items: [{name: "widget", price: 9.99}, {name: "gadget", price: 19.99}]
+nested: {a: {b: {c: 42}}}
+nums: [10, 20, 30]
+scalar: 123
+"#).expect("parse nested doc")
+}
+
+#[test]
+fn get_path_empty_string() {
+    let doc = make_nested_doc();
+    let val = doc.get("name").unwrap();
+    assert!(val.get_path("").is_none());
+    assert!(doc.get_path("").is_none());
+}
+
+#[test]
+fn get_path_single_field() {
+    let doc = make_nested_doc();
+    let nested = doc.get("nested").unwrap();
+    assert_eq!(nested.get_path("a").unwrap().get("b").unwrap().get("c").unwrap().as_int(), Some(42));
+}
+
+#[test]
+fn get_path_nested_field() {
+    let doc = make_nested_doc();
+    let nested = doc.get("nested").unwrap();
+    let result = nested.get_path("a.b.c");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().as_int(), Some(42));
+}
+
+#[test]
+fn get_path_array_index() {
+    let doc = make_nested_doc();
+    let nums = doc.get("nums").unwrap();
+    assert_eq!(nums.get_path("[0]").unwrap().as_int(), Some(10));
+    assert_eq!(nums.get_path("[2]").unwrap().as_int(), Some(30));
+}
+
+#[test]
+fn get_path_mixed() {
+    let doc = make_nested_doc();
+    let items = doc.get("items").unwrap();
+    let name = items.get_path("[0].name");
+    assert!(name.is_some());
+    assert_eq!(name.unwrap().as_str(), Some("widget"));
+    let price = items.get_path("[1].price");
+    assert!(price.is_some());
+}
+
+#[test]
+fn get_path_missing_field() {
+    let doc = make_nested_doc();
+    let nested = doc.get("nested").unwrap();
+    assert!(nested.get_path("a.b.nonexistent").is_none());
+    assert!(nested.get_path("x.y.z").is_none());
+}
+
+#[test]
+fn get_path_missing_index() {
+    let doc = make_nested_doc();
+    let nums = doc.get("nums").unwrap();
+    assert!(nums.get_path("[999]").is_none());
+}
+
+#[test]
+fn get_path_unclosed_bracket() {
+    let doc = make_nested_doc();
+    let items = doc.get("items").unwrap();
+    // Unclosed bracket — must return None, not panic
+    assert!(items.get_path("[0").is_none());
+}
+
+#[test]
+fn get_path_empty_bracket() {
+    let doc = make_nested_doc();
+    let nums = doc.get("nums").unwrap();
+    // Empty brackets — non-numeric, must return None
+    assert!(nums.get_path("[]").is_none());
+}
+
+#[test]
+fn get_path_non_numeric_index() {
+    let doc = make_nested_doc();
+    let nums = doc.get("nums").unwrap();
+    assert!(nums.get_path("[abc]").is_none());
+    assert!(nums.get_path("[one]").is_none());
+}
+
+#[test]
+fn get_path_negative_index() {
+    let doc = make_nested_doc();
+    let nums = doc.get("nums").unwrap();
+    // Negative index — usize parse fails, must return None
+    assert!(nums.get_path("[-1]").is_none());
+}
+
+#[test]
+fn get_path_double_dot() {
+    let doc = make_nested_doc();
+    let nested = doc.get("nested").unwrap();
+    // Double dot creates empty field name segment — should fail gracefully
+    assert!(nested.get_path("a..b").is_none());
+}
+
+#[test]
+fn get_path_leading_dot() {
+    let doc = make_nested_doc();
+    let nested = doc.get("nested").unwrap();
+    // Leading dot creates empty first segment
+    assert!(nested.get_path(".a").is_none());
+}
+
+#[test]
+fn get_path_trailing_dot() {
+    let doc = make_nested_doc();
+    let nested = doc.get("nested").unwrap();
+    // Trailing dot is consumed as separator with no following segment —
+    // parser exits the loop at the resolved value (same as "a")
+    let via_dot = nested.get_path("a.");
+    let via_plain = nested.get_path("a");
+    assert!(via_dot.is_some());
+    assert_eq!(via_dot, via_plain);
+}
+
+#[test]
+fn get_path_only_dots() {
+    let doc = make_nested_doc();
+    let nested = doc.get("nested").unwrap();
+    assert!(nested.get_path("...").is_none());
+    assert!(nested.get_path(".").is_none());
+}
+
+#[test]
+fn get_path_huge_index() {
+    let doc = make_nested_doc();
+    let nums = doc.get("nums").unwrap();
+    // Index that overflows usize — parse fails, must return None
+    assert!(nums.get_path("[999999999999999999999]").is_none());
+}
+
+#[test]
+fn get_path_on_scalar() {
+    let doc = make_nested_doc();
+    let scalar = doc.get("scalar").unwrap();
+    // Scalar values have no fields or indices
+    assert!(scalar.get_path("anything").is_none());
+    assert!(scalar.get_path("[0]").is_none());
+    assert!(scalar.get_path("a.b.c").is_none());
+}
+
+#[test]
+fn doc_get_path_traversal() {
+    let doc = make_nested_doc();
+    // Document-level get_path: first segment is the document key
+    assert_eq!(doc.get_path("age").unwrap().as_int(), Some(30));
+    assert_eq!(doc.get_path("nested.a.b.c").unwrap().as_int(), Some(42));
+    assert_eq!(doc.get_path("items[0].name").unwrap().as_str(), Some("widget"));
+    assert_eq!(doc.get_path("nums[1]").unwrap().as_int(), Some(20));
+    assert!(doc.get_path("nonexistent.field").is_none());
+}

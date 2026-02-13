@@ -167,7 +167,7 @@ fn unknown_command_prints_error_and_exits_1() {
     let output = run(&["frobnicate"]);
     assert_failure(&output);
     let err = stderr_str(&output);
-    assert!(err.contains("Unknown command"), "Expected 'Unknown command' on stderr, got: {}", err);
+    assert!(err.contains("frobnicate"), "Expected unrecognized subcommand error on stderr, got: {}", err);
 }
 
 #[test]
@@ -176,9 +176,9 @@ fn each_valid_command_recognized_with_no_args() {
     for cmd in &["compile", "decompile", "info", "validate", "to-json", "from-json", "tlbx-to-json", "json-to-tlbx"] {
         let output = run(&[cmd]);
         assert_failure(&output);
-        // Should NOT say "Unknown command"
+        // Should NOT say "unrecognized subcommand"
         let err = stderr_str(&output);
-        assert!(!err.contains("Unknown command"),
+        assert!(!err.contains("unrecognized subcommand"),
             "Command '{}' was not recognized: {}", cmd, err);
     }
 }
@@ -779,7 +779,7 @@ fn error_messages_go_to_stderr() {
     // Unknown command error -> stderr
     let output = run(&["frobnicate"]);
     let err = stderr_str(&output);
-    assert!(err.contains("Unknown command"), "Unknown command error should be on stderr");
+    assert!(err.contains("frobnicate"), "Unrecognized subcommand error should be on stderr");
 
     // Nonexistent file with compile -> Error goes to stderr via main()
     let dir = tempfile::tempdir().unwrap();

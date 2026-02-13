@@ -31,6 +31,8 @@ flate2.workspace = true
 serde_json = { version = "1.0", features = ["preserve_order", "arbitrary_precision"] }
 indexmap.workspace = true
 tealeaf-derive = { workspace = true, optional = true }
+clap = { version = "4", features = ["derive", "color"] }
+clap_complete = "4"
 
 [dev-dependencies]
 tealeaf-derive = { workspace = true }

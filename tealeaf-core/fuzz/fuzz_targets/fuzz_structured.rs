@@ -454,4 +454,22 @@ fuzz_target!(|data: &[u8]| {
         let _ = tealeaf::TeaLeaf::from_json(&json);
     }
     let _ = tl.to_json_compact();
+
+    // ---- Test 4: get_path no-panic check ----
+    // Generate random path strings from fuzzer input and verify get_path never panics
+    for (_key, value) in &tl.data {
+        // Try arbitrary path derived from fuzzer data
+        if let Ok(path_str) = std::str::from_utf8(data) {
+            let _ = value.get_path(path_str);
+        }
+        // Also try well-formed paths that exercise different branches
+        let _ = value.get_path("[0]");
+        let _ = value.get_path("[0].[0]");
+        let _ = value.get_path("[999999]");
+        let _ = value.get_path("");
+    }
+    // Test document-level get_path with arbitrary path
+    if let Ok(path_str) = std::str::from_utf8(data) {
+        let _ = tl.get_path(path_str);
+    }
 });

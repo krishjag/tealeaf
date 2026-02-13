@@ -73,11 +73,6 @@ internal static class TLTextEmitter
 
     private static void EmitGetSchema(StringBuilder sb, TeaLeafModel model)
     {
-        sb.AppendLine("    /// <summary>Generates a TeaLeaf @struct definition for this type and all nested types.</summary>");
-        sb.AppendLine("    /// <returns>A string containing @struct declarations for this type and its dependencies.</returns>");
-        sb.AppendLine("    public static string GetTeaLeafSchema()");
-        sb.AppendLine("    {");
-
         var fields = new List<string>();
         foreach (var prop in model.Properties)
         {
@@ -90,7 +85,7 @@ internal static class TLTextEmitter
 
         string fieldList = string.Join(", ", fields);
 
-        // Collect unique nested C# type names that have [TeaLeaf] and thus GetTeaLeafSchema()
+        // Collect unique nested C# type names that have [TeaLeaf] and thus CollectTeaLeafSchemas()
         var nestedCSharpTypes = new HashSet<string>();
         foreach (var prop in model.Properties)
         {
@@ -105,22 +100,46 @@ internal static class TLTextEmitter
                 nestedCSharpTypes.Add(nestedTypeName);
         }
 
-        if (nestedCSharpTypes.Count == 0)
+        // Public backward-compatible method: delegates to CollectTeaLeafSchemas()
+        sb.AppendLine("    /// <summary>Generates a TeaLeaf @struct definition for this type and all nested types.</summary>");
+        sb.AppendLine("    /// <returns>A string containing @struct declarations for this type and its dependencies.</returns>");
+        sb.AppendLine("    public static string GetTeaLeafSchema()");
+        sb.AppendLine("    {");
+        sb.AppendLine("        var emitted = new System.Collections.Generic.HashSet<string>();");
+        sb.AppendLine("        var sb = new System.Text.StringBuilder(256);");
+        sb.AppendLine("        CollectTeaLeafSchemas(sb, emitted);");
+        sb.AppendLine("        return sb.ToString();");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // Public dedup-aware recursive collector (public for cross-assembly access)
+        sb.AppendLine("    /// <summary>Collects @struct definitions for this type and nested types, deduplicating by name.</summary>");
+        sb.AppendLine("    public static void CollectTeaLeafSchemas(System.Text.StringBuilder sb, System.Collections.Generic.HashSet<string> emitted)");
+        sb.AppendLine("    {");
+
+        // Recursively collect from nested types first (dependency order)
+        foreach (var nestedType in nestedCSharpTypes)
         {
-            // No nested types — simple single-line return
-            sb.AppendLine($"        return \"@struct {model.StructName} ({fieldList})\";");
-        }
-        else
-        {
-            // Has nested types — emit calls to their GetTeaLeafSchema() methods
-            sb.AppendLine("        var sb = new System.Text.StringBuilder(256);");
-            foreach (var nestedType in nestedCSharpTypes)
+            if (model.CrossAssemblyFallbackTypes.Contains(nestedType))
             {
-                sb.AppendLine($"        sb.AppendLine(global::{nestedType}.GetTeaLeafSchema());");
+                // Fallback for referenced assemblies compiled with older generator (no CollectTeaLeafSchemas)
+                sb.AppendLine("        {");
+                sb.AppendLine($"            var __schema = global::{nestedType}.GetTeaLeafSchema();");
+                sb.AppendLine("            if (__schema.Length > 0) { if (sb.Length > 0) sb.AppendLine(); sb.Append(__schema); }");
+                sb.AppendLine("        }");
             }
-            sb.AppendLine($"        sb.Append(\"@struct {model.StructName} ({fieldList})\");");
-            sb.AppendLine("        return sb.ToString();");
+            else
+            {
+                sb.AppendLine($"        global::{nestedType}.CollectTeaLeafSchemas(sb, emitted);");
+            }
         }
+
+        // Emit own schema if not already emitted
+        sb.AppendLine($"        if (emitted.Add(\"{model.StructName}\"))");
+        sb.AppendLine("        {");
+        sb.AppendLine("            if (sb.Length > 0) sb.AppendLine();");
+        sb.AppendLine($"            sb.Append(\"@struct {model.StructName} ({fieldList})\");");
+        sb.AppendLine("        }");
 
         sb.AppendLine("    }");
     }

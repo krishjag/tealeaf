@@ -32,6 +32,7 @@
 - [validate](./cli/validate.md)
 - [to-json / from-json](./cli/json-conversion.md)
 - [tlbx-to-json / json-to-tlbx](./cli/binary-json-conversion.md)
+- [completions](./cli/completions.md)
 
 ---
 

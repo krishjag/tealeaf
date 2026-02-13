@@ -738,6 +738,122 @@ public class TLDocumentTests
         Assert.Equal("a.b.c", path?.AsString());
     }
 
+    // ==========================================================================
+    // Schema Access Tests (Action #1)
+    // ==========================================================================
+
+    [Fact]
+    public void Schemas_ParsedDocumentWithSchemas_ReturnsSchemas()
+    {
+        using var doc = TLDocument.Parse(@"
+            @struct user (name: string, age: int, active: bool)
+
+            users: @table user [
+                (alice, 30, true)
+                (bob, 25, false)
+            ]
+        ");
+
+        Assert.Equal(1, doc.SchemaCount);
+        Assert.Single(doc.Schemas);
+
+        var schema = doc.Schemas[0];
+        Assert.Equal("user", schema.Name);
+        Assert.Equal(3, schema.Fields.Count);
+        Assert.Equal("name", schema.Fields[0].Name);
+        Assert.Equal("string", schema.Fields[0].Type);
+        Assert.Equal("age", schema.Fields[1].Name);
+        Assert.Equal("int", schema.Fields[1].Type);
+        Assert.Equal("active", schema.Fields[2].Name);
+        Assert.Equal("bool", schema.Fields[2].Type);
+    }
+
+    [Fact]
+    public void GetSchema_ByName_ReturnsCorrectSchema()
+    {
+        using var doc = TLDocument.Parse(@"
+            @struct item (sku: string, qty: int, price: float)
+            @struct order (id: string, total: float)
+
+            items: @table item [
+                (A, 2, 9.99)
+            ]
+            order: { id: ORD-001, total: 9.99 }
+        ");
+
+        Assert.Equal(2, doc.SchemaCount);
+
+        var item = doc.GetSchema("item");
+        Assert.NotNull(item);
+        Assert.Equal("item", item!.Name);
+        Assert.Equal(3, item.Fields.Count);
+        Assert.Equal("sku", item.Fields[0].Name);
+
+        var order = doc.GetSchema("order");
+        Assert.NotNull(order);
+        Assert.Equal("order", order!.Name);
+        Assert.Equal(2, order.Fields.Count);
+
+        var notFound = doc.GetSchema("nonexistent");
+        Assert.Null(notFound);
+    }
+
+    [Fact]
+    public void SchemaCount_NoSchemas_ReturnsZero()
+    {
+        using var doc = TLDocument.Parse("name: alice\nage: 30");
+
+        Assert.Equal(0, doc.SchemaCount);
+        Assert.Empty(doc.Schemas);
+    }
+
+    [Fact]
+    public void Schemas_FromJson_ReturnsInferredSchemas()
+    {
+        const string json = @"{""users"": [{""name"": ""alice"", ""age"": 30}, {""name"": ""bob"", ""age"": 25}]}";
+        using var doc = TLDocument.FromJson(json);
+
+        // FromJson infers schemas for uniform object arrays
+        Assert.True(doc.SchemaCount > 0, "Expected at least one inferred schema");
+        Assert.True(doc.Schemas.Count > 0);
+
+        // The inferred schema should have name and age fields
+        var schema = doc.Schemas[0];
+        Assert.True(schema.HasField("name"));
+        Assert.True(schema.HasField("age"));
+    }
+
+    [Fact]
+    public void Schemas_NullableAndArrayFields_ReportCorrectly()
+    {
+        using var doc = TLDocument.Parse(@"
+            @struct record (name: string, email: string?, tags: []string)
+
+            data: @table record [
+                (alice, alice_email, [dev, ops])
+            ]
+        ");
+
+        Assert.Equal(1, doc.SchemaCount);
+        var schema = doc.GetSchema("record");
+        Assert.NotNull(schema);
+
+        var nameField = schema!.GetField("name");
+        Assert.NotNull(nameField);
+        Assert.False(nameField!.IsNullable);
+        Assert.False(nameField.IsArray);
+
+        var emailField = schema.GetField("email");
+        Assert.NotNull(emailField);
+        Assert.True(emailField!.IsNullable);
+        Assert.False(emailField.IsArray);
+
+        var tagsField = schema.GetField("tags");
+        Assert.NotNull(tagsField);
+        Assert.False(tagsField!.IsNullable);
+        Assert.True(tagsField.IsArray);
+    }
+
     [Fact]
     public void FromJson_MixedArrayTypes_StaysAsAny()
     {

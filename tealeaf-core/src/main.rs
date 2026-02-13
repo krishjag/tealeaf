@@ -1,33 +1,138 @@
 //! TeaLeaf CLI
 
-use std::env;
+use std::path::{Path, PathBuf};
 use std::process;
 
-use tealeaf::{TeaLeaf, Reader, FormatOptions};
+use clap::{CommandFactory, Parser, Subcommand};
+use clap_complete::{generate, Shell};
+use tealeaf::{FormatOptions, Reader, TeaLeaf};
+
+#[derive(Parser)]
+#[command(
+    name = "tealeaf",
+    version,
+    about = "Schema-aware data format with human-readable text and compact binary",
+    arg_required_else_help = true
+)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Compile text format (.tl) to binary (.tlbx)
+    Compile {
+        /// Input .tl file
+        input: PathBuf,
+        /// Output .tlbx file
+        #[arg(short, long)]
+        output: PathBuf,
+    },
+
+    /// Decompile binary (.tlbx) to text format (.tl)
+    Decompile {
+        /// Input .tlbx file
+        input: PathBuf,
+        /// Output .tl file
+        #[arg(short, long)]
+        output: PathBuf,
+        /// Omit insignificant whitespace for token-efficient output
+        #[arg(long)]
+        compact: bool,
+        /// Write whole-number floats as integers (e.g. 42.0 becomes 42)
+        #[arg(long)]
+        compact_floats: bool,
+    },
+
+    /// Show file info (auto-detects text/binary format)
+    Info {
+        /// Input .tl or .tlbx file
+        input: PathBuf,
+    },
+
+    /// Validate a text format (.tl) file
+    Validate {
+        /// Input .tl file
+        input: PathBuf,
+    },
+
+    /// Convert TeaLeaf text (.tl) to JSON
+    ToJson {
+        /// Input .tl file
+        input: PathBuf,
+        /// Output .json file (prints to stdout if omitted)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
+
+    /// Convert JSON to TeaLeaf text (.tl) with schema inference
+    FromJson {
+        /// Input .json file
+        input: PathBuf,
+        /// Output .tl file
+        #[arg(short, long)]
+        output: PathBuf,
+        /// Omit insignificant whitespace for token-efficient output
+        #[arg(long)]
+        compact: bool,
+        /// Write whole-number floats as integers (e.g. 42.0 becomes 42)
+        #[arg(long)]
+        compact_floats: bool,
+    },
+
+    /// Convert TeaLeaf binary (.tlbx) to JSON
+    TlbxToJson {
+        /// Input .tlbx file
+        input: PathBuf,
+        /// Output .json file (prints to stdout if omitted)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
+
+    /// Convert JSON to TeaLeaf binary (.tlbx)
+    JsonToTlbx {
+        /// Input .json file
+        input: PathBuf,
+        /// Output .tlbx file
+        #[arg(short, long)]
+        output: PathBuf,
+    },
+
+    /// Generate shell completions
+    Completions {
+        /// Shell to generate completions for
+        shell: Shell,
+    },
+}
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    
-    if args.len() < 2 {
-        print_usage();
-        process::exit(1);
-    }
+    let cli = match Cli::try_parse() {
+        Ok(cli) => cli,
+        Err(e) => {
+            let _ = e.print();
+            match e.kind() {
+                clap::error::ErrorKind::DisplayHelp
+                | clap::error::ErrorKind::DisplayVersion => process::exit(0),
+                _ => process::exit(1),
+            }
+        }
+    };
 
-    let result = match args[1].as_str() {
-        "compile" => cmd_compile(&args[2..]),
-        "decompile" => cmd_decompile(&args[2..]),
-        "info" => cmd_info(&args[2..]),
-        "validate" => cmd_validate(&args[2..]),
-        "to-json" => cmd_to_json(&args[2..]),
-        "from-json" => cmd_from_json(&args[2..]),
-        "tlbx-to-json" => cmd_tlbx_to_json(&args[2..]),
-        "json-to-tlbx" => cmd_json_to_tlbx(&args[2..]),
-        "--version" | "-V" => { println!("tealeaf {}", env!("CARGO_PKG_VERSION")); Ok(()) }
-        "help" | "--help" | "-h" => { print_usage(); Ok(()) }
-        _ => {
-            eprintln!("Unknown command: {}", args[1]);
-            print_usage();
-            process::exit(1);
+    let result = match cli.command {
+        Commands::Compile { ref input, ref output } => cmd_compile(input, output),
+        Commands::Decompile { ref input, ref output, compact, compact_floats } =>
+            cmd_decompile(input, output, compact, compact_floats),
+        Commands::Info { ref input } => cmd_info(input),
+        Commands::Validate { ref input } => cmd_validate(input),
+        Commands::ToJson { ref input, ref output } => cmd_to_json(input, output.as_deref()),
+        Commands::FromJson { ref input, ref output, compact, compact_floats } =>
+            cmd_from_json(input, output, compact, compact_floats),
+        Commands::TlbxToJson { ref input, ref output } => cmd_tlbx_to_json(input, output.as_deref()),
+        Commands::JsonToTlbx { ref input, ref output } => cmd_json_to_tlbx(input, output),
+        Commands::Completions { shell } => {
+            generate(shell, &mut Cli::command(), "tealeaf", &mut std::io::stdout());
+            Ok(())
         }
     };
 
@@ -37,67 +142,26 @@ fn main() {
     }
 }
 
-fn print_usage() {
-    println!("TeaLeaf v{} - Schema-aware data format", env!("CARGO_PKG_VERSION"));
-    println!();
-    println!("Usage: tealeaf <command> [options]");
-    println!();
-    println!("Commands:");
-    println!("  compile <input.tl> -o <output.tlbx>              Compile text to binary");
-    println!("  decompile <input.tlbx> -o <output.tl> [--compact] [--compact-floats]");
-    println!("                                                     Decompile binary to text");
-    println!("  info <file.tl|file.tlbx>                         Show file info (auto-detects format)");
-    println!("  validate <file.tl>                               Validate text format");
-    println!();
-    println!("JSON Conversion:");
-    println!("  to-json <input.tl> [-o <output.json>]            Convert TeaLeaf text to JSON");
-    println!("  from-json <input.json> -o <output.tl> [--compact] [--compact-floats]");
-    println!("                                                     Convert JSON to TeaLeaf text");
-    println!("  tlbx-to-json <input.tlbx> [-o <out.json>] Convert TeaLeaf binary to JSON");
-    println!("  json-to-tlbx <input.json> -o <out.tlbx>   Convert JSON to TeaLeaf binary");
-    println!();
-    println!("  help                                      Show this help");
-}
-
-fn cmd_compile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
-    if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: tealeaf compile <input.tl> -o <output.tlbx>");
-        process::exit(1);
-    }
-
-    let input = &args[0];
-    let output = &args[2];
-
-    println!("Compiling {} -> {}", input, output);
+fn cmd_compile(input: &Path, output: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    println!("Compiling {} -> {}", input.display(), output.display());
 
     let doc = TeaLeaf::load(input)?;
     doc.compile(output, true)?;
-    
+
     let in_size = std::fs::metadata(input)?.len();
     let out_size = std::fs::metadata(output)?.len();
     let ratio = out_size as f64 / in_size as f64 * 100.0;
-    
+
     println!("Done: {} bytes -> {} bytes ({:.1}%)", in_size, out_size, ratio);
     Ok(())
 }
 
-fn cmd_decompile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
-    if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: tealeaf decompile <input.tlbx> -o <output.tl> [--compact]");
-        process::exit(1);
-    }
-
-    let input = &args[0];
-    let output = &args[2];
-    let remaining = &args[3..];
-    let compact = remaining.iter().any(|a| a == "--compact");
-    let compact_floats = remaining.iter().any(|a| a == "--compact-floats");
-
+fn cmd_decompile(input: &Path, output: &Path, compact: bool, compact_floats: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut flags = Vec::new();
     if compact { flags.push("compact"); }
     if compact_floats { flags.push("compact-floats"); }
     let flag_str = if flags.is_empty() { String::new() } else { format!(" ({})", flags.join(", ")) };
-    println!("Decompiling {} -> {}{}", input, output, flag_str);
+    println!("Decompiling {} -> {}{}", input.display(), output.display(), flag_str);
 
     let reader = Reader::open(input)?;
     let doc = TeaLeaf::from_reader(&reader)?;
@@ -110,13 +174,7 @@ fn cmd_decompile(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn cmd_info(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
-    if args.is_empty() {
-        eprintln!("Usage: tealeaf info <file.tl|file.tlbx>");
-        process::exit(1);
-    }
-
-    let input = &args[0];
+fn cmd_info(input: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let file_size = std::fs::metadata(input)?.len();
 
     // Auto-detect format: try reading first 4 bytes for magic
@@ -131,7 +189,7 @@ fn cmd_info(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    println!("File: {}", input);
+    println!("File: {}", input.display());
     println!("Size: {} bytes", file_size);
 
     if is_binary {
@@ -187,22 +245,15 @@ fn cmd_info(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn cmd_validate(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
-    if args.is_empty() {
-        eprintln!("Usage: tealeaf validate <file.tl>");
-        process::exit(1);
-    }
-
-    let input = &args[0];
-
+fn cmd_validate(input: &Path) -> Result<(), Box<dyn std::error::Error>> {
     match TeaLeaf::load(input) {
         Ok(doc) => {
-            println!("✓ Valid");
+            println!("\u{2713} Valid");
             println!("  Schemas: {}", doc.schemas.len());
             println!("  Keys: {}", doc.data.len());
         }
         Err(e) => {
-            println!("✗ Invalid: {}", e);
+            println!("\u{2717} Invalid: {}", e);
             process::exit(1);
         }
     }
@@ -210,26 +261,14 @@ fn cmd_validate(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn cmd_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
-    if args.is_empty() {
-        eprintln!("Usage: tealeaf to-json <input.tl> [-o <output.json>]");
-        process::exit(1);
-    }
-
-    let input = &args[0];
-    let output = if args.len() >= 3 && args[1] == "-o" {
-        Some(&args[2])
-    } else {
-        None
-    };
-
+fn cmd_to_json(input: &Path, output: Option<&Path>) -> Result<(), Box<dyn std::error::Error>> {
     let doc = TeaLeaf::load(input)?;
     let json = doc.to_json()?;
 
     match output {
         Some(path) => {
             std::fs::write(path, &json)?;
-            println!("Converted {} -> {}", input, path);
+            println!("Converted {} -> {}", input.display(), path.display());
         }
         None => {
             println!("{}", json);
@@ -239,23 +278,12 @@ fn cmd_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn cmd_from_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
-    if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: tealeaf from-json <input.json> -o <output.tl> [--compact]");
-        process::exit(1);
-    }
-
-    let input = &args[0];
-    let output = &args[2];
-    let remaining = &args[3..];
-    let compact = remaining.iter().any(|a| a == "--compact");
-    let compact_floats = remaining.iter().any(|a| a == "--compact-floats");
-
+fn cmd_from_json(input: &Path, output: &Path, compact: bool, compact_floats: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut flags = Vec::new();
     if compact { flags.push("compact"); }
     if compact_floats { flags.push("compact-floats"); }
     let flag_str = if flags.is_empty() { String::new() } else { format!(" ({})", flags.join(", ")) };
-    println!("Converting {} -> {}{}", input, output, flag_str);
+    println!("Converting {} -> {}{}", input.display(), output.display(), flag_str);
 
     let json_content = std::fs::read_to_string(input)?;
 
@@ -276,19 +304,7 @@ fn cmd_from_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn cmd_tlbx_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
-    if args.is_empty() {
-        eprintln!("Usage: tealeaf tlbx-to-json <input.tlbx> [-o <output.json>]");
-        process::exit(1);
-    }
-
-    let input = &args[0];
-    let output = if args.len() >= 3 && args[1] == "-o" {
-        Some(&args[2])
-    } else {
-        None
-    };
-
+fn cmd_tlbx_to_json(input: &Path, output: Option<&Path>) -> Result<(), Box<dyn std::error::Error>> {
     let reader = Reader::open(input)?;
     let doc = TeaLeaf::from_reader(&reader)?;
     let json = doc.to_json()?;
@@ -296,7 +312,7 @@ fn cmd_tlbx_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     match output {
         Some(path) => {
             std::fs::write(path, &json)?;
-            println!("Converted {} -> {}", input, path);
+            println!("Converted {} -> {}", input.display(), path.display());
         }
         None => {
             println!("{}", json);
@@ -306,16 +322,8 @@ fn cmd_tlbx_to_json(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn cmd_json_to_tlbx(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
-    if args.len() < 3 || args[1] != "-o" {
-        eprintln!("Usage: tealeaf json-to-tlbx <input.json> -o <output.tlbx>");
-        process::exit(1);
-    }
-
-    let input = &args[0];
-    let output = &args[2];
-
-    println!("Converting {} -> {}", input, output);
+fn cmd_json_to_tlbx(input: &Path, output: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    println!("Converting {} -> {}", input.display(), output.display());
 
     let json_content = std::fs::read_to_string(input)?;
     let doc = TeaLeaf::from_json(&json_content)?;
@@ -328,4 +336,3 @@ fn cmd_json_to_tlbx(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     println!("Done: {} bytes -> {} bytes ({:.1}%)", in_size, out_size, ratio);
     Ok(())
 }
-

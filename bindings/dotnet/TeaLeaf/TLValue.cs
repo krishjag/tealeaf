@@ -234,7 +234,14 @@ public sealed class TLValue : IDisposable
             var key = GetMapKey(i);
             var value = GetMapValue(i);
             if (key != null && value != null)
+            {
                 yield return (key, value);
+            }
+            else
+            {
+                key?.Dispose();
+                value?.Dispose();
+            }
         }
     }
 
@@ -314,6 +321,114 @@ public sealed class TLValue : IDisposable
     public string[] ObjectKeys => GetObjectKeys();
 
     /// <summary>
+    /// Gets the number of fields in this object value. Returns 0 if not an object.
+    /// </summary>
+    public int ObjectFieldCount
+    {
+        get
+        {
+            ThrowIfDisposed();
+            if (Type != TLType.Object) return 0;
+            return (int)NativeMethods.tl_value_object_len(_handle);
+        }
+    }
+
+    /// <summary>
+    /// Gets the key at the specified index from this object value. Returns null if not an object or out of bounds.
+    /// </summary>
+    /// <param name="index">The zero-based index of the field.</param>
+    /// <returns>The field key as a string, or null if not an object or index is out of bounds.</returns>
+    public string? GetObjectKeyAt(int index)
+    {
+        ThrowIfDisposed();
+        if (Type != TLType.Object || index < 0) return null;
+        var ptr = NativeMethods.tl_value_object_get_key_at(_handle, (nuint)index);
+        return NativeMethods.PtrToStringAndFree(ptr);
+    }
+
+    /// <summary>
+    /// Gets the value at the specified index from this object value. Returns null if not an object or out of bounds.
+    /// </summary>
+    /// <param name="index">The zero-based index of the field.</param>
+    /// <returns>The field value as a TLValue, or null if not an object or index is out of bounds. The caller must dispose.</returns>
+    public TLValue? GetObjectValueAt(int index)
+    {
+        ThrowIfDisposed();
+        if (Type != TLType.Object || index < 0) return null;
+        var ptr = NativeMethods.tl_value_object_get_value_at(_handle, (nuint)index);
+        return ptr == IntPtr.Zero ? null : new TLValue(ptr);
+    }
+
+    /// <summary>
+    /// Gets all key-value pairs from this object value.
+    /// </summary>
+    /// <returns>An enumerable of (Key, Value) tuples. Each TLValue must be disposed by the caller.</returns>
+    public IEnumerable<(string Key, TLValue Value)> AsObject()
+    {
+        ThrowIfDisposed();
+        if (Type != TLType.Object)
+            yield break;
+
+        int len = ObjectFieldCount;
+        for (int i = 0; i < len; i++)
+        {
+            var key = GetObjectKeyAt(i);
+            var value = GetObjectValueAt(i);
+            if (key != null && value != null)
+            {
+                yield return (key, value);
+            }
+            else
+            {
+                value?.Dispose();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the keys of this object value as an enumerable. Returns empty if not an object.
+    /// Does not allocate a full array — iterates using indexed access.
+    /// </summary>
+    public IEnumerable<string> Keys
+    {
+        get
+        {
+            ThrowIfDisposed();
+            if (Type != TLType.Object) yield break;
+            int len = ObjectFieldCount;
+            for (int i = 0; i < len; i++)
+            {
+                var key = GetObjectKeyAt(i);
+                if (key != null) yield return key;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Enumerates this value's contents. For objects, yields (Key, Value) pairs.
+    /// For arrays, yields (index.ToString(), element) pairs.
+    /// </summary>
+    public IEnumerator<KeyValuePair<string, TLValue>> GetEnumerator()
+    {
+        ThrowIfDisposed();
+        if (Type == TLType.Object)
+        {
+            foreach (var (key, value) in AsObject())
+                yield return new KeyValuePair<string, TLValue>(key, value);
+        }
+        else if (Type == TLType.Array)
+        {
+            int len = ArrayLength;
+            for (int i = 0; i < len; i++)
+            {
+                var elem = GetArrayElement(i);
+                if (elem != null)
+                    yield return new KeyValuePair<string, TLValue>(i.ToString(), elem);
+            }
+        }
+    }
+
+    /// <summary>
     /// Indexer for array access.
     /// </summary>
     public TLValue? this[int index] => GetArrayElement(index);
@@ -322,6 +437,24 @@ public sealed class TLValue : IDisposable
     /// Indexer for object field access.
     /// </summary>
     public TLValue? this[string key] => GetField(key);
+
+    /// <summary>
+    /// Navigate a dot-path expression to reach a deeply nested value.
+    /// Supports field names separated by dots and array indices in brackets.
+    /// Implemented as a single native call for efficiency.
+    /// </summary>
+    /// <param name="path">
+    /// A dot-separated path such as <c>"items[0].product.price.base_price"</c>.
+    /// Segments: <c>field</c> for object lookup, <c>[N]</c> for array indexing.
+    /// </param>
+    /// <returns>The value at the path, or null if any segment is missing. The caller must dispose.</returns>
+    public TLValue? GetPath(string path)
+    {
+        ThrowIfDisposed();
+        if (string.IsNullOrEmpty(path)) return null;
+        var ptr = NativeMethods.tl_value_get_path(_handle, path);
+        return ptr == IntPtr.Zero ? null : new TLValue(ptr);
+    }
 
     /// <summary>
     /// Converts this value to its .NET equivalent.

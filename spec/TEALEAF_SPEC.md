@@ -1,4 +1,4 @@
-# TeaLeaf Format Specification v2.0.0-beta.11
+# TeaLeaf Format Specification v2.0.0-beta.12
 
 > **Status: Beta / Request for Comments**
 >
@@ -1017,6 +1017,8 @@ JSON Conversion:
   tlbx-to-json <input.tlbx> [-o <out.json>] Convert TeaLeaf binary to JSON
   json-to-tlbx <input.json> -o <out.tlbx>   Convert JSON to TeaLeaf binary
 
+Utilities:
+  completions <shell>                       Generate shell completions
   help                                      Show help
 ```
 
@@ -1024,6 +1026,7 @@ JSON Conversion:
 - `from-json` automatically infers schemas from uniform arrays
 - `info` auto-detects whether file is text or binary format
 - `compile` enables compression by default
+- `completions` supports `bash`, `zsh`, `fish`, `powershell`, and `elvish`
 
 ---
 

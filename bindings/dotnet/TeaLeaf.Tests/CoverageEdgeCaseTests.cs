@@ -2055,4 +2055,640 @@ public class TeaLeafTextHelperEdgeCaseTests
         Assert.True(restored.Extra.ContainsKey("data"));
         Assert.IsType<byte[]>(restored.Extra["data"]);
     }
+
+    // ================================================================
+    // TLValue.GetEnumerator — object and array iteration
+    // ================================================================
+
+    [Fact]
+    public void GetEnumerator_Object_YieldsKeyValuePairs()
+    {
+        using var doc = TLDocument.Parse("value: {name: alice, age: 30}");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        var pairs = new List<KeyValuePair<string, TLValue>>();
+        var enumerator = value.GetEnumerator();
+        while (enumerator.MoveNext())
+            pairs.Add(enumerator.Current);
+
+        Assert.Equal(2, pairs.Count);
+        Assert.Equal("name", pairs[0].Key);
+        Assert.Equal("alice", pairs[0].Value.AsString());
+        Assert.Equal("age", pairs[1].Key);
+        Assert.Equal(30, pairs[1].Value.AsInt());
+
+        foreach (var (_, v) in pairs)
+            v.Dispose();
+    }
+
+    [Fact]
+    public void GetEnumerator_Array_YieldsIndexedPairs()
+    {
+        using var doc = TLDocument.Parse("value: [10, 20, 30]");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        var pairs = new List<KeyValuePair<string, TLValue>>();
+        var enumerator = value.GetEnumerator();
+        while (enumerator.MoveNext())
+            pairs.Add(enumerator.Current);
+
+        Assert.Equal(3, pairs.Count);
+        Assert.Equal("0", pairs[0].Key);
+        Assert.Equal(10, pairs[0].Value.AsInt());
+        Assert.Equal("1", pairs[1].Key);
+        Assert.Equal(20, pairs[1].Value.AsInt());
+        Assert.Equal("2", pairs[2].Key);
+        Assert.Equal(30, pairs[2].Value.AsInt());
+
+        foreach (var (_, v) in pairs)
+            v.Dispose();
+    }
+
+    [Fact]
+    public void GetEnumerator_ScalarValue_YieldsNothing()
+    {
+        using var doc = TLDocument.Parse("value: hello");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        var enumerator = value.GetEnumerator();
+        Assert.False(enumerator.MoveNext());
+    }
+
+    // ================================================================
+    // TLValue.Keys property (lazy IEnumerable)
+    // ================================================================
+
+    [Fact]
+    public void Keys_OnObject_ReturnsAllKeys()
+    {
+        using var doc = TLDocument.Parse("value: {x: 1, y: 2, z: 3}");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        var keys = value.Keys.ToList();
+        Assert.Equal(3, keys.Count);
+        Assert.Contains("x", keys);
+        Assert.Contains("y", keys);
+        Assert.Contains("z", keys);
+    }
+
+    [Fact]
+    public void Keys_OnNonObject_YieldsEmpty()
+    {
+        using var doc = TLDocument.Parse("value: [1, 2]");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        Assert.Empty(value.Keys.ToList());
+    }
+
+    // ================================================================
+    // TLValue.IsNull property
+    // ================================================================
+
+    [Fact]
+    public void IsNull_NullValue_ReturnsTrue()
+    {
+        using var doc = TLDocument.Parse("value: ~");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.True(value.IsNull);
+    }
+
+    [Fact]
+    public void IsNull_NonNullValue_ReturnsFalse()
+    {
+        using var doc = TLDocument.Parse("value: 42");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.False(value.IsNull);
+    }
+
+    // ================================================================
+    // TLValue.AsArray/AsMap on wrong types
+    // ================================================================
+
+    [Fact]
+    public void AsArray_OnNonArray_YieldsEmpty()
+    {
+        using var doc = TLDocument.Parse("value: hello");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        Assert.Empty(value.AsArray().ToList());
+    }
+
+    [Fact]
+    public void AsMap_OnNonMap_YieldsEmpty()
+    {
+        using var doc = TLDocument.Parse("value: 42");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        Assert.Empty(value.AsMap().ToList());
+    }
+
+    // ================================================================
+    // TLValue type mismatch returns null
+    // ================================================================
+
+    [Fact]
+    public void AsBool_OnNonBool_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse("value: 42");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Null(value.AsBool());
+    }
+
+    [Fact]
+    public void AsInt_OnNonInt_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse("value: hello");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Null(value.AsInt());
+    }
+
+    [Fact]
+    public void AsFloat_OnNonFloat_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse("value: hello");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Null(value.AsFloat());
+    }
+
+    [Fact]
+    public void AsString_OnNonString_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse("value: 42");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Null(value.AsString());
+    }
+
+    [Fact]
+    public void AsTimestamp_OnNonTimestamp_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse("value: hello");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Null(value.AsTimestamp());
+    }
+
+    [Fact]
+    public void AsDateTime_OnNonTimestamp_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse("value: hello");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Null(value.AsDateTime());
+    }
+
+    // ================================================================
+    // TLValue.ArrayLength on wrong type
+    // ================================================================
+
+    [Fact]
+    public void ArrayLength_OnNonArray_ReturnsZero()
+    {
+        using var doc = TLDocument.Parse("value: hello");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Equal(0, value.ArrayLength);
+    }
+
+    // ================================================================
+    // TLDocument.Compile(compress: true) produces valid output
+    // ================================================================
+
+    [Fact]
+    public void Compile_WithCompression_ProducesValidOutput()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_compress_{Guid.NewGuid()}.tlbx");
+        var pathUncompressed = Path.Combine(Path.GetTempPath(), $"test_nocompress_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            using (var doc = TLDocument.Parse(@"
+                @struct item (name: string, price: float, qty: int)
+                items: @table item [
+                    (widget, 9.99, 10),
+                    (gadget, 24.99, 5),
+                    (doohickey, 4.99, 100),
+                    (thingamajig, 14.99, 50),
+                    (whatchamacallit, 39.99, 25),
+                ]
+            "))
+            {
+                doc.Compile(path, compress: true);
+                doc.Compile(pathUncompressed, compress: false);
+            }
+
+            // Both files should be readable
+            using var reader = TLReader.Open(path);
+            using var items = reader["items"];
+            Assert.NotNull(items);
+            Assert.Equal(5, items.ArrayLength);
+
+            using var first = items[0];
+            using var name = first?["name"];
+            Assert.Equal("widget", name?.AsString());
+
+            // Compressed should be no larger than uncompressed
+            var compressedSize = new FileInfo(path).Length;
+            var uncompressedSize = new FileInfo(pathUncompressed).Length;
+            Assert.True(compressedSize <= uncompressedSize,
+                $"Compressed ({compressedSize}) should be <= uncompressed ({uncompressedSize})");
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+            if (File.Exists(pathUncompressed)) File.Delete(pathUncompressed);
+        }
+    }
+
+    // ================================================================
+    // TLReader.TryCreateFromJson — success and failure paths
+    // ================================================================
+
+    [Fact]
+    public void TryCreateFromJson_ValidJson_ReturnsTrue()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_create_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            var result = TLReader.TryCreateFromJson(@"{""name"": ""alice""}", path);
+            Assert.True(result);
+            Assert.True(File.Exists(path));
+
+            using var reader = TLReader.Open(path);
+            using var name = reader["name"];
+            Assert.Equal("alice", name?.AsString());
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void TryCreateFromJson_InvalidJson_ReturnsFalse()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_create_fail_{Guid.NewGuid()}.tlbx");
+        var result = TLReader.TryCreateFromJson("not valid json", path);
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void CreateFromJson_InvalidJson_ThrowsTLException()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_create_throw_{Guid.NewGuid()}.tlbx");
+        Assert.Throws<TLException>(() => TLReader.CreateFromJson("not valid json", path));
+    }
+
+    // ================================================================
+    // TLReader.GetAsJson — missing key returns null
+    // ================================================================
+
+    [Fact]
+    public void GetAsJson_NonExistentKey_ReturnsNull()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_getjson_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            TLReader.CreateFromJson(@"{""name"": ""alice""}", path);
+            using var reader = TLReader.Open(path);
+
+            Assert.Null(reader.GetAsJson("nonexistent"));
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    // ================================================================
+    // TLReader.GetDynamic — missing key
+    // ================================================================
+
+    [Fact]
+    public void GetDynamic_NonExistentKey_ReturnsNull()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_dyn_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            TLReader.CreateFromJson(@"{""name"": ""alice""}", path);
+            using var reader = TLReader.Open(path);
+
+            Assert.Null(reader.GetDynamic("nonexistent"));
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    // ================================================================
+    // TLDocumentBuilder.AddDocument — schema conflict detection
+    // ================================================================
+
+    [Fact]
+    public void AddDocument_SchemaConflict_ThrowsInvalidOperationException()
+    {
+        using var doc1 = TLDocument.Parse(@"
+            @struct item (name: string, price: float)
+            items: @table item [(widget, 9.99)]
+        ");
+        using var doc2 = TLDocument.Parse(@"
+            @struct item (id: int, label: string, qty: int)
+            items: @table item [(1, gadget, 5)]
+        ");
+
+        var builder = new TLDocumentBuilder();
+        builder.AddDocument(doc1);
+
+        var ex = Assert.Throws<InvalidOperationException>(() => builder.AddDocument(doc2));
+        Assert.Contains("item", ex.Message);
+        Assert.Contains("conflicts", ex.Message);
+    }
+
+    [Fact]
+    public void AddDocument_SameSchema_NoConflict()
+    {
+        using var doc1 = TLDocument.Parse(@"
+            @struct item (name: string, price: float)
+            items1: @table item [(widget, 9.99)]
+        ");
+        using var doc2 = TLDocument.Parse(@"
+            @struct item (name: string, price: float)
+            items2: @table item [(gadget, 24.99)]
+        ");
+
+        using var result = new TLDocumentBuilder()
+            .AddDocument(doc1)
+            .AddDocument(doc2)
+            .Build();
+
+        using var items1 = result["items1"];
+        Assert.NotNull(items1);
+        using var items2 = result["items2"];
+        Assert.NotNull(items2);
+    }
+
+    // ================================================================
+    // TLDocumentBuilder.Add(float) scalar overload
+    // ================================================================
+
+    [Fact]
+    public void Add_Float_ProducesValidDocument()
+    {
+        using var doc = new TLDocumentBuilder()
+            .Add("temperature", 98.6f)
+            .Build();
+
+        using var val = doc["temperature"];
+        Assert.NotNull(val);
+        Assert.True(Math.Abs(98.6 - val.AsFloat()!.Value) < 0.1);
+    }
+
+    // ================================================================
+    // TLDocumentBuilder.AddList(string) with null items
+    // ================================================================
+
+    [Fact]
+    public void AddList_StringsWithNull_SerializesNullAsTilde()
+    {
+        using var doc = new TLDocumentBuilder()
+            .AddList("tags", new string?[] { "alpha", null!, "gamma" })
+            .Build();
+
+        using var val = doc["tags"];
+        Assert.NotNull(val);
+        Assert.Equal(3, val.ArrayLength);
+
+        using var first = val[0];
+        Assert.Equal("alpha", first?.AsString());
+
+        using var second = val[1];
+        Assert.NotNull(second);
+        Assert.Equal(TLType.Null, second.Type);
+
+        using var third = val[2];
+        Assert.Equal("gamma", third?.AsString());
+    }
+
+    // ================================================================
+    // TLReader Open/TryOpen — failure paths
+    // ================================================================
+
+    [Fact]
+    public void TryOpen_NonExistent_ReturnsFalse()
+    {
+        var result = TLReader.TryOpen("/nonexistent/path.tlbx", out var reader);
+        Assert.False(result);
+        Assert.Null(reader);
+    }
+
+    [Fact]
+    public void Open_NonExistent_ThrowsTLException()
+    {
+        Assert.Throws<TLException>(() => TLReader.Open("/nonexistent/path.tlbx"));
+    }
+
+    // ================================================================
+    // TLReader.ToJsonCompact — compact JSON from binary
+    // ================================================================
+
+    [Fact]
+    public void ToJsonCompact_ProducesMinifiedJson()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_compact_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            TLReader.CreateFromJson(@"{""name"": ""alice"", ""age"": 30}", path);
+            using var reader = TLReader.Open(path);
+
+            var compact = reader.ToJsonCompact();
+            Assert.DoesNotContain("\n", compact);
+            Assert.Contains("alice", compact);
+            Assert.Contains("30", compact);
+
+            var pretty = reader.ToJson();
+            Assert.True(compact.Length < pretty.Length,
+                "Compact JSON should be shorter than pretty JSON");
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    // ================================================================
+    // Mmap equivalence with regular Open
+    // ================================================================
+
+    [Fact]
+    public void OpenMmap_ProducesSameJsonAsOpen()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_mmap_eq_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            TLReader.CreateFromJson(@"{""name"": ""alice"", ""items"": [1, 2, 3]}", path);
+
+            using var regular = TLReader.Open(path);
+            using var mmap = TLReader.OpenMmap(path);
+
+            Assert.Equal(regular.ToJson(), mmap.ToJson());
+            Assert.Equal(regular.ToJsonCompact(), mmap.ToJsonCompact());
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    // ================================================================
+    // TLReader FloatToJsonNode — whole-number float preserves .0
+    // ================================================================
+
+    [Fact]
+    public void Reader_ToJson_WholeNumberFloat_PreservesDecimal()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_float_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            using (var doc = TLDocument.Parse("price: 42.0"))
+            {
+                doc.Compile(path);
+            }
+
+            using var reader = TLReader.Open(path);
+            var json = reader.ToJson();
+            Assert.Contains("42.0", json);
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    // ================================================================
+    // TLReader.GetAsJson — returns formatted JSON for a key
+    // ================================================================
+
+    [Fact]
+    public void GetAsJson_ReturnsFormattedJson()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"test_getjson2_{Guid.NewGuid()}.tlbx");
+        try
+        {
+            TLReader.CreateFromJson(@"{""user"": {""name"": ""alice"", ""age"": 30}}", path);
+            using var reader = TLReader.Open(path);
+
+            var json = reader.GetAsJson("user");
+            Assert.NotNull(json);
+            Assert.Contains("alice", json);
+            Assert.Contains("30", json);
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    // ================================================================
+    // NeedsQuoting — sign prefix
+    // ================================================================
+
+    [Fact]
+    public void NeedsQuoting_SignPrefix_ReturnsTrue()
+    {
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("+123"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("-abc"));
+    }
+
+    // ================================================================
+    // AppendValue — string that needs quoting
+    // ================================================================
+
+    [Fact]
+    public void AppendValue_StringNeedingQuoting_QuotesCorrectly()
+    {
+        var sb = new StringBuilder();
+        TeaLeafTextHelper.AppendValue(sb, "hello world", typeof(string));
+        Assert.Equal("\"hello world\"", sb.ToString());
+    }
+
+    [Fact]
+    public void AppendValue_NullableInt_AppendsNumber()
+    {
+        var sb = new StringBuilder();
+        TeaLeafTextHelper.AppendValue(sb, 42, typeof(int?));
+        Assert.Equal("42", sb.ToString());
+    }
+
+    // ================================================================
+    // GetTLTypeName — sbyte, ushort edge types
+    // ================================================================
+
+    [Fact]
+    public void GetTLTypeName_SignedByteAndUnsignedShort()
+    {
+        Assert.Equal("int8", TeaLeafTextHelper.GetTLTypeName(typeof(sbyte)));
+        Assert.Equal("uint16", TeaLeafTextHelper.GetTLTypeName(typeof(ushort)));
+    }
+
+    // ================================================================
+    // Serializer.GetSchema — produces valid @struct text
+    // ================================================================
+
+    [Fact]
+    public void Serializer_GetSchema_ProducesValidStruct()
+    {
+        var schema = TeaLeafSerializer.GetSchema<SimpleUser>();
+        Assert.Contains("@struct", schema);
+        Assert.Contains("simple_user", schema);
+        Assert.Contains("name:", schema);
+        Assert.Contains("age:", schema);
+        Assert.Contains("active:", schema);
+    }
+
+    // ================================================================
+    // Serializer.ToText (body only) — no schema, no key wrapper
+    // ================================================================
+
+    [Fact]
+    public void Serializer_ToText_BodyOnly_NoSchema()
+    {
+        var user = new SimpleUser { Name = "alice", Age = 30, Active = true };
+        var body = TeaLeafSerializer.ToText(user);
+
+        Assert.DoesNotContain("@struct", body);
+        Assert.Contains("name:", body);
+        Assert.Contains("alice", body);
+    }
+
+    // ================================================================
+    // Serializer.ToTLDocument with collection
+    // ================================================================
+
+    [Fact]
+    public void Serializer_ToTLDocument_Collection_ProducesDocument()
+    {
+        var items = new List<WithTimestamps>
+        {
+            new() { Label = "first", CreatedAt = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero) },
+            new() { Label = "second", CreatedAt = new DateTimeOffset(2025, 6, 1, 0, 0, 0, TimeSpan.Zero) }
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument<WithTimestamps>(items, "events");
+        Assert.Contains("events", doc.Keys);
+        var json = doc.ToJson();
+        Assert.Contains("first", json);
+        Assert.Contains("second", json);
+    }
 }

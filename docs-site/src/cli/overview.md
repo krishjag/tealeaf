@@ -20,6 +20,7 @@ tealeaf <command> [options]
 | [`from-json`](./json-conversion.md) | Convert JSON to TeaLeaf text |
 | [`tlbx-to-json`](./binary-json-conversion.md) | Convert TeaLeaf binary to JSON |
 | [`json-to-tlbx`](./binary-json-conversion.md) | Convert JSON to TeaLeaf binary |
+| [`completions`](./completions.md) | Generate shell completions |
 | `help` | Show help text |
 
 ## Global Options

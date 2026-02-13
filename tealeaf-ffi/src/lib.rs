@@ -209,6 +209,35 @@ pub unsafe extern "C" fn tl_document_get(
     }
 }
 
+/// Navigate a dot-path expression on a document to reach a deeply nested value.
+/// The first segment is the document key; remaining segments traverse via Value::get_path.
+/// Path syntax: `key.field[N].field`
+/// Returns a cloned value. Caller must free with tl_value_free.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+/// `path` must be a valid, NUL-terminated UTF-8 string.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_get_path(
+    doc: *const TLDocument,
+    path: *const c_char,
+) -> *mut TLValue {
+    if doc.is_null() || path.is_null() {
+        return ptr::null_mut();
+    }
+
+    let path_str = match CStr::from_ptr(path).to_str() {
+        Ok(s) => s,
+        Err(_) => return ptr::null_mut(),
+    };
+
+    match (*doc).inner.get_path(path_str) {
+        Some(v) => Box::into_raw(Box::new(TLValue { inner: v.clone() })),
+        None => ptr::null_mut(),
+    }
+}
+
 /// Get all keys in the document.
 /// Returns a NULL-terminated array of strings. Caller must free with tl_string_array_free.
 ///
@@ -846,6 +875,34 @@ pub unsafe extern "C" fn tl_value_object_get(
     }
 }
 
+/// Navigate a dot-path expression on a value to reach a deeply nested value.
+/// Path syntax: `field.field[N].field`
+/// Returns a cloned value. Caller must free with tl_value_free.
+///
+/// # Safety
+///
+/// `value` must be a valid `TLValue` pointer or null.
+/// `path` must be a valid, NUL-terminated UTF-8 string.
+#[no_mangle]
+pub unsafe extern "C" fn tl_value_get_path(
+    value: *const TLValue,
+    path: *const c_char,
+) -> *mut TLValue {
+    if value.is_null() || path.is_null() {
+        return ptr::null_mut();
+    }
+
+    let path_str = match CStr::from_ptr(path).to_str() {
+        Ok(s) => s,
+        Err(_) => return ptr::null_mut(),
+    };
+
+    match (*value).inner.get_path(path_str) {
+        Some(v) => Box::into_raw(Box::new(TLValue { inner: v.clone() })),
+        None => ptr::null_mut(),
+    }
+}
+
 /// Get object keys. Returns NULL-terminated array.
 /// Caller must free with tl_string_array_free.
 ///
@@ -870,6 +927,67 @@ pub unsafe extern "C" fn tl_value_object_keys(value: *const TLValue) -> *mut *mu
             std::mem::forget(result);
             ptr
         }
+        None => ptr::null_mut(),
+    }
+}
+
+/// Get object field count. Returns 0 if not an object.
+///
+/// # Safety
+///
+/// `value` must be a valid `TLValue` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_value_object_len(value: *const TLValue) -> usize {
+    if value.is_null() {
+        return 0;
+    }
+    (*value).inner.as_object().map(|o| o.len()).unwrap_or(0)
+}
+
+/// Get object key by index. Returns NULL if out of bounds or not an object.
+/// Caller must free with tl_string_free.
+///
+/// # Safety
+///
+/// `value` must be a valid `TLValue` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_value_object_get_key_at(
+    value: *const TLValue,
+    index: usize,
+) -> *mut c_char {
+    if value.is_null() {
+        return ptr::null_mut();
+    }
+    match (*value).inner.as_object() {
+        Some(obj) => match obj.get_index(index) {
+            Some((k, _)) => CString::new(k.as_str())
+                .map(|s| s.into_raw())
+                .unwrap_or(ptr::null_mut()),
+            None => ptr::null_mut(),
+        },
+        None => ptr::null_mut(),
+    }
+}
+
+/// Get object value by index. Returns NULL if out of bounds or not an object.
+/// Caller must free with tl_value_free.
+///
+/// # Safety
+///
+/// `value` must be a valid `TLValue` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_value_object_get_value_at(
+    value: *const TLValue,
+    index: usize,
+) -> *mut TLValue {
+    if value.is_null() {
+        return ptr::null_mut();
+    }
+    match (*value).inner.as_object() {
+        Some(obj) => match obj.get_index(index) {
+            Some((_, v)) => Box::into_raw(Box::new(TLValue { inner: v.clone() })),
+            None => ptr::null_mut(),
+        },
         None => ptr::null_mut(),
     }
 }
@@ -1005,7 +1123,167 @@ pub unsafe extern "C" fn tl_reader_keys(reader: *const TLReader) -> *mut *mut c_
 }
 
 // =============================================================================
-// Schema API (for dynamic typing support)
+// Document Schema API
+// =============================================================================
+
+/// Get the number of schemas in a parsed document.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_schema_count(doc: *const TLDocument) -> usize {
+    if doc.is_null() {
+        return 0;
+    }
+    (*doc).inner.schemas.len()
+}
+
+/// Get a schema name by index from a parsed document.
+/// Caller must free the returned string with tl_string_free.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_schema_name(
+    doc: *const TLDocument,
+    index: usize,
+) -> *mut c_char {
+    if doc.is_null() {
+        return ptr::null_mut();
+    }
+    match (*doc).inner.schemas.get_index(index) {
+        Some((_, schema)) => CString::new(schema.name.as_str())
+            .map(|s| s.into_raw())
+            .unwrap_or(ptr::null_mut()),
+        None => ptr::null_mut(),
+    }
+}
+
+/// Get the number of fields in a schema from a parsed document.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_schema_field_count(
+    doc: *const TLDocument,
+    schema_index: usize,
+) -> usize {
+    if doc.is_null() {
+        return 0;
+    }
+    match (*doc).inner.schemas.get_index(schema_index) {
+        Some((_, schema)) => schema.fields.len(),
+        None => 0,
+    }
+}
+
+/// Get a field name from a schema in a parsed document.
+/// Caller must free the returned string with tl_string_free.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_schema_field_name(
+    doc: *const TLDocument,
+    schema_index: usize,
+    field_index: usize,
+) -> *mut c_char {
+    if doc.is_null() {
+        return ptr::null_mut();
+    }
+    let schema = match (*doc).inner.schemas.get_index(schema_index) {
+        Some((_, s)) => s,
+        None => return ptr::null_mut(),
+    };
+    match schema.fields.get(field_index) {
+        Some(field) => CString::new(field.name.as_str())
+            .map(|s| s.into_raw())
+            .unwrap_or(ptr::null_mut()),
+        None => ptr::null_mut(),
+    }
+}
+
+/// Get a field's base type from a schema in a parsed document.
+/// Caller must free the returned string with tl_string_free.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_schema_field_type(
+    doc: *const TLDocument,
+    schema_index: usize,
+    field_index: usize,
+) -> *mut c_char {
+    if doc.is_null() {
+        return ptr::null_mut();
+    }
+    let schema = match (*doc).inner.schemas.get_index(schema_index) {
+        Some((_, s)) => s,
+        None => return ptr::null_mut(),
+    };
+    match schema.fields.get(field_index) {
+        Some(field) => CString::new(field.field_type.base.as_str())
+            .map(|s| s.into_raw())
+            .unwrap_or(ptr::null_mut()),
+        None => ptr::null_mut(),
+    }
+}
+
+/// Check if a field is nullable in a schema from a parsed document.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_schema_field_nullable(
+    doc: *const TLDocument,
+    schema_index: usize,
+    field_index: usize,
+) -> bool {
+    if doc.is_null() {
+        return false;
+    }
+    let schema = match (*doc).inner.schemas.get_index(schema_index) {
+        Some((_, s)) => s,
+        None => return false,
+    };
+    match schema.fields.get(field_index) {
+        Some(field) => field.field_type.nullable,
+        None => false,
+    }
+}
+
+/// Check if a field is an array type in a schema from a parsed document.
+///
+/// # Safety
+///
+/// `doc` must be a valid `TLDocument` pointer or null.
+#[no_mangle]
+pub unsafe extern "C" fn tl_document_schema_field_is_array(
+    doc: *const TLDocument,
+    schema_index: usize,
+    field_index: usize,
+) -> bool {
+    if doc.is_null() {
+        return false;
+    }
+    let schema = match (*doc).inner.schemas.get_index(schema_index) {
+        Some((_, s)) => s,
+        None => return false,
+    };
+    match schema.fields.get(field_index) {
+        Some(field) => field.field_type.is_array,
+        None => false,
+    }
+}
+
+// =============================================================================
+// Reader Schema API (for dynamic typing support)
 // =============================================================================
 
 /// Get the number of schemas in a binary file.
@@ -1231,7 +1509,7 @@ pub unsafe extern "C" fn tl_result_free(result: *mut TLResult) {
 /// Get the library version string.
 #[no_mangle]
 pub extern "C" fn tl_version() -> *const c_char {
-    static VERSION: &[u8] = b"2.0.0-beta.11\0";
+    static VERSION: &[u8] = b"2.0.0-beta.12\0";
     VERSION.as_ptr() as *const c_char
 }
 
@@ -1506,6 +1784,9 @@ headers: @map {"Content-Type": "application/json", "Accept": "*/*"}
             assert!(tl_value_map_get_value(ptr::null(), 0).is_null());
             assert!(tl_value_object_get(ptr::null(), CString::new("k").unwrap().as_ptr()).is_null());
             assert!(tl_value_object_keys(ptr::null()).is_null());
+            assert_eq!(tl_value_object_len(ptr::null()), 0);
+            assert!(tl_value_object_get_key_at(ptr::null(), 0).is_null());
+            assert!(tl_value_object_get_value_at(ptr::null(), 0).is_null());
         }
     }
 
@@ -2007,6 +2288,19 @@ headers: @map {"Content-Type": "application/json", "Accept": "*/*"}
     }
 
     #[test]
+    fn wrong_type_object_iteration_on_array() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "array_val");
+            assert_eq!(tl_value_object_len(val), 0);
+            assert!(tl_value_object_get_key_at(val, 0).is_null());
+            assert!(tl_value_object_get_value_at(val, 0).is_null());
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
     fn wrong_type_ref_name_on_string() {
         unsafe {
             let doc = parse_doc(ALL_TYPES_FIXTURE);
@@ -2255,6 +2549,102 @@ headers: @map {"Content-Type": "application/json", "Accept": "*/*"}
     }
 
     // =========================================================================
+    // Group 8b: Schema Introspection via Document
+    // =========================================================================
+
+    #[test]
+    fn document_schema_count_and_names() {
+        unsafe {
+            let doc = parse_doc(SCHEMA_FIXTURE);
+            let count = tl_document_schema_count(doc);
+            assert_eq!(count, 1, "SCHEMA_FIXTURE has 1 schema");
+
+            let name = tl_document_schema_name(doc, 0);
+            let name_str = read_and_free_string(name);
+            assert_eq!(name_str, "Person");
+
+            // Out of bounds
+            assert!(tl_document_schema_name(doc, 1).is_null());
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn document_schema_fields() {
+        unsafe {
+            let doc = parse_doc(SCHEMA_FIXTURE);
+
+            let field_count = tl_document_schema_field_count(doc, 0);
+            assert_eq!(field_count, 2);
+
+            let f0 = read_and_free_string(tl_document_schema_field_name(doc, 0, 0));
+            let f1 = read_and_free_string(tl_document_schema_field_name(doc, 0, 1));
+            assert_eq!(f0, "name");
+            assert_eq!(f1, "age");
+
+            let t0 = read_and_free_string(tl_document_schema_field_type(doc, 0, 0));
+            let t1 = read_and_free_string(tl_document_schema_field_type(doc, 0, 1));
+            assert_eq!(t0, "string");
+            assert_eq!(t1, "int");
+
+            assert_eq!(tl_document_schema_field_nullable(doc, 0, 0), false);
+            assert_eq!(tl_document_schema_field_is_array(doc, 0, 0), false);
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn document_schema_nullable_and_array() {
+        unsafe {
+            let fixture = r#"
+@struct Item (name: string, tags: []string, note: string?)
+items: @table Item [
+  ("Widget", ["a", "b"], "test"),
+]
+"#;
+            let doc = parse_doc(fixture);
+            let count = tl_document_schema_count(doc);
+            assert_eq!(count, 1);
+
+            // tags field: is_array=true, nullable=false
+            assert_eq!(tl_document_schema_field_is_array(doc, 0, 1), true);
+            assert_eq!(tl_document_schema_field_nullable(doc, 0, 1), false);
+
+            // note field: is_array=false, nullable=true
+            assert_eq!(tl_document_schema_field_is_array(doc, 0, 2), false);
+            assert_eq!(tl_document_schema_field_nullable(doc, 0, 2), true);
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn document_schema_no_schemas() {
+        unsafe {
+            let doc = parse_doc(SIMPLE_FIXTURE);
+            assert_eq!(tl_document_schema_count(doc), 0);
+            assert!(tl_document_schema_name(doc, 0).is_null());
+            assert_eq!(tl_document_schema_field_count(doc, 0), 0);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn null_document_schema_functions() {
+        unsafe {
+            assert_eq!(tl_document_schema_count(ptr::null()), 0);
+            assert!(tl_document_schema_name(ptr::null(), 0).is_null());
+            assert_eq!(tl_document_schema_field_count(ptr::null(), 0), 0);
+            assert!(tl_document_schema_field_name(ptr::null(), 0, 0).is_null());
+            assert!(tl_document_schema_field_type(ptr::null(), 0, 0).is_null());
+            assert_eq!(tl_document_schema_field_nullable(ptr::null(), 0, 0), false);
+            assert_eq!(tl_document_schema_field_is_array(ptr::null(), 0, 0), false);
+        }
+    }
+
+    // =========================================================================
     // Group 9: Reader Operations
     // =========================================================================
 
@@ -2483,7 +2873,7 @@ headers: @map {"Content-Type": "application/json", "Accept": "*/*"}
         let v = tl_version();
         assert!(!v.is_null());
         let version = unsafe { CStr::from_ptr(v) }.to_str().unwrap();
-        assert_eq!(version, "2.0.0-beta.11");
+        assert_eq!(version, "2.0.0-beta.12");
         // Note: do NOT free this - it's a static string
     }
 
@@ -2636,6 +3026,237 @@ empty: b""
             assert!(with_schemas.contains("@struct"), "to_text should include schemas");
             assert!(!data_only.contains("@struct"), "to_text_data_only should not include schemas");
 
+            tl_document_free(doc);
+        }
+    }
+
+    // =========================================================================
+    // Object Iteration
+    // =========================================================================
+
+    #[test]
+    fn value_object_len() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "object_val");
+            assert_eq!(tl_value_object_len(val), 2);
+            tl_value_free(val);
+
+            let empty = doc_get(doc, "empty_object");
+            assert_eq!(tl_value_object_len(empty), 0);
+            tl_value_free(empty);
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_object_len_not_object() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "string_val");
+            assert_eq!(tl_value_object_len(val), 0);
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_object_get_key_at() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "object_val");
+
+            let key0 = tl_value_object_get_key_at(val, 0);
+            assert!(!key0.is_null());
+            assert_eq!(read_and_free_string(key0), "name");
+
+            let key1 = tl_value_object_get_key_at(val, 1);
+            assert!(!key1.is_null());
+            assert_eq!(read_and_free_string(key1), "age");
+
+            // Out of bounds
+            let key2 = tl_value_object_get_key_at(val, 2);
+            assert!(key2.is_null());
+
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_object_get_value_at() {
+        unsafe {
+            let doc = parse_doc(ALL_TYPES_FIXTURE);
+            let val = doc_get(doc, "object_val");
+
+            let val0 = tl_value_object_get_value_at(val, 0);
+            assert!(!val0.is_null());
+            let name = read_and_free_string(tl_value_as_string(val0));
+            assert_eq!(name, "alice");
+            tl_value_free(val0);
+
+            let val1 = tl_value_object_get_value_at(val, 1);
+            assert!(!val1.is_null());
+            assert_eq!(tl_value_as_int(val1), 30);
+            tl_value_free(val1);
+
+            // Out of bounds
+            let val2 = tl_value_object_get_value_at(val, 2);
+            assert!(val2.is_null());
+
+            tl_value_free(val);
+            tl_document_free(doc);
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // get_path tests
+    // ---------------------------------------------------------------
+
+    #[test]
+    fn get_path_simple() {
+        unsafe {
+            let text = CString::new("order: { id: ORD-001, status: delivered }").unwrap();
+            let doc = tl_parse(text.as_ptr());
+            assert!(!doc.is_null());
+
+            let path = CString::new("order.id").unwrap();
+            let val = tl_document_get_path(doc, path.as_ptr());
+            assert!(!val.is_null());
+            let s = read_and_free_string(tl_value_as_string(val));
+            assert_eq!(s, "ORD-001");
+            tl_value_free(val);
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn get_path_deep() {
+        unsafe {
+            let text = CString::new(
+                "order: { customer: { address: { city: Seattle, zip: \"98101\" } } }",
+            )
+            .unwrap();
+            let doc = tl_parse(text.as_ptr());
+            assert!(!doc.is_null());
+
+            let path = CString::new("order.customer.address.city").unwrap();
+            let val = tl_document_get_path(doc, path.as_ptr());
+            assert!(!val.is_null());
+            let s = read_and_free_string(tl_value_as_string(val));
+            assert_eq!(s, "Seattle");
+            tl_value_free(val);
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn get_path_array_index() {
+        unsafe {
+            let text = CString::new("data: { items: [alpha, beta, gamma] }").unwrap();
+            let doc = tl_parse(text.as_ptr());
+            assert!(!doc.is_null());
+
+            let path = CString::new("data.items[1]").unwrap();
+            let val = tl_document_get_path(doc, path.as_ptr());
+            assert!(!val.is_null());
+            let s = read_and_free_string(tl_value_as_string(val));
+            assert_eq!(s, "beta");
+            tl_value_free(val);
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn get_path_nested_array() {
+        unsafe {
+            let text = CString::new(
+                "root: { items: [{ product: { price: 349.99 } }, { product: { price: 159.0 } }] }",
+            )
+            .unwrap();
+            let doc = tl_parse(text.as_ptr());
+            assert!(!doc.is_null());
+
+            let path = CString::new("root.items[0].product.price").unwrap();
+            let val = tl_document_get_path(doc, path.as_ptr());
+            assert!(!val.is_null());
+            assert!((tl_value_as_float(val) - 349.99).abs() < 0.01);
+            tl_value_free(val);
+
+            let path2 = CString::new("root.items[1].product.price").unwrap();
+            let val2 = tl_document_get_path(doc, path2.as_ptr());
+            assert!(!val2.is_null());
+            assert!((tl_value_as_float(val2) - 159.0).abs() < 0.01);
+            tl_value_free(val2);
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn get_path_missing() {
+        unsafe {
+            let text = CString::new("order: { status: ok }").unwrap();
+            let doc = tl_parse(text.as_ptr());
+            assert!(!doc.is_null());
+
+            let path = CString::new("order.nonexistent.field").unwrap();
+            assert!(tl_document_get_path(doc, path.as_ptr()).is_null());
+
+            let path2 = CString::new("nosuchkey.field").unwrap();
+            assert!(tl_document_get_path(doc, path2.as_ptr()).is_null());
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn get_path_just_key() {
+        unsafe {
+            let doc = parse_doc("greeting: hello\n");
+
+            let path = CString::new("greeting").unwrap();
+            let val = tl_document_get_path(doc, path.as_ptr());
+            assert!(!val.is_null());
+            let s = read_and_free_string(tl_value_as_string(val));
+            assert_eq!(s, "hello");
+            tl_value_free(val);
+
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn value_get_path() {
+        unsafe {
+            let doc = parse_doc("root: { a: { b: { c: 42 } } }\n");
+            let root = doc_get(doc, "root");
+
+            let path = CString::new("a.b.c").unwrap();
+            let val = tl_value_get_path(root, path.as_ptr());
+            assert!(!val.is_null());
+            assert_eq!(tl_value_as_int(val), 42);
+            tl_value_free(val);
+
+            tl_value_free(root);
+            tl_document_free(doc);
+        }
+    }
+
+    #[test]
+    fn get_path_null_safety() {
+        unsafe {
+            let path = CString::new("a.b").unwrap();
+            assert!(tl_value_get_path(ptr::null(), path.as_ptr()).is_null());
+            assert!(tl_document_get_path(ptr::null(), path.as_ptr()).is_null());
+
+            let text = CString::new("x: 1").unwrap();
+            let doc = tl_parse(text.as_ptr());
+            assert!(tl_document_get_path(doc, ptr::null()).is_null());
             tl_document_free(doc);
         }
     }

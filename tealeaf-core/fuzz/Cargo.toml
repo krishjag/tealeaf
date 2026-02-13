@@ -50,3 +50,8 @@ doc = false
 name = "fuzz_structured"
 path = "fuzz_targets/fuzz_structured.rs"
 doc = false
+
+[[bin]]
+name = "fuzz_get_path"
+path = "fuzz_targets/fuzz_get_path.rs"
+doc = false

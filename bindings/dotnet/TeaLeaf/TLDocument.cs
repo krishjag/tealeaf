@@ -9,6 +9,8 @@ public sealed class TLDocument : IDisposable
 {
     private IntPtr _handle;
     private bool _disposed;
+    private TLSchema[]? _schemas;
+    private Dictionary<string, TLSchema>? _schemaMap;
 
     private TLDocument(IntPtr handle)
     {
@@ -134,6 +136,25 @@ public sealed class TLDocument : IDisposable
     public TLValue? this[string key] => Get(key);
 
     /// <summary>
+    /// Navigate a dot-path expression to reach a deeply nested value.
+    /// The first segment is used as the document key; remaining segments
+    /// traverse nested objects and arrays.
+    /// Implemented as a single native call for efficiency.
+    /// </summary>
+    /// <param name="path">
+    /// A dot-separated path such as <c>"order.items[0].product.price.base_price"</c>.
+    /// The first segment (<c>order</c>) is the top-level document key.
+    /// </param>
+    /// <returns>The value at the path, or null if any segment is missing. The caller must dispose.</returns>
+    public TLValue? GetPath(string path)
+    {
+        ThrowIfDisposed();
+        if (string.IsNullOrEmpty(path)) return null;
+        var ptr = NativeMethods.tl_document_get_path(_handle, path);
+        return ptr == IntPtr.Zero ? null : new TLValue(ptr);
+    }
+
+    /// <summary>
     /// Convert the document to TeaLeaf text format.
     /// </summary>
     /// <param name="compact">If true, removes insignificant whitespace for token-efficient output.</param>
@@ -185,6 +206,43 @@ public sealed class TLDocument : IDisposable
     }
 
     /// <summary>
+    /// Get all schemas defined in the document.
+    /// </summary>
+    public IReadOnlyList<TLSchema> Schemas
+    {
+        get
+        {
+            ThrowIfDisposed();
+            LoadSchemas();
+            return _schemas!;
+        }
+    }
+
+    /// <summary>
+    /// Get a schema by name.
+    /// </summary>
+    /// <param name="name">The schema name to look up.</param>
+    /// <returns>The schema, or null if not found.</returns>
+    public TLSchema? GetSchema(string name)
+    {
+        ThrowIfDisposed();
+        LoadSchemas();
+        return _schemaMap!.TryGetValue(name, out var schema) ? schema : null;
+    }
+
+    /// <summary>
+    /// Get the number of schemas in the document.
+    /// </summary>
+    public int SchemaCount
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return (int)NativeMethods.tl_document_schema_count(_handle);
+        }
+    }
+
+    /// <summary>
     /// Check if the document contains a key.
     /// </summary>
     public bool ContainsKey(string key)
@@ -194,6 +252,43 @@ public sealed class TLDocument : IDisposable
 
     /// <inheritdoc/>
     public override string ToString() => ToText();
+
+    private void LoadSchemas()
+    {
+        if (_schemas != null)
+            return;
+
+        var count = (int)NativeMethods.tl_document_schema_count(_handle);
+        _schemas = new TLSchema[count];
+        _schemaMap = new Dictionary<string, TLSchema>(count);
+
+        for (int i = 0; i < count; i++)
+        {
+            var namePtr = NativeMethods.tl_document_schema_name(_handle, (nuint)i);
+            var name = NativeMethods.PtrToStringAndFree(namePtr) ?? $"schema_{i}";
+
+            var fieldCount = (int)NativeMethods.tl_document_schema_field_count(_handle, (nuint)i);
+            var fields = new TLField[fieldCount];
+
+            for (int j = 0; j < fieldCount; j++)
+            {
+                var fieldNamePtr = NativeMethods.tl_document_schema_field_name(_handle, (nuint)i, (nuint)j);
+                var fieldName = NativeMethods.PtrToStringAndFree(fieldNamePtr) ?? $"field_{j}";
+
+                var fieldTypePtr = NativeMethods.tl_document_schema_field_type(_handle, (nuint)i, (nuint)j);
+                var fieldType = NativeMethods.PtrToStringAndFree(fieldTypePtr) ?? "unknown";
+
+                var nullable = NativeMethods.tl_document_schema_field_nullable(_handle, (nuint)i, (nuint)j);
+                var isArray = NativeMethods.tl_document_schema_field_is_array(_handle, (nuint)i, (nuint)j);
+
+                fields[j] = new TLField(fieldName, fieldType, nullable, isArray);
+            }
+
+            var schema = new TLSchema(name, fields);
+            _schemas[i] = schema;
+            _schemaMap[name] = schema;
+        }
+    }
 
     private void ThrowIfDisposed()
     {

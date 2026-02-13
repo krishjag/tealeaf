@@ -1,6 +1,6 @@
 /*
  * TeaLeaf FFI - C bindings for the TeaLeaf format library
- * Version: 2.0.0-beta.11 (Request for Comments)
+ * Version: 2.0.0-beta.12 (Request for Comments)
  *
  * This header provides a C-compatible API for parsing and manipulating
  * TeaLeaf documents from languages like C# via FFI.
@@ -117,6 +117,19 @@ void tl_document_free(struct TLDocument *doc);
  * `tl_value_free`.
  */
 struct TLValue *tl_document_get(const struct TLDocument *doc, const char *key);
+
+/**
+ * Navigate a dot-path expression on a document to reach a deeply nested value.
+ * The first segment is the document key; remaining segments traverse via Value::get_path.
+ * Path syntax: `key.field[N].field`
+ * Returns a cloned value. Caller must free with tl_value_free.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ * `path` must be a valid, NUL-terminated UTF-8 string.
+ */
+struct TLValue *tl_document_get_path(const struct TLDocument *doc, const char *path);
 
 /**
  * Get all keys in the document.
@@ -437,6 +450,18 @@ struct TLValue *tl_value_array_get(const struct TLValue *value, uintptr_t index)
 struct TLValue *tl_value_object_get(const struct TLValue *value, const char *key);
 
 /**
+ * Navigate a dot-path expression on a value to reach a deeply nested value.
+ * Path syntax: `field.field[N].field`
+ * Returns a cloned value. Caller must free with tl_value_free.
+ *
+ * # Safety
+ *
+ * `value` must be a valid `TLValue` pointer or null.
+ * `path` must be a valid, NUL-terminated UTF-8 string.
+ */
+struct TLValue *tl_value_get_path(const struct TLValue *value, const char *path);
+
+/**
  * Get object keys. Returns NULL-terminated array.
  * Caller must free with tl_string_array_free.
  *
@@ -445,6 +470,35 @@ struct TLValue *tl_value_object_get(const struct TLValue *value, const char *key
  * `value` must be a valid `TLValue` pointer or null.
  */
 char **tl_value_object_keys(const struct TLValue *value);
+
+/**
+ * Get object field count. Returns 0 if not an object.
+ *
+ * # Safety
+ *
+ * `value` must be a valid `TLValue` pointer or null.
+ */
+uintptr_t tl_value_object_len(const struct TLValue *value);
+
+/**
+ * Get object key by index. Returns NULL if out of bounds or not an object.
+ * Caller must free with tl_string_free.
+ *
+ * # Safety
+ *
+ * `value` must be a valid `TLValue` pointer or null.
+ */
+char *tl_value_object_get_key_at(const struct TLValue *value, uintptr_t index);
+
+/**
+ * Get object value by index. Returns NULL if out of bounds or not an object.
+ * Caller must free with tl_value_free.
+ *
+ * # Safety
+ *
+ * `value` must be a valid `TLValue` pointer or null.
+ */
+struct TLValue *tl_value_object_get_value_at(const struct TLValue *value, uintptr_t index);
 
 /**
  * Open a binary TeaLeaf file for reading (reads file into memory).
@@ -494,6 +548,80 @@ struct TLValue *tl_reader_get(const struct TLReader *reader, const char *key);
  * `reader` must be a valid `TLReader` pointer or null.
  */
 char **tl_reader_keys(const struct TLReader *reader);
+
+/**
+ * Get the number of schemas in a parsed document.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+uintptr_t tl_document_schema_count(const struct TLDocument *doc);
+
+/**
+ * Get a schema name by index from a parsed document.
+ * Caller must free the returned string with tl_string_free.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+char *tl_document_schema_name(const struct TLDocument *doc, uintptr_t index);
+
+/**
+ * Get the number of fields in a schema from a parsed document.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+uintptr_t tl_document_schema_field_count(const struct TLDocument *doc, uintptr_t schema_index);
+
+/**
+ * Get a field name from a schema in a parsed document.
+ * Caller must free the returned string with tl_string_free.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+char *tl_document_schema_field_name(const struct TLDocument *doc,
+                                    uintptr_t schema_index,
+                                    uintptr_t field_index);
+
+/**
+ * Get a field's base type from a schema in a parsed document.
+ * Caller must free the returned string with tl_string_free.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+char *tl_document_schema_field_type(const struct TLDocument *doc,
+                                    uintptr_t schema_index,
+                                    uintptr_t field_index);
+
+/**
+ * Check if a field is nullable in a schema from a parsed document.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+bool tl_document_schema_field_nullable(const struct TLDocument *doc,
+                                       uintptr_t schema_index,
+                                       uintptr_t field_index);
+
+/**
+ * Check if a field is an array type in a schema from a parsed document.
+ *
+ * # Safety
+ *
+ * `doc` must be a valid `TLDocument` pointer or null.
+ */
+bool tl_document_schema_field_is_array(const struct TLDocument *doc,
+                                       uintptr_t schema_index,
+                                       uintptr_t field_index);
 
 /**
  * Get the number of schemas in a binary file.

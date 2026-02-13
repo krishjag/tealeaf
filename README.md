@@ -276,17 +276,18 @@ tealeaf help
 tealeaf <command> [options]
 
 Commands:
-  compile       Convert text to binary
-  decompile     Convert binary to text
-  info          Show file info
-  validate      Validate text syntax
+  compile       Compile text (.tl) to binary (.tlbx)
+  decompile     Decompile binary (.tlbx) to text (.tl)
+  info          Show file info (auto-detects format)
+  validate      Validate text format syntax
   to-json       Convert TeaLeaf text to JSON
   from-json     Convert JSON to TeaLeaf text
   tlbx-to-json  Convert TeaLeaf binary to JSON
   json-to-tlbx  Convert JSON to TeaLeaf binary
+  completions   Generate shell completions
 ```
 
-Run `tealeaf help <command>` for detailed usage.
+Run `tealeaf help <command>` for detailed usage. Shell completions are available for Bash, Zsh, Fish, PowerShell, and Elvish via `tealeaf completions <shell>`.
 
 ---
 

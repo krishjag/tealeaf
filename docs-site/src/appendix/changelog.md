@@ -1,6 +1,60 @@
 # Changelog
 
-## v2.0.0-beta.11 (Current)
+## v2.0.0-beta.12 (Current)
+
+### Features
+- **Clap CLI migration** — Replaced hand-rolled `env::args()` parsing with `clap` v4 derive macros. Provides auto-generated colored help, typo suggestions (e.g., `compil` → "did you mean 'compile'?"), `--help`/`-h` on every subcommand, and `--version`/`-V` flag — all derived from annotated structs with zero manual usage text.
+  - Added `clap = { version = "4", features = ["derive", "color"] }` and `clap_complete = "4"` dependencies
+  - `try_parse()` pattern preserves exit code 1 for all errors (including no-args help via `arg_required_else_help`)
+  - Deleted `print_usage()` function — clap auto-generates help from doc comments
+- **Shell completions subcommand** — `tealeaf completions <shell>` generates tab-completion scripts for bash, zsh, fish, powershell, and elvish. Completes subcommands, flags, and `help` arguments.
+- **`get_path` dot-path navigation** — Navigate nested values using dot-path expressions with array indexing.
+  - Rust: `TeaLeaf::get_path("order.items[0].name")` at document level, `Value::get_path("items[0].price")` within values
+  - FFI: `tl_document_get_path(doc, path)` and `tl_value_get_path(value, path)`
+  - .NET: `TLDocument.GetPath(path)` and `TLValue.GetPath(path)` with null-safe returns
+  - Path syntax: `key.field[N].field` — dot-separated field access, `[N]` for array indexing
+- **Object field iteration API** — Enumerate object fields by index without knowing keys upfront.
+  - FFI: `tl_value_object_len`, `tl_value_object_get_key_at`, `tl_value_object_get_value_at`
+  - .NET: `TLValue.ObjectFieldCount`, `GetObjectKeyAt(index)`, `GetObjectValueAt(index)`, `AsObject()` for `(key, value)` tuples, `Keys` property, `GetEnumerator()` for `foreach` support on objects and arrays
+- **Document schema introspection API** — Inspect schema definitions at runtime without parsing text.
+  - FFI: `tl_document_schema_count`, `tl_document_schema_name`, `tl_document_schema_field_count`, `tl_document_schema_field_name`, `tl_document_schema_field_type`, `tl_document_schema_field_nullable`, `tl_document_schema_field_is_array` (7 new C functions)
+  - .NET: `TLDocument.Schemas` (IReadOnlyList), `TLDocument.GetSchema(name)`, `TLDocument.SchemaCount`; `TLSchema` and `TLField` classes with `Name`, `Type`, `IsNullable`, `IsArray` properties
+- **`TLDocumentBuilder`** (.NET) — Fluent API for building multi-key documents with schema support.
+  - Scalar overloads: `Add(key, string|int|long|double|float|bool|DateTimeOffset)`
+  - List overloads: `AddList(key, IEnumerable<string|int|double>)`
+  - Object support: `Add<T>(key, value)` and `AddList<T>(key, items)` for `[TeaLeaf]`-attributed types
+  - Document merging: `AddDocument(TLDocument)` with automatic schema deduplication
+  - Builder pattern: all methods return `this` for chaining
+  - `Build()` produces a `TLDocument` with merged schemas
+
+### Bug Fixes
+- **Schema deduplication in .NET source generator** — Diamond dependency scenarios (type A and type B both reference type C) no longer emit duplicate `@struct` definitions. New `CollectTeaLeafSchemas(StringBuilder, HashSet<string>)` method performs dependency-order traversal with a shared `emitted` set. Cross-assembly fallback detects types from referenced assemblies compiled with older generator versions.
+- Fixed memory leak in `TLValue.AsMap()` where failed key/value pairs weren't disposed
+
+### CLI
+- Improved `--compact` description: "Omit insignificant whitespace for token-efficient output" (was "Use compact single-line output")
+- Improved `--compact-floats` description: "Write whole-number floats as integers (e.g. 42.0 becomes 42)" (was "Use compact float representation")
+
+### Testing
+- Added 26 `TLDocumentBuilder` tests — single/multi-key documents, nested types, list support, `AddDocument` merging, JSON and binary round-trips, scalar overloads, method chaining
+- Added 14 `GetPath` .NET tests — document and value-level navigation across 6-level nested objects with arrays and mixed types
+- Added 15 adversarial `get_path` edge-case tests — empty string, nested fields, array indexing (valid/out-of-bounds/negative), unclosed brackets, empty brackets, non-numeric indices, double dots, leading/trailing dots, huge index overflow, scalar rejection
+- Added `fuzz_get_path` fuzzer target — dedicated fuzzer splitting input between document and path strings, testing both `TeaLeaf::get_path` and `Value::get_path`
+- Updated `fuzz_structured` fuzzer — added `get_path` coverage with arbitrary and well-formed paths
+- Added 2 source generator deduplication tests — `SharedNestedType_DeduplicatesSchemas` (diamond) and `DeepDiamondDependency_DeduplicatesSchemas`
+- Added .NET tests for `GetEnumerator()` on objects/arrays/scalars and `Keys` property
+- Updated 3 CLI integration test assertions for clap error message format (`"Unknown command"` → `"frobnicate"` substring, `"unrecognized subcommand"` negative check)
+
+### Documentation
+- New [completions](../cli/completions.md) CLI reference page — usage, arguments, install instructions for 5 shells, completion coverage details
+- Updated [CLI overview](../cli/overview.md) — added `completions` to command table
+- Updated [SUMMARY.md](../SUMMARY.md) — added completions to CLI Reference navigation
+- Updated [README.md](../../README.md) — added `completions` to command list
+- Updated [TEALEAF_SPEC.md](../../spec/TEALEAF_SPEC.md) — added `completions` under new "Utilities" subsection in Section 7
+
+---
+
+## v2.0.0-beta.11
 
 ### Features
 - **Optional/nullable field support in schema inference** — `analyze_array()` and `analyze_nested_objects()` no longer require strict field uniformity across all objects. Fields not present in every object are automatically marked nullable (`?`), enabling schema inference for real-world datasets where records share most fields but differ in optional ones (e.g., DCAT metadata, API responses). Requires at least 1 field present in all objects.

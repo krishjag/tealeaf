@@ -61,6 +61,11 @@ internal static class NativeMethods
         [MarshalAs(UnmanagedType.LPUTF8Str)] string key);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_document_get_path(
+        IntPtr doc,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string path);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr tl_document_keys(IntPtr doc);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -92,6 +97,33 @@ internal static class NativeMethods
         IntPtr doc,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string path,
         [MarshalAs(UnmanagedType.I1)] bool compress);
+
+    // ==========================================================================
+    // Document Schema API
+    // ==========================================================================
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint tl_document_schema_count(IntPtr doc);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_document_schema_name(IntPtr doc, nuint index);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint tl_document_schema_field_count(IntPtr doc, nuint schemaIndex);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_document_schema_field_name(IntPtr doc, nuint schemaIndex, nuint fieldIndex);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_document_schema_field_type(IntPtr doc, nuint schemaIndex, nuint fieldIndex);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    public static extern bool tl_document_schema_field_nullable(IntPtr doc, nuint schemaIndex, nuint fieldIndex);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    public static extern bool tl_document_schema_field_is_array(IntPtr doc, nuint schemaIndex, nuint fieldIndex);
 
     // ==========================================================================
     // JSON Conversion API
@@ -151,7 +183,21 @@ internal static class NativeMethods
         [MarshalAs(UnmanagedType.LPUTF8Str)] string key);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_value_get_path(
+        IntPtr value,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string path);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr tl_value_object_keys(IntPtr value);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint tl_value_object_len(IntPtr value);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_value_object_get_key_at(IntPtr value, nuint index);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr tl_value_object_get_value_at(IntPtr value, nuint index);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nuint tl_value_bytes_len(IntPtr value);

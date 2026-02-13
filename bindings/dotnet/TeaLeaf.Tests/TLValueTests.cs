@@ -353,4 +353,274 @@ public class TLValueTests
         using var items = doc.GetRequired("items");
         Assert.Throws<IndexOutOfRangeException>(() => items.GetRequired(99));
     }
+
+    // ------------------------------------------------------------------
+    // Object field iteration
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void ObjectFieldCount_ReturnsCorrectCount()
+    {
+        using var doc = TLDocument.Parse("value: {a: 1, b: 2, c: 3}");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Equal(3, value.ObjectFieldCount);
+    }
+
+    [Fact]
+    public void ObjectFieldCount_EmptyObject_ReturnsZero()
+    {
+        using var doc = TLDocument.Parse("value: {}");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Equal(0, value.ObjectFieldCount);
+    }
+
+    [Fact]
+    public void ObjectFieldCount_NotObject_ReturnsZero()
+    {
+        using var doc = TLDocument.Parse("value: hello");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+        Assert.Equal(0, value.ObjectFieldCount);
+    }
+
+    [Fact]
+    public void GetObjectKeyAt_ReturnsKeysInOrder()
+    {
+        using var doc = TLDocument.Parse("value: {name: alice, age: 30, active: true}");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        Assert.Equal("name", value.GetObjectKeyAt(0));
+        Assert.Equal("age", value.GetObjectKeyAt(1));
+        Assert.Equal("active", value.GetObjectKeyAt(2));
+    }
+
+    [Fact]
+    public void GetObjectValueAt_ReturnsValuesInOrder()
+    {
+        using var doc = TLDocument.Parse("value: {name: alice, age: 30, active: true}");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        using var val0 = value.GetObjectValueAt(0);
+        Assert.Equal("alice", val0?.AsString());
+
+        using var val1 = value.GetObjectValueAt(1);
+        Assert.Equal(30, val1?.AsInt());
+
+        using var val2 = value.GetObjectValueAt(2);
+        Assert.True(val2?.AsBool());
+    }
+
+    [Fact]
+    public void GetObjectKeyAt_OutOfBounds_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse("value: {a: 1}");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        Assert.Null(value.GetObjectKeyAt(99));
+        Assert.Null(value.GetObjectKeyAt(-1));
+    }
+
+    [Fact]
+    public void GetObjectValueAt_OutOfBounds_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse("value: {a: 1}");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        Assert.Null(value.GetObjectValueAt(99));
+        Assert.Null(value.GetObjectValueAt(-1));
+    }
+
+    [Fact]
+    public void AsObject_EnumeratesAllPairs()
+    {
+        using var doc = TLDocument.Parse("value: {name: alice, age: 30}");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        var pairs = value.AsObject().ToList();
+        Assert.Equal(2, pairs.Count);
+
+        Assert.Equal("name", pairs[0].Key);
+        Assert.Equal("alice", pairs[0].Value.AsString());
+
+        Assert.Equal("age", pairs[1].Key);
+        Assert.Equal(30, pairs[1].Value.AsInt());
+
+        // Clean up
+        foreach (var (_, v) in pairs)
+            v.Dispose();
+    }
+
+    [Fact]
+    public void AsObject_NotObject_YieldsEmpty()
+    {
+        using var doc = TLDocument.Parse("value: hello");
+        using var value = doc["value"];
+        Assert.NotNull(value);
+
+        var pairs = value.AsObject().ToList();
+        Assert.Empty(pairs);
+    }
+
+    // ------------------------------------------------------------------
+    // GetPath — dot-path navigation
+    // ------------------------------------------------------------------
+
+    private const string NestedDoc = """
+        order: {
+            order_id: ORD-001
+            customer: {
+                name: Alice
+                email: "alice@example.com"
+                address: {
+                    city: Seattle
+                    state: WA
+                    zip: "98101"
+                }
+            }
+            items: [
+                {
+                    product: {
+                        name: Headphones
+                        price: {
+                            base_price: 349.99
+                            currency: USD
+                        }
+                    }
+                    quantity: 1
+                }
+                {
+                    product: {
+                        name: Keyboard
+                        price: {
+                            base_price: 159.0
+                            currency: USD
+                        }
+                    }
+                    quantity: 2
+                }
+            ]
+            status: delivered
+        }
+        """;
+
+    [Fact]
+    public void GetPath_SingleLevel()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order.order_id");
+        Assert.NotNull(val);
+        Assert.Equal("ORD-001", val.AsString());
+    }
+
+    [Fact]
+    public void GetPath_TwoLevels()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order.customer.name");
+        Assert.NotNull(val);
+        Assert.Equal("Alice", val.AsString());
+    }
+
+    [Fact]
+    public void GetPath_ThreeLevels()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order.customer.address.city");
+        Assert.NotNull(val);
+        Assert.Equal("Seattle", val.AsString());
+    }
+
+    [Fact]
+    public void GetPath_ArrayIndex()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order.items[0].quantity");
+        Assert.NotNull(val);
+        Assert.Equal(1, val.AsInt());
+    }
+
+    [Fact]
+    public void GetPath_ArrayIndexSecondElement()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order.items[1].product.name");
+        Assert.NotNull(val);
+        Assert.Equal("Keyboard", val.AsString());
+    }
+
+    [Fact]
+    public void GetPath_DeepNest_SixLevels()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order.items[0].product.price.base_price");
+        Assert.NotNull(val);
+        Assert.True(Math.Abs(349.99 - val.AsFloat()!.Value) < 0.01);
+    }
+
+    [Fact]
+    public void GetPath_MissingKey_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order.customer.phone");
+        Assert.Null(val);
+    }
+
+    [Fact]
+    public void GetPath_MissingIntermediate_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order.nonexistent.field");
+        Assert.Null(val);
+    }
+
+    [Fact]
+    public void GetPath_ArrayOutOfBounds_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order.items[99].product.name");
+        Assert.Null(val);
+    }
+
+    [Fact]
+    public void GetPath_DocumentLevel_JustKey()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var val = doc.GetPath("order");
+        Assert.NotNull(val);
+        Assert.Equal(TLType.Object, val.Type);
+    }
+
+    [Fact]
+    public void GetPath_OnValue_RelativePath()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        using var order = doc["order"];
+        Assert.NotNull(order);
+
+        using var val = order.GetPath("items[1].product.price.currency");
+        Assert.NotNull(val);
+        Assert.Equal("USD", val.AsString());
+    }
+
+    [Fact]
+    public void GetPath_EmptyPath_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        Assert.Null(doc.GetPath(""));
+        Assert.Null(doc.GetPath(null!));
+    }
+
+    [Fact]
+    public void GetPath_NonexistentRoot_ReturnsNull()
+    {
+        using var doc = TLDocument.Parse(NestedDoc);
+        Assert.Null(doc.GetPath("nosuchkey.field"));
+    }
 }
