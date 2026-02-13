@@ -1558,4 +1558,141 @@ public partial class MutableItem
         // Should NOT contain constructor local variables pattern
         Assert.DoesNotContain("_p_", gen);
     }
+
+    // =========================================================================
+    // @table code emission for List<NestedType>
+    // =========================================================================
+
+    [Fact]
+    public void Generator_ListOfNestedType_EmitsTableFormat()
+    {
+        var source = @"
+using System.Collections.Generic;
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(Generate = true)]
+public partial class LineItem
+{
+    public string Sku { get; set; } = """";
+    public int Qty { get; set; }
+    public double Price { get; set; }
+}
+
+[TeaLeaf(Generate = true)]
+public partial class Invoice
+{
+    public string InvoiceId { get; set; } = """";
+    public List<LineItem> Items { get; set; } = new();
+    public double Total { get; set; }
+}
+";
+        var result = RunGenerator(source);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var invoiceGen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("Invoice.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        var lineItemGen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("LineItem.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Invoice should emit @table for the nested list
+        Assert.Contains("@table line_item", invoiceGen);
+        // LineItem should have WriteTeaLeafTupleValue method
+        Assert.Contains("WriteTeaLeafTupleValue", lineItemGen);
+    }
+
+    [Fact]
+    public void Generator_DeeplyNestedType_EmitsTableAndTupleValue()
+    {
+        var source = @"
+using System.Collections.Generic;
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(Generate = true)]
+public partial class Coord
+{
+    public double Lat { get; set; }
+    public double Lng { get; set; }
+}
+
+[TeaLeaf(Generate = true)]
+public partial class Place
+{
+    public string Name { get; set; } = """";
+    public Coord Location { get; set; } = new();
+}
+
+[TeaLeaf(Generate = true)]
+public partial class Trip
+{
+    public string TripId { get; set; } = """";
+    public List<Place> Stops { get; set; } = new();
+}
+";
+        var result = RunGenerator(source);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var tripGen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("Trip.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        var placeGen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("Place.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        var coordGen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("Coord.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Trip should emit @table for the nested list of Place
+        Assert.Contains("@table place", tripGen);
+
+        // Place should have WriteTeaLeafTupleValue that calls nested Coord tuple
+        Assert.Contains("WriteTeaLeafTupleValue", placeGen);
+
+        // Coord should also have WriteTeaLeafTupleValue
+        Assert.Contains("WriteTeaLeafTupleValue", coordGen);
+    }
+
+    [Fact]
+    public void Generator_TableEmission_NoTrailingCommaPattern()
+    {
+        var source = @"
+using System.Collections.Generic;
+using TeaLeaf.Annotations;
+
+namespace TestModels;
+
+[TeaLeaf(Generate = true)]
+public partial class Tag
+{
+    public string Key { get; set; } = """";
+    public string Value { get; set; } = """";
+}
+
+[TeaLeaf(Generate = true)]
+public partial class Tagged
+{
+    public string Name { get; set; } = """";
+    public List<Tag> Tags { get; set; } = new();
+}
+";
+        var result = RunGenerator(source);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var taggedGen = result.GeneratedTrees
+            .First(t => t.FilePath.Contains("Tagged.TeaLeaf.g.cs"))
+            .GetText().ToString();
+
+        // Should use separator pattern (first_ flag) instead of terminator
+        Assert.Contains("first_", taggedGen);
+        // Should contain @table directive
+        Assert.Contains("@table tag", taggedGen);
+    }
 }

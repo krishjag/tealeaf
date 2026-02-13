@@ -214,12 +214,15 @@ public static class TeaLeafSerializer
         else
         {
             sb.AppendLine();
+            bool first = true;
             foreach (var item in itemList)
             {
+                if (!first) sb.AppendLine(",");
+                first = false;
                 sb.Append("    ");
                 WriteTupleValue(sb, item!, info);
-                sb.AppendLine(",");
             }
+            sb.AppendLine();
             sb.AppendLine("]");
         }
 
@@ -395,14 +398,17 @@ public static class TeaLeafSerializer
 
             sb.AppendLine();
             var tupleIndent = indent + "    ";
+            bool firstTuple = true;
             foreach (var item in list)
             {
                 if (item == null) continue;
+                if (!firstTuple) sb.AppendLine(",");
+                firstTuple = false;
                 sb.Append(tupleIndent);
                 var itemInfo = TeaLeafTypeInfo.GetOrCreate(item.GetType());
                 WriteTupleValue(sb, item, itemInfo);
-                sb.AppendLine(",");
             }
+            sb.AppendLine();
             sb.Append(indent);
             sb.AppendLine("]");
         }

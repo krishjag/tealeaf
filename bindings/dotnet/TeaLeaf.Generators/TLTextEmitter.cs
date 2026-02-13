@@ -497,14 +497,17 @@ internal static class TLTextEmitter
                     sb.AppendLine($"{indent}else");
                     sb.AppendLine($"{indent}{{");
                     sb.AppendLine($"{indent}    sb.AppendLine();");
+                    sb.AppendLine($"{indent}    var first_{prop.CSharpName} = true;");
                     sb.AppendLine($"{indent}    foreach (var item in {access})");
                     sb.AppendLine($"{indent}    {{");
                     sb.AppendLine($"{indent}        if (item is null) continue;");
+                    sb.AppendLine($"{indent}        if (!first_{prop.CSharpName}) sb.AppendLine(\",\");");
+                    sb.AppendLine($"{indent}        first_{prop.CSharpName} = false;");
                     sb.AppendLine($"{indent}        sb.Append(indent);");
                     sb.AppendLine($"{indent}        sb.Append(\"    \");");
                     sb.AppendLine($"{indent}        item.WriteTeaLeafTupleValue(sb);");
-                    sb.AppendLine($"{indent}        sb.AppendLine(\",\");");
                     sb.AppendLine($"{indent}    }}");
+                    sb.AppendLine($"{indent}    sb.AppendLine();");
                     sb.AppendLine($"{indent}    sb.Append(indent);");
                     sb.AppendLine($"{indent}    sb.AppendLine(\"]\");");
                     sb.AppendLine($"{indent}}}");
@@ -588,7 +591,9 @@ internal static class TLTextEmitter
                             c == '"' || c == '\\' || c == '#' || c == ':' ||
                             c == ',' || c == '{' || c == '}' || c == '[' ||
                             c == ']' || c == '(' || c == ')' || c == '~' ||
-                            c == '@' || c == '!' || c == '/')
+                            c == '@' || c == '!' || c == '/' || c == '%' ||
+                            c == '=' || c == '?' || c == '\'' ||
+                            c > '\x007F')
                         {
                             needsQuoting = true;
                             break;

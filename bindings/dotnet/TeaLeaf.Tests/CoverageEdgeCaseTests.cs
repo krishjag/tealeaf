@@ -2701,6 +2701,70 @@ public class TeaLeafTextHelperEdgeCaseTests
     }
 
     // ================================================================
+    // NeedsQuoting — Rust lexer token characters
+    // ================================================================
+
+    [Fact]
+    public void NeedsQuoting_PercentSign_ReturnsTrue()
+    {
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("%"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("50%"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("humidity%RH"));
+    }
+
+    [Fact]
+    public void NeedsQuoting_EqualsSign_ReturnsTrue()
+    {
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("="));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("a=b"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("key=value"));
+    }
+
+    [Fact]
+    public void NeedsQuoting_QuestionMark_ReturnsTrue()
+    {
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("?"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("what?"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("is?it"));
+    }
+
+    [Fact]
+    public void NeedsQuoting_SingleQuote_ReturnsTrue()
+    {
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("'"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("it's"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("don't"));
+    }
+
+    [Fact]
+    public void NeedsQuoting_ExclamationMark_ReturnsTrue()
+    {
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("!"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("hello!"));
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("!ref"));
+    }
+
+    [Fact]
+    public void NeedsQuoting_NonAsciiChars_ReturnsTrue()
+    {
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("\u00b0C"));     // degree symbol
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("caf\u00e9"));   // e-acute
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("\u2764"));       // heart symbol
+        Assert.True(TeaLeafTextHelper.NeedsQuoting("\u00fc"));       // u-umlaut
+    }
+
+    [Fact]
+    public void NeedsQuoting_SafeIdentifiers_ReturnFalse()
+    {
+        // These should NOT need quoting (alphanumeric, underscore, hyphen, dot)
+        Assert.False(TeaLeafTextHelper.NeedsQuoting("hello"));
+        Assert.False(TeaLeafTextHelper.NeedsQuoting("hello_world"));
+        Assert.False(TeaLeafTextHelper.NeedsQuoting("hello-world"));
+        Assert.False(TeaLeafTextHelper.NeedsQuoting("v1.2.3"));
+        Assert.False(TeaLeafTextHelper.NeedsQuoting("ABC"));
+    }
+
+    // ================================================================
     // AppendValue — string that needs quoting
     // ================================================================
 

@@ -8,7 +8,7 @@ Enable the `derive` feature:
 
 ```toml
 [dependencies]
-tealeaf-core = { version = "2.0.0-beta.12", features = ["derive"] }
+tealeaf-core = { version = "2.0.0-beta.13", features = ["derive"] }
 ```
 
 ## ToTeaLeaf

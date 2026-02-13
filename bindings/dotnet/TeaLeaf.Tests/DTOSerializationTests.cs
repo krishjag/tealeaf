@@ -105,6 +105,16 @@ public partial class TestOrderWithItems
     public double Total { get; set; }
 }
 
+// Deeply nested @table: List<PersonWithAddress> where PersonWithAddress has nested Address
+[TeaLeaf(Generate = true)]
+[TLKey("team")]
+public partial class TeamWithMembers
+{
+    [TLRename("team_name")]
+    public string TeamName { get; set; } = "";
+    public List<PersonWithAddress> Members { get; set; } = new();
+}
+
 // ========================================================================
 // Tests
 // ========================================================================
@@ -776,6 +786,489 @@ public class DTOSerializationTests
             if (File.Exists(path)) File.Delete(path);
         }
     }
+
+    // ------------------------------------------------------------------
+    // Regression: Percent sign quoting (source-generated)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void RoundTrip_PercentInString_PreservesData()
+    {
+        var user = new SimpleUser { Name = "50%", Age = 1, Active = true };
+
+        using var doc = user.ToTLDocument();
+        var restored = SimpleUser.FromTeaLeaf(doc);
+
+        Assert.Equal("50%", restored.Name);
+    }
+
+    [Fact]
+    public void Serialization_PercentInString_IsQuoted()
+    {
+        var user = new SimpleUser { Name = "%", Age = 1, Active = true };
+        var text = user.ToTeaLeafText();
+        Assert.Contains("\"%\"", text);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: Non-ASCII character quoting (source-generated)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void RoundTrip_NonAsciiChar_PreservesData()
+    {
+        var user = new SimpleUser { Name = "\u00b0C", Age = 1, Active = true };
+
+        using var doc = user.ToTLDocument();
+        var restored = SimpleUser.FromTeaLeaf(doc);
+
+        Assert.Equal("\u00b0C", restored.Name);
+    }
+
+    [Fact]
+    public void Serialization_NonAsciiChar_IsQuoted()
+    {
+        var user = new SimpleUser { Name = "\u00b0C", Age = 1, Active = true };
+        var text = user.ToTeaLeafText();
+        Assert.Contains("\"", text);
+        Assert.Contains("\u00b0C", text);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: Equals sign quoting (source-generated)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void RoundTrip_EqualsInString_PreservesData()
+    {
+        var user = new SimpleUser { Name = "key=value", Age = 1, Active = true };
+
+        using var doc = user.ToTLDocument();
+        var restored = SimpleUser.FromTeaLeaf(doc);
+
+        Assert.Equal("key=value", restored.Name);
+    }
+
+    [Fact]
+    public void Serialization_EqualsInString_IsQuoted()
+    {
+        var user = new SimpleUser { Name = "a=b", Age = 1, Active = true };
+        var text = user.ToTeaLeafText();
+        Assert.Contains("\"a=b\"", text);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: Question mark quoting (source-generated)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void RoundTrip_QuestionMarkInString_PreservesData()
+    {
+        var user = new SimpleUser { Name = "what?", Age = 1, Active = true };
+
+        using var doc = user.ToTLDocument();
+        var restored = SimpleUser.FromTeaLeaf(doc);
+
+        Assert.Equal("what?", restored.Name);
+    }
+
+    [Fact]
+    public void Serialization_QuestionMarkInString_IsQuoted()
+    {
+        var user = new SimpleUser { Name = "why?", Age = 1, Active = true };
+        var text = user.ToTeaLeafText();
+        Assert.Contains("\"why?\"", text);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: Single quote quoting (source-generated)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void RoundTrip_SingleQuoteInString_PreservesData()
+    {
+        var user = new SimpleUser { Name = "it's", Age = 1, Active = true };
+
+        using var doc = user.ToTLDocument();
+        var restored = SimpleUser.FromTeaLeaf(doc);
+
+        Assert.Equal("it's", restored.Name);
+    }
+
+    [Fact]
+    public void Serialization_SingleQuoteInString_IsQuoted()
+    {
+        var user = new SimpleUser { Name = "it's", Age = 1, Active = true };
+        var text = user.ToTeaLeafText();
+        Assert.Contains("\"it's\"", text);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: @table no trailing comma (source-generated)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void TableOutput_NoTrailingComma_ParsesCorrectly()
+    {
+        var order = new TestOrderWithItems
+        {
+            OrderId = "ORD-TBL",
+            Items = new List<TestOrderItem>
+            {
+                new TestOrderItem { ProductName = "Alpha", Quantity = 3, UnitPrice = 15.0 },
+                new TestOrderItem { ProductName = "Beta", Quantity = 1, UnitPrice = 42.0 }
+            },
+            Total = 87.0
+        };
+
+        var text = order.ToTeaLeafDocument();
+
+        // Verify @table syntax is used
+        Assert.Contains("@table", text);
+
+        // No trailing comma before ]
+        Assert.DoesNotMatch(@"\),\s*\]", text);
+
+        // Parse should succeed without errors
+        using var doc = TLDocument.Parse(text);
+        Assert.NotNull(doc);
+
+        using var value = doc["test_order"];
+        Assert.NotNull(value);
+    }
+
+    // ------------------------------------------------------------------
+    // Combined: all special characters round-trip (source-generated)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void RoundTrip_AllSpecialCharsCombined()
+    {
+        var specialValues = new[]
+        {
+            "%", "50%", "=", "a=b", "?", "why?",
+            "'", "it's", "\u00b0C", "caf\u00e9",
+            "a/b", "a:b", "a@b", "a!b", "a~b"
+        };
+
+        foreach (var val in specialValues)
+        {
+            var user = new SimpleUser { Name = val, Age = 1, Active = true };
+            using var doc = user.ToTLDocument();
+            var restored = SimpleUser.FromTeaLeaf(doc);
+
+            Assert.Equal(val, restored.Name);
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // @table with deeply nested objects (source-generated)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void RoundTrip_DeeplyNestedTable_PreservesData()
+    {
+        var original = new TeamWithMembers
+        {
+            TeamName = "Engineering",
+            Members = new List<PersonWithAddress>
+            {
+                new PersonWithAddress
+                {
+                    Name = "alice",
+                    HomeAddress = new Address { Street = "123 Main St", City = "Springfield", Zip = "62701" }
+                },
+                new PersonWithAddress
+                {
+                    Name = "bob",
+                    HomeAddress = new Address { Street = "456 Oak Ave", City = "Portland", Zip = "97201" }
+                }
+            }
+        };
+
+        using var doc = original.ToTLDocument();
+        var restored = TeamWithMembers.FromTeaLeaf(doc);
+
+        Assert.Equal("Engineering", restored.TeamName);
+        Assert.Equal(2, restored.Members.Count);
+        Assert.Equal("alice", restored.Members[0].Name);
+        Assert.Equal("123 Main St", restored.Members[0].HomeAddress.Street);
+        Assert.Equal("Springfield", restored.Members[0].HomeAddress.City);
+        Assert.Equal("bob", restored.Members[1].Name);
+        Assert.Equal("456 Oak Ave", restored.Members[1].HomeAddress.Street);
+    }
+
+    [Fact]
+    public void DeeplyNestedTable_TextContainsTableDirective()
+    {
+        var team = new TeamWithMembers
+        {
+            TeamName = "QA",
+            Members = new List<PersonWithAddress>
+            {
+                new PersonWithAddress
+                {
+                    Name = "carol",
+                    HomeAddress = new Address { Street = "789 Elm", City = "Boston", Zip = "02101" }
+                }
+            }
+        };
+
+        var text = team.ToTeaLeafDocument();
+
+        // Should contain @table for the nested list
+        Assert.Contains("@table", text);
+        // Should contain struct definitions for both nested types
+        Assert.Contains("@struct address", text);
+        Assert.Contains("@struct person_with_address", text);
+        Assert.Contains("@struct team_with_members", text);
+        // No trailing comma
+        Assert.DoesNotMatch(@"\),\s*\]", text);
+
+        // Must parse without errors
+        using var doc = TLDocument.Parse(text);
+        Assert.NotNull(doc);
+    }
+
+    [Fact]
+    public void RoundTrip_EmptyNestedList_PreservesData()
+    {
+        var original = new TeamWithMembers
+        {
+            TeamName = "Empty Team",
+            Members = new List<PersonWithAddress>()
+        };
+
+        using var doc = original.ToTLDocument();
+        var restored = TeamWithMembers.FromTeaLeaf(doc);
+
+        Assert.Equal("Empty Team", restored.TeamName);
+        Assert.Empty(restored.Members);
+    }
+
+    [Fact]
+    public void RoundTrip_SingleItemNestedList_PreservesData()
+    {
+        var original = new TeamWithMembers
+        {
+            TeamName = "Solo",
+            Members = new List<PersonWithAddress>
+            {
+                new PersonWithAddress
+                {
+                    Name = "only",
+                    HomeAddress = new Address { Street = "1 Lone Rd", City = "Solo City", Zip = "00001" }
+                }
+            }
+        };
+
+        using var doc = original.ToTLDocument();
+        var restored = TeamWithMembers.FromTeaLeaf(doc);
+
+        Assert.Equal("Solo", restored.TeamName);
+        Assert.Single(restored.Members);
+        Assert.Equal("only", restored.Members[0].Name);
+        Assert.Equal("1 Lone Rd", restored.Members[0].HomeAddress.Street);
+    }
+
+    // ------------------------------------------------------------------
+    // Compact output round-trip (source-generated)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Compact_SimpleUser_SmallerThanPretty()
+    {
+        var user = new SimpleUser { Name = "alice", Age = 30, Active = true };
+
+        using var doc = user.ToTLDocument();
+        var pretty = doc.ToText();
+        var compact = doc.ToText(compact: true);
+
+        Assert.True(compact.Length < pretty.Length,
+            $"Compact ({compact.Length}) should be smaller than pretty ({pretty.Length})");
+    }
+
+    [Fact]
+    public void Compact_SimpleUser_RoundTripsCorrectly()
+    {
+        var original = new SimpleUser { Name = "alice", Age = 30, Active = true };
+
+        using var doc = original.ToTLDocument();
+        var compactText = doc.ToText(compact: true);
+
+        // Parse the compact output and verify data
+        using var reparsed = TLDocument.Parse(compactText);
+        var restored = SimpleUser.FromTeaLeaf(reparsed);
+
+        Assert.Equal(original.Name, restored.Name);
+        Assert.Equal(original.Age, restored.Age);
+        Assert.Equal(original.Active, restored.Active);
+    }
+
+    [Fact]
+    public void Compact_Product_RoundTripsWithFloats()
+    {
+        var original = new Product
+        {
+            Name = "Widget",
+            Price = 19.99,
+            Description = "A fine widget"
+        };
+
+        using var doc = original.ToTLDocument();
+        var compactText = doc.ToText(compact: true);
+
+        using var reparsed = TLDocument.Parse(compactText);
+        var restored = Product.FromTeaLeaf(reparsed);
+
+        Assert.Equal(original.Name, restored.Name);
+        Assert.True(Math.Abs(original.Price - restored.Price) < 0.01);
+        Assert.Equal(original.Description, restored.Description);
+    }
+
+    [Fact]
+    public void CompactFloats_WholeNumberDouble_StripsDecimal()
+    {
+        // Use a Rust-parsed document with explicit float notation to test compactFloats
+        using var doc = TLDocument.Parse(@"
+            @struct item (name: string, price: float)
+            item: { name: test, price: 42.0 }
+        ");
+        var withDecimal = doc.ToText();
+        var compactFloats = doc.ToText(compactFloats: true);
+
+        // Pretty output should preserve 42.0
+        Assert.Contains("42.0", withDecimal);
+        // CompactFloats output should strip .0
+        Assert.DoesNotContain("42.0", compactFloats);
+        Assert.Contains("42", compactFloats);
+    }
+
+    [Fact]
+    public void CompactFloats_WholeNumberDouble_RoundTripsAsInt()
+    {
+        var product = new Product { Name = "test", Price = 100.0 };
+
+        using var doc = product.ToTLDocument();
+        var compactFloatsText = doc.ToText(compactFloats: true);
+
+        // Re-parse: compactFloats strips .0, so parser sees int
+        using var reparsed = TLDocument.Parse(compactFloatsText);
+        using var val = reparsed["custom_product"];
+        Assert.NotNull(val);
+
+        using var price = val["price"];
+        Assert.NotNull(price);
+        // Value should be accessible (as int since .0 was stripped)
+        Assert.Equal(100, price.AsInt());
+    }
+
+    [Fact]
+    public void CompactFloats_FractionalDouble_PreservesDecimal()
+    {
+        var product = new Product { Name = "test", Price = 19.99 };
+
+        using var doc = product.ToTLDocument();
+        var compactFloats = doc.ToText(compactFloats: true);
+
+        // Fractional values should retain their decimal
+        Assert.Contains("19.99", compactFloats);
+    }
+
+    [Fact]
+    public void CompactAndCompactFloats_Combined_RoundTrips()
+    {
+        var order = new TestOrderWithItems
+        {
+            OrderId = "ORD-COMPACT",
+            Items = new List<TestOrderItem>
+            {
+                new TestOrderItem { ProductName = "Alpha", Quantity = 3, UnitPrice = 15.0 },
+                new TestOrderItem { ProductName = "Beta", Quantity = 1, UnitPrice = 24.99 }
+            },
+            Total = 39.99
+        };
+
+        using var doc = order.ToTLDocument();
+        var pretty = doc.ToText();
+        var compact = doc.ToText(compact: true, compactFloats: true);
+
+        // Compact should be smaller
+        Assert.True(compact.Length < pretty.Length);
+
+        // Whole-number floats should lose .0
+        Assert.DoesNotContain("15.0", compact);
+        // Fractional floats should be preserved
+        Assert.Contains("24.99", compact);
+        Assert.Contains("39.99", compact);
+
+        // Should still parse
+        using var reparsed = TLDocument.Parse(compact);
+        using var val = reparsed["test_order"];
+        Assert.NotNull(val);
+
+        using var orderId = val["order_id"];
+        Assert.Equal("ORD-COMPACT", orderId?.AsString());
+    }
+
+    [Fact]
+    public void Compact_NestedObject_RoundTrips()
+    {
+        var original = new PersonWithAddress
+        {
+            Name = "alice",
+            HomeAddress = new Address { Street = "123 Main St", City = "Springfield", Zip = "62701" }
+        };
+
+        using var doc = original.ToTLDocument();
+        var compactText = doc.ToText(compact: true);
+
+        using var reparsed = TLDocument.Parse(compactText);
+        var restored = PersonWithAddress.FromTeaLeaf(reparsed);
+
+        Assert.Equal("alice", restored.Name);
+        Assert.Equal("123 Main St", restored.HomeAddress.Street);
+        Assert.Equal("Springfield", restored.HomeAddress.City);
+        Assert.Equal("62701", restored.HomeAddress.Zip);
+    }
+
+    [Fact]
+    public void Compact_DeeplyNestedTable_RoundTrips()
+    {
+        var original = new TeamWithMembers
+        {
+            TeamName = "Engineering",
+            Members = new List<PersonWithAddress>
+            {
+                new PersonWithAddress
+                {
+                    Name = "alice",
+                    HomeAddress = new Address { Street = "123 Main St", City = "Springfield", Zip = "62701" }
+                },
+                new PersonWithAddress
+                {
+                    Name = "bob",
+                    HomeAddress = new Address { Street = "456 Oak Ave", City = "Portland", Zip = "97201" }
+                }
+            }
+        };
+
+        using var doc = original.ToTLDocument();
+        var pretty = doc.ToText();
+        var compact = doc.ToText(compact: true);
+
+        Assert.True(compact.Length < pretty.Length);
+
+        using var reparsed = TLDocument.Parse(compact);
+        var restored = TeamWithMembers.FromTeaLeaf(reparsed);
+
+        Assert.Equal("Engineering", restored.TeamName);
+        Assert.Equal(2, restored.Members.Count);
+        Assert.Equal("alice", restored.Members[0].Name);
+        Assert.Equal("123 Main St", restored.Members[0].HomeAddress.Street);
+        Assert.Equal("bob", restored.Members[1].Name);
+        Assert.Equal("456 Oak Ave", restored.Members[1].HomeAddress.Street);
+    }
 }
 
 // ========================================================================
@@ -1275,5 +1768,601 @@ public class TeaLeafSerializerTests
         Assert.Equal(5, restored.Items[0].Quantity);
         Assert.Equal("Cog", restored.Items[1].ProductName);
         Assert.True(Math.Abs(30.0 - restored.Total) < 0.01);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: Percent sign quoting
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_RoundTrip_PercentInString()
+    {
+        var user = new SimpleUser
+        {
+            Name = "50%",
+            Age = 1,
+            Active = true
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(user);
+        var restored = TeaLeafSerializer.FromDocument<SimpleUser>(doc);
+
+        Assert.Equal("50%", restored.Name);
+    }
+
+    [Fact]
+    public void Serializer_Serialization_PercentIsQuoted()
+    {
+        var user = new SimpleUser { Name = "%", Age = 1, Active = true };
+        var text = TeaLeafSerializer.ToText(user);
+        Assert.Contains("\"%\"", text);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: Non-ASCII character quoting (e.g. degree symbol)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_RoundTrip_NonAsciiCharacter()
+    {
+        var user = new SimpleUser
+        {
+            Name = "\u00b0C",
+            Age = 1,
+            Active = true
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(user);
+        var restored = TeaLeafSerializer.FromDocument<SimpleUser>(doc);
+
+        Assert.Equal("\u00b0C", restored.Name);
+    }
+
+    [Fact]
+    public void Serializer_Serialization_NonAsciiIsQuoted()
+    {
+        var user = new SimpleUser { Name = "\u00b0C", Age = 1, Active = true };
+        var text = TeaLeafSerializer.ToText(user);
+        // Non-ASCII character should trigger quoting
+        Assert.Contains("\"", text);
+        Assert.Contains("\u00b0C", text);
+    }
+
+    [Fact]
+    public void Serializer_RoundTrip_UnicodeEmoji()
+    {
+        var product = new Product
+        {
+            Name = "\u2764 Heart",
+            Price = 1.0
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(product);
+        var restored = TeaLeafSerializer.FromDocument<Product>(doc);
+
+        Assert.Equal("\u2764 Heart", restored.Name);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: Equals sign quoting
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_RoundTrip_EqualsInString()
+    {
+        var user = new SimpleUser
+        {
+            Name = "key=value",
+            Age = 1,
+            Active = true
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(user);
+        var restored = TeaLeafSerializer.FromDocument<SimpleUser>(doc);
+
+        Assert.Equal("key=value", restored.Name);
+    }
+
+    [Fact]
+    public void Serializer_Serialization_EqualsIsQuoted()
+    {
+        var user = new SimpleUser { Name = "a=b", Age = 1, Active = true };
+        var text = TeaLeafSerializer.ToText(user);
+        Assert.Contains("\"a=b\"", text);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: Question mark quoting
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_RoundTrip_QuestionMarkInString()
+    {
+        var user = new SimpleUser
+        {
+            Name = "what?",
+            Age = 1,
+            Active = true
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(user);
+        var restored = TeaLeafSerializer.FromDocument<SimpleUser>(doc);
+
+        Assert.Equal("what?", restored.Name);
+    }
+
+    [Fact]
+    public void Serializer_Serialization_QuestionMarkIsQuoted()
+    {
+        var user = new SimpleUser { Name = "why?", Age = 1, Active = true };
+        var text = TeaLeafSerializer.ToText(user);
+        Assert.Contains("\"why?\"", text);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: Single quote quoting
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_RoundTrip_SingleQuoteInString()
+    {
+        var user = new SimpleUser
+        {
+            Name = "it's",
+            Age = 1,
+            Active = true
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(user);
+        var restored = TeaLeafSerializer.FromDocument<SimpleUser>(doc);
+
+        Assert.Equal("it's", restored.Name);
+    }
+
+    [Fact]
+    public void Serializer_Serialization_SingleQuoteIsQuoted()
+    {
+        var user = new SimpleUser { Name = "it's", Age = 1, Active = true };
+        var text = TeaLeafSerializer.ToText(user);
+        Assert.Contains("\"it's\"", text);
+    }
+
+    // ------------------------------------------------------------------
+    // Regression: @table no trailing comma — parse succeeds
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_TableOutput_NoTrailingComma_ParsesCorrectly()
+    {
+        var order = new TestOrderWithItems
+        {
+            OrderId = "ORD-TBL",
+            Items = new List<TestOrderItem>
+            {
+                new TestOrderItem { ProductName = "Alpha", Quantity = 3, UnitPrice = 15.0 },
+                new TestOrderItem { ProductName = "Beta", Quantity = 1, UnitPrice = 42.0 }
+            },
+            Total = 87.0
+        };
+
+        var text = TeaLeafSerializer.ToDocument(order);
+
+        // Verify @table syntax is used
+        Assert.Contains("@table", text);
+
+        // Verify no trailing comma before closing bracket:
+        // The text should NOT contain "),\r\n]" or "),\n]" patterns
+        // Instead, the last tuple should end with ")\r\n" or ")\n" followed by "]"
+        Assert.DoesNotMatch(@"\),\s*\]", text);
+
+        // Parse should succeed without errors
+        using var doc = TLDocument.Parse(text);
+        Assert.NotNull(doc);
+
+        using var value = doc["test_order"];
+        Assert.NotNull(value);
+    }
+
+    [Fact]
+    public void Serializer_CollectionToText_TableOutput_NoTrailingComma()
+    {
+        var items = new List<TestOrderItem>
+        {
+            new TestOrderItem { ProductName = "X", Quantity = 1, UnitPrice = 10.0 },
+            new TestOrderItem { ProductName = "Y", Quantity = 2, UnitPrice = 20.0 },
+            new TestOrderItem { ProductName = "Z", Quantity = 3, UnitPrice = 30.0 }
+        };
+
+        var text = TeaLeafSerializer.ToText<TestOrderItem>(items, "items");
+
+        // Should use @table format
+        Assert.Contains("@table", text);
+
+        // No trailing comma before ]
+        Assert.DoesNotMatch(@"\),\s*\]", text);
+
+        // Should round-trip through the parser
+        using var doc = TLDocument.Parse(text);
+        using var value = doc["items"];
+        Assert.NotNull(value);
+        Assert.Equal(TLType.Array, value.Type);
+        Assert.Equal(3, value.ArrayLength);
+    }
+
+    // ------------------------------------------------------------------
+    // Combined: all special characters in a single round-trip
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_RoundTrip_AllSpecialCharsCombined()
+    {
+        // Test multiple special chars that required quoting fixes
+        var specialValues = new[]
+        {
+            "%", "50%", "=", "a=b", "?", "why?",
+            "'", "it's", "\u00b0C", "caf\u00e9",
+            "a/b", "a:b", "a@b", "a!b", "a~b"
+        };
+
+        foreach (var val in specialValues)
+        {
+            var user = new SimpleUser { Name = val, Age = 1, Active = true };
+            using var doc = TeaLeafSerializer.ToTLDocument(user);
+            var restored = TeaLeafSerializer.FromDocument<SimpleUser>(doc);
+
+            Assert.Equal(val, restored.Name);
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // @table with deeply nested objects (reflection)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_RoundTrip_DeeplyNestedTable()
+    {
+        var original = new TeamWithMembers
+        {
+            TeamName = "Engineering",
+            Members = new List<PersonWithAddress>
+            {
+                new PersonWithAddress
+                {
+                    Name = "alice",
+                    HomeAddress = new Address { Street = "123 Main St", City = "Springfield", Zip = "62701" }
+                },
+                new PersonWithAddress
+                {
+                    Name = "bob",
+                    HomeAddress = new Address { Street = "456 Oak Ave", City = "Portland", Zip = "97201" }
+                }
+            }
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var restored = TeaLeafSerializer.FromDocument<TeamWithMembers>(doc);
+
+        Assert.Equal("Engineering", restored.TeamName);
+        Assert.Equal(2, restored.Members.Count);
+        Assert.Equal("alice", restored.Members[0].Name);
+        Assert.Equal("123 Main St", restored.Members[0].HomeAddress.Street);
+        Assert.Equal("Springfield", restored.Members[0].HomeAddress.City);
+        Assert.Equal("bob", restored.Members[1].Name);
+        Assert.Equal("456 Oak Ave", restored.Members[1].HomeAddress.Street);
+    }
+
+    [Fact]
+    public void Serializer_DeeplyNestedTable_TextContainsTableDirective()
+    {
+        var team = new TeamWithMembers
+        {
+            TeamName = "QA",
+            Members = new List<PersonWithAddress>
+            {
+                new PersonWithAddress
+                {
+                    Name = "carol",
+                    HomeAddress = new Address { Street = "789 Elm", City = "Boston", Zip = "02101" }
+                }
+            }
+        };
+
+        var text = TeaLeafSerializer.ToDocument(team);
+
+        Assert.Contains("@table", text);
+        Assert.Contains("@struct address", text);
+        Assert.Contains("@struct person_with_address", text);
+        Assert.DoesNotMatch(@"\),\s*\]", text);
+
+        using var doc = TLDocument.Parse(text);
+        Assert.NotNull(doc);
+    }
+
+    [Fact]
+    public void Serializer_CollectionToText_DeeplyNestedTable()
+    {
+        var people = new List<PersonWithAddress>
+        {
+            new PersonWithAddress
+            {
+                Name = "alice",
+                HomeAddress = new Address { Street = "123 Main", City = "NYC", Zip = "10001" }
+            },
+            new PersonWithAddress
+            {
+                Name = "bob",
+                HomeAddress = new Address { Street = "456 Oak", City = "LA", Zip = "90001" }
+            }
+        };
+
+        var text = TeaLeafSerializer.ToText<PersonWithAddress>(people, "people");
+
+        Assert.Contains("@table", text);
+        Assert.DoesNotMatch(@"\),\s*\]", text);
+
+        using var doc = TLDocument.Parse(text);
+        var restored = TeaLeafSerializer.FromList<PersonWithAddress>(doc, "people");
+
+        Assert.Equal(2, restored.Count);
+        Assert.Equal("alice", restored[0].Name);
+        Assert.Equal("123 Main", restored[0].HomeAddress.Street);
+        Assert.Equal("bob", restored[1].Name);
+    }
+
+    [Fact]
+    public void Serializer_RoundTrip_EmptyNestedList()
+    {
+        var original = new TeamWithMembers
+        {
+            TeamName = "Ghost Team",
+            Members = new List<PersonWithAddress>()
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var restored = TeaLeafSerializer.FromDocument<TeamWithMembers>(doc);
+
+        Assert.Equal("Ghost Team", restored.TeamName);
+        Assert.Empty(restored.Members);
+    }
+
+    [Fact]
+    public void Serializer_RoundTrip_SingleItemNestedList()
+    {
+        var original = new TeamWithMembers
+        {
+            TeamName = "Solo",
+            Members = new List<PersonWithAddress>
+            {
+                new PersonWithAddress
+                {
+                    Name = "only",
+                    HomeAddress = new Address { Street = "1 Lone Rd", City = "Solo City", Zip = "00001" }
+                }
+            }
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var restored = TeaLeafSerializer.FromDocument<TeamWithMembers>(doc);
+
+        Assert.Equal("Solo", restored.TeamName);
+        Assert.Single(restored.Members);
+        Assert.Equal("only", restored.Members[0].Name);
+        Assert.Equal("1 Lone Rd", restored.Members[0].HomeAddress.Street);
+    }
+
+    // ------------------------------------------------------------------
+    // Compact output round-trip (reflection serializer)
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Serializer_Compact_SmallerThanPretty()
+    {
+        var user = new SimpleUser { Name = "alice", Age = 30, Active = true };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(user);
+        var pretty = doc.ToText();
+        var compact = doc.ToText(compact: true);
+
+        Assert.True(compact.Length < pretty.Length,
+            $"Compact ({compact.Length}) should be smaller than pretty ({pretty.Length})");
+    }
+
+    [Fact]
+    public void Serializer_Compact_RoundTripsCorrectly()
+    {
+        var original = new SimpleUser { Name = "alice", Age = 30, Active = true };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var compactText = doc.ToText(compact: true);
+
+        using var reparsed = TLDocument.Parse(compactText);
+        var restored = TeaLeafSerializer.FromDocument<SimpleUser>(reparsed);
+
+        Assert.Equal(original.Name, restored.Name);
+        Assert.Equal(original.Age, restored.Age);
+        Assert.Equal(original.Active, restored.Active);
+    }
+
+    [Fact]
+    public void Serializer_Compact_Product_RoundTripsWithFloats()
+    {
+        var original = new Product
+        {
+            Name = "Widget",
+            Price = 19.99,
+            Description = "A fine widget"
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var compactText = doc.ToText(compact: true);
+
+        using var reparsed = TLDocument.Parse(compactText);
+        var restored = TeaLeafSerializer.FromDocument<Product>(reparsed);
+
+        Assert.Equal(original.Name, restored.Name);
+        Assert.True(Math.Abs(original.Price - restored.Price) < 0.01);
+        Assert.Equal(original.Description, restored.Description);
+    }
+
+    [Fact]
+    public void Serializer_CompactFloats_WholeNumberDouble_StripsDecimal()
+    {
+        // Use a Rust-parsed document with explicit float notation to test compactFloats
+        using var doc = TLDocument.Parse(@"
+            @struct item (name: string, price: float)
+            item: { name: test, price: 42.0 }
+        ");
+        var withDecimal = doc.ToText();
+        var compactFloats = doc.ToText(compactFloats: true);
+
+        Assert.Contains("42.0", withDecimal);
+        Assert.DoesNotContain("42.0", compactFloats);
+        Assert.Contains("42", compactFloats);
+    }
+
+    [Fact]
+    public void Serializer_CompactFloats_WholeNumberDouble_RoundTripsAsInt()
+    {
+        var product = new Product { Name = "test", Price = 100.0 };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(product);
+        var compactFloatsText = doc.ToText(compactFloats: true);
+
+        using var reparsed = TLDocument.Parse(compactFloatsText);
+        using var val = reparsed["custom_product"];
+        Assert.NotNull(val);
+
+        using var price = val["price"];
+        Assert.NotNull(price);
+        Assert.Equal(100, price.AsInt());
+    }
+
+    [Fact]
+    public void Serializer_CompactFloats_FractionalDouble_PreservesDecimal()
+    {
+        var product = new Product { Name = "test", Price = 19.99 };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(product);
+        var compactFloats = doc.ToText(compactFloats: true);
+
+        Assert.Contains("19.99", compactFloats);
+    }
+
+    [Fact]
+    public void Serializer_CompactAndCompactFloats_Combined_RoundTrips()
+    {
+        var order = new TestOrderWithItems
+        {
+            OrderId = "ORD-COMPACT-REF",
+            Items = new List<TestOrderItem>
+            {
+                new TestOrderItem { ProductName = "Alpha", Quantity = 3, UnitPrice = 15.0 },
+                new TestOrderItem { ProductName = "Beta", Quantity = 1, UnitPrice = 24.99 }
+            },
+            Total = 39.99
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(order);
+        var pretty = doc.ToText();
+        var compact = doc.ToText(compact: true, compactFloats: true);
+
+        Assert.True(compact.Length < pretty.Length);
+
+        Assert.DoesNotContain("15.0", compact);
+        Assert.Contains("24.99", compact);
+        Assert.Contains("39.99", compact);
+
+        using var reparsed = TLDocument.Parse(compact);
+        using var val = reparsed["test_order"];
+        Assert.NotNull(val);
+
+        using var orderId = val["order_id"];
+        Assert.Equal("ORD-COMPACT-REF", orderId?.AsString());
+    }
+
+    [Fact]
+    public void Serializer_Compact_NestedObject_RoundTrips()
+    {
+        var original = new PersonWithAddress
+        {
+            Name = "alice",
+            HomeAddress = new Address { Street = "123 Main St", City = "Springfield", Zip = "62701" }
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var compactText = doc.ToText(compact: true);
+
+        using var reparsed = TLDocument.Parse(compactText);
+        var restored = TeaLeafSerializer.FromDocument<PersonWithAddress>(reparsed);
+
+        Assert.Equal("alice", restored.Name);
+        Assert.Equal("123 Main St", restored.HomeAddress.Street);
+        Assert.Equal("Springfield", restored.HomeAddress.City);
+        Assert.Equal("62701", restored.HomeAddress.Zip);
+    }
+
+    [Fact]
+    public void Serializer_Compact_DeeplyNestedTable_RoundTrips()
+    {
+        var original = new TeamWithMembers
+        {
+            TeamName = "Engineering",
+            Members = new List<PersonWithAddress>
+            {
+                new PersonWithAddress
+                {
+                    Name = "alice",
+                    HomeAddress = new Address { Street = "123 Main St", City = "Springfield", Zip = "62701" }
+                },
+                new PersonWithAddress
+                {
+                    Name = "bob",
+                    HomeAddress = new Address { Street = "456 Oak Ave", City = "Portland", Zip = "97201" }
+                }
+            }
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument(original);
+        var pretty = doc.ToText();
+        var compact = doc.ToText(compact: true);
+
+        Assert.True(compact.Length < pretty.Length);
+
+        using var reparsed = TLDocument.Parse(compact);
+        var restored = TeaLeafSerializer.FromDocument<TeamWithMembers>(reparsed);
+
+        Assert.Equal("Engineering", restored.TeamName);
+        Assert.Equal(2, restored.Members.Count);
+        Assert.Equal("alice", restored.Members[0].Name);
+        Assert.Equal("123 Main St", restored.Members[0].HomeAddress.Street);
+        Assert.Equal("bob", restored.Members[1].Name);
+        Assert.Equal("456 Oak Ave", restored.Members[1].HomeAddress.Street);
+    }
+
+    [Fact]
+    public void Serializer_Compact_CollectionToText_RoundTrips()
+    {
+        var items = new List<TestOrderItem>
+        {
+            new TestOrderItem { ProductName = "X", Quantity = 1, UnitPrice = 10.0 },
+            new TestOrderItem { ProductName = "Y", Quantity = 2, UnitPrice = 20.50 }
+        };
+
+        using var doc = TeaLeafSerializer.ToTLDocument<TestOrderItem>(items, "items");
+        var compact = doc.ToText(compact: true, compactFloats: true);
+
+        // Whole-number float 10.0 should lose .0
+        Assert.DoesNotContain("10.0", compact);
+        // Fractional float 20.50 should be preserved
+        Assert.Contains("20.5", compact);
+
+        using var reparsed = TLDocument.Parse(compact);
+        var restored = TeaLeafSerializer.FromList<TestOrderItem>(reparsed, "items");
+
+        Assert.Equal(2, restored.Count);
+        Assert.Equal("X", restored[0].ProductName);
+        Assert.Equal(1, restored[0].Quantity);
+        Assert.Equal("Y", restored[1].ProductName);
+        Assert.Equal(2, restored[1].Quantity);
     }
 }
