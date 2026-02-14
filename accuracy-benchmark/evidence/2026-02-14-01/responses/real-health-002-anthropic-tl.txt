@@ -1,0 +1,132 @@
+# CDC PLACES Data Analysis - Washington State Counties
+
+## 1. Adult Population Percentage by County
+
+| County | Total Population | Adult Population | % Adults (18+) |
+|--------|-----------------|------------------|----------------|
+| **Island** | 86,267 | 71,614 | **83.01%** |
+| Ferry | 7,497 | 6,217 | 82.93% |
+| Whatcom | 231,919 | 189,784 | 81.83% |
+| King | 2,271,380 | 1,836,529 | 80.86% |
+| Garfield | 2,363 | 1,865 | 78.93% |
+| Spokane | 551,455 | 433,863 | 78.68% |
+| Clark | 521,150 | 405,348 | 77.78% |
+| Pierce | 928,696 | 716,813 | 77.18% |
+| Benton | 215,219 | 159,518 | 74.12% |
+| **Yakima** | 256,643 | 183,160 | **71.37%** |
+
+## 2. Chronic Disease Burden Score
+
+**Composite score = Average of: Arthritis, High Blood Pressure, Diabetes, CHD, COPD, and Stroke**
+
+| County | Chronic Disease Burden Score |
+|--------|------------------------------|
+| King | 10.52% |
+| Whatcom | 12.60% |
+| Benton | 13.08% |
+| Clark | 13.38% |
+| Pierce | 13.70% |
+| Spokane | 13.82% |
+| Yakima | 14.25% |
+| Island | 15.08% |
+| Garfield | 16.55% |
+| Ferry | 19.87% |
+
+## 3. Counties Ranked by Chronic Disease Burden
+
+| Rank | County | Score | Description |
+|------|--------|-------|-------------|
+| 1 | **Ferry** | **19.87%** | Highest burden (rural, smallest population) |
+| 2 | Garfield | 16.55% | Second highest (rural) |
+| 3 | Island | 15.08% | |
+| 4 | Yakima | 14.25% | |
+| 5 | Spokane | 13.82% | |
+| 6 | Pierce | 13.70% | |
+| 7 | Clark | 13.38% | |
+| 8 | Benton | 13.08% | |
+| 9 | Whatcom | 12.60% | |
+| 10 | **King** | **10.52%** | Lowest burden (largest, most urban) |
+
+**Key Finding:** There's a clear **urban-rural gradient** with rural counties (Ferry, Garfield) showing nearly 2x the chronic disease burden compared to urban King County.
+
+## 4. Disability Burden Analysis
+
+**Average of all 7 disability measures (Cognition, Any Disability, Hearing, Independent Living, Mobility, Self-care, Vision):**
+
+| County | Average Disability Prevalence |
+|--------|------------------------------|
+| **Ferry** | **15.40%** |
+| Yakima | 13.84% |
+| Garfield | 11.71% |
+| Pierce | 11.43% |
+| Spokane | 11.20% |
+| Benton | 11.13% |
+| Whatcom | 11.01% |
+| Island | 10.76% |
+| Clark | 10.56% |
+| King | 7.77% |
+
+**Highest Disability Burden: Ferry County (15.40%)** - nearly double King County's rate
+
+## 5. Preventive Service Utilization Leaders
+
+### Dental Visit Rate (DENTAL)
+**Winner: King County - 71.8%**
+- Island: 70.5% (2nd)
+- Clark: 69.1% (3rd)
+- Lowest: Yakima: 55.0%
+
+### Mammography Rate (MAMMOUSE)
+**Winner: Spokane County - 76.9%**
+- King: 75.6% (2nd)
+- Clark & Garfield: 75.2% (tied 3rd)
+- Lowest: Ferry: 62.7%
+
+### Cholesterol Screening Rate (CHOLSCREEN)
+**Winner: Garfield County - 86.4%**
+- Island: 85.9% (2nd)
+- King: 85.6% (3rd)
+- Lowest: Yakima: 79.2%
+
+**Key Finding:** Smaller counties excel at cholesterol screening, while larger urban counties lead in dental care access.
+
+## 6. Population-Weighted Obesity Rate
+
+**Statewide average (weighted by adult population): 29.70%**
+
+| County | Obesity Rate | Weight in Average |
+|--------|-------------|-------------------|
+| King | 22.6% | 45.9% of total adults |
+| Pierce | 36.9% | 17.9% of total adults |
+| Spokane | 34.7% | 10.8% of total adults |
+| Clark | 35.3% | 10.1% of total adults |
+| Other 6 counties | Various | 15.3% of total adults |
+
+**Key Finding:** Despite King County having the lowest obesity rate (22.6%), the statewide average is pulled up to 29.70% by higher rates in other counties, particularly Ferry (40.2%), Yakima (39.7%), and Pierce (36.9%).
+
+## 7. Highest Average Prevalence by Category
+
+| Category | Measure with Highest Average | Average Prevalence |
+|----------|----------------------------|-------------------|
+| **HLTHOUT** (Health Outcomes) | **High Cholesterol** (HIGHCHOL) | **35.84%** |
+| **HLTHSTAT** (Health Status) | **General Health - Fair/Poor** (GHLTH) | **18.30%** |
+| **PREVENT** (Prevention) | **Cholesterol Screening** (CHOLSCREEN) | **83.77%** |
+| **RISKBEH** (Risk Behaviors) | **Short Sleep Duration** (SLEEP) | **31.51%** |
+| **DISABLT** (Disability) | **Any Disability** (DISABILITY) | **29.90%** |
+
+### Summary of Top Measures:
+- **High cholesterol** affects more than 1 in 3 adults statewide
+- **Short sleep** affects nearly 1 in 3 adults
+- **Any disability** affects nearly 30% of adults
+- **Fair/poor health** is self-reported by nearly 1 in 5 adults
+- **Cholesterol screening** has excellent uptake at 84%
+
+---
+
+## Key Insights:
+
+1. **Health Equity Gap:** Ferry and Garfield counties show dramatically worse health outcomes across nearly all measures compared to King County
+2. **Preventive Care Success:** Cholesterol screening rates exceed 79% in all counties, indicating strong preventive health infrastructure
+3. **Sleep Crisis:** Short sleep duration affects 29-37% across all counties - a consistent statewide issue
+4. **Obesity Challenge:** Weighted average of 29.70% indicates obesity affects nearly 1 in 3 Washington adults
+5. **Disability Burden:** Rural counties show significantly higher disability prevalence, likely related to aging populations and chronic disease burden

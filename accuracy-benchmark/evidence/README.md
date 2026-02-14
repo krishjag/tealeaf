@@ -6,8 +6,7 @@ This directory contains dated evidence packages from real-world benchmark runs c
 
 | Date | Models | Tasks | Domains | TL Input Savings | Notes |
 |------|--------|-------|---------|-----------------|-------|
-| [2026-02-14](2026-02-14/) | Sonnet 4.5, GPT-5.2 | 14 | 7 | ~51% vs JSON | Second full run with format hint system and CLI filter improvements |
-| [2026-02-13](2026-02-13/) | Sonnet 4.5, GPT-5.2 | 14 | 7 | ~51% vs JSON | First full 7-domain real-world benchmark |
+| [2026-02-14-01](2026-02-14-01/) | Sonnet 4.5, GPT-5.2 | 14 | 7 | ~51% vs JSON | Full 7-domain run, max_tokens 8192, 84/84 API calls successful, 0 errors |
 
 ## Structure
 

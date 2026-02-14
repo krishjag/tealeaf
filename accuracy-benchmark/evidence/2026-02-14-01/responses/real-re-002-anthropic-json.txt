@@ -1,0 +1,231 @@
+# Analysis of Manhattan's Highest-Value Properties
+
+## 1. Zoning District Distribution
+
+**Zoning Frequency (zonedist1):**
+- **C6-4**: 5 properties (commercial, high density)
+- **C5-3**: 3 properties (commercial, high density)
+- **C5-2.5**: 3 properties (commercial, high density)
+- **R7-2**: 2 properties (residential)
+- **C6-6**: 2 properties (commercial, highest density)
+- **C6-5.5**: 2 properties (commercial, highest density)
+- Other zones: 1 each (M2-3, M1-5, M1-6, R8, PARK)
+
+**Key Findings:**
+- **Commercial (C) zones dominate**: 26 out of 30 properties (87%)
+- **Manufacturing (M) zones**: Only 3 properties:
+  - 360 West Street (M2-3) - Convention Center
+  - 111 8th Avenue (M1-5) - Google's NYC headquarters area
+  - 500 West 33rd Street (C6-4/HY) - Hudson Yards area
+- **Residential (R) zones**: 3 properties:
+  - 240 1st Avenue (R7-2) - Stuyvesant Town
+  - Roosevelt Island (R7-2) - Affordable housing complex
+  - Fort Washington Ave (R8) - Hospital campus
+- **C6 zones** (highest density commercial): Most common, allowing FAR 10-15+, indicating intensive development rights
+
+## 2. Building Age Profile
+
+**Properties by Decade Built:**
+
+| Decade | Count | Avg. Assessed Value | Properties |
+|--------|-------|---------------------|------------|
+| **1930s** | 5 | $515M | Empire State Bldg ($534M), Rockefeller Center properties, Presbyterian Hospital ($460M) |
+| **1940s** | 1 | $792M | Stuyvesant Town (1945) - massive housing complex |
+| **1960s** | 5 | $575M | Multiple office towers on 5th/6th Avenues |
+| **1970s** | 7 | $511M | Post-war office boom period |
+| **1980s** | 1 | $520M | 388 Greenwich St (1989) |
+| **1990s** | 1 | $474M | American Museum of Natural History (1998) |
+| **2000s** | 5 | $734M | Time Warner Center ($794M), One Bryant Park ($787M), etc. |
+| **2010s** | 5 | $715M | Newest towers: Hudson Yards developments |
+
+**Key Insights:**
+- **1940s paradox**: Single property (Stuyvesant Town) has highest average due to massive scale (8,764 residential units)
+- **2000s-2010s buildings average $725M**: Modern towers command premiums, 40% higher than older buildings
+- **1930s Art Deco icons remain valuable**: Empire State Building and Rockefeller Center properties still command $500M+ valuations
+- **No clear linear relationship**: Historic landmarks and modern supertalls both achieve top valuations
+
+## 3. Area Composition Analysis
+
+**Top 10 Most Mixed-Use Properties** (multiple significant area types):
+
+1. **Time Warner Center** (1 Columbus Circle):
+   - Office: 37%, Residential: 21%, Retail: 20%, Garage: 5%, Other: 6%
+   - TRUE mixed-use: residential + commercial + hotel
+
+2. **One Beacon Court** (151 E 58th St):
+   - Office: 66%, Retail: 11%, Residential: 22%
+   - Mixed residential/commercial
+
+3. **Stuyvesant Town** (240 1st Ave):
+   - Residential: 94%, Retail: 1%, Office: <1%, Garage: 5%
+   - Primarily residential with amenities
+
+4. **Roosevelt Island Complex**:
+   - Residential: 78%, Retail: 11%, Office: <1%, Garage: 8%
+   - Affordable housing complex
+
+**Single-Purpose Properties:**
+
+**Pure Office (>95% office space):**
+- 388 Greenwich St (Citigroup): 100% office
+- 111 8th Avenue: 100% office (Google building)
+- 427 10th Avenue: 99% office
+- 509 W 34th Street: 100% office
+- 51 E 42nd Street (One Vanderbilt): 98% office
+
+**Institutional Single-Purpose:**
+- American Museum of Natural History: 91% "other" (museum/educational)
+- Presbyterian Hospital: 100% "other" (healthcare)
+- Convention Center: 57% other, 43% storage (public facility)
+
+**Commercial Office Dominance:**
+- **23 of 30 properties** are 85%+ commercial/office space
+- Only **3 properties** have substantial residential components (>20%)
+
+## 4. Floor Plate Analysis
+
+**Largest Average Floor Plates** (bldgarea ÷ numfloors):
+
+| Property | Address | Floors | Avg Floor Plate | Building Class |
+|----------|---------|--------|-----------------|----------------|
+| **Convention Center** | 360 West St | 4 | **1,015,149 sq ft** | P9 (Public facility) |
+| **Roosevelt Island** | Main Street | 18 | 265,928 sq ft | D4 (Housing) |
+| **Presbyterian Hospital** | 180 Ft Washington | 22 | 167,888 sq ft | I1 (Hospital) |
+| **Stuyvesant Town** | 240 1st Ave | 13 | 687,860 sq ft | D7 (Multiple dwellings) |
+| **111 8th Avenue** | | 17 | 127,176 sq ft | O6 (Office) |
+| **One WTC Complex** | 185 Greenwich | 104 | 86,216 sq ft | O4 (Office) |
+
+**Typical Office Tower Floor Plates** (O4 class):
+- Range: 27,000 - 58,000 sq ft
+- Average: ~42,000 sq ft
+- **One WTC** has largest at 86,216 sq ft (104 floors, 9M sq ft total)
+
+**Pattern Analysis:**
+- **P9/I1/D-classes** (public, institutional, housing): Massive horizontal floor plates, lower rise
+- **O4** (office buildings): Moderate plates (30-60K sq ft), high rise (40-70 floors)
+- **RC** (condos): Smaller plates (25-40K sq ft), very high rise (50-70 floors)
+- **Inverse relationship**: Higher buildings tend to have smaller floor plates (structural/economic constraints)
+
+## 5. Top Property Owners by Assessed Value
+
+| Rank | Owner Name | Properties | Total Assessed Value | Avg per Property |
+|------|------------|------------|---------------------|------------------|
+| 1 | **LOWER MANHATTAN DEV CORP** | 1 | **$1,673M** | $1,673M |
+| 2 | **NEW YORK CONVENTION CENTER** | 1 | **$931M** | $931M |
+| 3 | **ONE BRYANT PARK** (exempt) | 1 | **$787M** | $787M |
+| 4 | **BPP ST OWNER LLC** | 1 | **$792M** | $792M |
+| 5 | **TIME WARNER CENTER CONDO** | 1 | **$794M** | $794M |
+
+**Rockefeller Center Ownership (RCPI/Related entities):**
+- 1250 Avenue of Americas: $619M
+- 1260 Avenue of Americas: $499M
+- 1271 Avenue of Americas: $470M
+- **Total: 3 properties, $1,588M**
+
+**Key Findings:**
+- **Low ownership concentration**: Most owners appear only once
+- **No dominant private landlord**: Unlike office markets with major REITs owning multiple towers
+- **Public/nonprofit exempt properties**: 5 properties (17%) have full tax exemptions totaling $5.4B
+- **Rockefeller Center** is the only multi-property ownership cluster among top 30
+- **Single-asset ownership dominance**: 90% are individually owned/syndicated entities
+
+## 6. Lot Coverage Analysis
+
+**Lot Coverage Calculation:** (bldgfront × bldgdepth) ÷ lotarea
+
+**Highest Lot Coverage** (most intensive site use):
+
+| Property | Address | Coverage | Notes |
+|----------|---------|----------|-------|
+| **One Vanderbilt** | 51 E 42nd St | **99%** | Maximum site utilization |
+| **American Museum** | Central Park West | **16%** | Museum campus with open space |
+| **Convention Center** | 360 West St | **50%** | Large exhibition halls |
+| **Empire State Bldg** | 350 5th Ave | **92%** | Classic tower-on-podium |
+| **Roosevelt Island** | Main Street | **0.5%** | Campus-style development |
+
+**Coverage Categories:**
+
+**Super-Intensive (>80%):**
+- 15 properties: Midtown office towers maximizing buildable area
+- Typical pattern: Small lots, maximum FAR utilization
+- Building footprint nearly equals lot size
+
+**Moderate Coverage (30-60%):**
+- 8 properties: Larger lots with setbacks/plazas
+- Hudson Yards developments (30-40% coverage)
+- Tower-in-plaza urban design
+
+**Campus Style (<20%):**
+- Roosevelt Island, Museum, Hospital: 1-16% coverage
+- Large lots with multiple buildings and open space
+- Institutional uses prioritize circulation/green space
+
+**Data Quality Note:** Some properties show impossible >100% coverage, indicating:
+- Bldgfront/depth may include cantilevers
+- Or measurement inconsistencies in PLUTO data
+
+## 7. Geographic Clustering Analysis
+
+**Location Breakdown by Latitude:**
+
+### **Lower Manhattan (40.70-40.72):**
+- **One World Trade Center** (40.7116, $1,673M) - 185 Greenwich St
+- **388 Greenwich Street** (40.7209, $520M) - Citigroup building
+- **Stuyvesant Town** (40.7317, $792M) - East Side housing
+
+**Characteristics:** Mix of commercial (WTC) and residential (East Village)
+
+### **Midtown Core (40.75-40.765):**
+**The "Billionaire's Row" of assessed values:**
+- Hudson Yards cluster (40.7535-40.7555):
+  - 500 West 33rd St: $744M
+  - 427 10th Ave: $699M
+  - 509 W 34th St: $541M
+- Midtown West (40.755-40.762):
+  - Empire State Building (40.7485, $534M)
+  - Times Square/6th Ave corridor (40.7555-40.7622)
+  - Multiple properties $440M-$570M
+
+### **Central Midtown (40.758-40.764):**
+**Highest concentration - 14 properties:**
+- 5th Avenue/Park Avenue corridor
+- Rockefeller Center cluster (40.7591-40.7605)
+- East 50s: 345 Park Ave ($489M), 761 5th Ave ($791M)
+
+**Average assessed value: $583M** - highest concentration
+
+### **Upper West Side/Harlem (40.78+):**
+- **American Museum** (40.7814, $474M) - Central Park West
+- **Presbyterian Hospital** (40.8407, $460M) - Washington Heights
+- Both exempt institutional properties
+
+### **Geographic Patterns:**
+
+1. **Midtown dominance**: 23 of 30 properties (77%) in 40.74-40.77 latitude band
+2. **Avenue of the Americas (6th Ave) spine**: Highest density corridor
+3. **Hudson Yards emergence**: 3 newest towers (2015-2019) in former industrial zone
+4. **No Upper East Side**: Surprisingly, zero properties in UES despite luxury character
+5. **Island outlier**: Roosevelt Island (40.7662, -73.9459) easternmost property
+
+**Value by Location:**
+- **Midtown 40.755-40.765**: Average $615M
+- **Lower Manhattan**: Average $995M (skewed by One WTC)
+- **Outer areas**: $467M average (institutional properties)
+
+**Property Type Correlations:**
+- **C6 zoning concentrated** 40.75-40.765 (Midtown core)
+- **M zones on edges**: West Side (Hudson Yards, Chelsea)
+- **Institutional properties**: Geographic outliers (north/south extremes)
+- **Newest construction (2015+)**: Hudson Yards western frontier
+
+---
+
+## Summary Insights
+
+1. **Zoning**: Commercial C6 zones dominate (87%), enabling high-density development; manufacturing zones only 10%
+2. **Age**: Modern towers (2000s-2010s) command 40% premium over older buildings, but 1930s landmarks remain highly valuable
+3. **Use Mix**: Overwhelmingly single-use office (77%); only 3 properties truly mixed-use
+4. **Floor Plates**: Inverse relationship between height and plate size; office towers average 42K sq ft/floor
+5. **Ownership**: Highly fragmented; no dominant landlord, though Rockefeller Center controls 3 properties
+6. **Site Coverage**: Midtown towers use 80-100% of lots; institutional campuses use <20%
+7. **Geography**: Extreme concentration in Midtown 40.75-40.765 corridor; Hudson Yards emerging as new high-value cluster

@@ -1,0 +1,530 @@
+# Manhattan's Highest-Value Properties: Comprehensive Analysis
+
+## 1. Zoning District Distribution
+
+### Zoning Frequency Analysis
+```
+C6-4:  5 properties (17%)
+C5-2.5: 4 properties (13%)
+C6-5.5: 3 properties (10%)
+C5-3:  3 properties (10%)
+C6-6:  2 properties (7%)
+R7-2:  2 properties (7%)
+M2-3:  1 property (3%)
+M1-5:  1 property (3%)
+M1-6:  0 properties
+R8:    1 property (3%)
+Other: 8 properties
+```
+
+### Breakdown by Zone Type
+
+**Commercial (C) Zones: 23 properties (77%)**
+- Dominated by high-density commercial districts (C6, C5)
+- C6 zones permit FAR up to 15-18 (ultra-high density)
+- C5 zones permit FAR up to 12-15 (high density)
+- These zones allow mixed commercial/residential, offices, retail, hotels
+
+**Manufacturing (M) Zones: 2 properties (7%)**
+1. **360 West Street** (M2-3) - Javits Convention Center - $931M assessed value
+2. **111 8th Avenue** (M1-5) - Google Building - $531M assessed value
+
+**Residential (R) Zones: 2 properties (7%)**
+1. **240 1 Avenue** (R7-2) - Mixed-use residential - $792M
+2. **180 Ft Washington Ave** (R8) - Presbyterian Hospital - $460M
+
+**Special Districts:**
+- **PARK zone**: American Museum of Natural History ($474M)
+
+### Key Finding
+The overwhelming dominance of C6 and C5 zoning reflects these are Manhattan's premier commercial districts where the highest-intensity development is permitted. The presence of valuable properties in M zones shows industrial conversions to tech/commercial uses.
+
+---
+
+## 2. Building Age Profile & Value Relationship
+
+### Properties by Decade Built
+
+**1930s (4 properties):**
+- Empire State Building (1931) - $534M
+- Google Building/111 8th Ave (1931) - $531M
+- Rockefeller Center 1250 (1937) - $619M
+- Presbyterian Hospital (1930) - $460M
+- **Average: $536M**
+
+**1940s (1 property):**
+- 240 1 Avenue (1945) - $792M
+- **Average: $792M**
+
+**1950s (1 property):**
+- 666 5th Avenue (1958) - $450M
+- **Average: $450M**
+
+**1960s (5 properties):**
+- Javits Center (1963, altered 2013) - $931M
+- 761 5th Avenue (1968) - $791M
+- 345 Park Avenue (1969) - $489M
+- 1251 Avenue of Americas (1970) - $511M
+- 1271 Avenue of Americas (1961) - $470M
+- **Average: $638M**
+
+**1970s (5 properties):**
+- 1221 Avenue of Americas (1971) - $571M
+- 1631 Broadway (1972) - $492M
+- 9 West 57th Street (1971) - $469M
+- 1211 Avenue of Americas (1973) - $440M
+- Main Street/Riverwalk (1975) - $534M
+- 250 West 34th Street (1972) - $437M
+- 601 Lexington (1978) - $452M
+- **Average: $485M**
+
+**1980s (1 property):**
+- 388 Greenwich Street (1989) - $520M
+- **Average: $520M**
+
+**1990s (1 property):**
+- American Museum (1998) - $474M
+- **Average: $474M**
+
+**2000s (5 properties):**
+- One Beacon Court (2001) - $507M
+- Time Warner Center (2004) - $794M
+- 1 Bryant Park (2005) - $787M
+- 185 Greenwich (2009) - $1,674M
+- **Average: $941M**
+
+**2010s (5 properties):**
+- 500 West 33rd (2015) - $744M
+- 51 East 42nd/One Vanderbilt (2017) - $524M
+- 527 West 34th (2018) - $541M
+- 427 10th Avenue (2019) - $699M
+- **Average: $627M**
+
+### Key Findings on Age vs Value
+
+**The #1 Property is the NEWEST:** 185 Greenwich Street (2009) - $1.67 BILLION
+- This is the World Trade Center complex, explaining the exceptional value
+
+**Surprisingly Strong 1940s Performance:** The single 1940s building has the highest average, but this is just one property (240 1st Avenue).
+
+**2000s Decade Has Highest Average:** $941M average, driven by major trophy developments post-9/11 (WTC, Time Warner Center, 1 Bryant Park)
+
+**1930s Art Deco Era Holds Value:** Iconic buildings like Empire State and Rockefeller Center maintain $500M+ valuations despite being 90+ years old
+
+**No Clear Linear Relationship:** Newer ≠ automatically higher value. Location, size, and prestige matter more than age.
+
+---
+
+## 3. Area Composition Analysis
+
+### Detailed Breakdown by Property
+
+| Property | Office % | Retail % | Residential % | Commercial % | Other % | Type |
+|----------|----------|----------|---------------|--------------|---------|------|
+| **185 Greenwich** | 79.9% | 9.2% | 0% | 0% | 10.9% | Office/Retail |
+| **Javits Center** | 0% | 0% | 0% | 0% | 100% | Special Purpose |
+| **Time Warner** | 37.2% | 19.9% | 21.0% | 16.4% | 5.5% | **MIXED-USE** |
+| **240 1st Ave** | 0.2% | 0.9% | 93.6% | 0% | 5.4% | Residential |
+| **761 5th Ave** | 93.0% | 4.7% | 0% | 2.3% | 0% | Office/Retail |
+| **1 Bryant Park** | 97.5% | 2.5% | 0% | 0% | 0% | Office |
+| **500 West 33rd** | 71.6% | 25.8% | 0% | 0% | 2.6% | Office/Retail |
+| **427 10th Ave** | 99.3% | 0.7% | 0% | 0% | 0% | Pure Office |
+| **1250 Amer** | 96.7% | 3.3% | 0% | 0% | 0% | Office |
+| **1221 Amer** | 90.7% | 3.2% | 0% | 0% | 6.0% | Office |
+| **527 W 34th** | 100% | 0% | 0% | 0% | 0% | **Pure Office** |
+| **Main St/Riverwalk** | 0.2% | 11.2% | 78.1% | 8.5% | 2.0% | **MIXED-USE** |
+| **Empire State** | 95.5% | 4.5% | 0% | 0% | 0% | Office/Retail |
+| **111 8th Ave** | 100% | 0% | 0% | 0% | 0% | **Pure Office** |
+| **1290 Amer** | 96.1% | 3.8% | 0% | 0.1% | 0% | Office |
+| **51 E 42nd** | 97.7% | 2.3% | 0% | 0% | 0% | Office |
+| **388 Greenwich** | 100% | 0% | 0% | 0% | 0% | **Pure Office** |
+| **1251 Amer** | 98.8% | 1.2% | 0% | 0% | 0% | Office |
+| **One Beacon Ct** | 66.4% | 11.2% | 22.4% | 0% | 0% | **MIXED-USE** |
+| **1260 Amer** | 68.2% | 11.8% | 0% | 0% | 20.0% | Office/Retail |
+| **1631 Broadway** | 90.3% | 6.5% | 0% | 3.2% | 0% | Office/Retail |
+| **345 Park Ave** | 87.9% | 4.6% | 0% | 2.7% | 4.9% | Office |
+| **Museum Natural History** | 0% | 0% | 0% | 0% | 100% | Special Purpose |
+| **1271 Amer** | 89.8% | 6.2% | 0% | 0% | 3.8% | Office |
+| **9 W 57th** | 95.4% | 1.1% | 0% | 3.5% | 0% | Office |
+| **Presbyterian Hosp** | 0% | 0% | 0% | 0% | 100% | Special Purpose |
+| **601 Lexington** | 88.6% | 9.0% | 0% | 0% | 2.3% | Office/Retail |
+| **666 5th Ave** | 93.0% | 7.0% | 0% | 0% | 0% | Office |
+| **1211 Amer** | 96.4% | 1.1% | 0% | 2.6% | 0% | Office |
+| **250 W 34th** | 86.2% | 8.1% | 0% | 5.7% | 0% | Office/Retail |
+
+### Most Mixed-Use Properties (3+ significant uses)
+
+**1. Time Warner Center (1 Columbus Circle)**
+- Office: 37.2%
+- Retail: 19.9%
+- Residential: 21.0%  
+- Commercial: 16.4%
+- TRUE VERTICAL MIXED-USE (office + luxury condos + Whole Foods + mall)
+
+**2. Main Street/Riverwalk 8**
+- Residential: 78.1%
+- Retail: 11.2%
+- Commercial: 8.5%
+- AFFORDABLE HOUSING with ground-floor retail
+
+**3. One Beacon Court (151 E 58th)**
+- Office: 66.4%
+- Residential: 22.4%
+- Retail: 11.2%
+- LUXURY MIXED-USE
+
+### Pure Single-Purpose Properties (100% one use)
+
+1. **527 West 34th Street** - 100% Office
+2. **111 8th Avenue** (Google) - 100% Office
+3. **388 Greenwich** - 100% Office
+4. **Javits Center** - 100% Other (convention)
+5. **American Museum Natural History** - 100% Other (museum)
+6. **Presbyterian Hospital** - 100% Other (healthcare)
+
+### Key Finding
+**The vast majority (23 properties) are office-dominant** with token retail at street level. Only **3 properties are truly mixed-use** with substantial residential components. The highest-value properties tend to be **pure office towers** in premium locations.
+
+---
+
+## 4. Floor Plate Size Analysis
+
+### Average Floor Plate Calculation (Building Area ÷ Number of Floors)
+
+| Property | Floors | Bldg Area (SF) | Avg Floor Plate | Building Class |
+|----------|--------|----------------|-----------------|----------------|
+| **Javits Center** | 4 | 4,060,596 | **1,015,149 SF** | P9 (Special) |
+| **Museum Natural History** | 7 | 1,360,264 | **194,323 SF** | P7 (Special) |
+| **Main Street/Riverwalk** | 18 | 4,786,701 | **265,928 SF** | D4 (Res) |
+| **Presbyterian Hospital** | 22 | 3,693,539 | **167,888 SF** | I1 (Hospital) |
+| **240 1st Avenue** | 13 | 8,942,176 | **687,860 SF** | D7 (Res) |
+| **111 8th Avenue (Google)** | 17 | 2,161,994 | **127,176 SF** | O6 (Office) |
+| **1260 Avenue Americas** | 31 | 2,734,038 | **88,195 SF** | O4 (Office) |
+| **185 Greenwich (WTC)** | 104 | 8,966,500 | **86,216 SF** | O4 (Office) |
+| **Empire State Building** | 102 | 2,812,739 | **27,575 SF** | O4 (Office) |
+| **Time Warner Center** | 54 | 2,101,990 | **38,926 SF** | RM (Mixed) |
+| **1250 Amer/Rockefeller** | 70 | 2,122,138 | **30,316 SF** | RC (Condo) |
+| **1 Bryant Park** | 55 | 2,245,112 | **40,820 SF** | O4 (Office) |
+| **1221 Avenue Americas** | 51 | 2,636,182 | **51,690 SF** | O4 (Office) |
+| **527 West 34th** | 66 | 2,221,336 | **33,657 SF** | O4 (Office) |
+| **500 West 33rd** | 68 | 3,224,812 | **47,424 SF** | RC (Condo) |
+| **51 E 42nd (One Vanderbilt)** | 60 | 1,678,135 | **27,969 SF** | O4 (Office) |
+| **1290 Amer** | 43 | 1,899,211 | **44,168 SF** | O4 (Office) |
+| **761 5th Avenue** | 50 | 1,824,820 | **36,497 SF** | O4 (Office) |
+| **1251 Amer** | 54 | 1,793,091 | **33,205 SF** | RC (Condo) |
+| **1271 Amer** | 47 | 1,962,900 | **41,765 SF** | O4 (Office) |
+| **1211 Amer** | 45 | 1,984,228 | **44,094 SF** | O4 (Office) |
+| **1631 Broadway** | 48 | 2,438,059 | **50,793 SF** | O4 (Office) |
+| **9 W 57th Street** | 49 | 1,698,259 | **34,658 SF** | O4 (Office) |
+| **345 Park Avenue** | 44 | 1,712,218 | **38,914 SF** | O4 (Office) |
+| **One Beacon Court** | 54 | 1,103,169 | **20,429 SF** | RM (Mixed) |
+| **601 Lexington** | 60 | 1,654,020 | **27,567 SF** | RC (Condo) |
+| **666 5th Avenue** | 40 | 1,341,058 | **33,526 SF** | RC (Condo) |
+| **388 Greenwich** | 39 | 2,354,289 | **60,366 SF** | O4 (Office) |
+| **250 W 34th** | 57 | 2,689,635 | **47,187 SF** | O4 (Office) |
+
+### Largest Floor Plates (>100,000 SF)
+
+1. **Javits Convention Center** - 1,015,149 SF average (special purpose building)
+2. **240 1st Avenue** - 687,860 SF (residential superblock)
+3. **Main Street/Riverwalk** - 265,928 SF (affordable housing tower)
+4. **Museum Natural History** - 194,323 SF (museum)
+5. **Presbyterian Hospital** - 167,888 SF (healthcare)
+
+### Typical Office Tower Floor Plates
+
+**Median for O4 (Office) Class: ~40,000 SF**
+- Range: 27,575 SF (Empire State, old slender tower) to 86,216 SF (185 Greenwich, modern efficient design)
+
+### Pattern Analysis by Building Class
+
+**O4 (Office buildings, Class B):** 
+- Highly variable: 27,575 - 86,216 SF
+- Newer buildings (2000s+) have LARGER floor plates (60,000-86,000 SF)
+- Pre-war (1930s) have SMALLER floor plates (27,000-30,000 SF)
+
+**RC (Residential/Commercial Condos):**
+- More consistent: 30,316 - 47,424 SF
+- Moderate floor plates for mixed-use efficiency
+
+**RM (Mixed Residential):**
+- Smallest: 20,429 - 38,926 SF
+- Smaller plates allow better residential unit layouts
+
+### Key Finding
+**Modern office buildings maximize floor plate efficiency** (60,000-100,000 SF) for open-plan layouts and fewer core penetrations. **Pre-war towers have smaller plates** (27,000-40,000 SF) due to older structural systems and daylighting requirements before AC. **Special purpose buildings** (convention centers, hospitals) have massive floor plates optimized for their functions.
+
+---
+
+## 5. Top Property Owners by Total Assessed Value
+
+### Ownership Concentration Analysis
+
+**Top 5 Owners:**
+
+1. **ROCKEFELLER-RELATED ENTITIES: $1,629,848,379**
+   - Rockefeller Center Properties (1250 Amer) - $619M
+   - Rockefeller Ctr North Inc (1271 Amer) - $470M
+   - RCPI Holdco LLC (1260 Amer) - $499M
+   - 1251 Amer (condo in complex) - $511M *if affiliated
+   - **3 confirmed properties**
+
+2. **"UNAVAILABLE OWNER": $1,612,785,418**
+   - 500 West 33rd - $744M
+   - 1251 Avenue Americas - $511M
+   - 601 Lexington - $452M
+   - 666 5th Avenue - $450M
+   - **4 properties** (data anonymization, likely major institutional owners)
+
+3. **LOWER MANHATTAN DEVELOPMENT CORP: $1,673,531,100**
+   - 185 Greenwich Street (WTC) - $1,674M
+   - **1 property** (public development corporation)
+
+4. **NYC/PUBLIC ENTITIES: $1,866,119,400**
+   - Javits Center (Convention Center Dev Corp) - $931M
+   - Museum Natural History (Dept Cultural Affairs) - $474M
+   - Presbyterian Hospital (NYC public hospital) - $460M
+   - **3 properties**
+
+5. **ESRT EMPIRE STATE BUILDING LLC: $534,044,700**
+   - Empire State Building - $534M
+   - **1 property**
+
+### Other Notable Multi-Property Owners
+
+**Time Warner Center/One Vanderbilt Area:**
+- Multiple properties but different ownership structures
+
+### Ownership Concentration Statistics
+
+**Total Value in Dataset:** $18.26 billion
+
+**Top 5 Owners Control:** $7.32 billion = **40% of total value**
+
+**Public/Quasi-Public Ownership:** 
+- LMDC, Javits, Museum, Hospital = $3.54 billion = **19.4% of total**
+
+**Single-Property Owners:** 17 different owners = **57% of properties**
+
+### Key Findings
+
+**Moderate Concentration:** Top 5 owners control 40%, but this includes public entities and data anonymization ("Unavailable Owner")
+
+**Rockefeller Group Dominates Private Ownership:** With 3+ properties worth $1.6B, represents the most significant private landlord concentration
+
+**High Public Presence:** Nearly 20% of value in public/quasi-public hands (WTC, Javits, Museum, Hospital)
+
+**Institutional Grade:** Most properties held by LLCs/institutional structures, not individuals. Names like "767 Fifth Partners," "509 W 34 LLC" indicate sophisticated ownership vehicles.
+
+**Data Quality Issue:** "UNAVAILABLE OWNER" for $1.6B suggests PLUTO data privacy limitations for certain high-value properties
+
+---
+
+## 6. Lot Coverage Analysis
+
+### Lot Coverage Calculation
+**Formula:** (Building Footprint ÷ Lot Area) × 100
+**Footprint Approximation:** bldgfront × bldgdepth (when available)
+
+| Property | Lot Area | Footprint* | Coverage % | Assessment |
+|----------|----------|------------|------------|------------|
+| **185 Greenwich (WTC)** | 833,945 SF | 39,600 SF | **4.7%** | $1,674M |
+| **Javits Center** | 962,250 SF | 477,413 SF | **49.6%** | $931M |
+| **Time Warner Center** | 149,560 SF | 207,132 SF | **138.5%** ⚠️ | $794M |
+| **240 1st Avenue** | 2,675,000 SF | 2,755,326 SF | **103.0%** ⚠️ | $792M |
+| **761 5th Avenue** | 84,350 SF | 63,160 SF | **74.9%** | $791M |
+| **1 Bryant Park** | 87,863 SF | 87,837 SF | **100.0%** | $787M |
+| **500 West 33rd** | 198,898 SF | 190,165 SF | **95.6%** | $744M |
+| **427 10th Avenue** | 69,125 SF | 38,688 SF | **56.0%** | $699M |
+| **1250 Amer/Rock** | 107,766 SF | 95,375 SF | **88.5%** | $619M |
+| **1221 Amer** | 102,452 SF | 94,768 SF | **92.5%** | $571M |
+| **527 W 34th** | 67,397 SF | 0 SF | **N/A** | $541M |
+| **Empire State** | 91,351 SF | 84,150 SF | **92.1%** | $534M |
+| **Main St/Riverwalk** | 4,227,757 SF | 0 SF | **N/A** | $534M |
+| **111 8th Ave (Google)** | 165,200 SF | 165,600 SF | **100.2%** | $531M |
+| **1290 Amer** | 89,775 SF | 90,048 SF | **100.3%** | $525M |
+| **51 E 42nd (Vanderbilt)** | 44,048 SF | 43,339 SF | **98.4%** | $524M |
+| **388 Greenwich** | 172,327 SF | 48,060 SF | **27.9%** | $520M |
+| **1251 Amer** | 98,206 SF | 106,128 SF | **108.1%** ⚠️ | $511M |
+| **One Beacon Court** | 84,348 SF | 0 SF | **N/A** | $507M |
+| **1260 Amer** | 184,764 SF | 48,240 SF | **26.1%** | $499M |
+| **1631 Broadway** | 90,400 SF | 56,950 SF | **63.0%** | $492M |
+| **345 Park Ave** | 81,337 SF | 76,048 SF | **93.5%** | $489M |
+| **Museum Natural History** | 738,000 SF | 120,000 SF | **16.3%** | $474M |
+| **1271 Amer** | 82,340 SF | 82,410 SF | **100.1%** | $470M |
+| **9 W 57th Street** | 62,058 SF | 50,292 SF | **81.0%** | $469M |
+| **Presbyterian Hospital** | 364,433 SF | 0 SF | **N/A** | $460M |
+| **601 Lexington** | 70,572 SF | 0 SF | **N/A** | $452M |
+| **666 5th Avenue** | 61,755 SF | 63,000 SF | **102.0%** ⚠️ | $450M |
+| **1211 Amer** | 84,855 SF | 79,148 SF | **93.3%** | $440M |
+| **250 W 34th** | 127,966 SF | 127,459 SF | **99.6%** | $437M |
+
+*Footprint = bldgfront × bldgdepth (when both >0)
+⚠️ Coverage >100% indicates cantilevers, overhangs, or data measurement discrepancies
+
+### Highest Lot Coverage (>100% - physically extends beyond lot)
+
+1. **Time Warner Center** - 138.5% (complex geometry with cantilevers)
+2. **1251 Avenue Americas** - 108.1% 
+3. **240 1st Avenue** - 103.0% (mega-block development)
+4. **666 5th Avenue** - 102.0%
+5. **1290 Avenue Americas** - 100.3%
+
+**These indicate towers with:**
+- Cantilevers/setbacks above street level
+- Underground extensions
+- Air rights from adjacent lots
+- Measurement methodology differences
+
+### Lowest Lot Coverage (<30% - significant open space)
+
+1. **185 Greenwich Street (WTC)** - 4.7% (massive 19-acre superblock with plaza)
+2. **Museum Natural History** - 16.3% (campus with gardens)
+3. **1260 Avenue Americas** - 26.1%
+4. **388 Greenwich Street** - 27.9%
+
+### Typical Commercial Tower Coverage: 80-100%
+
+Most profitable commercial developments **maximize lot coverage** at street level, then set back at upper floors per zoning.
+
+### Key Findings
+
+**High-Value ≠ High Coverage:** The #1 property (185 Greenwich) has the LOWEST coverage (4.7%) because it's on a superblock with extensive public plazas required by zoning
+
+**Pre-War vs Modern:** Pre-war towers (1930s-40s) tend toward 90-95% coverage. Modern towers (2000s+) show more variation (5-100%) based on site-specific zoning and design
+
+**Midtown Pattern:** Avenue of Americas properties show remarkably consistent 90-108% coverage, indicating full lot-line development typical of that corridor
+
+**Institutional Uses:** Museums and hospitals have lowest coverage (16-50%), preserving open space
+
+---
+
+## 7. Geographic Clustering & Location Analysis
+
+### Latitude-Based Neighborhood Classification
+
+**Lower Manhattan (lat 40.70-40.72):**
+1. **185 Greenwich Street** - 40.7116° - $1,674M - WTC site
+2. **388 Greenwich Street** - 40.7209° - $520M - Tribeca
+
+**Midtown South/Chelsea (lat 40.74-40.76):**
+3. **240 1st Avenue** - 40.7317° - $792M - Stuy Town area
+4. **111 8th Avenue** - 40.7414° - $531M - Chelsea (Google)
+5. **Empire State Building** - 40.7485° - $534M - Herald Square
+6. **250 W 34th** - 40.7513° - $437M - Penn Station area
+7. **1631 Broadway** - 40.7621° - $492M - Times Square
+
+**Hudson Yards/West Side (lat 40.75-40.76):**
+8. **Javits Center** - 40.7580° - $931M
+9. **500 West 33rd** - 40.7535° - $744M
+10. **427 10th Avenue** - 40.7545° - $699M
+11. **527 West 34th** - 40.7552° - $541M
+12. **706 17th (West Side)** - 40.7552° - $541M
+
+**Midtown Core - Plaza District (lat 40.755-40.761):**
+13. **1 Bryant Park** - 40.7556° - $787M
+14. **51 E 42nd (One Vanderbilt)** - 40.7530° - $524M
+15. **345 Park Avenue** - 40.7578° - $489M
+16. **761 5th Avenue** - 40.7636° - $791M
+17. **9 W 57th Street** - 40.7639° - $469M
+
+**Rockefeller Center Cluster (lat 40.759-40.761):**
+18. **1250 Avenue Americas** - 40.7591° - $619M
+19. **1260 Avenue Americas** - 40.7595° - $499M
+20. **1290 Avenue Americas** - 40.7605° - $525M
+21. **1271 Avenue Americas** - 40.7605° - $470M
+22. **1251 Avenue Americas** - 40.7600° - $511M
+23. **1221 Avenue Americas** - 40.7594° - $571M
+24. **1211 Avenue Americas** - 40.7587° - $440M
+25. **666 5th Avenue** - 40.7604° - $450M
+
+**Upper East Side (lat 40.761-40.762):**
+26. **151 E 58th (One Beacon)** - 40.7616° - $507M
+27. **601 Lexington** - 40.7584° - $452M
+
+**Upper West Side (lat 40.768-40.769):**
+28. **Time Warner Center** - 40.7685° - $794M
+29. **Museum Natural History** - 40.7814° - $474M
+
+**Washington Heights (lat 40.84):**
+30. **Presbyterian Hospital** - 40.8407° - $460M
+
+### Geographic Value Clusters
+
+**ROCKEFELLER CENTER CORRIDOR (6th Ave, 47th-57th St)**
+- **7 properties**
+- **Total Value: $4.09 BILLION (22% of dataset)**
+- Average: $584M per property
+- Extremely tight geographic cluster (3-block radius)
+- All office towers, 1930s-1970s construction
+
+**HUDSON YARDS/FAR WEST SIDE**
+- **4 properties** 
+- **Total Value: $2.92 BILLION (16% of dataset)**
+- Newest neighborhood, all post-2000 development
+- Mixed office/residential/convention uses
+
+**WORLD TRADE CENTER AREA**
+- **2 properties**
+- **Total Value: $2.19 BILLION (12% of dataset)**
+- Dominated by single mega-property (185 Greenwich)
+
+**PLAZA DISTRICT (Park Ave, 42nd-57th)**
+- **5 properties**
+- **Total Value: $3.04 BILLION (17% of dataset)**
+- Traditional prestige office addresses
+
+### Location vs Property Type
+
+**Lower Manhattan:** 100% office (financial district legacy)
+
+**Midtown Core (40.75-40.76):** 95% office, dominates the dataset
+
+**Hudson Yards:** 75% office, 25% special purpose (Javits)
+
+**Upper West/East:** More mixed-use and institutional (museum, hospital, residential condos)
+
+**Washington Heights:** Institutional only (hospital)
+
+### Location vs Value Pattern
+
+**Highest Average Values:**
+1. **Rockefeller Center** - $584M average
+2. **Hudson Yards** - $731M average  
+3. **WTC** - $1,097M average (skewed by one mega-property)
+
+**Lower Values:**
+- Upper Manhattan (hospital, museum) - $460-474M
+- Peripheral Midtown locations - $437-541M
+
+### Key Findings
+
+**Extreme Geographic Concentration:** 11 of 30 properties (37%) are within a 0.5-mile radius of Rockefeller Center
+
+**The "Spine of Value":** 6th Avenue from 42nd to 57th Street contains $4+ billion in assessed value along a single corridor
+
+**Hudson Yards Emergence:** The Far West Side (10th/11th Ave) now rivals traditional Midtown in property values, reflecting 2010s mega-development
+
+**Longitude Matters:** Properties west of 8th Avenue (Hudson Yards cluster) average $731M. Properties on Avenue of Americas average $584M. Properties on Park/Lexington average only $473M - **the west side is outvaluing the traditional east side prestige corridor**
+
+**Transit Proximity:** Highest-value clusters align with Penn Station (34th St) and Grand Central (42nd St) transit hubs
+
+**Central Park Premium:** Time Warner Center at Columbus Circle ($794M) commands higher value than comparable office buildings, reflecting residential condo premium for park views
+
+---
+
+## Summary of Key Insights
+
+1. **Zoning**: C6 high-density commercial zones dominate (77%), enabling the FAR 15-18 supertowers that generate highest values
+
+2. **Age**: 2000s buildings average highest ($941M) but iconic 1930s towers still command $500M+. Age is less important than location and prestige.
+
+3. **Use**: 23 of 30 are office-dominant. True mixed-use is rare (3 properties). Pure office generates highest values.
+
+4. **Floor Plates**: Modern efficiency = 60,000-100,000 SF plates. Pre-war towers had 27,000-40,000 SF. Bigger plates = higher values.
+
+5. **Ownership**: Top 5 owners control 40% of value. Rockefeller entities dominate private ownership. Public entities hold 19%.
+
+6. **Lot Coverage**: High value ≠ high coverage. WTC's 4.7% coverage (with plazas) is #1 property. Most commercial towers maximize at 90-100%.
+
+7. **Geography**: Rockefeller Center corridor = 22% of total value in 3-block radius. Hudson Yards emerging as new value center. **West side now outvalues traditional East Side.**

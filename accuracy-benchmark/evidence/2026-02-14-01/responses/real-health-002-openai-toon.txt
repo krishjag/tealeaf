@@ -1,0 +1,110 @@
+## 1) Percent of residents who are adults (18+)
+Calculated as: **adult_population / population × 100**
+
+| County | Population | Adult pop | % adults |
+|---|---:|---:|---:|
+| King | 2,271,380 | 1,836,529 | 80.9% |
+| Pierce | 928,696 | 716,813 | 77.2% |
+| Spokane | 551,455 | 433,863 | 78.7% |
+| Clark | 521,150 | 405,348 | 77.8% |
+| Yakima | 256,643 | 183,160 | 71.4% |
+| Whatcom | 231,919 | 189,784 | 81.8% |
+| Benton | 215,219 | 159,518 | 74.1% |
+| Island | 86,267 | 71,614 | 83.0% |
+| Ferry | 7,497 | 6,217 | 82.9% |
+| Garfield | 2,363 | 1,865 | 78.9% |
+
+Highest % adults: **Island (83.0%)** (very close: Ferry 82.9%). Lowest: **Yakima (71.4%)**.
+
+---
+
+## 2) Composite “chronic disease burden” score (mean of 6 measures)
+Definition: average of **ARTHRITIS, BPHIGH, DIABETES, CHD, COPD, STROKE** (all crude %).
+
+| County | Chronic disease burden score |
+|---|---:|
+| King | 10.6 |
+| Pierce | 13.7 |
+| Spokane | 13.8 |
+| Clark | 13.7 |
+| Yakima | 14.3 |
+| Whatcom | 12.1 |
+| Benton | 13.1 |
+| Island | 15.1 |
+| Ferry | 19.9 |
+| Garfield | 16.5 |
+
+(Example: King = (19.4+26.7+7.3+4.0+3.4+2.3)/6 = **10.6**)
+
+---
+
+## 3) Rank counties by chronic disease burden (highest → lowest)
+1. **Ferry — 19.9**
+2. **Garfield — 16.5**
+3. **Island — 15.1**
+4. **Yakima — 14.3**
+5. **Spokane — 13.8**
+6. **Pierce — 13.7**
+7. **Clark — 13.7**
+8. **Benton — 13.1**
+9. **Whatcom — 12.1**
+10. **King — 10.6**
+
+---
+
+## 4) Disability burden: average DISABLT prevalence per county
+Computed as the mean of the 7 disability measures: **COGNITION, DISABILITY, HEARING, INDEPLIVE, MOBILITY, SELFCARE, VISION**.
+
+| County | Avg disability prevalence (DISABLT mean) |
+|---|---:|
+| King | 7.8 |
+| Pierce | 11.4 |
+| Spokane | 11.2 |
+| Clark | 10.6 |
+| Yakima | 13.8 |
+| Whatcom | 11.0 |
+| Benton | 11.1 |
+| Island | 10.8 |
+| Ferry | 15.4 |
+| Garfield | 11.7 |
+
+**Highest disability burden: Ferry (15.4%)**.
+
+---
+
+## 5) Preventive service utilization leaders (PREVENT)
+Highest rates among the 10 counties:
+
+- **Dental visit (DENTAL): King — 71.8%**
+- **Mammography (MAMMOUSE): Spokane — 76.9%**
+- **Cholesterol screening (CHOLSCREEN): Garfield — 86.4%**
+
+---
+
+## 6) Population-weighted average obesity (OBESITY), weighted by adult_population
+Weighted mean obesity prevalence across all 10 counties:
+
+\[
+\frac{\sum(\text{adult pop}_i \times \text{obesity}_i)}{\sum(\text{adult pop}_i)}
+\]
+
+- Total adult population (10 counties): **4,004,711**
+- **Population-weighted obesity average: 28.0%**
+
+(Heavily influenced by King due to its large adult population and lower obesity prevalence.)
+
+---
+
+## 7) By category, measure with the highest overall average prevalence (across counties)
+Averaged each measure across the 10 counties within its category (using the values provided). Highest-average measure per category:
+
+- **HLTHOUT (Health Outcomes): HIGHCHOL (High cholesterol) — avg 35.3%**
+- **HLTHSTAT (Health Status): GHLTH (Fair/poor self-rated health) — avg 18.3%**
+- **PREVENT (Prevention): CHOLSCREEN (Cholesterol screening) — avg 83.8%**
+- **RISKBEH (Risk Behaviors): SLEEP (Short sleep duration) — avg 31.5%**
+- **DISABLT (Disability): DISABILITY (Any disability) — avg 29.9%**
+- **HRSN (Health-Related Social Needs):** not computable from the excerpt provided (no HRSN measures/values included for these counties)
+
+---
+
+If you want, I can also (a) add uncertainty-aware comparisons using the confidence intervals, or (b) compute z-score standardized composites so measures with different baselines don’t dominate the chronic disease score.

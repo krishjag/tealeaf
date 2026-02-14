@@ -1,0 +1,4190 @@
+=== API Request: HR-001 (JSON format) ===
+Task ID:     HR-001
+Category:    hr
+Complexity:  Complex
+Output Type: Calculation
+Format:      JSON
+Max Tokens:  8192
+Temperature: 0.3
+==================================================
+=== PROMPT ===
+
+You are a labor economist analyzing the BLS Job Openings and Labor Turnover Survey (JOLTS) data.
+The data contains monthly seasonally adjusted job openings, hires, and separations for 12 US industries in 2025.
+Levels are in thousands; rates are percent of employment.
+
+{
+  "source": "BLS Job Openings and Labor Turnover Survey (JOLTS)",
+  "license": "US Government Public Domain",
+  "url": "https://www.bls.gov/jts/",
+  "description": "Monthly seasonally adjusted job openings, hires, and separations data for 12 industries, 2025. Levels in thousands; rates as percent of employment.",
+  "year": 2025,
+  "seasonal_adjustment": "Seasonally Adjusted",
+  "unit_level": "Thousands",
+  "unit_rate": "Percent",
+  "data_elements": [
+    {
+      "id": "JO",
+      "key": "job_openings",
+      "name": "Job Openings",
+      "description": "Unfilled positions on the last business day of the month"
+    },
+    {
+      "id": "HI",
+      "key": "hires",
+      "name": "Hires",
+      "description": "Workers added to payroll during the month"
+    },
+    {
+      "id": "TS",
+      "key": "total_separations",
+      "name": "Total Separations",
+      "description": "Workers who left or were removed from payroll during the month"
+    },
+    {
+      "id": "QU",
+      "key": "quits",
+      "name": "Quits",
+      "description": "Workers who left voluntarily (excludes retirements and transfers)"
+    },
+    {
+      "id": "LD",
+      "key": "layoffs_discharges",
+      "name": "Layoffs and Discharges",
+      "description": "Involuntary separations initiated by the employer"
+    },
+    {
+      "id": "OS",
+      "key": "other_separations",
+      "name": "Other Separations",
+      "description": "Retirements, transfers, disability, and deaths"
+    }
+  ],
+  "industries": [
+    {
+      "code": "000000",
+      "name": "Total nonfarm",
+      "hierarchy_level": "0",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 7762.0,
+            "rate": 4.7
+          },
+          "hires": {
+            "level": 5371.0,
+            "rate": 3.4
+          },
+          "total_separations": {
+            "level": 5272.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 3256.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 1674.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 342.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 7480.0,
+            "rate": 4.5
+          },
+          "hires": {
+            "level": 5370.0,
+            "rate": 3.4
+          },
+          "total_separations": {
+            "level": 5316.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 3250.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 1780.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 286.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 7200.0,
+            "rate": 4.3
+          },
+          "hires": {
+            "level": 5404.0,
+            "rate": 3.4
+          },
+          "total_separations": {
+            "level": 5183.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 3344.0,
+            "rate": 2.1
+          },
+          "layoffs_discharges": {
+            "level": 1590.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 248.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 7395.0,
+            "rate": 4.4
+          },
+          "hires": {
+            "level": 5615.0,
+            "rate": 3.5
+          },
+          "total_separations": {
+            "level": 5313.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 3215.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 1789.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 309.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 7712.0,
+            "rate": 4.6
+          },
+          "hires": {
+            "level": 5465.0,
+            "rate": 3.4
+          },
+          "total_separations": {
+            "level": 5213.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 3270.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 1611.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 332.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 7357.0,
+            "rate": 4.4
+          },
+          "hires": {
+            "level": 5267.0,
+            "rate": 3.3
+          },
+          "total_separations": {
+            "level": 5341.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 3209.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 1796.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 335.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 7208.0,
+            "rate": 4.3
+          },
+          "hires": {
+            "level": 5240.0,
+            "rate": 3.3
+          },
+          "total_separations": {
+            "level": 5221.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 3166.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 1787.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 269.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 7227.0,
+            "rate": 4.3
+          },
+          "hires": {
+            "level": 5126.0,
+            "rate": 3.2
+          },
+          "total_separations": {
+            "level": 5111.0,
+            "rate": 3.2
+          },
+          "quits": {
+            "level": 3091.0,
+            "rate": 1.9
+          },
+          "layoffs_discharges": {
+            "level": 1725.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 295.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 7658.0,
+            "rate": 4.6
+          },
+          "hires": {
+            "level": 5367.0,
+            "rate": 3.4
+          },
+          "total_separations": {
+            "level": 5264.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 3128.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 1781.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 354.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 7449.0,
+            "rate": 4.5
+          },
+          "hires": {
+            "level": 5368.0,
+            "rate": 3.4
+          },
+          "total_separations": {
+            "level": 5069.0,
+            "rate": 3.2
+          },
+          "quits": {
+            "level": 2973.0,
+            "rate": 1.9
+          },
+          "layoffs_discharges": {
+            "level": 1850.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 246.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 6928.0,
+            "rate": 4.2
+          },
+          "hires": {
+            "level": 5121.0,
+            "rate": 3.2
+          },
+          "total_separations": {
+            "level": 5144.0,
+            "rate": 3.2
+          },
+          "quits": {
+            "level": 3193.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 1701.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 249.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 6542.0,
+            "rate": 3.9
+          },
+          "hires": {
+            "level": 5293.0,
+            "rate": 3.3
+          },
+          "total_separations": {
+            "level": 5251.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 3204.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 1762.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 285.0,
+            "rate": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "code": "100000",
+      "name": "Total private",
+      "hierarchy_level": "1",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 6860.0,
+            "rate": 4.8
+          },
+          "hires": {
+            "level": 5000.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 4959.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 3078.0,
+            "rate": 2.3
+          },
+          "layoffs_discharges": {
+            "level": 1596.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 285.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 6588.0,
+            "rate": 4.6
+          },
+          "hires": {
+            "level": 5020.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 4966.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 3054.0,
+            "rate": 2.3
+          },
+          "layoffs_discharges": {
+            "level": 1680.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 232.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 6342.0,
+            "rate": 4.5
+          },
+          "hires": {
+            "level": 5055.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 4845.0,
+            "rate": 3.6
+          },
+          "quits": {
+            "level": 3159.0,
+            "rate": 2.3
+          },
+          "layoffs_discharges": {
+            "level": 1490.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 197.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 6562.0,
+            "rate": 4.6
+          },
+          "hires": {
+            "level": 5259.0,
+            "rate": 3.9
+          },
+          "total_separations": {
+            "level": 4981.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 3032.0,
+            "rate": 2.2
+          },
+          "layoffs_discharges": {
+            "level": 1712.0,
+            "rate": 1.3
+          },
+          "other_separations": {
+            "level": 236.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 6876.0,
+            "rate": 4.8
+          },
+          "hires": {
+            "level": 5109.0,
+            "rate": 3.8
+          },
+          "total_separations": {
+            "level": 4860.0,
+            "rate": 3.6
+          },
+          "quits": {
+            "level": 3083.0,
+            "rate": 2.3
+          },
+          "layoffs_discharges": {
+            "level": 1521.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 256.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 6536.0,
+            "rate": 4.6
+          },
+          "hires": {
+            "level": 4935.0,
+            "rate": 3.6
+          },
+          "total_separations": {
+            "level": 5016.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 3026.0,
+            "rate": 2.2
+          },
+          "layoffs_discharges": {
+            "level": 1717.0,
+            "rate": 1.3
+          },
+          "other_separations": {
+            "level": 273.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 6401.0,
+            "rate": 4.5
+          },
+          "hires": {
+            "level": 4918.0,
+            "rate": 3.6
+          },
+          "total_separations": {
+            "level": 4907.0,
+            "rate": 3.6
+          },
+          "quits": {
+            "level": 2984.0,
+            "rate": 2.2
+          },
+          "layoffs_discharges": {
+            "level": 1711.0,
+            "rate": 1.3
+          },
+          "other_separations": {
+            "level": 212.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 6457.0,
+            "rate": 4.5
+          },
+          "hires": {
+            "level": 4805.0,
+            "rate": 3.5
+          },
+          "total_separations": {
+            "level": 4781.0,
+            "rate": 3.5
+          },
+          "quits": {
+            "level": 2908.0,
+            "rate": 2.1
+          },
+          "layoffs_discharges": {
+            "level": 1644.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 228.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 6871.0,
+            "rate": 4.8
+          },
+          "hires": {
+            "level": 5021.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 4898.0,
+            "rate": 3.6
+          },
+          "quits": {
+            "level": 2918.0,
+            "rate": 2.1
+          },
+          "layoffs_discharges": {
+            "level": 1702.0,
+            "rate": 1.3
+          },
+          "other_separations": {
+            "level": 278.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 6665.0,
+            "rate": 4.7
+          },
+          "hires": {
+            "level": 5027.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 4743.0,
+            "rate": 3.5
+          },
+          "quits": {
+            "level": 2800.0,
+            "rate": 2.1
+          },
+          "layoffs_discharges": {
+            "level": 1754.0,
+            "rate": 1.3
+          },
+          "other_separations": {
+            "level": 189.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 6227.0,
+            "rate": 4.4
+          },
+          "hires": {
+            "level": 4826.0,
+            "rate": 3.5
+          },
+          "total_separations": {
+            "level": 4855.0,
+            "rate": 3.6
+          },
+          "quits": {
+            "level": 3034.0,
+            "rate": 2.2
+          },
+          "layoffs_discharges": {
+            "level": 1626.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 194.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 5804.0,
+            "rate": 4.1
+          },
+          "hires": {
+            "level": 4978.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 4932.0,
+            "rate": 3.6
+          },
+          "quits": {
+            "level": 3029.0,
+            "rate": 2.2
+          },
+          "layoffs_discharges": {
+            "level": 1696.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 207.0,
+            "rate": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "code": "230000",
+      "name": "Construction",
+      "hierarchy_level": "2",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 242.0,
+            "rate": 2.8
+          },
+          "hires": {
+            "level": 346.0,
+            "rate": 4.2
+          },
+          "total_separations": {
+            "level": 333.0,
+            "rate": 4.0
+          },
+          "quits": {
+            "level": 164.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 149.0,
+            "rate": 1.8
+          },
+          "other_separations": {
+            "level": 19.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 286.0,
+            "rate": 3.3
+          },
+          "hires": {
+            "level": 347.0,
+            "rate": 4.2
+          },
+          "total_separations": {
+            "level": 348.0,
+            "rate": 4.2
+          },
+          "quits": {
+            "level": 180.0,
+            "rate": 2.2
+          },
+          "layoffs_discharges": {
+            "level": 149.0,
+            "rate": 1.8
+          },
+          "other_separations": {
+            "level": 18.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 251.0,
+            "rate": 2.9
+          },
+          "hires": {
+            "level": 306.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 322.0,
+            "rate": 3.9
+          },
+          "quits": {
+            "level": 166.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 150.0,
+            "rate": 1.8
+          },
+          "other_separations": {
+            "level": 5.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 242.0,
+            "rate": 2.8
+          },
+          "hires": {
+            "level": 364.0,
+            "rate": 4.4
+          },
+          "total_separations": {
+            "level": 357.0,
+            "rate": 4.3
+          },
+          "quits": {
+            "level": 162.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 180.0,
+            "rate": 2.2
+          },
+          "other_separations": {
+            "level": 14.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 232.0,
+            "rate": 2.7
+          },
+          "hires": {
+            "level": 358.0,
+            "rate": 4.3
+          },
+          "total_separations": {
+            "level": 358.0,
+            "rate": 4.3
+          },
+          "quits": {
+            "level": 174.0,
+            "rate": 2.1
+          },
+          "layoffs_discharges": {
+            "level": 167.0,
+            "rate": 2.0
+          },
+          "other_separations": {
+            "level": 17.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 242.0,
+            "rate": 2.8
+          },
+          "hires": {
+            "level": 348.0,
+            "rate": 4.2
+          },
+          "total_separations": {
+            "level": 356.0,
+            "rate": 4.3
+          },
+          "quits": {
+            "level": 154.0,
+            "rate": 1.9
+          },
+          "layoffs_discharges": {
+            "level": 183.0,
+            "rate": 2.2
+          },
+          "other_separations": {
+            "level": 19.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 303.0,
+            "rate": 3.5
+          },
+          "hires": {
+            "level": 331.0,
+            "rate": 4.0
+          },
+          "total_separations": {
+            "level": 316.0,
+            "rate": 3.8
+          },
+          "quits": {
+            "level": 90.0,
+            "rate": 1.1
+          },
+          "layoffs_discharges": {
+            "level": 212.0,
+            "rate": 2.6
+          },
+          "other_separations": {
+            "level": 14.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 188.0,
+            "rate": 2.2
+          },
+          "hires": {
+            "level": 353.0,
+            "rate": 4.3
+          },
+          "total_separations": {
+            "level": 351.0,
+            "rate": 4.2
+          },
+          "quits": {
+            "level": 146.0,
+            "rate": 1.8
+          },
+          "layoffs_discharges": {
+            "level": 183.0,
+            "rate": 2.2
+          },
+          "other_separations": {
+            "level": 22.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 231.0,
+            "rate": 2.7
+          },
+          "hires": {
+            "level": 355.0,
+            "rate": 4.3
+          },
+          "total_separations": {
+            "level": 340.0,
+            "rate": 4.1
+          },
+          "quits": {
+            "level": 136.0,
+            "rate": 1.6
+          },
+          "layoffs_discharges": {
+            "level": 197.0,
+            "rate": 2.4
+          },
+          "other_separations": {
+            "level": 7.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 202.0,
+            "rate": 2.4
+          },
+          "hires": {
+            "level": 331.0,
+            "rate": 4.0
+          },
+          "total_separations": {
+            "level": 288.0,
+            "rate": 3.5
+          },
+          "quits": {
+            "level": 110.0,
+            "rate": 1.3
+          },
+          "layoffs_discharges": {
+            "level": 161.0,
+            "rate": 1.9
+          },
+          "other_separations": {
+            "level": 16.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 284.0,
+            "rate": 3.3
+          },
+          "hires": {
+            "level": 335.0,
+            "rate": 4.0
+          },
+          "total_separations": {
+            "level": 299.0,
+            "rate": 3.6
+          },
+          "quits": {
+            "level": 140.0,
+            "rate": 1.7
+          },
+          "layoffs_discharges": {
+            "level": 145.0,
+            "rate": 1.7
+          },
+          "other_separations": {
+            "level": 14.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 292.0,
+            "rate": 3.4
+          },
+          "hires": {
+            "level": 347.0,
+            "rate": 4.2
+          },
+          "total_separations": {
+            "level": 342.0,
+            "rate": 4.1
+          },
+          "quits": {
+            "level": 148.0,
+            "rate": 1.8
+          },
+          "layoffs_discharges": {
+            "level": 177.0,
+            "rate": 2.1
+          },
+          "other_separations": {
+            "level": 17.0,
+            "rate": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "code": "300000",
+      "name": "Manufacturing",
+      "hierarchy_level": "2",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 513.0,
+            "rate": 3.9
+          },
+          "hires": {
+            "level": 332.0,
+            "rate": 2.6
+          },
+          "total_separations": {
+            "level": 337.0,
+            "rate": 2.6
+          },
+          "quits": {
+            "level": 185.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 132.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 20.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 445.0,
+            "rate": 3.4
+          },
+          "hires": {
+            "level": 318.0,
+            "rate": 2.5
+          },
+          "total_separations": {
+            "level": 323.0,
+            "rate": 2.5
+          },
+          "quits": {
+            "level": 179.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 121.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 23.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 397.0,
+            "rate": 3.0
+          },
+          "hires": {
+            "level": 319.0,
+            "rate": 2.5
+          },
+          "total_separations": {
+            "level": 311.0,
+            "rate": 2.4
+          },
+          "quits": {
+            "level": 184.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 106.0,
+            "rate": 0.8
+          },
+          "other_separations": {
+            "level": 21.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 392.0,
+            "rate": 3.0
+          },
+          "hires": {
+            "level": 330.0,
+            "rate": 2.6
+          },
+          "total_separations": {
+            "level": 316.0,
+            "rate": 2.5
+          },
+          "quits": {
+            "level": 180.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 119.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 18.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 425.0,
+            "rate": 3.2
+          },
+          "hires": {
+            "level": 279.0,
+            "rate": 2.2
+          },
+          "total_separations": {
+            "level": 283.0,
+            "rate": 2.2
+          },
+          "quits": {
+            "level": 148.0,
+            "rate": 1.2
+          },
+          "layoffs_discharges": {
+            "level": 111.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 24.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 396.0,
+            "rate": 3.0
+          },
+          "hires": {
+            "level": 293.0,
+            "rate": 2.3
+          },
+          "total_separations": {
+            "level": 315.0,
+            "rate": 2.5
+          },
+          "quits": {
+            "level": 175.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 112.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 28.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 438.0,
+            "rate": 3.3
+          },
+          "hires": {
+            "level": 301.0,
+            "rate": 2.4
+          },
+          "total_separations": {
+            "level": 306.0,
+            "rate": 2.4
+          },
+          "quits": {
+            "level": 175.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 116.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 15.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 409.0,
+            "rate": 3.1
+          },
+          "hires": {
+            "level": 305.0,
+            "rate": 2.4
+          },
+          "total_separations": {
+            "level": 313.0,
+            "rate": 2.5
+          },
+          "quits": {
+            "level": 172.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 121.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 20.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 385.0,
+            "rate": 2.9
+          },
+          "hires": {
+            "level": 320.0,
+            "rate": 2.5
+          },
+          "total_separations": {
+            "level": 327.0,
+            "rate": 2.6
+          },
+          "quits": {
+            "level": 189.0,
+            "rate": 1.5
+          },
+          "layoffs_discharges": {
+            "level": 117.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 21.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 414.0,
+            "rate": 3.2
+          },
+          "hires": {
+            "level": 317.0,
+            "rate": 2.5
+          },
+          "total_separations": {
+            "level": 319.0,
+            "rate": 2.5
+          },
+          "quits": {
+            "level": 178.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 128.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 13.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 399.0,
+            "rate": 3.0
+          },
+          "hires": {
+            "level": 282.0,
+            "rate": 2.2
+          },
+          "total_separations": {
+            "level": 301.0,
+            "rate": 2.4
+          },
+          "quits": {
+            "level": 182.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 104.0,
+            "rate": 0.8
+          },
+          "other_separations": {
+            "level": 15.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 433.0,
+            "rate": 3.3
+          },
+          "hires": {
+            "level": 287.0,
+            "rate": 2.3
+          },
+          "total_separations": {
+            "level": 311.0,
+            "rate": 2.4
+          },
+          "quits": {
+            "level": 184.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 111.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 16.0,
+            "rate": 0.1
+          }
+        }
+      ]
+    },
+    {
+      "code": "440000",
+      "name": "Retail trade",
+      "hierarchy_level": "3",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 656.0,
+            "rate": 4.0
+          },
+          "hires": {
+            "level": 637.0,
+            "rate": 4.1
+          },
+          "total_separations": {
+            "level": 597.0,
+            "rate": 3.8
+          },
+          "quits": {
+            "level": 395.0,
+            "rate": 2.5
+          },
+          "layoffs_discharges": {
+            "level": 171.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 31.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 528.0,
+            "rate": 3.3
+          },
+          "hires": {
+            "level": 601.0,
+            "rate": 3.9
+          },
+          "total_separations": {
+            "level": 645.0,
+            "rate": 4.1
+          },
+          "quits": {
+            "level": 404.0,
+            "rate": 2.6
+          },
+          "layoffs_discharges": {
+            "level": 229.0,
+            "rate": 1.5
+          },
+          "other_separations": {
+            "level": 12.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 538.0,
+            "rate": 3.3
+          },
+          "hires": {
+            "level": 632.0,
+            "rate": 4.1
+          },
+          "total_separations": {
+            "level": 652.0,
+            "rate": 4.2
+          },
+          "quits": {
+            "level": 473.0,
+            "rate": 3.0
+          },
+          "layoffs_discharges": {
+            "level": 162.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 17.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 561.0,
+            "rate": 3.5
+          },
+          "hires": {
+            "level": 575.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 555.0,
+            "rate": 3.6
+          },
+          "quits": {
+            "level": 386.0,
+            "rate": 2.5
+          },
+          "layoffs_discharges": {
+            "level": 136.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 33.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 466.0,
+            "rate": 2.9
+          },
+          "hires": {
+            "level": 575.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 581.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 412.0,
+            "rate": 2.6
+          },
+          "layoffs_discharges": {
+            "level": 149.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 21.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 629.0,
+            "rate": 3.9
+          },
+          "hires": {
+            "level": 587.0,
+            "rate": 3.8
+          },
+          "total_separations": {
+            "level": 607.0,
+            "rate": 3.9
+          },
+          "quits": {
+            "level": 419.0,
+            "rate": 2.7
+          },
+          "layoffs_discharges": {
+            "level": 162.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 26.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 548.0,
+            "rate": 3.4
+          },
+          "hires": {
+            "level": 583.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 582.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 375.0,
+            "rate": 2.4
+          },
+          "layoffs_discharges": {
+            "level": 169.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 38.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 603.0,
+            "rate": 3.7
+          },
+          "hires": {
+            "level": 572.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 580.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 398.0,
+            "rate": 2.6
+          },
+          "layoffs_discharges": {
+            "level": 149.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 32.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 620.0,
+            "rate": 3.8
+          },
+          "hires": {
+            "level": 576.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 516.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 317.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 168.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 30.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 651.0,
+            "rate": 4.0
+          },
+          "hires": {
+            "level": 578.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 570.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 403.0,
+            "rate": 2.6
+          },
+          "layoffs_discharges": {
+            "level": 158.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 9.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 726.0,
+            "rate": 4.5
+          },
+          "hires": {
+            "level": 571.0,
+            "rate": 3.7
+          },
+          "total_separations": {
+            "level": 578.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 428.0,
+            "rate": 2.7
+          },
+          "layoffs_discharges": {
+            "level": 138.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 12.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 531.0,
+            "rate": 3.3
+          },
+          "hires": {
+            "level": 589.0,
+            "rate": 3.8
+          },
+          "total_separations": {
+            "level": 664.0,
+            "rate": 4.3
+          },
+          "quits": {
+            "level": 515.0,
+            "rate": 3.3
+          },
+          "layoffs_discharges": {
+            "level": 135.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 14.0,
+            "rate": 0.1
+          }
+        }
+      ]
+    },
+    {
+      "code": "510000",
+      "name": "Information",
+      "hierarchy_level": "2",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 130.0,
+            "rate": 4.2
+          },
+          "hires": {
+            "level": 80.0,
+            "rate": 2.7
+          },
+          "total_separations": {
+            "level": 81.0,
+            "rate": 2.7
+          },
+          "quits": {
+            "level": 43.0,
+            "rate": 1.5
+          },
+          "layoffs_discharges": {
+            "level": 30.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 8.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 131.0,
+            "rate": 4.2
+          },
+          "hires": {
+            "level": 79.0,
+            "rate": 2.7
+          },
+          "total_separations": {
+            "level": 85.0,
+            "rate": 2.9
+          },
+          "quits": {
+            "level": 30.0,
+            "rate": 1.0
+          },
+          "layoffs_discharges": {
+            "level": 47.0,
+            "rate": 1.6
+          },
+          "other_separations": {
+            "level": 7.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 154.0,
+            "rate": 5.0
+          },
+          "hires": {
+            "level": 83.0,
+            "rate": 2.8
+          },
+          "total_separations": {
+            "level": 76.0,
+            "rate": 2.6
+          },
+          "quits": {
+            "level": 35.0,
+            "rate": 1.2
+          },
+          "layoffs_discharges": {
+            "level": 33.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 8.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 165.0,
+            "rate": 5.3
+          },
+          "hires": {
+            "level": 89.0,
+            "rate": 3.0
+          },
+          "total_separations": {
+            "level": 78.0,
+            "rate": 2.7
+          },
+          "quits": {
+            "level": 33.0,
+            "rate": 1.1
+          },
+          "layoffs_discharges": {
+            "level": 35.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 10.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 177.0,
+            "rate": 5.7
+          },
+          "hires": {
+            "level": 84.0,
+            "rate": 2.9
+          },
+          "total_separations": {
+            "level": 82.0,
+            "rate": 2.8
+          },
+          "quits": {
+            "level": 37.0,
+            "rate": 1.2
+          },
+          "layoffs_discharges": {
+            "level": 35.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 11.0,
+            "rate": 0.4
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 189.0,
+            "rate": 6.0
+          },
+          "hires": {
+            "level": 99.0,
+            "rate": 3.4
+          },
+          "total_separations": {
+            "level": 97.0,
+            "rate": 3.3
+          },
+          "quits": {
+            "level": 45.0,
+            "rate": 1.5
+          },
+          "layoffs_discharges": {
+            "level": 46.0,
+            "rate": 1.6
+          },
+          "other_separations": {
+            "level": 6.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 180.0,
+            "rate": 5.8
+          },
+          "hires": {
+            "level": 86.0,
+            "rate": 2.9
+          },
+          "total_separations": {
+            "level": 91.0,
+            "rate": 3.1
+          },
+          "quits": {
+            "level": 40.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 43.0,
+            "rate": 1.5
+          },
+          "other_separations": {
+            "level": 8.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 172.0,
+            "rate": 5.5
+          },
+          "hires": {
+            "level": 77.0,
+            "rate": 2.6
+          },
+          "total_separations": {
+            "level": 85.0,
+            "rate": 2.9
+          },
+          "quits": {
+            "level": 40.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 38.0,
+            "rate": 1.3
+          },
+          "other_separations": {
+            "level": 7.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 203.0,
+            "rate": 6.5
+          },
+          "hires": {
+            "level": 76.0,
+            "rate": 2.6
+          },
+          "total_separations": {
+            "level": 81.0,
+            "rate": 2.8
+          },
+          "quits": {
+            "level": 28.0,
+            "rate": 1.0
+          },
+          "layoffs_discharges": {
+            "level": 48.0,
+            "rate": 1.6
+          },
+          "other_separations": {
+            "level": 5.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 124.0,
+            "rate": 4.1
+          },
+          "hires": {
+            "level": 73.0,
+            "rate": 2.5
+          },
+          "total_separations": {
+            "level": 93.0,
+            "rate": 3.2
+          },
+          "quits": {
+            "level": 38.0,
+            "rate": 1.3
+          },
+          "layoffs_discharges": {
+            "level": 47.0,
+            "rate": 1.6
+          },
+          "other_separations": {
+            "level": 8.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 89.0,
+            "rate": 3.0
+          },
+          "hires": {
+            "level": 84.0,
+            "rate": 2.9
+          },
+          "total_separations": {
+            "level": 82.0,
+            "rate": 2.8
+          },
+          "quits": {
+            "level": 32.0,
+            "rate": 1.1
+          },
+          "layoffs_discharges": {
+            "level": 46.0,
+            "rate": 1.6
+          },
+          "other_separations": {
+            "level": 5.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 101.0,
+            "rate": 3.4
+          },
+          "hires": {
+            "level": 111.0,
+            "rate": 3.8
+          },
+          "total_separations": {
+            "level": 109.0,
+            "rate": 3.7
+          },
+          "quits": {
+            "level": 60.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 47.0,
+            "rate": 1.6
+          },
+          "other_separations": {
+            "level": 3.0,
+            "rate": 0.1
+          }
+        }
+      ]
+    },
+    {
+      "code": "510099",
+      "name": "Financial activities",
+      "hierarchy_level": "2",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 516.0,
+            "rate": 5.3
+          },
+          "hires": {
+            "level": 201.0,
+            "rate": 2.2
+          },
+          "total_separations": {
+            "level": 181.0,
+            "rate": 2.0
+          },
+          "quits": {
+            "level": 123.0,
+            "rate": 1.3
+          },
+          "layoffs_discharges": {
+            "level": 35.0,
+            "rate": 0.4
+          },
+          "other_separations": {
+            "level": 22.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 431.0,
+            "rate": 4.5
+          },
+          "hires": {
+            "level": 217.0,
+            "rate": 2.3
+          },
+          "total_separations": {
+            "level": 190.0,
+            "rate": 2.1
+          },
+          "quits": {
+            "level": 116.0,
+            "rate": 1.3
+          },
+          "layoffs_discharges": {
+            "level": 54.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 21.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 428.0,
+            "rate": 4.4
+          },
+          "hires": {
+            "level": 244.0,
+            "rate": 2.6
+          },
+          "total_separations": {
+            "level": 223.0,
+            "rate": 2.4
+          },
+          "quits": {
+            "level": 138.0,
+            "rate": 1.5
+          },
+          "layoffs_discharges": {
+            "level": 65.0,
+            "rate": 0.7
+          },
+          "other_separations": {
+            "level": 19.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 418.0,
+            "rate": 4.3
+          },
+          "hires": {
+            "level": 217.0,
+            "rate": 2.3
+          },
+          "total_separations": {
+            "level": 239.0,
+            "rate": 2.6
+          },
+          "quits": {
+            "level": 127.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 92.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 20.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 490.0,
+            "rate": 5.0
+          },
+          "hires": {
+            "level": 220.0,
+            "rate": 2.4
+          },
+          "total_separations": {
+            "level": 201.0,
+            "rate": 2.2
+          },
+          "quits": {
+            "level": 132.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 47.0,
+            "rate": 0.5
+          },
+          "other_separations": {
+            "level": 21.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 366.0,
+            "rate": 3.8
+          },
+          "hires": {
+            "level": 205.0,
+            "rate": 2.2
+          },
+          "total_separations": {
+            "level": 192.0,
+            "rate": 2.1
+          },
+          "quits": {
+            "level": 112.0,
+            "rate": 1.2
+          },
+          "layoffs_discharges": {
+            "level": 58.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 21.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 404.0,
+            "rate": 4.2
+          },
+          "hires": {
+            "level": 209.0,
+            "rate": 2.3
+          },
+          "total_separations": {
+            "level": 213.0,
+            "rate": 2.3
+          },
+          "quits": {
+            "level": 133.0,
+            "rate": 1.4
+          },
+          "layoffs_discharges": {
+            "level": 58.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 21.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 390.0,
+            "rate": 4.0
+          },
+          "hires": {
+            "level": 212.0,
+            "rate": 2.3
+          },
+          "total_separations": {
+            "level": 210.0,
+            "rate": 2.3
+          },
+          "quits": {
+            "level": 114.0,
+            "rate": 1.2
+          },
+          "layoffs_discharges": {
+            "level": 72.0,
+            "rate": 0.8
+          },
+          "other_separations": {
+            "level": 25.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 449.0,
+            "rate": 4.6
+          },
+          "hires": {
+            "level": 219.0,
+            "rate": 2.4
+          },
+          "total_separations": {
+            "level": 219.0,
+            "rate": 2.4
+          },
+          "quits": {
+            "level": 135.0,
+            "rate": 1.5
+          },
+          "layoffs_discharges": {
+            "level": 57.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 27.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 342.0,
+            "rate": 3.6
+          },
+          "hires": {
+            "level": 208.0,
+            "rate": 2.3
+          },
+          "total_separations": {
+            "level": 184.0,
+            "rate": 2.0
+          },
+          "quits": {
+            "level": 105.0,
+            "rate": 1.1
+          },
+          "layoffs_discharges": {
+            "level": 52.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 27.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 354.0,
+            "rate": 3.7
+          },
+          "hires": {
+            "level": 167.0,
+            "rate": 1.8
+          },
+          "total_separations": {
+            "level": 189.0,
+            "rate": 2.0
+          },
+          "quits": {
+            "level": 109.0,
+            "rate": 1.2
+          },
+          "layoffs_discharges": {
+            "level": 55.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 24.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 256.0,
+            "rate": 2.7
+          },
+          "hires": {
+            "level": 207.0,
+            "rate": 2.2
+          },
+          "total_separations": {
+            "level": 175.0,
+            "rate": 1.9
+          },
+          "quits": {
+            "level": 108.0,
+            "rate": 1.2
+          },
+          "layoffs_discharges": {
+            "level": 41.0,
+            "rate": 0.4
+          },
+          "other_separations": {
+            "level": 26.0,
+            "rate": 0.3
+          }
+        }
+      ]
+    },
+    {
+      "code": "540099",
+      "name": "Professional and business services",
+      "hierarchy_level": "2",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 1211.0,
+            "rate": 5.1
+          },
+          "hires": {
+            "level": 962.0,
+            "rate": 4.3
+          },
+          "total_separations": {
+            "level": 1038.0,
+            "rate": 4.6
+          },
+          "quits": {
+            "level": 589.0,
+            "rate": 2.6
+          },
+          "layoffs_discharges": {
+            "level": 379.0,
+            "rate": 1.7
+          },
+          "other_separations": {
+            "level": 70.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 1336.0,
+            "rate": 5.6
+          },
+          "hires": {
+            "level": 1056.0,
+            "rate": 4.7
+          },
+          "total_separations": {
+            "level": 1023.0,
+            "rate": 4.5
+          },
+          "quits": {
+            "level": 576.0,
+            "rate": 2.6
+          },
+          "layoffs_discharges": {
+            "level": 412.0,
+            "rate": 1.8
+          },
+          "other_separations": {
+            "level": 35.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 1249.0,
+            "rate": 5.2
+          },
+          "hires": {
+            "level": 1042.0,
+            "rate": 4.6
+          },
+          "total_separations": {
+            "level": 988.0,
+            "rate": 4.4
+          },
+          "quits": {
+            "level": 558.0,
+            "rate": 2.5
+          },
+          "layoffs_discharges": {
+            "level": 394.0,
+            "rate": 1.7
+          },
+          "other_separations": {
+            "level": 36.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 1386.0,
+            "rate": 5.8
+          },
+          "hires": {
+            "level": 1112.0,
+            "rate": 4.9
+          },
+          "total_separations": {
+            "level": 1063.0,
+            "rate": 4.7
+          },
+          "quits": {
+            "level": 545.0,
+            "rate": 2.4
+          },
+          "layoffs_discharges": {
+            "level": 465.0,
+            "rate": 2.1
+          },
+          "other_separations": {
+            "level": 53.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 1302.0,
+            "rate": 5.4
+          },
+          "hires": {
+            "level": 1069.0,
+            "rate": 4.7
+          },
+          "total_separations": {
+            "level": 1000.0,
+            "rate": 4.4
+          },
+          "quits": {
+            "level": 528.0,
+            "rate": 2.3
+          },
+          "layoffs_discharges": {
+            "level": 401.0,
+            "rate": 1.8
+          },
+          "other_separations": {
+            "level": 71.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 1365.0,
+            "rate": 5.7
+          },
+          "hires": {
+            "level": 1010.0,
+            "rate": 4.5
+          },
+          "total_separations": {
+            "level": 1016.0,
+            "rate": 4.5
+          },
+          "quits": {
+            "level": 404.0,
+            "rate": 1.8
+          },
+          "layoffs_discharges": {
+            "level": 545.0,
+            "rate": 2.4
+          },
+          "other_separations": {
+            "level": 67.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 1274.0,
+            "rate": 5.3
+          },
+          "hires": {
+            "level": 1032.0,
+            "rate": 4.6
+          },
+          "total_separations": {
+            "level": 1059.0,
+            "rate": 4.7
+          },
+          "quits": {
+            "level": 595.0,
+            "rate": 2.6
+          },
+          "layoffs_discharges": {
+            "level": 418.0,
+            "rate": 1.9
+          },
+          "other_separations": {
+            "level": 46.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 1235.0,
+            "rate": 5.2
+          },
+          "hires": {
+            "level": 1015.0,
+            "rate": 4.5
+          },
+          "total_separations": {
+            "level": 1076.0,
+            "rate": 4.8
+          },
+          "quits": {
+            "level": 574.0,
+            "rate": 2.5
+          },
+          "layoffs_discharges": {
+            "level": 452.0,
+            "rate": 2.0
+          },
+          "other_separations": {
+            "level": 51.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 1502.0,
+            "rate": 6.3
+          },
+          "hires": {
+            "level": 1030.0,
+            "rate": 4.6
+          },
+          "total_separations": {
+            "level": 1122.0,
+            "rate": 5.0
+          },
+          "quits": {
+            "level": 571.0,
+            "rate": 2.5
+          },
+          "layoffs_discharges": {
+            "level": 469.0,
+            "rate": 2.1
+          },
+          "other_separations": {
+            "level": 82.0,
+            "rate": 0.4
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 1300.0,
+            "rate": 5.5
+          },
+          "hires": {
+            "level": 1008.0,
+            "rate": 4.5
+          },
+          "total_separations": {
+            "level": 1031.0,
+            "rate": 4.6
+          },
+          "quits": {
+            "level": 543.0,
+            "rate": 2.4
+          },
+          "layoffs_discharges": {
+            "level": 463.0,
+            "rate": 2.1
+          },
+          "other_separations": {
+            "level": 26.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 1273.0,
+            "rate": 5.3
+          },
+          "hires": {
+            "level": 992.0,
+            "rate": 4.4
+          },
+          "total_separations": {
+            "level": 1074.0,
+            "rate": 4.8
+          },
+          "quits": {
+            "level": 514.0,
+            "rate": 2.3
+          },
+          "layoffs_discharges": {
+            "level": 512.0,
+            "rate": 2.3
+          },
+          "other_separations": {
+            "level": 48.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 1016.0,
+            "rate": 4.3
+          },
+          "hires": {
+            "level": 940.0,
+            "rate": 4.2
+          },
+          "total_separations": {
+            "level": 862.0,
+            "rate": 3.8
+          },
+          "quits": {
+            "level": 363.0,
+            "rate": 1.6
+          },
+          "layoffs_discharges": {
+            "level": 459.0,
+            "rate": 2.0
+          },
+          "other_separations": {
+            "level": 41.0,
+            "rate": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "code": "620000",
+      "name": "Health care and social assistance",
+      "hierarchy_level": "3",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 1498.0,
+            "rate": 6.1
+          },
+          "hires": {
+            "level": 743.0,
+            "rate": 3.2
+          },
+          "total_separations": {
+            "level": 664.0,
+            "rate": 2.9
+          },
+          "quits": {
+            "level": 457.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 163.0,
+            "rate": 0.7
+          },
+          "other_separations": {
+            "level": 44.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 1405.0,
+            "rate": 5.7
+          },
+          "hires": {
+            "level": 709.0,
+            "rate": 3.1
+          },
+          "total_separations": {
+            "level": 654.0,
+            "rate": 2.8
+          },
+          "quits": {
+            "level": 438.0,
+            "rate": 1.9
+          },
+          "layoffs_discharges": {
+            "level": 164.0,
+            "rate": 0.7
+          },
+          "other_separations": {
+            "level": 51.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 1368.0,
+            "rate": 5.6
+          },
+          "hires": {
+            "level": 731.0,
+            "rate": 3.2
+          },
+          "total_separations": {
+            "level": 656.0,
+            "rate": 2.8
+          },
+          "quits": {
+            "level": 483.0,
+            "rate": 2.1
+          },
+          "layoffs_discharges": {
+            "level": 125.0,
+            "rate": 0.5
+          },
+          "other_separations": {
+            "level": 48.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 1547.0,
+            "rate": 6.2
+          },
+          "hires": {
+            "level": 783.0,
+            "rate": 3.4
+          },
+          "total_separations": {
+            "level": 704.0,
+            "rate": 3.0
+          },
+          "quits": {
+            "level": 490.0,
+            "rate": 2.1
+          },
+          "layoffs_discharges": {
+            "level": 185.0,
+            "rate": 0.8
+          },
+          "other_separations": {
+            "level": 29.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 1615.0,
+            "rate": 6.5
+          },
+          "hires": {
+            "level": 679.0,
+            "rate": 2.9
+          },
+          "total_separations": {
+            "level": 605.0,
+            "rate": 2.6
+          },
+          "quits": {
+            "level": 446.0,
+            "rate": 1.9
+          },
+          "layoffs_discharges": {
+            "level": 141.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 19.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 1435.0,
+            "rate": 5.8
+          },
+          "hires": {
+            "level": 704.0,
+            "rate": 3.0
+          },
+          "total_separations": {
+            "level": 638.0,
+            "rate": 2.7
+          },
+          "quits": {
+            "level": 455.0,
+            "rate": 1.9
+          },
+          "layoffs_discharges": {
+            "level": 143.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 40.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 1297.0,
+            "rate": 5.3
+          },
+          "hires": {
+            "level": 689.0,
+            "rate": 2.9
+          },
+          "total_separations": {
+            "level": 609.0,
+            "rate": 2.6
+          },
+          "quits": {
+            "level": 432.0,
+            "rate": 1.8
+          },
+          "layoffs_discharges": {
+            "level": 156.0,
+            "rate": 0.7
+          },
+          "other_separations": {
+            "level": 20.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 1378.0,
+            "rate": 5.5
+          },
+          "hires": {
+            "level": 689.0,
+            "rate": 2.9
+          },
+          "total_separations": {
+            "level": 667.0,
+            "rate": 2.8
+          },
+          "quits": {
+            "level": 500.0,
+            "rate": 2.1
+          },
+          "layoffs_discharges": {
+            "level": 149.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 17.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 1375.0,
+            "rate": 5.5
+          },
+          "hires": {
+            "level": 826.0,
+            "rate": 3.5
+          },
+          "total_separations": {
+            "level": 737.0,
+            "rate": 3.1
+          },
+          "quits": {
+            "level": 517.0,
+            "rate": 2.2
+          },
+          "layoffs_discharges": {
+            "level": 177.0,
+            "rate": 0.8
+          },
+          "other_separations": {
+            "level": 43.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 1401.0,
+            "rate": 5.6
+          },
+          "hires": {
+            "level": 760.0,
+            "rate": 3.2
+          },
+          "total_separations": {
+            "level": 690.0,
+            "rate": 2.9
+          },
+          "quits": {
+            "level": 443.0,
+            "rate": 1.9
+          },
+          "layoffs_discharges": {
+            "level": 206.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 41.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 1341.0,
+            "rate": 5.4
+          },
+          "hires": {
+            "level": 671.0,
+            "rate": 2.8
+          },
+          "total_separations": {
+            "level": 620.0,
+            "rate": 2.6
+          },
+          "quits": {
+            "level": 434.0,
+            "rate": 1.8
+          },
+          "layoffs_discharges": {
+            "level": 153.0,
+            "rate": 0.6
+          },
+          "other_separations": {
+            "level": 33.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 1249.0,
+            "rate": 5.0
+          },
+          "hires": {
+            "level": 728.0,
+            "rate": 3.1
+          },
+          "total_separations": {
+            "level": 671.0,
+            "rate": 2.8
+          },
+          "quits": {
+            "level": 462.0,
+            "rate": 2.0
+          },
+          "layoffs_discharges": {
+            "level": 169.0,
+            "rate": 0.7
+          },
+          "other_separations": {
+            "level": 40.0,
+            "rate": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "code": "700000",
+      "name": "Leisure and hospitality",
+      "hierarchy_level": "2",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 1057.0,
+            "rate": 5.9
+          },
+          "hires": {
+            "level": 901.0,
+            "rate": 5.3
+          },
+          "total_separations": {
+            "level": 892.0,
+            "rate": 5.3
+          },
+          "quits": {
+            "level": 607.0,
+            "rate": 3.6
+          },
+          "layoffs_discharges": {
+            "level": 246.0,
+            "rate": 1.4
+          },
+          "other_separations": {
+            "level": 39.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 1030.0,
+            "rate": 5.7
+          },
+          "hires": {
+            "level": 888.0,
+            "rate": 5.2
+          },
+          "total_separations": {
+            "level": 939.0,
+            "rate": 5.5
+          },
+          "quits": {
+            "level": 641.0,
+            "rate": 3.8
+          },
+          "layoffs_discharges": {
+            "level": 266.0,
+            "rate": 1.6
+          },
+          "other_separations": {
+            "level": 33.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 960.0,
+            "rate": 5.4
+          },
+          "hires": {
+            "level": 919.0,
+            "rate": 5.4
+          },
+          "total_separations": {
+            "level": 880.0,
+            "rate": 5.2
+          },
+          "quits": {
+            "level": 673.0,
+            "rate": 4.0
+          },
+          "layoffs_discharges": {
+            "level": 196.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 12.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 914.0,
+            "rate": 5.1
+          },
+          "hires": {
+            "level": 1037.0,
+            "rate": 6.1
+          },
+          "total_separations": {
+            "level": 955.0,
+            "rate": 5.6
+          },
+          "quits": {
+            "level": 688.0,
+            "rate": 4.0
+          },
+          "layoffs_discharges": {
+            "level": 242.0,
+            "rate": 1.4
+          },
+          "other_separations": {
+            "level": 24.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 1199.0,
+            "rate": 6.6
+          },
+          "hires": {
+            "level": 1128.0,
+            "rate": 6.6
+          },
+          "total_separations": {
+            "level": 1027.0,
+            "rate": 6.0
+          },
+          "quits": {
+            "level": 768.0,
+            "rate": 4.5
+          },
+          "layoffs_discharges": {
+            "level": 220.0,
+            "rate": 1.3
+          },
+          "other_separations": {
+            "level": 38.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 1034.0,
+            "rate": 5.7
+          },
+          "hires": {
+            "level": 1013.0,
+            "rate": 5.9
+          },
+          "total_separations": {
+            "level": 1056.0,
+            "rate": 6.2
+          },
+          "quits": {
+            "level": 818.0,
+            "rate": 4.8
+          },
+          "layoffs_discharges": {
+            "level": 217.0,
+            "rate": 1.3
+          },
+          "other_separations": {
+            "level": 21.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 995.0,
+            "rate": 5.5
+          },
+          "hires": {
+            "level": 948.0,
+            "rate": 5.6
+          },
+          "total_separations": {
+            "level": 979.0,
+            "rate": 5.7
+          },
+          "quits": {
+            "level": 722.0,
+            "rate": 4.2
+          },
+          "layoffs_discharges": {
+            "level": 242.0,
+            "rate": 1.4
+          },
+          "other_separations": {
+            "level": 14.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 1092.0,
+            "rate": 6.0
+          },
+          "hires": {
+            "level": 917.0,
+            "rate": 5.4
+          },
+          "total_separations": {
+            "level": 817.0,
+            "rate": 4.8
+          },
+          "quits": {
+            "level": 560.0,
+            "rate": 3.3
+          },
+          "layoffs_discharges": {
+            "level": 234.0,
+            "rate": 1.4
+          },
+          "other_separations": {
+            "level": 24.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 1181.0,
+            "rate": 6.5
+          },
+          "hires": {
+            "level": 957.0,
+            "rate": 5.6
+          },
+          "total_separations": {
+            "level": 887.0,
+            "rate": 5.2
+          },
+          "quits": {
+            "level": 618.0,
+            "rate": 3.6
+          },
+          "layoffs_discharges": {
+            "level": 254.0,
+            "rate": 1.5
+          },
+          "other_separations": {
+            "level": 15.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 1155.0,
+            "rate": 6.3
+          },
+          "hires": {
+            "level": 982.0,
+            "rate": 5.7
+          },
+          "total_separations": {
+            "level": 867.0,
+            "rate": 5.1
+          },
+          "quits": {
+            "level": 546.0,
+            "rate": 3.2
+          },
+          "layoffs_discharges": {
+            "level": 306.0,
+            "rate": 1.8
+          },
+          "other_separations": {
+            "level": 14.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 884.0,
+            "rate": 4.9
+          },
+          "hires": {
+            "level": 1001.0,
+            "rate": 5.8
+          },
+          "total_separations": {
+            "level": 1014.0,
+            "rate": 5.9
+          },
+          "quits": {
+            "level": 761.0,
+            "rate": 4.4
+          },
+          "layoffs_discharges": {
+            "level": 239.0,
+            "rate": 1.4
+          },
+          "other_separations": {
+            "level": 14.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 950.0,
+            "rate": 5.2
+          },
+          "hires": {
+            "level": 1035.0,
+            "rate": 6.0
+          },
+          "total_separations": {
+            "level": 1009.0,
+            "rate": 5.9
+          },
+          "quits": {
+            "level": 766.0,
+            "rate": 4.5
+          },
+          "layoffs_discharges": {
+            "level": 234.0,
+            "rate": 1.4
+          },
+          "other_separations": {
+            "level": 10.0,
+            "rate": 0.1
+          }
+        }
+      ]
+    },
+    {
+      "code": "720000",
+      "name": "Accommodation and food services",
+      "hierarchy_level": "3",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 901.0,
+            "rate": 5.9
+          },
+          "hires": {
+            "level": 742.0,
+            "rate": 5.2
+          },
+          "total_separations": {
+            "level": 745.0,
+            "rate": 5.2
+          },
+          "quits": {
+            "level": 536.0,
+            "rate": 3.7
+          },
+          "layoffs_discharges": {
+            "level": 175.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 35.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 900.0,
+            "rate": 5.9
+          },
+          "hires": {
+            "level": 711.0,
+            "rate": 5.0
+          },
+          "total_separations": {
+            "level": 765.0,
+            "rate": 5.4
+          },
+          "quits": {
+            "level": 564.0,
+            "rate": 4.0
+          },
+          "layoffs_discharges": {
+            "level": 172.0,
+            "rate": 1.2
+          },
+          "other_separations": {
+            "level": 29.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 825.0,
+            "rate": 5.5
+          },
+          "hires": {
+            "level": 746.0,
+            "rate": 5.2
+          },
+          "total_separations": {
+            "level": 708.0,
+            "rate": 5.0
+          },
+          "quits": {
+            "level": 602.0,
+            "rate": 4.2
+          },
+          "layoffs_discharges": {
+            "level": 99.0,
+            "rate": 0.7
+          },
+          "other_separations": {
+            "level": 7.0,
+            "rate": 0.0
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 727.0,
+            "rate": 4.8
+          },
+          "hires": {
+            "level": 854.0,
+            "rate": 6.0
+          },
+          "total_separations": {
+            "level": 787.0,
+            "rate": 5.5
+          },
+          "quits": {
+            "level": 615.0,
+            "rate": 4.3
+          },
+          "layoffs_discharges": {
+            "level": 152.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 20.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 1062.0,
+            "rate": 6.9
+          },
+          "hires": {
+            "level": 923.0,
+            "rate": 6.4
+          },
+          "total_separations": {
+            "level": 851.0,
+            "rate": 5.9
+          },
+          "quits": {
+            "level": 691.0,
+            "rate": 4.8
+          },
+          "layoffs_discharges": {
+            "level": 125.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 35.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 864.0,
+            "rate": 5.7
+          },
+          "hires": {
+            "level": 848.0,
+            "rate": 5.9
+          },
+          "total_separations": {
+            "level": 892.0,
+            "rate": 6.2
+          },
+          "quits": {
+            "level": 752.0,
+            "rate": 5.3
+          },
+          "layoffs_discharges": {
+            "level": 125.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 15.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 880.0,
+            "rate": 5.8
+          },
+          "hires": {
+            "level": 798.0,
+            "rate": 5.6
+          },
+          "total_separations": {
+            "level": 799.0,
+            "rate": 5.6
+          },
+          "quits": {
+            "level": 664.0,
+            "rate": 4.6
+          },
+          "layoffs_discharges": {
+            "level": 122.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 12.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 986.0,
+            "rate": 6.4
+          },
+          "hires": {
+            "level": 748.0,
+            "rate": 5.2
+          },
+          "total_separations": {
+            "level": 686.0,
+            "rate": 4.8
+          },
+          "quits": {
+            "level": 524.0,
+            "rate": 3.7
+          },
+          "layoffs_discharges": {
+            "level": 142.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 20.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 1019.0,
+            "rate": 6.6
+          },
+          "hires": {
+            "level": 788.0,
+            "rate": 5.5
+          },
+          "total_separations": {
+            "level": 754.0,
+            "rate": 5.2
+          },
+          "quits": {
+            "level": 598.0,
+            "rate": 4.2
+          },
+          "layoffs_discharges": {
+            "level": 144.0,
+            "rate": 1.0
+          },
+          "other_separations": {
+            "level": 12.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 985.0,
+            "rate": 6.4
+          },
+          "hires": {
+            "level": 807.0,
+            "rate": 5.6
+          },
+          "total_separations": {
+            "level": 708.0,
+            "rate": 4.9
+          },
+          "quits": {
+            "level": 486.0,
+            "rate": 3.4
+          },
+          "layoffs_discharges": {
+            "level": 213.0,
+            "rate": 1.5
+          },
+          "other_separations": {
+            "level": 9.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 724.0,
+            "rate": 4.8
+          },
+          "hires": {
+            "level": 827.0,
+            "rate": 5.7
+          },
+          "total_separations": {
+            "level": 835.0,
+            "rate": 5.8
+          },
+          "quits": {
+            "level": 699.0,
+            "rate": 4.8
+          },
+          "layoffs_discharges": {
+            "level": 128.0,
+            "rate": 0.9
+          },
+          "other_separations": {
+            "level": 9.0,
+            "rate": 0.1
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 809.0,
+            "rate": 5.3
+          },
+          "hires": {
+            "level": 884.0,
+            "rate": 6.1
+          },
+          "total_separations": {
+            "level": 870.0,
+            "rate": 6.0
+          },
+          "quits": {
+            "level": 706.0,
+            "rate": 4.9
+          },
+          "layoffs_discharges": {
+            "level": 155.0,
+            "rate": 1.1
+          },
+          "other_separations": {
+            "level": 9.0,
+            "rate": 0.1
+          }
+        }
+      ]
+    },
+    {
+      "code": "900000",
+      "name": "Government",
+      "hierarchy_level": "1",
+      "monthly_data": [
+        {
+          "month": 1,
+          "month_name": "January",
+          "job_openings": {
+            "level": 902.0,
+            "rate": 3.7
+          },
+          "hires": {
+            "level": 371.0,
+            "rate": 1.6
+          },
+          "total_separations": {
+            "level": 313.0,
+            "rate": 1.3
+          },
+          "quits": {
+            "level": 178.0,
+            "rate": 0.8
+          },
+          "layoffs_discharges": {
+            "level": 78.0,
+            "rate": 0.3
+          },
+          "other_separations": {
+            "level": 57.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 2,
+          "month_name": "February",
+          "job_openings": {
+            "level": 892.0,
+            "rate": 3.6
+          },
+          "hires": {
+            "level": 350.0,
+            "rate": 1.5
+          },
+          "total_separations": {
+            "level": 350.0,
+            "rate": 1.5
+          },
+          "quits": {
+            "level": 197.0,
+            "rate": 0.8
+          },
+          "layoffs_discharges": {
+            "level": 100.0,
+            "rate": 0.4
+          },
+          "other_separations": {
+            "level": 53.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 3,
+          "month_name": "March",
+          "job_openings": {
+            "level": 858.0,
+            "rate": 3.5
+          },
+          "hires": {
+            "level": 349.0,
+            "rate": 1.5
+          },
+          "total_separations": {
+            "level": 337.0,
+            "rate": 1.4
+          },
+          "quits": {
+            "level": 186.0,
+            "rate": 0.8
+          },
+          "layoffs_discharges": {
+            "level": 100.0,
+            "rate": 0.4
+          },
+          "other_separations": {
+            "level": 51.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 4,
+          "month_name": "April",
+          "job_openings": {
+            "level": 833.0,
+            "rate": 3.4
+          },
+          "hires": {
+            "level": 357.0,
+            "rate": 1.5
+          },
+          "total_separations": {
+            "level": 333.0,
+            "rate": 1.4
+          },
+          "quits": {
+            "level": 183.0,
+            "rate": 0.8
+          },
+          "layoffs_discharges": {
+            "level": 77.0,
+            "rate": 0.3
+          },
+          "other_separations": {
+            "level": 72.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 5,
+          "month_name": "May",
+          "job_openings": {
+            "level": 836.0,
+            "rate": 3.4
+          },
+          "hires": {
+            "level": 356.0,
+            "rate": 1.5
+          },
+          "total_separations": {
+            "level": 353.0,
+            "rate": 1.5
+          },
+          "quits": {
+            "level": 187.0,
+            "rate": 0.8
+          },
+          "layoffs_discharges": {
+            "level": 90.0,
+            "rate": 0.4
+          },
+          "other_separations": {
+            "level": 76.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 6,
+          "month_name": "June",
+          "job_openings": {
+            "level": 821.0,
+            "rate": 3.4
+          },
+          "hires": {
+            "level": 331.0,
+            "rate": 1.4
+          },
+          "total_separations": {
+            "level": 324.0,
+            "rate": 1.4
+          },
+          "quits": {
+            "level": 183.0,
+            "rate": 0.8
+          },
+          "layoffs_discharges": {
+            "level": 79.0,
+            "rate": 0.3
+          },
+          "other_separations": {
+            "level": 62.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 7,
+          "month_name": "July",
+          "job_openings": {
+            "level": 807.0,
+            "rate": 3.3
+          },
+          "hires": {
+            "level": 321.0,
+            "rate": 1.4
+          },
+          "total_separations": {
+            "level": 315.0,
+            "rate": 1.3
+          },
+          "quits": {
+            "level": 181.0,
+            "rate": 0.8
+          },
+          "layoffs_discharges": {
+            "level": 76.0,
+            "rate": 0.3
+          },
+          "other_separations": {
+            "level": 57.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 8,
+          "month_name": "August",
+          "job_openings": {
+            "level": 770.0,
+            "rate": 3.2
+          },
+          "hires": {
+            "level": 321.0,
+            "rate": 1.4
+          },
+          "total_separations": {
+            "level": 331.0,
+            "rate": 1.4
+          },
+          "quits": {
+            "level": 183.0,
+            "rate": 0.8
+          },
+          "layoffs_discharges": {
+            "level": 81.0,
+            "rate": 0.3
+          },
+          "other_separations": {
+            "level": 67.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 9,
+          "month_name": "September",
+          "job_openings": {
+            "level": 787.0,
+            "rate": 3.2
+          },
+          "hires": {
+            "level": 346.0,
+            "rate": 1.5
+          },
+          "total_separations": {
+            "level": 365.0,
+            "rate": 1.5
+          },
+          "quits": {
+            "level": 211.0,
+            "rate": 0.9
+          },
+          "layoffs_discharges": {
+            "level": 80.0,
+            "rate": 0.3
+          },
+          "other_separations": {
+            "level": 75.0,
+            "rate": 0.3
+          }
+        },
+        {
+          "month": 10,
+          "month_name": "October",
+          "job_openings": {
+            "level": 784.0,
+            "rate": 3.2
+          },
+          "hires": {
+            "level": 341.0,
+            "rate": 1.5
+          },
+          "total_separations": {
+            "level": 326.0,
+            "rate": 1.4
+          },
+          "quits": {
+            "level": 173.0,
+            "rate": 0.7
+          },
+          "layoffs_discharges": {
+            "level": 96.0,
+            "rate": 0.4
+          },
+          "other_separations": {
+            "level": 57.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 11,
+          "month_name": "November",
+          "job_openings": {
+            "level": 701.0,
+            "rate": 2.9
+          },
+          "hires": {
+            "level": 295.0,
+            "rate": 1.3
+          },
+          "total_separations": {
+            "level": 289.0,
+            "rate": 1.2
+          },
+          "quits": {
+            "level": 159.0,
+            "rate": 0.7
+          },
+          "layoffs_discharges": {
+            "level": 75.0,
+            "rate": 0.3
+          },
+          "other_separations": {
+            "level": 55.0,
+            "rate": 0.2
+          }
+        },
+        {
+          "month": 12,
+          "month_name": "December",
+          "job_openings": {
+            "level": 738.0,
+            "rate": 3.1
+          },
+          "hires": {
+            "level": 314.0,
+            "rate": 1.3
+          },
+          "total_separations": {
+            "level": 319.0,
+            "rate": 1.4
+          },
+          "quits": {
+            "level": 175.0,
+            "rate": 0.7
+          },
+          "layoffs_discharges": {
+            "level": 66.0,
+            "rate": 0.3
+          },
+          "other_separations": {
+            "level": 78.0,
+            "rate": 0.3
+          }
+        }
+      ]
+    }
+  ]
+}
+
+Perform the following calculations and analysis:
+1. For each industry, calculate the average monthly job openings level and hires level for the full year
+2. Compute the job openings-to-hires ratio (average JO level / average HI level) for each industry. Which industry has the highest ratio (hardest to fill positions)?
+3. Calculate the quit rate minus the layoff rate (QU rate - LD rate) for each industry, averaged over the year. This measures voluntary vs involuntary turnover balance. Rank industries from highest to lowest
+4. For Total nonfarm, compute the month-over-month change in job openings level for each month. In which month was the largest increase? The largest decrease?
+5. Calculate total separations as the sum of quits + layoffs + other separations (using levels) for each industry. Verify this matches the reported TS level within rounding
+6. Which industry has the highest average quit rate? Which has the highest average layoff rate?
+7. Compare the private sector (Total private) to Government: which has higher hire rates, quit rates, and layoff rates on average?

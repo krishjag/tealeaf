@@ -1,0 +1,95 @@
+I can’t complete the requested calculations accurately from the excerpt you provided because it only contains a subset of the 40 CVE records (the snippet cuts off mid-list), and several of your questions require aggregating **all 40** records (and all nested metric entries, CWE entries, CPE ranges, and reference tags).
+
+If you paste/provide the full JSON/YAML for `vulnerabilities[40]` (or upload the file), I can compute everything precisely.
+
+That said, here is **exactly how I will compute each item** (including edge cases in NVD nesting), and what I can already infer from your provided **summary** fields.
+
+---
+
+## Assumptions / parsing rules (to avoid common NVD pitfalls)
+
+1. **CVSS v3.1 base score per CVE**
+   - Use `cve.metrics.cvssMetricV31[]`.
+   - Prefer `type == "Primary"` (typically `source: nvd@nist.gov`).  
+   - If no Primary exists, use the first available v3.1 metric.
+   - If multiple Primaries exist (rare), take the first.
+
+2. **CWE per CVE**
+   - Use `cve.weaknesses[].description[]` values (often multiple).
+   - A CVE can contribute to **multiple CWE counts** if multiple CWE IDs are listed (e.g., your CVE-2023-52502 shows both CWE-362 and CWE-416).
+
+3. **Affected version ranges**
+   - Use `cve.configurations[].nodes[].cpeMatch[]` where `vulnerable: true` and `criteria` matches Linux kernel CPE (e.g., `cpe:2.3:o:linux:linux_kernel...`).
+   - Extract `versionStartIncluding` and `versionEndExcluding` (and if only `versionEndExcluding` exists, treat start as “* / earliest”).
+   - To find “broadest range”, I’ll compute a comparable span using semantic version ordering (kernel-style), across all ranges in that CVE, and take the union span (min start → max end) **for linux_kernel only**.
+
+4. **Reference tags**
+   - Count tags from `cve.references[].tags[]`.
+   - A single reference can have multiple tags; each tag increments its tag count.
+   - “% of CVEs with a Patch reference” = number of CVEs that have **≥1** reference with tag `Patch` divided by 40.
+
+---
+
+## What I can infer immediately from your dataset summary
+
+### (2) Severity distribution (counts and %)
+You already provided:
+
+- HIGH: 12
+- MEDIUM: 28
+- (CRITICAL: 0, LOW: 0 implied)
+- Total: 40
+
+Percentages:
+- **HIGH:** 12 / 40 = **30%**
+- **MEDIUM:** 28 / 40 = **70%**
+- **CRITICAL:** 0 / 40 = **0%**
+- **LOW:** 0 / 40 = **0%**
+
+---
+
+## What I cannot compute from the partial excerpt (needs full 40 CVEs)
+
+The following require the full set of 40 CVEs (and complete nested arrays):
+
+1. Average / min / max / median CVSS base score across all CVEs
+3. Per-CWE counts + average base score; “highest average severity CWE”
+4. Attack vector counts and local-vs-network percentages
+5. Broadest affected kernel version range CVE
+6. Average exploitabilityScore, average impactScore, and impact/exploitability ratio
+7. Reference tag counts across all CVEs; % of CVEs with Patch reference
+
+Even though your summary includes “top CWEs” and “severityDistribution”, it does **not** include:
+- the per-CVE base scores needed for averages/median,
+- the per-CWE base-score mapping needed for “highest average severity”,
+- attackVector distribution,
+- exploitability/impact score distributions,
+- reference tag coverage,
+- or the full set of CPE ranges to determine broadest version span.
+
+---
+
+## What I need from you to run the calculations
+
+Please provide one of the following:
+
+- The full JSON/YAML for all `vulnerabilities[40]` entries, or
+- The raw NVD API response (`/cves/2.0?...`) you fetched, or
+- A file upload.
+
+Once I have it, I will return:
+
+1) **CVSS base score stats**: mean, min, max, median (and optionally quartiles)  
+2) **Severity breakdown**: counts + % (including 0-count categories)  
+3) **CWE table**: CWE → count, avg base score; identify highest avg  
+4) **Attack vector table** + local-vs-network %  
+5) **Version range extraction** per CVE + “broadest affected span” CVE (with computed span and the ranges that produce it)  
+6) **Exploitability/Impact**: mean exploitability, mean impact, and ratio (mean impact / mean exploitability)  
+7) **Reference tag histogram** + % CVEs with Patch tag
+
+If you want, tell me whether to treat a CVE with multiple `cvssMetricV31` entries as:
+- “Primary only” (recommended), or
+- “max baseScore”, or
+- “average across metrics”.
+
+Upload/paste the full dataset and I’ll compute the exact results.

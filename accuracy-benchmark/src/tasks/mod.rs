@@ -284,6 +284,9 @@ pub struct TaskResult {
     pub response: Option<TaskResponse>,
     pub error_message: Option<String>,
     pub timestamp: DateTime<Utc>,
+    /// Number of retry attempts before this result (0 = first attempt succeeded)
+    #[serde(default)]
+    pub retry_count: u32,
 }
 
 fn default_format() -> DataFormat {
@@ -327,10 +330,13 @@ pub struct TaskResponse {
     pub output_tokens: u32,
     pub latency_ms: u64,
     pub finish_reason: String,
+    pub http_status: u16,
+    pub response_length: usize,
 }
 
 impl From<CompletionResponse> for TaskResponse {
     fn from(resp: CompletionResponse) -> Self {
+        let response_length = resp.content.len();
         Self {
             content: resp.content,
             model: resp.model,
@@ -338,6 +344,8 @@ impl From<CompletionResponse> for TaskResponse {
             output_tokens: resp.output_tokens,
             latency_ms: resp.latency_ms,
             finish_reason: resp.finish_reason,
+            http_status: resp.http_status,
+            response_length,
         }
     }
 }
@@ -345,11 +353,11 @@ impl From<CompletionResponse> for TaskResponse {
 impl TaskResult {
     /// Create a successful result
     pub fn success(task_id: String, provider: String, response: CompletionResponse) -> Self {
-        Self::success_with_format(task_id, provider, response, DataFormat::TL)
+        Self::success_with_format(task_id, provider, response, DataFormat::TL, 0)
     }
 
-    /// Create a successful result with specific format
-    pub fn success_with_format(task_id: String, provider: String, response: CompletionResponse, format: DataFormat) -> Self {
+    /// Create a successful result with specific format and retry count
+    pub fn success_with_format(task_id: String, provider: String, response: CompletionResponse, format: DataFormat, retry_count: u32) -> Self {
         Self {
             task_id,
             provider,
@@ -358,16 +366,17 @@ impl TaskResult {
             response: Some(response.into()),
             error_message: None,
             timestamp: Utc::now(),
+            retry_count,
         }
     }
 
     /// Create a failure result
     pub fn failure(task_id: String, provider: String, error: String) -> Self {
-        Self::failure_with_format(task_id, provider, error, DataFormat::TL)
+        Self::failure_with_format(task_id, provider, error, DataFormat::TL, 0)
     }
 
-    /// Create a failure result with specific format
-    pub fn failure_with_format(task_id: String, provider: String, error: String, format: DataFormat) -> Self {
+    /// Create a failure result with specific format and retry count
+    pub fn failure_with_format(task_id: String, provider: String, error: String, format: DataFormat, retry_count: u32) -> Self {
         Self {
             task_id,
             provider,
@@ -376,6 +385,7 @@ impl TaskResult {
             response: None,
             error_message: Some(error),
             timestamp: Utc::now(),
+            retry_count,
         }
     }
 

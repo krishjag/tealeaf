@@ -1,0 +1,48 @@
+{
+  "run_id": "20260214-065720",
+  "timestamp": "2026-02-14T07:19:54.637821200+00:00",
+  "total_tasks": 14,
+  "provider_rankings": [
+    {
+      "provider": "anthropic",
+      "wins": 8,
+      "avg_score": 0.9440613871616073
+    },
+    {
+      "provider": "openai",
+      "wins": 6,
+      "avg_score": 0.9374827406096725
+    }
+  ],
+  "category_breakdown": {
+    "legal": {
+      "leader": "openai",
+      "margin": 0.007335164835164831
+    },
+    "technology": {
+      "leader": "openai",
+      "margin": 0.02839285714285711
+    },
+    "retail": {
+      "leader": "anthropic",
+      "margin": 0.017084942084942045
+    },
+    "real_estate": {
+      "leader": "openai",
+      "margin": 0.008855981416956982
+    },
+    "finance": {
+      "leader": "anthropic",
+      "margin": 0.06796130952380952
+    },
+    "healthcare": {
+      "leader": "openai",
+      "margin": 0.0040322580645161255
+    },
+    "hr": {
+      "leader": "anthropic",
+      "margin": 0.00962053571428556
+    }
+  },
+  "detailed_results_file": "analysis.tl"
+}

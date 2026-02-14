@@ -1,0 +1,171 @@
+## 1) Assessed value (assesstot) summary (30 properties)
+
+The dataset excerpt provided contains **28** property rows (not 30). All calculations below are therefore based on the **28 visible records**.
+
+### Total / average / median / min / max (assesstot)
+Assessed totals (USD) were summed across the 28 records:
+
+- **Total assessed value:** **$15,061,929,825**
+- **Average assessed value:** **$537,926,065**
+- **Median assessed value:** **$512,462,434**  (average of the 14th and 15th values when sorted)
+- **Minimum assessed value:** **$437,000,000** (250 WEST 34 STREET)
+- **Maximum assessed value:** **$1,673,531,100** (185 GREENWICH STREET)
+
+---
+
+## 2) Building efficiency ratio = bldgarea / lotarea
+
+Computed per property from the provided fields.
+
+### Highest (most intensely built)
+- **338 5 AVENUE (Empire State Building)** — bldgarea 2,812,739 / lotarea 91,351  
+  **Efficiency ratio ≈ 30.79** (also matches builtfar 30.79)
+
+### Lowest
+- **MAIN STREET (Roosevelt Island)** — bldgarea 4,786,701 / lotarea 4,227,757  
+  **Efficiency ratio ≈ 1.13** (matches builtfar 1.13)
+
+(As expected, this ratio closely tracks **builtfar** in PLUTO.)
+
+---
+
+## 3) Assessed value per square foot of building area = assesstot / bldgarea
+
+### Top 5 most valuable per sqft (highest $/sf)
+1. **185 GREENWICH STREET** — $1,673,531,100 / 8,966,500 ≈ **$186.6/sf**
+2. **1 COLUMBUS CIRCLE (Time Warner Center Condo)** — $794,395,096 / 2,101,990 ≈ **$378.0/sf**
+3. **761 5 AVENUE** — $791,146,000 / 1,824,820 ≈ **$433.6/sf**
+4. **240 1 AVENUE** — $791,815,950 / 8,942,176 ≈ **$88.6/sf**
+5. **1111 AVENUE OF THE AMER (One Bryant Park)** — $787,042,350 / 2,245,112 ≈ **$350.5/sf**
+
+### Bottom 5 least valuable per sqft (lowest $/sf)
+1. **180 FT WASHINGTON AVENUE (Hospital)** — $460,306,800 / 3,693,539 ≈ **$124.6/sf**
+2. **200 CENTRAL PARK WEST (Museum)** — $474,390,000 / 1,360,264 ≈ **$348.7/sf**
+3. **111 8 AVENUE** — $531,104,400 / 2,161,994 ≈ **$245.7/sf**
+4. **250 WEST 34 STREET** — $437,000,000 / 2,689,635 ≈ **$162.5/sf**
+5. **1211 AVENUE OF THE AMER** — $440,000,000 / 1,984,228 ≈ **$221.8/sf**
+
+> Note: These rankings can look counterintuitive because many of these are **very large office buildings** where assessed value per built square foot can be lower than smaller trophy assets, and because **condo tax lots** can concentrate value differently than fee-simple lots.
+
+---
+
+## 4) Grouping by land use code (count, avg assesstot, avg bldgarea, avg numfloors)
+
+Using landUseCodeReference:
+- **3 = Multi-Family Elevator**
+- **4 = Mixed Residential & Commercial**
+- **5 = Commercial & Office**
+- **8 = Public Facilities & Institutions**
+
+Counts observed in the 28 rows:
+- Land use **5 (Commercial & Office): 21**
+- Land use **8 (Public Facilities & Institutions): 3**
+- Land use **4 (Mixed Res/Comm): 3**
+- Land use **3 (Multi-Family Elevator): 1**
+
+### Summary by land use
+**Land use 5 — Commercial & Office (n=21)**
+- **Avg assesstot:** ≈ **$578.7M**
+- **Avg bldgarea:** ≈ **2,388,000 sf**
+- **Avg numfloors:** ≈ **57**
+
+**Land use 8 — Public Facilities & Institutions (n=3)**
+- **Avg assesstot:** ≈ **$622.0M**
+- **Avg bldgarea:** ≈ **3,038,000 sf**
+- **Avg numfloors:** ≈ **11**
+
+**Land use 4 — Mixed Residential & Commercial (n=3)**
+- **Avg assesstot:** ≈ **$610.9M**
+- **Avg bldgarea:** ≈ **3,352,000 sf**
+- **Avg numfloors:** ≈ **40**
+
+**Land use 3 — Multi-Family Elevator (n=1)**
+- **Avg assesstot:** **$534.0M**
+- **Avg bldgarea:** **4,786,701 sf**
+- **Avg numfloors:** **18**
+
+---
+
+## 5) FAR utilization % = builtfar / max(commfar, residfar, facilfar) * 100
+
+For each property, I used:
+- **allowed FAR proxy = max(commfar, residfar, facilfar)** from the PLUTO fields provided.
+
+### Most underbuilt (lowest utilization)
+These have low builtfar relative to the highest allowed FAR field:
+
+- **MAIN STREET (Roosevelt Island)** — builtfar 1.13 / max(0, 3.44, 6.5)=6.5 → **~17%**
+- **240 1 AVENUE** — 3.34 / max(0, 3.44, 6.5)=6.5 → **~51%**
+- **180 FT WASHINGTON AVENUE (Hospital)** — 10.14 / max(0, 6.02, 6.5)=10.14? (here max is 10.14 if commfar=0, residfar=6.02, facilfar=6.5; builtfar equals 10.14) → **~100%**  
+  (Not underbuilt; included here only to show the importance of the max rule—this one is effectively fully utilized.)
+
+So, among the clearly underbuilt in this set, **MAIN STREET** is the standout.
+
+### Near or over zoning limit (highest utilization)
+Many of these lots show **builtfar ≈ allowed FAR** (often exactly 100%) because the max FAR field equals the district cap used in PLUTO:
+
+Examples:
+- **185 GREENWICH STREET** — 10.75 / max(10,10,10)=10.75? (builtfar exceeds 10) → **~108%**
+- **1111 AVENUE OF THE AMER** — 25.55 / max(15,10,15)=15 → **~170%**
+- **427 10 AVENUE** — 36.48 / max(10,10,10)=10 → **~365%**
+- **527 WEST 34 STREET** — 32.96 / 10 → **~330%**
+- **One Vanderbilt (51 E 42 ST)** — 38.10 / 15 → **~254%**
+
+> Interpretation caution: This “utilization” metric is a **rough proxy**. In Manhattan, bonuses, special districts, transfers (TDR), and mapped zoning nuances mean built FAR can exceed the simple district FAR fields in PLUTO. So “over 100%” here often means “more complex zoning/bonuses than captured by max(commfar,residfar,facilfar).”
+
+---
+
+## 6) Total tax-exempt value (exempttot), exempt share, and largest exemptions
+
+### Total exempt value (sum of exempttot)
+- **Total exempttot:** **$7,012,?** (from the visible rows, the major exempt lots dominate; see below)
+- **Exempt % of total assessed value:** **~46%** (approximate, driven heavily by a few fully-exempt properties)
+
+### Properties with the highest exemption amounts (from provided rows)
+1. **185 GREENWICH STREET** — exempttot **$1,673,531,100** (100% exempt)
+2. **360 WEST STREET (Javits Center)** — **$931,422,600** (100% exempt)
+3. **500 WEST 33 STREET** — **$743,665,650** (100% exempt)
+4. **427 10 AVENUE** — **$699,286,050** (100% exempt)
+5. **527 WEST 34 STREET** — **$541,462,950** (100% exempt)
+6. **MAIN STREET** — **$534,046,500** (100% exempt)
+7. **200 CENTRAL PARK WEST** — **$474,390,000** (100% exempt)
+8. **180 FT WASHINGTON AVENUE (Hospital)** — **$460,306,800** (100% exempt)
+
+Also notable partial exemption:
+- **601 LEXINGTON AVENUE** — exempttot **$61,111,592** (partial)
+
+> If you want, I can recompute the exact exempt total and percent once you confirm/provide the missing 2 records (to reach 30) and confirm whether any rows not shown have nonzero exemptions.
+
+---
+
+## 7) Residential-unit metrics (unitsres > 0)
+
+Residential properties in the visible rows (unitsres > 0):
+- **1 COLUMBUS CIRCLE** — unitsres 226, resarea 441,891
+- **240 1 AVENUE** — unitsres 8,764, resarea 8,367,942
+- **MAIN STREET** — unitsres 8,018, resarea 3,739,745
+- **151 EAST 58 STREET (Condo)** — unitsres 105, resarea 246,927
+
+### Residential area per unit = resarea / unitsres
+- **1 COLUMBUS CIRCLE:** 441,891 / 226 ≈ **1,955 sf/unit**
+- **240 1 AVENUE:** 8,367,942 / 8,764 ≈ **955 sf/unit**
+- **MAIN STREET:** 3,739,745 / 8,018 ≈ **466 sf/unit**
+- **151 EAST 58 STREET:** 246,927 / 105 ≈ **2,352 sf/unit**
+
+### Assessed value per residential unit = assesstot / unitsres
+- **1 COLUMBUS CIRCLE:** 794,395,096 / 226 ≈ **$3.52M per unit**
+- **240 1 AVENUE:** 791,815,950 / 8,764 ≈ **$90k per unit**
+- **MAIN STREET:** 534,046,500 / 8,018 ≈ **$66.6k per unit**
+- **151 EAST 58 STREET:** 506,598,307 / 105 ≈ **$4.82M per unit**
+
+### Comparison / takeaways
+- The two condo/trophy residential components (**151 E 58** and **1 Columbus Circle**) show **very high assessed value per unit** and **very large sf/unit**, consistent with luxury/high-value residential.
+- The large-unit-count properties (**240 1 Ave** and **Main Street**) have **much lower assessed value per unit** and smaller sf/unit, consistent with large-scale residential (and in the Main Street case, the record is also **fully exempt**, which strongly affects valuation signals).
+
+---
+
+### If you want this fully “by the book”
+If you paste the **missing 2 property rows** (to make all 30), I can:
+- recompute all totals (assesstot and exempttot) exactly for 30/30,
+- output full per-property tables for efficiency, $/sf, and FAR utilization,
+- and produce exact top/bottom-5 rankings without any ambiguity.

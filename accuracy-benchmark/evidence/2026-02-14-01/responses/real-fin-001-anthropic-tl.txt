@@ -1,0 +1,69 @@
+# Financial Analysis of SEC 10-K Filings
+
+## Individual Company Metrics
+
+### 1. **APPLE INC**
+- **Total Current Assets:** $147,957,000,000
+- **Total Current Liabilities:** $165,631,000,000
+- **Current Ratio:** 0.89
+- **Total Revenue:** $416,161,000,000
+- **Net Income:** $112,010,000,000
+- **Net Profit Margin:** 26.9%
+- **Operating Cash Flow:** $111,482,000,000
+
+### 2. **VISA INC**
+- **Total Current Assets:** $37,766,000,000
+- **Total Current Liabilities:** $35,048,000,000
+- **Current Ratio:** 1.08
+- **Total Revenue:** $40,000,000,000
+- **Net Income:** $20,058,000,000
+- **Net Profit Margin:** 50.1%
+- **Operating Cash Flow:** $23,059,000,000
+
+### 3. **COSTCO WHOLESALE CORP**
+- **Total Current Assets:** $38,380,000,000
+- **Total Current Liabilities:** $37,108,000,000
+- **Current Ratio:** 1.03
+- **Total Revenue:** $275,235,000,000
+- **Net Income:** $8,099,000,000
+- **Net Profit Margin:** 2.9%
+- **Operating Cash Flow:** $13,335,000,000
+
+### 4. **QUALCOMM INC**
+- **Total Current Assets:** $25,754,000,000
+- **Total Current Liabilities:** $9,144,000,000
+- **Current Ratio:** 2.82
+- **Total Revenue:** $44,284,000,000
+- **Net Income:** $5,541,000,000
+- **Net Profit Margin:** 12.5%
+- **Operating Cash Flow:** $14,012,000,000
+
+---
+
+## Comparative Rankings
+
+### **6. Companies Ranked by Current Ratio (Strongest Liquidity First):**
+1. **Qualcomm** - 2.82 ⭐ (Strongest liquidity position)
+2. **Visa** - 1.08
+3. **Costco** - 1.03
+4. **Apple** - 0.89 (Below 1.0 indicates potential short-term liquidity concerns)
+
+### **7. Companies Ranked by Net Profit Margin:**
+1. **Visa** - 50.1% ⭐ (Exceptional profitability)
+2. **Apple** - 26.9%
+3. **Qualcomm** - 12.5%
+4. **Costco** - 2.9% (Typical for retail industry with high volume/low margin model)
+
+### **8. Highest Operating Cash Flow:**
+**Apple Inc** - $111,482,000,000 ⭐
+
+This is 4.8x larger than Visa's operating cash flow and reflects Apple's massive scale and strong cash generation capability.
+
+---
+
+## Key Insights
+
+- **Qualcomm** has the strongest liquidity position with nearly $3 in current assets for every $1 of current liabilities
+- **Visa** demonstrates superior profitability, converting half of every revenue dollar into net income
+- **Apple** generates the most operating cash flow in absolute terms, reflecting its enormous business scale
+- **Costco's** thin profit margins (2.9%) are characteristic of its membership warehouse business model focused on volume and member value

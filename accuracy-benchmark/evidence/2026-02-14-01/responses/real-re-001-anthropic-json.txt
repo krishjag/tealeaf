@@ -1,0 +1,175 @@
+# NYC Manhattan Property Tax Analysis - Top 30 Assessed Value Properties
+
+## 1. Total Assessed Value Statistics
+
+**Summary Statistics:**
+- **Total Assessed Value**: $18,262,649,478
+- **Average**: $608,754,983
+- **Median**: $518,582,200
+- **Minimum**: $437,000,000 (250 West 34 Street)
+- **Maximum**: $1,673,531,100 (185 Greenwich Street - One World Trade Center)
+
+## 2. Building Efficiency Ratio (Building Area / Lot Area)
+
+**Top 5 Most Intensely Built:**
+
+| Rank | Address | BBL | Ratio | Built FAR |
+|------|---------|-----|-------|-----------|
+| 1 | **51 East 42 Street** (One Vanderbilt) | 1012770027 | **38.10** | 38.10 |
+| 2 | 527 West 34 Street | 1007060017 | **32.96** | 32.96 |
+| 3 | 427 10 Avenue | 1007050039 | **36.48** | 36.48 |
+| 4 | 338 5 Avenue (Empire State Building) | 1008350041 | **30.79** | 30.79 |
+| 5 | 9 West 57 Street | 1012730022 | **27.37** | 27.37 |
+
+**Bottom 5 Least Intensely Built:**
+
+| Rank | Address | BBL | Ratio | Built FAR |
+|------|---------|-----|-------|-----------|
+| 1 | **Main Street** (Roosevelt Island) | 1013730001 | **1.13** | 1.13 |
+| 2 | 200 Central Park West (Museum) | 1011300001 | **1.84** | 1.84 |
+| 3 | 240 1 Avenue (Stuyvesant Town) | 1009720001 | **3.34** | 3.34 |
+| 4 | 360 West Street (Javits Center) | 1006800001 | **4.22** | 4.22 |
+| 5 | 180 Ft Washington Avenue (Hospital) | 1021380040 | **10.14** | 10.14 |
+
+## 3. Assessed Value Per Square Foot Rankings
+
+**Top 5 Most Valuable ($/sqft):**
+
+| Rank | Address | Assessed Value | Building Area | $/sqft | Land Use |
+|------|---------|----------------|---------------|--------|----------|
+| 1 | **1 Columbus Circle** (Time Warner Center) | $794,395,096 | 2,101,990 | **$377.89** | Mixed Res/Com |
+| 2 | 761 5 Avenue | $791,146,000 | 1,824,820 | **$433.52** | Commercial |
+| 3 | 9 West 57 Street | $469,342,800 | 1,698,259 | **$276.39** | Commercial |
+| 4 | 151 East 58 Street (One Beacon Court) | $506,598,307 | 1,103,169 | **$459.22** | Mixed Res/Com |
+| 5 | 51 East 42 Street (One Vanderbilt) | $523,704,600 | 1,678,135 | **$312.06** | Commercial |
+
+**Bottom 5 Least Valuable ($/sqft):**
+
+| Rank | Address | Assessed Value | Building Area | $/sqft | Land Use |
+|------|---------|----------------|---------------|--------|----------|
+| 1 | **Main Street** (Roosevelt Island) | $534,046,500 | 4,786,701 | **$111.57** | Multi-Family |
+| 2 | 180 Ft Washington Avenue | $460,306,800 | 3,693,539 | **$124.61** | Public Facility |
+| 3 | 240 1 Avenue (Stuyvesant Town) | $791,815,950 | 8,942,176 | **$88.56** | Mixed Res/Com |
+| 4 | 360 West Street (Javits Center) | $931,422,600 | 4,060,596 | **$229.40** | Public Facility |
+| 5 | 111 8 Avenue (Google Building) | $531,104,400 | 2,161,994 | **$245.60** | Commercial |
+
+## 4. Analysis by Land Use Type
+
+| Land Use | Count | Avg Assessed Value | Avg Building Area | Avg Floors | Description |
+|----------|-------|-------------------|-------------------|------------|-------------|
+| **5 - Commercial & Office** | 23 | $595,134,152 | 2,135,717 sf | 50.4 | Office towers |
+| **8 - Public Facilities** | 3 | $621,373,133 | 3,038,133 sf | 11.0 | Javits, Museum, Hospital |
+| **4 - Mixed Res/Com** | 3 | $697,286,652 | 3,810,436 sf | 26.0 | High-rise mixed-use |
+| **3 - Multi-Family** | 1 | $534,046,500 | 4,786,701 sf | 18.0 | Roosevelt Island housing |
+
+**Key Insights:**
+- Mixed-use properties command the highest average assessed values
+- Public facilities have the largest average building footprints
+- Commercial properties have the most floors (averaging 50.4 stories)
+
+## 5. FAR Utilization Analysis
+
+**Most Underbuilt (Lowest FAR Utilization):**
+
+| Address | Built FAR | Max Zoned FAR | Utilization | Land Use |
+|---------|-----------|---------------|-------------|----------|
+| **Main Street** (Roosevelt Island) | 1.13 | 6.50 | **17.4%** | Multi-Family |
+| 200 Central Park West | 1.84 | 0.00* | **N/A** | PARK zone |
+| 240 1 Avenue | 3.34 | 6.50 | **51.4%** | Mixed Res/Com |
+| 360 West Street | 4.22 | 2.00 | **211.0%** | Overbuilt (M2-3) |
+| 185 Greenwich St | 10.75 | 10.00 | **107.5%** | Slightly over |
+
+*PARK zone has no standard FAR
+
+**At or Near Zoning Limit (>90% Utilization):**
+
+| Address | Built FAR | Max Zoned FAR | Utilization | Description |
+|---------|-----------|---------------|-------------|-------------|
+| **51 East 42 Street** | 38.10 | 15.00 | **254.0%** | Air rights transfer |
+| 427 10 Avenue | 36.48 | 10.00 | **364.8%** | Bonus FAR |
+| 527 West 34 Street | 32.96 | 10.00 | **329.6%** | Hudson Yards bonus |
+| 338 5 Avenue | 30.79 | 15.00 | **205.3%** | Historic bonus |
+| 9 West 57 Street | 27.37 | 12.00 | **228.1%** | Bonus FAR |
+
+**Note:** Many properties exceed base FAR through bonuses, air rights transfers, and as-of-right provisions.
+
+## 6. Tax Exemption Analysis
+
+**Tax Exemption Summary:**
+- **Total Exempt Value**: $7,193,007,392
+- **Total Assessed Value**: $18,262,649,478
+- **Exemption Percentage**: **39.4%** of total assessed value
+
+**Top 10 Properties by Exemption Amount:**
+
+| Rank | Address | Exemption Amount | % of Property Value | Owner Type | Reason |
+|------|---------|------------------|---------------------|------------|---------|
+| 1 | **185 Greenwich St** (WTC) | $1,673,531,100 | 100% | Other | LMDC ownership |
+| 2 | 360 West Street (Javits) | $931,422,600 | 100% | Public | Convention center |
+| 3 | 1111 Avenue of Americas | $787,042,350 | 100% | Public | Bank of America |
+| 4 | 500 West 33 Street | $743,665,650 | 100% | Public | Hudson Yards |
+| 5 | 427 10 Avenue | $699,286,050 | 100% | Public | Hudson Yards |
+| 6 | 527 West 34 Street | $541,462,950 | 100% | Public | Hudson Yards |
+| 7 | Main Street (Roosevelt Is.) | $534,046,500 | 100% | City | Affordable housing |
+| 8 | 200 Central Park West | $474,390,000 | 100% | City | Museum of Natural History |
+| 9 | 180 Ft Washington Ave | $460,306,800 | 100% | Public | Hospital |
+| 10 | 1 Columbus Circle | $73,812,600 | 9% | Private | Partial condo exemption |
+
+**Key Findings:**
+- 15 of 30 properties (50%) have 100% tax exemptions
+- Hudson Yards properties (3) account for $1.98B in exemptions
+- Public facilities and government-related entities dominate exemptions
+
+## 7. Residential Properties Analysis
+
+**Properties with Residential Units (4 total):**
+
+| Address | Units | Res Area (sf) | Assessed Value | Area/Unit | Value/Unit |
+|---------|-------|---------------|----------------|-----------|------------|
+| **1 Columbus Circle** | 226 | 441,891 | $794,395,096 | **1,955 sf** | **$3,515,929** |
+| 240 1 Avenue (Stuy Town) | 8,764 | 8,367,942 | $791,815,950 | **955 sf** | **$90,354** |
+| Main Street (Roosevelt Is.) | 8,018 | 3,739,745 | $534,046,500 | **466 sf** | **$66,609** |
+| 151 East 58 St (Beacon Ct) | 105 | 246,927 | $506,598,307 | **2,352 sf** | **$4,824,746** |
+
+**Comparative Analysis:**
+
+**Luxury Condominiums:**
+- **One Beacon Court** (151 E 58th): $4.8M/unit, 2,352 sf/unit
+  - Ultra-luxury condos in prime Midtown East
+  - Highest per-unit value and largest unit sizes
+  
+- **Time Warner Center** (1 Columbus Circle): $3.5M/unit, 1,955 sf/unit
+  - Mixed-use luxury tower
+  - Premium Central Park location
+
+**Affordable/Middle-Income Housing:**
+- **Stuyvesant Town** (240 1st Ave): $90K/unit, 955 sf/unit
+  - Historic middle-income housing complex
+  - 8,764 units (largest residential complex)
+  - Modest unit sizes, stabilized rents
+
+- **Roosevelt Island** (Main Street): $67K/unit, 466 sf/unit
+  - Affordable housing development
+  - Smallest units (likely studio/1BR predominance)
+  - 100% tax exempt (City-owned)
+  - 8,018 units
+
+**Key Insights:**
+- **72:1 value ratio** between luxury condos and affordable housing per unit
+- **5:1 size ratio** between luxury and affordable units
+- Luxury properties: 331 units averaging $4.2M each
+- Affordable properties: 16,782 units averaging $78K each
+- The 4 residential properties house **17,113 total units**
+
+---
+
+## Summary Conclusions
+
+1. **Extreme Concentration**: Top 30 properties represent $18.3B in assessed value
+2. **Development Intensity**: Modern supertalls (One Vanderbilt, Hudson Yards) achieve FAR ratios 3-4x base zoning through bonuses
+3. **Two-Tier Market**: Luxury residential ($3.5-4.8M/unit) vs. affordable ($67-90K/unit) 
+4. **Tax Policy Impact**: 39.4% of value is tax-exempt, concentrated in public facilities, government projects, and affordable housing
+5. **Land Use**: 77% are pure commercial office towers, reflecting Manhattan's role as a business center
+6. **Historical Range**: Buildings span 1930-2019, with newest towers (2015-2019) achieving highest density
+
+This dataset represents Manhattan's most valuable real estate, dominated by supertall office towers, public infrastructure, and a small number of ultra-luxury residential properties.

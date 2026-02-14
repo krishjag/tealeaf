@@ -1,0 +1,123 @@
+## 1) Time from offense date to sentencing date
+- **Offense date:** 2015-05-05  
+- **Sentencing date:** 2020-02-24  
+
+Elapsed time:
+- From **2015-05-05 → 2020-02-05** = **4 years 9 months**
+- From **2020-02-05 → 2020-02-24** = **19 days**
+
+**Answer:** **4 years and 9 months** elapsed (approximately **4 years 9 months 19 days**).
+
+---
+
+## 2) Sentence components by charge (prison + extended supervision), totals, and concurrency
+### Charge 1 — Battery by Prisoners (Felony H) (Count 1)
+- **Initial confinement / prison:** **12 years**
+- **Extended supervision (ES):** **3 years**
+- **Total (IC + ES):** **15 years**
+- **Concurrency:** **Consecutive** to “any other sentence currently serving.”
+
+### Charge 2 — Disorderly Conduct (Misd. B) (Count 2)
+- **Initial confinement / prison:** **1 year**
+- **Extended supervision (ES):** **6 months**
+- **Total (IC + ES):** **1 year 6 months**
+- **Concurrency:** **Concurrent with Count 1** (both IC and ES noted concurrent with Ct. 1).
+
+---
+
+## 3) Defense attorneys and duration on the case (months)
+WCCA lists **3 defense attorneys** with “entered” and “withdrawn” dates:
+
+1) **Leonie C. Dolch**
+- **Entered:** 2016-03-15  
+- **Withdrawn:** 2016-07-07  
+- Duration: **~4 months** (Mar 15 → Jul 7)
+
+2) **Ronald Gabriel Benavides**
+- **Entered:** 2016-07-07  
+- **Withdrawn:** 2020-03-12  
+- Duration: **~44 months** (Jul 2016 → Mar 2020)
+
+3) **Jennifer A. Lohr**
+- **Entered:** 2020-05-20  
+- **Withdrawn:** 2025-10-02  
+- Duration: **~64 months** (May 2020 → Oct 2025)
+
+*(These are month-approximations based on calendar month differences; exact day-count conversions would vary slightly.)*
+
+---
+
+## 4) Total docket entries per year (2016–2025) and most active year
+Using the provided docket list (231 total entries) and counting entries by their **date year**:
+
+- **2016:** 33  
+- **2017:** 13  
+- **2018:** 14  
+- **2019:** 22  
+- **2020:** 18  
+- **2021:** 23  
+- **2022:** 30  
+- **2023:** 18  
+- **2024:** 9  
+- **2025:** 3  
+
+**Most active year:** **2016** (33 entries)  
+**Second highest:** **2022** (30 entries)
+
+---
+
+## 5) Appeal-related docket entries and percentage of total
+Counted docket entries that explicitly reference:
+- **“Court of Appeals”** (including “Order of Court of Appeals,” “Acknowledgment from Court of Appeals,” “Transmittal … to court of appeals,” “Court of Appeals decision & order reversing,” etc.), and/or
+- **“Supreme Court”** (acknowledgments/orders/decision/remittitur).
+
+**Appeal-related entries identified:** **31**
+
+- Court of Appeals-related (including remand orders, acknowledgments, transmittals, extensions, decision): **27**
+- Supreme Court-related (acknowledgment/order/decision/remittitur): **4**
+
+**Percentage of total docket entries:**
+- Total docket entries = **231**
+- Appeal-related = **31**
+- **31 / 231 ≈ 13.4%**
+
+**Answer:** **31 appeal-related entries**, about **13.4%** of the docket.
+
+---
+
+## 6) Receivables calculations (due, paid, balance, % collected)
+Receivables record (single line) shows:
+- **amountDue:** 761  
+- **paid:** 352  
+- **balanceDue:** 0  
+- **adjust:** 0  
+- **docCollected:** true  
+
+Calculations:
+- **Total amount due:** **$761**
+- **Total paid:** **$352**
+- **Remaining balance (computed as due − paid − adjust):** **$761 − $352 − $0 = $409**
+- **Balance shown in record:** **$0** (WCCA field), but **probAmt = 409** strongly indicates **$409** was/should be handled via probation/collections mechanism even though the “balanceDue” field is 0.
+- **% collected (paid / amountDue):** **352 / 761 ≈ 46.3%**
+
+**Answer (financial reality from fields):**
+- Due **$761**, Paid **$352**, Remaining **$409**, Collected **~46.3%**.  
+*(Note: WCCA’s “balanceDue: 0” conflicts with due/paid math; the dataset also includes “probAmt: 409,” consistent with the $409 remainder.)*
+
+---
+
+## 7) Bond amount and bond-related docket entries (with dates)
+### Bond amount
+- **Signature bond set:** **$5,000** (“with felony conds.”)
+
+### Bond-related docket entries identified
+1) **2016-02-11** — **Signature bond set** — **$5,000**  
+   - Docket: “Signature bond set” (amount 5000; addlTxt: “with felony conds.”)
+
+2) **2016-02-25** — **Signature bond signed** — **$5,000**  
+   - Docket: “Signature bond signed” (amount 5000; addlTxt: “and filed.”)
+
+Additionally, bond is referenced (not as a separate bond transaction) in:
+- **2016-10-26** — Arraignment entry notes: **“Bond continued.”** (no amount stated there)
+
+**Answer:** Bond set at **$5,000**. Bond entries: **02/11/2016 (set)** and **02/25/2016 (signed/ filed)** (plus “bond continued” reference on **10/26/2016**).

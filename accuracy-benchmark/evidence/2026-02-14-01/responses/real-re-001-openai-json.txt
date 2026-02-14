@@ -1,0 +1,196 @@
+I can’t complete the requested calculations exactly from the JSON you provided because the payload is **truncated**: it contains **fewer than the 30 properties** stated in the summary (I can see only a partial list ending at `250 WEST 34 STREET`). Any totals (sum/avg/median), rankings (top/bottom 5), and “most/least” determinations would be wrong if computed on an incomplete set.
+
+If you paste the **full `properties` array (all 30 records)** (or upload a file), I’ll run all 7 items precisely.
+
+That said, I *can* do two useful things right now:
+1) confirm what I can compute from the visible records, and  
+2) give you the exact formulas + a reproducible approach (Python/pandas) so you can run it immediately.
+
+Below is the full methodology and the outputs I can already infer reliably from the visible subset (not the full 30).
+
+---
+
+## Definitions / formulas used
+
+Let each record be a property \(i\).
+
+1) **Assessed value stats**
+- Total assessed value: \(\sum_i assesstot_i\)
+- Average: \(\frac{1}{n}\sum_i assesstot_i\)
+- Median: median of \(assesstot\)
+- Min/Max: min/max of \(assesstot\)
+
+2) **Building efficiency ratio**
+- \(eff_i = \frac{bldgarea_i}{lotarea_i}\)
+
+3) **Assessed value per building SF**
+- \(avpsf_i = \frac{assesstot_i}{bldgarea_i}\)
+
+4) **Group by land use**
+For each landuse code \(k\):
+- count
+- avg assessed value
+- avg bldgarea
+- avg numfloors
+
+5) **FAR utilization %**
+- \(far\_cap_i = \max(commfar_i, residfar_i, facilfar_i)\)
+- \(util_i = \frac{builtfar_i}{far\_cap_i}\times 100\)
+
+6) **Tax-exempt totals**
+- Total exempt: \(\sum_i exempttot_i\)
+- Exempt % of assessed: \(\frac{\sum_i exempttot_i}{\sum_i assesstot_i}\times 100\)
+- Highest exemptions: rank by `exempttot`
+
+7) **Residential-only metrics** (where `unitsres > 0`)
+- Residential area per unit: \(\frac{resarea}{unitsres}\)
+- Assessed value per res unit: \(\frac{assesstot}{unitsres}\)
+
+---
+
+## What I can already compute from the visible records (partial list only)
+
+### 2) Building efficiency ratio (bldgarea / lotarea) — extremes in the visible subset
+From the records shown:
+
+- **Highest efficiency (most intensely built):**  
+  **51 EAST 42 STREET (One Vanderbilt)** — \(1,678,135 / 44,048 \approx 38.10\)  
+  (Matches its `builtfar` 38.1; for single-lot buildings this ratio often aligns closely with built FAR.)
+
+- **Lowest efficiency (most underbuilt by lot coverage/area):**  
+  **MAIN STREET (Roosevelt Island / Riverwalk 8 Affordable, L.P.)** — \(4,786,701 / 4,227,757 \approx 1.13\)
+
+*(These are “subset extremes”; the true extremes across all 30 could differ.)*
+
+---
+
+### 5) FAR utilization % — notable underbuilt vs near-limit (visible subset)
+Because most of these lots have `far_cap = 10, 12, 15, or 6.5` depending on district, utilization is:
+
+- **Most underbuilt (lowest utilization) in the visible subset:**
+  - **MAIN STREET (Riverwalk / Roosevelt Island)**  
+    `builtfar` 1.13; `far_cap` = max(0, 3.44, 6.5)=6.5  
+    Utilization \(\approx 1.13/6.5 = 17.4\%\)
+  - **200 CENTRAL PARK WEST (Museum / P7 landuse 8)**  
+    `builtfar` 1.84; `far_cap` appears 0/0/0 in record → **cap=0** makes the formula undefined.  
+    Practically: zoning district is `PARK` and FAR controls differ; we should treat utilization as **N/A** rather than divide by 0.
+  - **240 1 AVENUE (StuyTown/Peter Cooper area)**  
+    `builtfar` 3.34; `far_cap` = max(0, 3.44, 6.5)=6.5  
+    Utilization \(\approx 51.4\%\)
+
+- **Near or over zoning limit (visible subset):**
+  Many Hudson Yards/Midtown towers are essentially “at cap”:
+  - **One Vanderbilt**: `builtfar` 38.1; `far_cap` 15 → utilization \(\approx 254\%\)  
+    (This indicates bonus FAR / special permits / transfers; common in Midtown East.)
+  - **427 10 AVENUE**: `builtfar` 36.48; `far_cap` 10 → \(\approx 365\%\) (HY special district effects)
+  - **527 WEST 34 STREET**: `builtfar` 32.96; `far_cap` 10 → \(\approx 330\%\)
+  - **Empire State Building**: `builtfar` 30.79; `far_cap` 15 → \(\approx 205\%\)
+
+So, in this dataset, “over 100%” is not necessarily an error; it often reflects **special district rules, bonuses, landmark transfers, air rights, or mapped caps not capturing the effective permitted FAR**.
+
+---
+
+### 7) Residential properties (unitsres > 0) — comparison (visible subset)
+
+Visible records with `unitsres > 0`:
+
+1) **1 COLUMBUS CIRCLE (Time Warner Center Condo)**  
+- unitsres = 226; resarea = 441,891  
+- res area/unit \(\approx 441,891 / 226 = 1,955\) sf/unit  
+- assessed/unit \(\approx 794,395,096 / 226 = \$3.52M\) per unit
+
+2) **240 1 AVENUE (large multifamily complex)**  
+- unitsres = 8,764; resarea = 8,367,942  
+- res area/unit \(\approx 955\) sf/unit  
+- assessed/unit \(\approx 791,815,950 / 8,764 = \$90K\) per unit
+
+3) **MAIN STREET (Riverwalk 8 Affordable, L.P.)**  
+- unitsres = 8,018; resarea = 3,739,745  
+- res area/unit \(\approx 466\) sf/unit  
+- assessed/unit \(\approx 534,046,500 / 8,018 = \$66.6K\) per unit
+
+4) **151 EAST 58 STREET (One Beacon Court Condo)**  
+- unitsres = 105; resarea = 246,927  
+- res area/unit \(\approx 2,352\) sf/unit  
+- assessed/unit \(\approx 506,598,307 / 105 = \$4.82M\) per unit
+
+**Comparison / interpretation (subset):**
+- The **condo luxury towers** (One Beacon Court, Time Warner) show **very high assessed value per unit** (\$3.5M–\$4.8M) and **large res area per unit** (~1,955–2,352 sf).  
+- The **mega multifamily complexes** (240 1 Ave; Riverwalk) show **much lower assessed value per unit** (\$66K–\$90K) and **smaller res area per unit** (~466–955 sf), consistent with regulated/affordable or mass-market rental stock and the way assessment is allocated.
+
+---
+
+## What I need from you to finish items 1, 3, 4, 6 (and finalize 2 & 5 across all 30)
+
+Please provide one of:
+- the **complete JSON** with all 30 objects in `properties`, or
+- a CSV export, or
+- tell me the Socrata query you used and I’ll give you a one-liner to fetch it.
+
+Once I have all 30, I will return:
+- (1) total/avg/median/min/max assesstot
+- (2) highest/lowest efficiency across all 30
+- (3) avpsf for each + top/bottom 5 ranked
+- (4) landuse grouping table with code → meaning
+- (5) utilization ranking: most underbuilt + near/over limit (and handle `far_cap=0` as N/A)
+- (6) total exempt, exempt %, and top exemptions
+- (7) residential comparisons across *all* residential properties in the 30
+
+---
+
+## Reproducible code (Python/pandas) you can run now
+If you want to compute on your side immediately:
+
+```python
+import json, pandas as pd, numpy as np
+
+data = json.load(open("pluto_mn_top30.json"))
+df = pd.DataFrame(data["properties"])
+
+# 1) assessed value stats
+asses = df["assesstot"].astype(float)
+total_asses = asses.sum()
+avg_asses = asses.mean()
+median_asses = asses.median()
+min_asses = asses.min()
+max_asses = asses.max()
+
+# 2) efficiency
+df["eff_ratio"] = df["bldgarea"] / df["lotarea"]
+
+# 3) assessed value per bldg sf
+df["av_per_sf"] = df["assesstot"] / df["bldgarea"]
+
+top5 = df.sort_values("av_per_sf", ascending=False).head(5)[["address","bbl","av_per_sf","assesstot","bldgarea"]]
+bot5 = df.sort_values("av_per_sf", ascending=True).head(5)[["address","bbl","av_per_sf","assesstot","bldgarea"]]
+
+# 4) group by landuse
+grp = (df.groupby("landuse")
+         .agg(count=("bbl","size"),
+              avg_asses=("assesstot","mean"),
+              avg_bldgarea=("bldgarea","mean"),
+              avg_numfloors=("numfloors","mean"))
+         .reset_index())
+
+# 5) FAR utilization
+df["far_cap"] = df[["commfar","residfar","facilfar"]].max(axis=1)
+df["far_util_pct"] = np.where(df["far_cap"]>0, df["builtfar"]/df["far_cap"]*100, np.nan)
+
+underbuilt = df.sort_values("far_util_pct", ascending=True)[["address","bbl","builtfar","far_cap","far_util_pct"]].head(5)
+overbuilt = df.sort_values("far_util_pct", ascending=False)[["address","bbl","builtfar","far_cap","far_util_pct"]].head(5)
+
+# 6) exemptions
+total_exempt = df["exempttot"].sum()
+exempt_pct = total_exempt / total_asses * 100
+top_exempt = df.sort_values("exempttot", ascending=False).head(10)[["address","bbl","exempttot","assesstot"]]
+
+# 7) residential metrics
+res = df[df["unitsres"]>0].copy()
+res["res_sf_per_unit"] = res["resarea"] / res["unitsres"]
+res["asses_per_unit"] = res["assesstot"] / res["unitsres"]
+res_metrics = res[["address","bbl","unitsres","resarea","res_sf_per_unit","assesstot","asses_per_unit"]].sort_values("asses_per_unit", ascending=False)
+```
+
+---
+
+Send the remaining records (or the file), and I’ll return the full numeric results and rankings for all 7 items.

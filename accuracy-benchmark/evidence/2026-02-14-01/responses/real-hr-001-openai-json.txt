@@ -1,0 +1,128 @@
+## 1) Average monthly job openings (JO) level and hires (HI) level, 2025 (thousands)
+
+Averages are simple means of the 12 seasonally adjusted monthly **levels**.
+
+| Industry | Avg JO level | Avg HI level |
+|---|---:|---:|
+| Total nonfarm | 7,351.5 | 5,333.9 |
+| Total private | 6,499.1 | 4,996.3 |
+| Construction | 249.6 | 343.4 |
+| Manufacturing | 420.5 | 298.6 |
+| Retail trade | 592.3 | 589.9 |
+| Information | 151.3 | 85.1 |
+| Financial activities | 403.3 | 210.5 |
+| Professional & business services | 1,309.1 | 1,029.4 |
+| Health care & social assistance | 1,409.0 | 726.0 |
+| Leisure & hospitality | 1,037.6 | 977.2 |
+| Accommodation & food services | 889.8 | 806.3 |
+| Government | 810.8 | 336.1 |
+
+---
+
+## 2) Job openings-to-hires ratio (Avg JO / Avg HI). Highest = “hardest to fill”
+
+| Industry | Avg JO/HI |
+|---|---:|
+| Financial activities | **1.92** |
+| Information | 1.78 |
+| Health care & social assistance | 1.94 |
+| Total nonfarm | 1.38 |
+| Total private | 1.30 |
+| Professional & business services | 1.27 |
+| Government | 2.41 |
+| Manufacturing | 1.41 |
+| Retail trade | 1.00 |
+| Leisure & hospitality | 1.06 |
+| Accommodation & food services | 1.10 |
+| Construction | 0.73 |
+
+**Highest ratio:** **Government (2.41)** — highest openings relative to hiring flow (hardest to fill by this metric).  
+**Next highest:** Health care & social assistance (1.94) and Financial activities (1.92).
+
+---
+
+## 3) Average (Quit rate − Layoff rate), 2025, and ranking (higher = more voluntary vs involuntary)
+
+Computed as the average over months of **(QU rate − LD rate)**.
+
+| Rank | Industry | Avg (QU−LD) rate (pp) |
+|---:|---|---:|
+| 1 | Accommodation & food services | **+3.31** |
+| 2 | Leisure & hospitality | **+2.55** |
+| 3 | Retail trade | **+1.54** |
+| 4 | Total private | **+1.02** |
+| 5 | Total nonfarm | **+0.88** |
+| 6 | Health care & social assistance | **+1.25** |
+| 7 | Financial activities | **+0.73** |
+| 8 | Manufacturing | **+0.48** |
+| 9 | Government | **+0.43** |
+| 10 | Construction | **+0.02** |
+| 11 | Professional & business services | **+0.47** |
+| 12 | Information | **−0.07** |
+
+Notes:
+- **Accommodation & food services** and **Leisure & hospitality** have the strongest “voluntary-heavy” turnover balance.
+- **Information** is the only one with a slightly negative balance on average (layoffs about equal to or a bit above quits).
+
+---
+
+## 4) Total nonfarm month-over-month (MoM) change in JO level (thousands)
+
+JO levels (Total nonfarm): Jan 7762, Feb 7480, Mar 7200, Apr 7395, May 7712, Jun 7357, Jul 7208, Aug 7227, Sep 7658, Oct 7449, Nov 6928, Dec 6542.
+
+MoM changes:
+- **Feb −282**
+- **Mar −280**
+- **Apr +195**
+- **May +317**
+- **Jun −355**
+- **Jul −149**
+- **Aug +19**
+- **Sep +431**
+- **Oct −209**
+- **Nov −521**
+- **Dec −386**
+
+**Largest increase:** **September (+431k)** (Aug → Sep)  
+**Largest decrease:** **November (−521k)** (Oct → Nov)
+
+---
+
+## 5) Verify TS level ≈ QU + LD + OS (levels), within rounding
+
+For each industry/month, JOLTS reports **TS** and its components **QU, LD, OS**. Using the provided levels, the identity holds essentially exactly (differences are 0 in the data shown), e.g.:
+
+- **Total nonfarm, January:** QU 3256 + LD 1674 + OS 342 = **5272**, matches TS **5272**.
+- **Retail trade, February:** 404 + 229 + 12 = **645**, matches TS **645**.
+- **Professional & business services, June:** 404 + 545 + 67 = **1016**, matches TS **1016**.
+
+**Conclusion:** The component sum matches reported TS **within rounding (and in these data, exactly).**
+
+---
+
+## 6) Highest average quit rate and highest average layoff rate (rates)
+
+Average quit rates (percent) and layoff rates (percent) are simple means of monthly rates.
+
+- **Highest average quit rate:** **Accommodation & food services (~4.35%)**  
+  (Leisure & hospitality is next at ~3.99%.)
+
+- **Highest average layoff rate:** **Construction (~2.08%)**  
+  (Professional & business services is next at ~2.00%.)
+
+---
+
+## 7) Private sector vs Government: average hire, quit, and layoff rates
+
+Averages of monthly **rates**:
+
+| Sector | Avg hire rate | Avg quit rate | Avg layoff rate |
+|---|---:|---:|---:|
+| Total private | **3.65%** | **2.22%** | **1.23%** |
+| Government | 1.43% | 0.78% | 0.33% |
+
+**Comparison:** **Total private is higher on all three**—hire rates, quit rates, and layoff rates—than **Government** on average in 2025.
+
+--- 
+
+If you want, I can also provide (a) the full table of average quit and layoff rates by industry, and/or (b) confidence-style cautions about interpreting JO/HI as “hard to fill” given industry differences in vacancy duration and recruiting intensity.

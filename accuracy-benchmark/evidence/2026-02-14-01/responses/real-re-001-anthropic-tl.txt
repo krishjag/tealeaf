@@ -1,0 +1,147 @@
+# NYC PLUTO Analysis: Manhattan's 30 Highest-Value Properties
+
+## 1. Total Assessed Value Statistics
+
+**Total Assessed Value:** $18,262,649,478
+
+**Statistics:**
+- **Average:** $608,754,983
+- **Median:** $510,909,634
+- **Minimum:** $437,000,000 (250 WEST 34 STREET)
+- **Maximum:** $1,673,531,100 (185 GREENWICH STREET - One World Trade Center)
+
+---
+
+## 2. Building Efficiency Ratio (Building Area / Lot Area)
+
+**Top 5 Most Intensely Built:**
+1. **51 EAST 42 STREET (One Vanderbilt)** - 38.10 ratio (1,678,135 sf on 44,048 sf lot)
+2. **427 10 AVENUE** - 36.48 ratio (2,521,850 sf on 69,125 sf lot)
+3. **338 5 AVENUE (Empire State Building)** - 30.79 ratio (2,812,739 sf on 91,351 sf lot)
+4. **9 WEST 57 STREET** - 27.37 ratio (1,698,259 sf on 62,058 sf lot)
+5. **1631 BROADWAY** - 26.97 ratio (2,438,059 sf on 90,400 sf lot)
+
+**Bottom 5 Least Intensely Built:**
+1. **MAIN STREET (Roosevelt Island)** - 1.13 ratio (4,786,701 sf on 4,227,757 sf lot)
+2. **200 CENTRAL PARK WEST (Museum)** - 1.84 ratio (1,360,264 sf on 738,000 sf lot)
+3. **240 1 AVENUE (Residential)** - 3.34 ratio (8,942,176 sf on 2,675,000 sf lot)
+4. **360 WEST STREET (Convention Center)** - 4.22 ratio (4,060,596 sf on 962,250 sf lot)
+5. **185 GREENWICH STREET (1 WTC)** - 10.75 ratio (8,966,500 sf on 833,945 sf lot)
+
+---
+
+## 3. Assessed Value per Square Foot
+
+**Top 5 Most Valuable ($/sqft):**
+1. **761 5 AVENUE** - $433.53/sqft ($791.1M / 1,824,820 sf)
+2. **151 EAST 58 STREET (One Beacon Court)** - $459.21/sqft ($506.6M / 1,103,169 sf)
+3. **51 EAST 42 STREET (One Vanderbilt)** - $312.06/sqft ($523.7M / 1,678,135 sf)
+4. **1 COLUMBUS CIRCLE (Time Warner Center)** - $377.90/sqft ($794.4M / 2,101,990 sf)
+5. **1221 AVENUE OF THE AMER** - $216.53/sqft ($570.8M / 2,636,182 sf)
+
+**Bottom 5 Least Valuable ($/sqft):**
+1. **MAIN STREET (Roosevelt Island affordable housing)** - $111.58/sqft ($534.0M / 4,786,701 sf)
+2. **180 FT WASHINGTON AVENUE (Hospital)** - $124.60/sqft ($460.3M / 3,693,539 sf)
+3. **240 1 AVENUE (Residential)** - $88.56/sqft ($791.8M / 8,942,176 sf)
+4. **250 WEST 34 STREET** - $162.47/sqft ($437.0M / 2,689,635 sf)
+5. **185 GREENWICH STREET (1 WTC)** - $186.68/sqft ($1,673.5M / 8,966,500 sf)
+
+---
+
+## 4. Analysis by Land Use Type
+
+| Land Use | Description | Count | Avg Assessed Value | Avg Building Area | Avg Floors |
+|----------|-------------|-------|-------------------|-------------------|------------|
+| **5** | Commercial & Office | 23 | $591,124,421 | 2,163,913 sf | 51.7 floors |
+| **8** | Public Facilities | 3 | $621,973,133 | 3,038,133 sf | 11.0 floors |
+| **4** | Mixed Residential & Commercial | 3 | $697,619,785 | 4,248,782 sf | 28.3 floors |
+| **3** | Multi-Family Elevator | 1 | $534,046,500 | 4,786,701 sf | 18.0 floors |
+
+**Key Insights:**
+- Commercial & Office (landuse 5) dominates with 23 of 30 properties (77%)
+- Mixed-use properties have highest average assessed value ($697.6M)
+- Public Facilities have largest average building area (3M+ sf)
+- Commercial properties are tallest on average (52 floors)
+
+---
+
+## 5. FAR Utilization Analysis
+
+**Most Underbuilt (< 50% utilization):**
+1. **MAIN STREET** - 17.4% (1.13 FAR built vs 6.5 max)
+2. **360 WEST STREET** - 211% (4.22 vs 2.0 max) *[over-utilized due to special permit]*
+3. **240 1 AVENUE** - 51.4% (3.34 vs 6.5 max)
+
+**Near/Over Zoning Limit (> 150% utilization):**
+1. **51 EAST 42 STREET** - 254% (38.1 vs 15.0 max) *[special permit/air rights]*
+2. **427 10 AVENUE** - 364.8% (36.48 vs 10.0 max) *[major air rights purchase]*
+3. **527 WEST 34 STREET** - 329.6% (32.96 vs 10.0 max)
+4. **338 5 AVENUE (Empire State)** - 205.3% (30.79 vs 15.0 max)
+5. **1221 AVENUE OF THE AMER** - 214.4% (25.73 vs 12.0 max)
+6. **1631 BROADWAY** - 179.8% (26.97 vs 15.0 max)
+7. **360 WEST STREET** - 211% (4.22 vs 2.0 max)
+
+**Well-Utilized (90-110%):**
+1. **185 GREENWICH STREET** - 107.5% (10.75 vs 10.0 max)
+2. **180 FT WASHINGTON AVENUE** - 156% (10.14 vs 6.5 max)
+
+*Note: Properties exceeding 100% typically have transfer development rights (TDR/air rights) or special permits*
+
+---
+
+## 6. Tax-Exempt Analysis
+
+**Total Tax-Exempt Value:** $6,579,578,192
+
+**Percentage of Total Assessed Value Exempt:** 36.0%
+
+**Properties with Highest Exemptions:**
+1. **185 GREENWICH STREET (1 WTC)** - $1,673,531,100 (100% exempt - government ownership)
+2. **360 WEST STREET (Convention Center)** - $931,422,600 (100% exempt - public facility)
+3. **1111 AVENUE OF THE AMER (Bryant Park)** - $787,042,350 (100% exempt)
+4. **500 WEST 33 STREET** - $743,665,650 (100% exempt)
+5. **427 10 AVENUE** - $699,286,050 (100% exempt)
+6. **527 WEST 34 STREET** - $541,462,950 (100% exempt)
+7. **MAIN STREET (Affordable housing)** - $534,046,500 (100% exempt)
+8. **200 CENTRAL PARK WEST (Museum)** - $474,390,000 (100% exempt - cultural institution)
+9. **180 FT WASHINGTON AVENUE (Hospital)** - $460,306,800 (100% exempt - nonprofit healthcare)
+10. **1 COLUMBUS CIRCLE** - $73,812,600 (9.3% exempt - partial condominium exemption)
+11. **601 LEXINGTON AVENUE** - $61,111,592 (13.5% exempt - partial exemption)
+
+**Summary:** 11 properties have tax exemptions. Most fully-exempt properties are government-owned (WTC, convention center) or serve public purposes (museum, hospital, affordable housing).
+
+---
+
+## 7. Residential Properties Analysis
+
+**Properties with Residential Units (unitsres > 0):**
+
+| Property | Units | Res Area (sf) | Area/Unit | Assessed Value | Value/Unit |
+|----------|-------|---------------|-----------|----------------|------------|
+| **240 1 AVENUE** | 8,764 | 8,367,942 | 955 sf | $791,815,950 | $90,354 |
+| **MAIN STREET (Roosevelt Island)** | 8,018 | 3,739,745 | 466 sf | $534,046,500 | $66,612 |
+| **1 COLUMBUS CIRCLE** | 226 | 441,891 | 1,955 sf | $794,395,096 | $3,515,022 |
+| **151 EAST 58 STREET** | 105 | 246,927 | 2,352 sf | $506,598,307 | $4,824,746 |
+
+**Key Insights:**
+
+**Affordable/Middle-Income Housing:**
+- **240 1 AVENUE**: 8,764 units, 955 sf/unit, $90K assessed value/unit (affordable housing)
+- **MAIN STREET**: 8,018 units, 466 sf/unit, $67K assessed value/unit (affordable housing on Roosevelt Island)
+
+**Luxury Condominiums:**
+- **151 EAST 58 STREET (One Beacon Court)**: 105 units, 2,352 sf/unit, $4.8M assessed value/unit
+- **1 COLUMBUS CIRCLE (Time Warner Center)**: 226 units, 1,955 sf/unit, $3.5M assessed value/unit
+
+**Value Differential:** Luxury condos have ~54x higher assessed value per unit than affordable housing, reflecting Manhattan's extreme property value stratification. Luxury units are also 2-5x larger (2,000+ sf vs 466-955 sf).
+
+---
+
+## Summary Findings
+
+1. **One World Trade Center** (185 Greenwich) is the highest-assessed property at $1.67B
+2. **One Vanderbilt** has the most intense development at 38x lot coverage
+3. **Luxury residential condos** command $400-460/sqft, while affordable housing is valued at $67-90K per unit
+4. **36% of total value** ($6.6B) is tax-exempt, primarily government/public facilities
+5. **Air rights** are heavily utilized - 7 properties exceed their base zoning FAR by 150%+
+6. **Commercial office** dominates (77% of properties), averaging 52 floors and $591M value

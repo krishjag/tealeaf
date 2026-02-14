@@ -1,0 +1,128 @@
+# Credit Analysis Summary - Fiscal Year 2025
+
+## Financial Metrics by Company
+
+### 1. APPLE INC
+**Balance Sheet Strength:**
+- Total Debt: $90.7B (Current: $12.4B + Long-term: $78.3B)
+- Stockholders' Equity: $73.7B
+- **Debt-to-Equity Ratio: 1.23**
+
+**Cash Flow Performance:**
+- Operating Cash Flow: $111.5B
+- Capital Expenditures: $12.7B
+- **Free Cash Flow: $98.8B** ⭐ *Highest absolute FCF*
+
+**Debt Service Coverage:**
+- Operating Income: $133.1B
+- Interest expense not separately disclosed (included in "Other expense, net" of $321M)
+- Interest coverage appears strong but cannot calculate precise ratio
+
+---
+
+### 2. VISA INC
+**Balance Sheet Strength:**
+- Total Debt: $25.2B (Current: $5.6B + Long-term: $19.6B)
+- Stockholders' Equity: $37.9B
+- **Debt-to-Equity Ratio: 0.66**
+
+**Cash Flow Performance:**
+- Operating Cash Flow: $23.1B
+- Capital Expenditures: $1.5B
+- **Free Cash Flow: $21.6B**
+
+**Debt Service Coverage:**
+- Operating Income: $24.0B
+- Interest Expense: $589M
+- **Interest Coverage Ratio: 40.7x** ⭐ *Excellent coverage*
+
+---
+
+### 3. COSTCO WHOLESALE CORP
+**Balance Sheet Strength:**
+- Total Debt: $5.7B (Current: $0 + Long-term: $5.7B)
+- Stockholders' Equity: $29.2B
+- **Debt-to-Equity Ratio: 0.20** ⭐ *Lowest leverage*
+
+**Cash Flow Performance:**
+- Operating Cash Flow: $13.3B
+- Capital Expenditures: $5.5B
+- **Free Cash Flow: $7.8B**
+
+**Debt Service Coverage:**
+- Operating Income: $10.4B
+- Interest Expense: $154M
+- **Interest Coverage Ratio: 67.4x** ⭐ *Highest coverage*
+
+---
+
+### 4. QUALCOMM INC
+**Balance Sheet Strength:**
+- Total Debt: $14.8B (Current: $0 + Long-term: $14.8B)
+- Stockholders' Equity: $21.2B
+- **Debt-to-Equity Ratio: 0.70**
+
+**Cash Flow Performance:**
+- Operating Cash Flow: $14.0B
+- Capital Expenditures: $1.2B
+- **Free Cash Flow: $12.8B**
+
+**Debt Service Coverage:**
+- Operating Income: $12.4B
+- Interest Expense: $664M
+- **Interest Coverage Ratio: 18.6x** *Strong coverage*
+
+---
+
+## Key Findings
+
+### 🏆 **Strongest Balance Sheet: COSTCO**
+- Debt-to-Equity of only 0.20 (lowest leverage among all four)
+- Interest coverage of 67.4x provides enormous cushion
+- Minimal debt burden with no short-term debt obligations
+- Conservative capital structure despite significant retail operations
+
+### 💰 **Most Free Cash Flow: APPLE**
+- Generated $98.8B in free cash flow (88.6% FCF conversion)
+- Despite higher leverage (1.23 D/E), produces massive cash
+- Returned $120.7B to shareholders via buybacks ($90.7B) and dividends ($15.4B)
+- Strong cash generation supports aggressive capital returns
+
+### ⚠️ **Risk Assessment:**
+
+**Apple - Moderate Concern:**
+- Only company with D/E ratio above 1.0
+- However, mitigated by:
+  - Exceptional cash generation ($111.5B operating cash flow)
+  - Large cash position ($35.9B) and marketable securities ($96.5B total)
+  - Strong business model with recurring revenue
+- **Verdict:** Leverage is manageable given cash flow strength
+
+**All Other Companies - Low Risk:**
+- Visa (0.66 D/E), Qualcomm (0.70 D/E), Costco (0.20 D/E) all show conservative leverage
+- All four companies have positive and substantial free cash flow
+- Interest coverage ratios range from 18.6x to 67.4x (all well above the 2.5x minimum threshold)
+- No companies show negative free cash flow
+
+### 📊 **Comparative Rankings:**
+
+**By Balance Sheet Strength (Lowest to Highest Risk):**
+1. Costco (0.20 D/E)
+2. Visa (0.66 D/E)
+3. Qualcomm (0.70 D/E)
+4. Apple (1.23 D/E)
+
+**By Free Cash Flow Generation:**
+1. Apple: $98.8B
+2. Visa: $21.6B
+3. Qualcomm: $12.8B
+4. Costco: $7.8B
+
+**By FCF Margin (FCF/Revenue):**
+1. Visa: 54.0% ($21.6B / $40.0B)
+2. Qualcomm: 29.0% ($12.8B / $44.3B)
+3. Apple: 23.7% ($98.8B / $416.2B)
+4. Costco: 2.8% ($7.8B / $275.2B)
+
+### ✅ **Credit Conclusion:**
+All four companies demonstrate **investment-grade credit quality** with no immediate concerns. Each maintains positive free cash flow, manageable debt levels, and strong debt service coverage. Apple's higher leverage is offset by exceptional cash generation, while Costco's retail model naturally carries lower leverage. Visa and Qualcomm maintain balanced profiles with strong technology-driven margins.

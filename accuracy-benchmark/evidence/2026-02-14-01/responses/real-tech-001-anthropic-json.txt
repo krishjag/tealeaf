@@ -1,0 +1,131 @@
+# Linux Kernel CVE Analysis - March 2024
+
+## 1. CVSS v3.1 Base Score Statistics
+
+Analyzing all CVEs with Primary CVSS v3.1 metrics:
+
+- **Average Score**: 6.33
+- **Minimum**: 5.5 (MEDIUM)
+- **Maximum**: 7.8 (HIGH)
+- **Median**: 5.5 (MEDIUM)
+
+**Score Distribution**:
+- 5.5: 20 CVEs
+- 6.1: 1 CVE
+- 7.0: 5 CVEs
+- 7.1: 7 CVEs
+- 7.8: 5 CVEs
+
+---
+
+## 2. Severity Categories
+
+**Total CVEs with Primary Scores**: 38 (out of 40 total)
+
+| Severity | Count | Percentage |
+|----------|-------|------------|
+| **HIGH** | 17 | 44.7% |
+| **MEDIUM** | 21 | 55.3% |
+| **LOW** | 0 | 0% |
+| **CRITICAL** | 0 | 0% |
+
+*Note: 2 CVEs (CVE-2021-47070, CVE-2021-47075) have only Secondary metrics and were excluded from primary analysis.*
+
+---
+
+## 3. CWE Analysis
+
+| CWE | CVE Count | Avg CVSS | Description |
+|-----|-----------|----------|-------------|
+| **CWE-416** (Use After Free) | 7 | **7.54** | Highest average severity |
+| **CWE-476** (NULL Pointer Deref) | 6 | 5.58 | |
+| **CWE-401** (Memory Leak) | 4 | 5.50 | |
+| **CWE-125** (Out-of-bounds Read) | 4 | 6.45 | |
+| **CWE-787** (Out-of-bounds Write) | 3 | 5.70 | |
+| **CWE-667** (Improper Locking) | 3 | 6.17 | |
+| **CWE-362** (Race Condition) | 2 | 7.05 | |
+| **CWE-672** (Operation after Expiration) | 1 | 7.00 | |
+| **CWE-369** (Divide By Zero) | 1 | 5.50 | |
+| **CWE-770** (Allocation w/o Limits) | 1 | 5.50 | |
+
+**Key Finding**: **CWE-416 (Use After Free)** has the highest average severity at **7.54**, making it the most dangerous vulnerability class in this dataset.
+
+---
+
+## 4. Attack Vector Analysis
+
+| Attack Vector | Count | Percentage |
+|--------------|-------|------------|
+| **LOCAL** | 37 | 97.4% |
+| **NETWORK** | 0 | 0% |
+| **ADJACENT_NETWORK** | 0 | 0% |
+| **PHYSICAL** | 0 | 0% |
+
+**Critical Insight**: **97.4% of vulnerabilities require local access**, meaning an attacker typically needs some level of system access to exploit these kernel vulnerabilities. This is typical for kernel vulnerabilities and highlights the importance of access controls and privilege separation.
+
+---
+
+## 5. Broadest Version Range Analysis
+
+**CVE-2023-52507** (nfc: nci: assert requested protocol) affects the **broadest kernel version range**:
+- **Range**: 3.2 → 6.5.8
+- **Span**: ~12 major kernel versions
+- **Affected versions include**: All kernels from 3.2 through 6.5.7
+
+**Other Notable Wide-Ranging CVEs**:
+- **CVE-2023-52522**: 2.6.37 → 6.5.7 (even broader span)
+- **CVE-2022-48627**: 3.7 → 5.18.13 + long-term versions
+
+---
+
+## 6. Exploitability vs Impact Scores
+
+**Across all Primary metrics**:
+
+| Metric | Average | Range |
+|--------|---------|-------|
+| **Exploitability Score** | 1.73 | 1.0 - 3.9 |
+| **Impact Score** | 4.42 | 1.4 - 5.9 |
+
+**Impact-to-Exploitability Ratio**: **2.56:1**
+
+**Analysis**: On average, the potential **impact is 2.5x greater than exploitability**, meaning these vulnerabilities are relatively difficult to exploit but have significant consequences when successfully exploited. This is consistent with kernel-level vulnerabilities requiring local access.
+
+**Exploitability Breakdown**:
+- Low (1.0-1.8): 37 CVEs → Typical for LOCAL attack vector with LOW privileges required
+- Medium (1.9-2.5): 0 CVEs
+- High (2.6-3.9): 1 CVE (CVE-2023-52502 with NETWORK vector)
+
+---
+
+## 7. Reference Tag Analysis
+
+**Total References Analyzed**: 348 across all CVEs
+
+| Tag Type | Count | Percentage |
+|----------|-------|------------|
+| **Patch** | 344 | 98.9% |
+| **Mailing List** | 2 | 0.6% |
+| **Other/Untagged** | 2 | 0.6% |
+
+**CVEs with Patch References**: **40 out of 40 (100%)**
+
+**Key Observations**:
+- Every single CVE has at least one Patch reference
+- Most CVEs have **6-8 patch references** (different kernel stable branches)
+- Patches typically point to git.kernel.org stable branches
+- Average of **8.7 references per CVE**
+
+**Typical Patch Pattern**:
+CVEs include patches for multiple stable kernel versions (e.g., 5.4.x, 5.10.x, 5.15.x, 6.1.x, 6.5.x), showing comprehensive backporting efforts.
+
+---
+
+## Summary Insights
+
+1. **Severity Profile**: Evenly split between HIGH (45%) and MEDIUM (55%) severity
+2. **Primary Threat**: Use-after-free vulnerabilities (CWE-416) are most severe
+3. **Attack Surface**: Nearly all require local access (97%), limiting remote exploitation
+4. **Version Impact**: Some vulnerabilities affect 10+ years of kernel versions
+5. **Remediation**: 100% patch availability demonstrates strong kernel security response
+6. **Risk Ratio**: High impact but lower exploitability favors defense-in-depth strategies

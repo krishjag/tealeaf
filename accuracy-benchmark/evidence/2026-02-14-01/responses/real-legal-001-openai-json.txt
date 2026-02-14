@@ -1,0 +1,122 @@
+### 1) Time from offense date to sentencing date (years/months)
+- **Offense date:** 2015-05-05  
+- **Sentencing date:** 2020-02-24  
+
+Elapsed time:
+- From **2015-05-05 → 2020-02-05** = **4 years 9 months**
+- From **2020-02-05 → 2020-02-24** = **19 days**
+
+**Answer:** **4 years 9 months** elapsed (plus **19 days**).
+
+---
+
+### 2) Sentence components by charge (prison + extended supervision); concurrency/consecutivity
+
+#### Charge 1 — Battery by Prisoners (Felony H) (Count 1)
+- **Initial confinement / prison:** **12 years**
+- **Extended supervision (ES):** **3 years**
+- **Total combined (IC + ES):** **15 years**
+- **Concurrency/consecutivity:** **Consecutive to any other sentence currently serving** (i.e., consecutive to other cases/sentences; not stated as consecutive to Count 2)
+
+#### Charge 2 — Disorderly Conduct (Misd. B) (Count 2)
+- **Initial confinement / prison:** **1 year**
+- **Extended supervision (ES):** **6 months**
+- **Total combined (IC + ES):** **1 year 6 months**
+- **Concurrency/consecutivity:** **Concurrent with Count 1** (both IC and ES noted concurrent with Ct. 1)
+
+---
+
+### 3) Defense attorneys and duration on the case (months)
+
+Defense counsel listed (3 total):
+1) **Leonie C. Dolch**
+   - **Entered:** 2016-03-15  
+   - **Withdrawn:** 2016-07-07  
+   - Duration: **3 months** (approx. 3 months, 22 days)
+
+2) **Ronald Gabriel Benavides**
+   - **Entered:** 2016-07-07  
+   - **Withdrawn:** 2020-03-12  
+   - Duration: **44 months** (approx. 44 months, 5 days)
+
+3) **Jennifer A. Lohr**
+   - **Entered:** 2020-05-20  
+   - **Withdrawn:** 2025-10-02  
+   - Duration: **64 months** (approx. 64 months, 12 days)
+
+**Answer:** **3 defense attorneys** represented the defendant.
+
+---
+
+### 4) Total docket entries per year (2016–2025) + most active year
+
+Counted from the provided `docketEntries` list:
+
+| Year | Docket entries |
+|---|---:|
+| **2016** | **29** |
+| **2017** | 10 |
+| **2018** | 22 |
+| **2019** | 23 |
+| **2020** | 18 |
+| **2021** | 25 |
+| **2022** | 25 |
+| **2023** | 19 |
+| **2024** | 6 |
+| **2025** | 2 |
+
+**Most activity:** **2016 (29 entries)**
+
+---
+
+### 5) Appeal-related docket entries + percentage of total
+
+**Method used:** counted entries whose description or additional text explicitly references **Court of Appeals**, **Supreme Court**, **appeal**, **remittitur**, or appellate record transmittal/acknowledgments/orders.
+
+**Appeal-related entries (count = 29):**
+- 2020: 2 (Court of Appeals orders extending deadlines)
+- 2021: 5 (Court of Appeals orders extending time to file/decide postconviction motion)
+- 2022: 12 (notice of appeal; COA acknowledgments/orders; appellate index/transmittals; COA remand order)
+- 2023: 7 (motion in COA; COA orders; COA acknowledgments; record transmittals)
+- 2024: 2 (COA decision reversing; Supreme Court acknowledgment re review)
+- 2025: 1 (Supreme Court decision filed)
+
+**Total docket entries (2016–2025):** 179  
+**Appeal-related:** 29  
+
+Percentage:
+- **29 / 179 ≈ 16.2%**
+
+**Answer:** **29 appeal-related entries**, about **16.2%** of all docket entries.
+
+---
+
+### 6) Receivables calculations (amount due/paid/balance/% collected)
+
+From `receivables[0]`:
+- **Total amount due:** 761.00  
+- **Total paid:** 352.00  
+- **Remaining balance:** 0.00 (WCCA shows `balanceDue: 0.0`)  
+- **AmountDue vs Paid collection rate:** 352 / 761 ≈ **46.3%**
+
+**Answer (as displayed in receivable fields):**
+- **Amount due:** $761.00  
+- **Paid:** $352.00  
+- **Balance due:** $0.00  
+- **% collected (paid ÷ amount due):** **46.3%**
+
+*(Note: the combination “paid $352” and “balance due $0” implies the remainder was satisfied via something other than “paid” as captured here (e.g., adjustment/other accounting), but `adjust` is shown as 0.00 in this extract.)*
+
+---
+
+### 7) Bond amount + bond-related docket entries (dates)
+
+**Bond amount set:** **$5,000 signature/recognizance bond** (“$5,000 recog. bond with felony conds.”)
+
+**Bond-related docket entries:**
+1) **2016-02-11** — **“Signature bond set”** — **$5,000** (addl: “with felony conds.”)
+2) **2016-02-11** — **“Hearing”** — notes include **“$5,000 recog. bond with felony conds.”**
+3) **2016-02-25** — **“Signature bond signed”** — **$5,000**
+4) **2016-10-26** — **“Arraignment”** — **“Bond continued.”** (no amount stated there, but it is bond-related)
+
+**Answer:** Bond was **$5,000**, with the bond set and referenced on **2016-02-11**, signed on **2016-02-25**, and continued on **2016-10-26**.

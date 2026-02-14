@@ -129,6 +129,7 @@ impl Executor {
                             provider.name().to_string(),
                             format!("Failed to prepare task with {} format: {}", format, e),
                             format,
+                            0,
                         ),
                     );
                 }
@@ -166,7 +167,7 @@ impl Executor {
         provider: Arc<dyn LLMProvider + Send + Sync>,
         format: DataFormat,
     ) -> TaskResult {
-        let mut last_error = None;
+        let mut errors: Vec<String> = Vec::new();
         let mut delay = self.config.retry_delay_ms;
 
         for attempt in 0..=self.config.retry_count {
@@ -198,6 +199,7 @@ impl Executor {
                         provider.name().to_string(),
                         response,
                         format,
+                        attempt,
                     );
                 }
                 Err(ProviderError::RateLimited { retry_after_ms }) => {
@@ -208,7 +210,7 @@ impl Executor {
                         retry_after_ms
                     );
                     sleep(Duration::from_millis(retry_after_ms)).await;
-                    last_error = Some(ProviderError::RateLimited { retry_after_ms });
+                    errors.push(format!("[attempt {}] {}", attempt, ProviderError::RateLimited { retry_after_ms }));
                 }
                 Err(e @ ProviderError::Config(_)) => {
                     // Config errors (invalid key, quota exceeded) are permanent —
@@ -220,7 +222,7 @@ impl Executor {
                         format,
                         e
                     );
-                    last_error = Some(e);
+                    errors.push(format!("[attempt {}] {}", attempt, e));
                     break;
                 }
                 Err(e) => {
@@ -231,16 +233,23 @@ impl Executor {
                         format,
                         e
                     );
-                    last_error = Some(e);
+                    errors.push(format!("[attempt {}] {}", attempt, e));
                 }
             }
         }
 
+        let error_message = if errors.is_empty() {
+            "Unknown error".to_string()
+        } else {
+            errors.join("\n")
+        };
+
         TaskResult::failure_with_format(
             task.metadata.id.clone(),
             provider.name().to_string(),
-            last_error.map(|e| e.to_string()).unwrap_or_else(|| "Unknown error".to_string()),
+            error_message,
             format,
+            self.config.retry_count,
         )
     }
 

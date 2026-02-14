@@ -1,0 +1,178 @@
+I can’t complete the requested *across-all-25-products* calculations from what you pasted because the JSON is truncated mid‑array (it ends at **Trix Mini Breakfast Cereal**, and I can only see a subset of the 25 foods). I *can* still do two useful things right now:
+
+1) Produce the nutrition summary + all derived metrics **for the products visible in your paste** (below).  
+2) If you paste the remaining foods (or the full JSON file), I’ll rerun everything for **all 25** exactly as requested.
+
+Below are results for the foods that are fully visible in your snippet (note: several General Mills entries appear multiple times as different package sizes/UPCs but with the same per‑100g nutrition).
+
+---
+
+## 1) Nutrition summary table (per 100 g) — products visible in snippet
+
+Calories = Energy (kcal). Macros in g/100g. Minerals in mg/100g.
+
+| fdcId | Product (short) | Brand owner | kcal | Protein | Fat | Carbs | Sugars | Fiber | Sodium (mg) | Iron (mg) | Calcium (mg) |
+|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1880521 | Bauducco Breakfast Cookie | Trusouth Oil LLC | 424 | 9.09 | 13.6 | 63.6 | 21.2 | 12.1 | 227 | 3.27 | 61 |
+| 769904 | belVita Biscuits “Breakfast Cereals & Milk” | (blank) | 0* | 7.9 | 14.5 | —* | 20.0 | 6.5 | —* | 4.2 | —* |
+| 770738 | belVita Biscuits “Breakfast Cereals & Milk” | (blank) | 0* | 7.9 | 14.5 | —* | 20.0 | 6.5 | —* | 4.2 | —* |
+| 2560946 | General Mills “Breakfast Pack Cereal” | (blank) | 394 | 9.09 | 4.55 | 81.8 | 33.3 | 6.1 | 636 | 8.18 | 242 |
+| 2746583 | Bluey Breakfast Cereal (Kix) | GENERAL MILLS SALES INC. | 375 | 7.5 | 2.5 | 85.0 | 10.0 | 7.5 | 450 | 27.0 | 325 |
+| 2746596 | Bluey Breakfast Cereal 2 Pack (Kix) | GENERAL MILLS SALES INC. | 375 | 7.5 | 2.5 | 85.0 | 10.0 | 7.5 | 450 | 27.0 | 325 |
+| 2746582 | Bluey Breakfast Cereal Family Size (Kix) | GENERAL MILLS SALES INC. | 375 | 7.5 | 2.5 | 85.0 | 10.0 | 7.5 | 450 | 27.0 | 325 |
+| 2738640 | Boo Berry Halloween Cereal | GENERAL MILLS SALES INC. | 390 | 4.88 | 3.66 | 85.4 | 26.8 | 2.4 | 439 | 8.78 | 317 |
+| 2716350 | Carmella Creeper Cereal | GENERAL MILLS SALES INC. | 393 | 5.39 | 4.07 | 87.1 | 26.8 | 3.7 | 470 | 8.78 | 317 |
+| 2739175 | Cheerios Breakfast Cereal | GENERAL MILLS SALES INC. | 359 | 12.8 | 6.41 | 74.4 | 5.13 | 10.3 | 487 | 32.3 | 333 |
+| 2746631 | Cheerios Breakfast Cereal | GENERAL MILLS SALES INC. | 359 | 12.8 | 6.41 | 74.4 | 5.13 | 10.3 | 487 | 32.3 | 333 |
+| 2738994 | Cheerios Cereal Cup | GENERAL MILLS SALES INC. | 361 | 13.9 | 6.94 | 75.0 | 5.56 | 11.1 | 500 | 32.2 | 333 |
+| 2746611 | Chocolate Cheerios | GENERAL MILLS SALES INC. | 389 | 8.33 | 5.56 | 80.6 | 27.8 | 8.3 | 500 | 10.0 | 361 |
+| 2746533 | Chocolate Chex | GENERAL MILLS SALES INC. | 419 | 4.65 | 8.14 | 81.4 | 25.6 | 4.7 | 581 | 29.3 | 302 |
+| 2747410 | Cinnamon Chex | GENERAL MILLS SALES INC. | 400 | 5.0 | 8.75 | 82.5 | 20.0 | 5.0 | 575 | 27.0 | 325 |
+| 2746532 | Cinnamon Chex | GENERAL MILLS SALES INC. | 400 | 5.0 | 8.75 | 82.5 | 20.0 | 5.0 | 575 | 27.0 | 325 |
+| 2746629 | Cookie Crisp | GENERAL MILLS SALES INC. | 389 | 5.56 | 4.17 | 86.1 | 33.3 | 5.6 | 528 | 10.0 | 361 |
+| 1869223 | Holy Crap “Dragons Blend” | Unisa Fisher LLC | 464 | 21.4 | 21.4 | 42.9 | 10.7 | 14.3 | 0 | 6.43 | 214 |
+| 2740713 | Lucky Charms | GENERAL MILLS SALES INC. | 389 | 8.33 | 4.17 | 83.3 | 33.3 | 5.6 | 611 | 10.0 | 361 |
+| 2145027 | Nature’s Promise Breakfast Biscuits | Ahold USA, Inc. | 464 | 10.7 | 16.1 | 71.4 | 21.4 | 7.1 | 250 | 1.43 | 36 |
+| 2746531 | Rice Chex | GENERAL MILLS SALES INC. | 375 | 7.5 | 2.5 | 87.5 | 7.5 | 5.0 | 775 | 36.0 | 325 |
+| 2746605 | Total Cereal | GENERAL MILLS SALES INC. | 350 | 7.5 | 2.5 | 82.5 | 15.0 | 10.0 | 475 | 45.0 | 100 |
+| 2720715 | Trix Loaded | GENERAL MILLS SALES INC. | 422 | 4.61 | 13.6 | 75.0 | 29.4 | 5.01 | 267 | 8.57 | 310 |
+| 2720722 | Trix Mini | GENERAL MILLS SALES INC. | 390 | 5.49 | 6.15 | 84.5 | 28.5 | 4.22 | 505 | 9.23 | 333 |
+| 2720723 | Trix Mini | GENERAL MILLS SALES INC. | 390 | 5.49 | 6.15 | 84.5 | 28.5 | 4.22 | 505 | 9.23 | 333 |
+
+\* For the belVita entries in your snippet, **Energy and some macro fields are not present** (only protein, fat, starch, sugars, fiber, iron, magnesium, thiamin, sat fat). I left missing values as “—/0*” rather than inventing them.
+
+---
+
+## 2) Sugar-to-fiber ratio (total sugars ÷ fiber)
+
+Computed where both sugars and fiber are present.
+
+**Best (lowest) ratio:**  
+- **Cheerios Breakfast Cereal** (fdcId 2739175 / 2746631): 5.13 / 10.3 ≈ **0.50**
+
+**Worst (highest) ratio:**  
+- **Boo Berry Halloween Breakfast Cereal** (fdcId 2738640): 26.8 / 2.4 ≈ **11.17**
+
+(Other high ratios: Lucky Charms and Cookie Crisp are ~5.95; Chocolate Cheerios ~3.35; Total ~1.50; Holy Crap Dragons Blend ~0.75.)
+
+---
+
+## 3) Rank by protein per 100 g (highest → lowest) + range
+
+### Protein ranking (visible products)
+1. **Holy Crap Dragons Blend** (1869223): **21.4 g**
+2. **Cheerios Cup** (2738994): **13.9 g**
+3. **Cheerios** (2739175): **12.8 g**
+4. **Cheerios** (2746631): **12.8 g**
+5. **Nature’s Promise Breakfast Biscuits** (2145027): **10.7 g**
+6. **Bauducco Breakfast Cookie** (1880521): **9.09 g**
+7. **GM Breakfast Pack Cereal** (2560946): **9.09 g**
+8. **Chocolate Cheerios** (2746611): **8.33 g**
+9. **Lucky Charms** (2740713): **8.33 g**
+10. **belVita** (769904): **7.9 g**
+11. **belVita** (770738): **7.9 g**
+12. **Bluey/Kix** (2746583): **7.5 g**
+13. **Bluey/Kix** (2746596): **7.5 g**
+14. **Bluey/Kix** (2746582): **7.5 g**
+15. **Rice Chex** (2746531): **7.5 g**
+16. **Total** (2746605): **7.5 g**
+17. **Trix Mini** (2720722): **5.49 g**
+18. **Trix Mini** (2720723): **5.49 g**
+19. **Carmella Creeper** (2716350): **5.39 g**
+20. **Cookie Crisp** (2746629): **5.56 g**
+21. **Cinnamon Chex** (2747410): **5.0 g**
+22. **Cinnamon Chex** (2746532): **5.0 g**
+23. **Boo Berry** (2738640): **4.88 g**
+24. **Chocolate Chex** (2746533): **4.65 g**
+25. **Trix Loaded** (2720715): **4.61 g**
+
+**Protein range (max − min):**  
+21.4 − 4.61 = **16.79 g per 100 g**
+
+---
+
+## 4) Micronutrients comparison: iron and calcium
+
+**Most iron-fortified (highest iron mg/100g):**  
+- **Total Breakfast Cereal** (2746605): **45.0 mg Fe/100g**  
+  (Next: Rice Chex 36.0; Cheerios ~32.3; Chocolate Chex 29.3; Kix 27.0)
+
+**Most calcium (highest Ca mg/100g):**  
+- **Chocolate Cheerios** (2746611) and **Cookie Crisp** (2746629) and **Lucky Charms** (2740713): **361 mg Ca/100g**  
+  (Cheerios is 333; many others 325; Boo Berry/Carmella 317; Chocolate Chex 302; Total 100; Nature’s Promise 36; Bauducco 61)
+
+---
+
+## 5) Average sodium + products >500 mg and <200 mg (visible products)
+
+### Average sodium (mg/100g)
+Using products with sodium present in the snippet (excluding belVita where sodium wasn’t shown):  
+Average ≈ **461 mg sodium per 100 g**
+
+### Exceed **500 mg/100g**
+- GM Breakfast Pack Cereal (2560946): **636**
+- Chocolate Chex (2746533): **581**
+- Cinnamon Chex (2747410): **575**
+- Cinnamon Chex (2746532): **575**
+- Cookie Crisp (2746629): **528**
+- Lucky Charms (2740713): **611**
+- Rice Chex (2746531): **775**
+- Trix Mini (2720722): **505**
+- Trix Mini (2720723): **505**
+
+### Below **200 mg/100g**
+- **Holy Crap Dragons Blend** (1869223): **0 mg**
+- (No other visible product is <200 mg/100g; Bauducco is 227 mg.)
+
+---
+
+## 6) General Mills vs non–General Mills averages (visible products)
+
+I grouped by **brandOwner == "GENERAL MILLS SALES INC."** as “General Mills”. Items with blank brandOwner (e.g., belVita, GM Breakfast Pack) are treated as **non‑GM** here.
+
+### General Mills (visible; n=19)
+Approx averages per 100 g:
+- **Calories:** ~**384 kcal**
+- **Sugars:** ~**20.8 g**
+- **Fiber:** ~**6.6 g**
+- **Protein:** ~**7.1 g**
+
+### Non–General Mills (visible; n=6; limited due to missing belVita calories)
+- **Calories:** ~**437 kcal** (computed only where calories present; belVita excluded from this average)
+- **Sugars:** ~**19.0 g** (includes belVita)
+- **Fiber:** ~**10.6 g** (includes belVita; strongly influenced by Holy Crap + Bauducco)
+- **Protein:** ~**11.4 g** (includes belVita; strongly influenced by Holy Crap)
+
+Interpretation note: the non‑GM group here is small and heterogeneous (seed-based cereal + cookies/biscuits), so averages are not representative of the full 25-product dataset.
+
+---
+
+## 7) Vitamin D percentDailyValue presence + range (visible products)
+
+Counting products in the snippet that show a **percentDailyValue** field for a Vitamin D nutrient (either “Vitamin D (D2 + D3)” in µg or “Vitamin D … International Units”):
+
+- **Has Vitamin D %DV:** **19 products** (all the General Mills cereals shown plus Rice/Chex/etc.; Nature’s Promise shows Vitamin D IU with 0% DV; belVita and Bauducco/Holy Crap do not show Vitamin D %DV in the visible nutrient lists)
+
+**Range of Vitamin D %DV (visible):** **15% to 20%**  
+- Lowest nonzero: **15%** (Cheerios Cup, 2738994)  
+- Highest: **20%** (many GM cereals: Kix/Bluey, Boo Berry, Carmella Creeper, Cheerios, Chocolate Cheerios, Chex, Lucky Charms, Rice Chex, Total, Trix, etc.)
+
+**Highest Vitamin D %DV:** **20%** (tie among multiple products)
+
+---
+
+## Data quality flags (important)
+- Some foods (notably **Boo Berry** and **Cheerios**) contain **duplicate nutrient blocks** in the same `foodNutrients` array (looks like per-serving and per-100g entries both present). For the table above, I used the clearly per‑100g macro values (e.g., Energy ~359 kcal/100g for Cheerios) and ignored the “~94 kcal” style entries that correspond to serving-level conversions.
+- belVita entries are missing Energy/Carb/Sodium/Calcium in the pasted portion; they may exist later in the full JSON.
+
+---
+
+## What I need to finish for *all 25*
+Please paste the remainder of `foods[]` (or upload the full JSON). Once I have all 25, I will:
+- regenerate the nutrition summary table for all products,
+- compute sugar:fiber best/worst across all 25,
+- rank all 25 by protein and compute the true range,
+- identify max iron and max calcium across all 25,
+- compute average sodium across all 25 and list >500 and <200,
+- compute GM vs non‑GM averages using consistent grouping,
+- count Vitamin D %DV presence and range across all 25.

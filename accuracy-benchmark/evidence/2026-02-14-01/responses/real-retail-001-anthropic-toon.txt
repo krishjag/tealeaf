@@ -1,0 +1,150 @@
+# Nutritional Analysis of 25 Breakfast Cereal Products
+
+## 1. Nutrition Summary Table (Per 100g)
+
+| Product | Calories | Protein (g) | Fat (g) | Carbs (g) | Sugars (g) | Fiber (g) |
+|---------|----------|-------------|---------|-----------|------------|-----------|
+| Bauducco Cookie | 424 | 9.09 | 13.6 | 63.6 | 21.2 | 12.1 |
+| Belvita Biscuits | N/A* | 7.9 | 14.5 | N/A | 20 | 6.5 |
+| Breakfast Pack | 394 | 9.09 | 4.55 | 81.8 | 33.3 | 6.1 |
+| Bluey Cereal | 375 | 7.5 | 2.5 | 85 | 10 | 7.5 |
+| Boo Berry | 390 | 4.88 | 3.66 | 85.4 | 26.8 | 2.4 |
+| Carmella Creeper | 393 | 5.39 | 4.07 | 87.1 | 26.8 | 3.7 |
+| Cheerios | 359 | 12.8 | 6.41 | 74.4 | 5.13 | 10.3 |
+| Cheerios Cup | 361 | 13.9 | 6.94 | 75 | 5.56 | 11.1 |
+| Chocolate Cheerios | 389 | 8.33 | 5.56 | 80.6 | 27.8 | 8.3 |
+| Chocolate Chex | 419 | 4.65 | 8.14 | 81.4 | 25.6 | 4.7 |
+| Cinnamon Chex | 400 | 5 | 8.75 | 82.5 | 20 | 5 |
+| Cookie Crisp | 389 | 5.56 | 4.17 | 86.1 | 33.3 | 5.6 |
+| Dragons Blend | 464 | 21.4 | 21.4 | 42.9 | 10.7 | 14.3 |
+| Lucky Charms | 389 | 8.33 | 4.17 | 83.3 | 33.3 | 5.6 |
+| Milk & Cereal | 464 | 10.7 | 16.1 | 71.4 | 21.4 | 7.1 |
+| Rice Chex | 375 | 7.5 | 2.5 | 87.5 | 7.5 | 5 |
+| Total Cereal | 350 | 7.5 | 2.5 | 82.5 | 15 | 10 |
+| Trix Loaded | 422 | 4.61 | 13.6 | 75 | 29.4 | 5.01 |
+| Trix Mini | 390 | 5.49 | 6.15 | 84.5 | 28.5 | 4.22 |
+
+*Note: Some duplicate products removed; Energy not reported for Belvita
+
+## 2. Sugar-to-Fiber Ratio Analysis
+
+**Best (Lowest) Ratios:**
+1. **Cheerios & Cheerios Cup: 0.50** ⭐ (Excellent - more fiber than sugar!)
+2. Dragons Blend: 0.75
+3. Bluey: 1.33
+4. Rice Chex & Total: 1.50
+
+**Worst (Highest) Ratios:**
+1. **Boo Berry: 11.17** (11x more sugar than fiber)
+2. Trix Mini: 6.75
+3. Carmella Creeper: 7.24
+4. Cookie Crisp & Lucky Charms: 5.95
+
+**Key Finding:** Regular Cheerios products offer the best nutritional balance with half as much sugar as fiber.
+
+## 3. Protein Content Ranking (Highest to Lowest)
+
+| Rank | Product | Protein (g/100g) |
+|------|---------|------------------|
+| 1 | **Dragons Blend** | 21.4 |
+| 2 | Cheerios Cup | 13.9 |
+| 3 | Cheerios | 12.8 |
+| 4 | Milk & Cereal Biscuits | 10.7 |
+| 5 | Bauducco Cookie | 9.09 |
+| 6 | Breakfast Pack | 9.09 |
+| 7 | Chocolate Cheerios | 8.33 |
+| 8 | Lucky Charms | 8.33 |
+| 9 | Belvita Biscuits | 7.9 |
+| 10 | Bluey/Rice Chex/Total | 7.5 |
+
+**Protein Range:** 21.4g - 4.61g = **16.79g difference**
+
+**Key Finding:** Dragons Blend (organic chia/hemp blend) has nearly 5x more protein than Trix Loaded.
+
+## 4. Micronutrient Comparison
+
+### Iron (Fe) Content:
+| Product | Iron (mg/100g) | % Daily Value |
+|---------|----------------|---------------|
+| **Total Cereal** | **45** | **100%** ⭐ Most Fortified |
+| Rice Chex | 36 | 80% |
+| Cheerios | 32.3 | 70% |
+| Chocolate Chex | 29.3 | 70% |
+| Cinnamon Chex | 27 | 60% |
+| Bluey | 27 | 60% |
+
+### Calcium (Ca) Content:
+| Product | Calcium (mg/100g) | % Daily Value |
+|---------|-------------------|---------------|
+| **Chocolate Cheerios** | **361** | **10%** ⭐ |
+| **Cookie Crisp** | **361** | **10%** ⭐ |
+| Lucky Charms | 361 | 10% |
+| Cheerios | 333 | 10% |
+| Trix Mini | 333 | 10% |
+| Cheerios Cup | 333 | 8% |
+
+**Key Finding:** Total Cereal is exceptionally fortified with 100% DV of iron per 100g. Calcium levels are relatively similar across General Mills products (300-361mg range).
+
+## 5. Sodium Content Analysis
+
+**Average Sodium:** 476.8 mg/100g
+
+### Products EXCEEDING 500mg/100g (High Sodium):
+1. Rice Chex: **775 mg**
+2. Lucky Charms: **611 mg**
+3. Breakfast Pack: **636 mg**
+4. Cinnamon Chex: **575 mg**
+5. Chocolate Chex: **581 mg**
+6. Cookie Crisp: **528 mg**
+7. Trix Mini: **505 mg**
+
+### Products BELOW 200mg/100g (Low Sodium):
+1. **Dragons Blend: 0 mg** (no added salt)
+
+**Key Finding:** Rice Chex has the highest sodium content. Only Dragons Blend qualifies as truly low-sodium.
+
+## 6. Brand Comparison: General Mills vs. Non-General Mills
+
+### General Mills Products (19 products):
+- **Average Calories:** 387 kcal
+- **Average Sugar:** 21.5g
+- **Average Fiber:** 6.3g
+- **Average Protein:** 7.2g
+
+### Non-General Mills Products (6 products):
+- **Average Calories:** 435 kcal (+48 kcal)
+- **Average Sugar:** 17.6g (-3.9g) ✓
+- **Average Fiber:** 9.6g (+3.3g) ✓
+- **Average Protein:** 11.1g (+3.9g) ✓
+
+**Key Finding:** Non-General Mills products (Bauducco, Belvita, Dragons Blend, Milk & Cereal) are higher in calories but offer significantly more protein and fiber with less sugar per 100g.
+
+## 7. Vitamin D Analysis
+
+**Products with Vitamin D Data:** 19 out of 25 products (76%)
+
+### Vitamin D Content (per 100g):
+| Product | Vitamin D (μg) | % Daily Value |
+|---------|----------------|---------------|
+| **Total Cereal** | **10** | **20%** ⭐ Highest |
+| Bluey varieties | 10 | 20% |
+| Cheerios varieties | 10 | 20% |
+| Chocolate Cheerios | 11 | 20% |
+| Cinnamon Chex | 10 | 20% |
+| Trix varieties | 9.52-10.3 | 20% |
+| Boo Berry | 9.8-10 | 20% |
+| Rice Chex | 10 | 20% |
+
+**Range:** 9.52 μg - 11 μg (minimal variation)
+
+**Key Finding:** All General Mills cereals with Vitamin D data provide approximately 20% daily value per 100g, showing consistent fortification across their product line. Total Cereal ties for highest Vitamin D at 10μg, providing 20% DV along with 100% DV for most B-vitamins and 100% DV for iron.
+
+---
+
+## Summary Insights:
+
+1. **Best Overall Nutrition:** Dragons Blend (highest protein, best sugar-fiber ratio after Cheerios, no sodium)
+2. **Best Mainstream Cereal:** Cheerios (lowest sugar, highest fiber-to-sugar ratio, high protein)
+3. **Most Fortified:** Total Cereal (100% DV for 10+ nutrients)
+4. **Highest Sugar:** Cookie Crisp, Lucky Charms, Breakfast Pack (33.3g/100g)
+5. **Watch Out For:** Boo Berry (sugar-to-fiber ratio of 11:1), Rice Chex (775mg sodium)

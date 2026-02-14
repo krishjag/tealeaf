@@ -744,6 +744,66 @@ async fn run_benchmark(
         }
 
         println!("API responses written to: {} ({} files)", responses_dir.display(), count);
+
+        // Save error details for failed tasks
+        let errors_dir = run_dir.join("errors");
+        let mut error_count = 0;
+
+        if let Some(ref format_results) = format_comparison_results {
+            for (key, result) in format_results {
+                if let Some(ref error) = result.error_message {
+                    if error_count == 0 {
+                        std::fs::create_dir_all(&errors_dir)?;
+                    }
+                    let filename = format!(
+                        "{}-{}-{}-{}.txt",
+                        source_prefix,
+                        key.task_id.to_lowercase(),
+                        key.provider,
+                        key.format.as_str()
+                    );
+                    let content = format!(
+                        "Task:     {}\nProvider: {}\nFormat:   {}\nStatus:   {:?}\nRetries:  {}\nTime:     {}\n\n{}\n",
+                        key.task_id, key.provider, key.format,
+                        result.status, result.retry_count,
+                        result.timestamp.format("%Y-%m-%dT%H:%M:%SZ"),
+                        error
+                    );
+                    std::fs::write(errors_dir.join(&filename), &content)?;
+                    error_count += 1;
+                }
+            }
+        } else {
+            for task_map in &task_results {
+                for (provider, result) in task_map {
+                    if let Some(ref error) = result.error_message {
+                        if error_count == 0 {
+                            std::fs::create_dir_all(&errors_dir)?;
+                        }
+                        let filename = format!(
+                            "{}-{}-{}-{}.txt",
+                            source_prefix,
+                            result.task_id.to_lowercase(),
+                            provider,
+                            result.format.as_str()
+                        );
+                        let content = format!(
+                            "Task:     {}\nProvider: {}\nFormat:   {}\nStatus:   {:?}\nRetries:  {}\nTime:     {}\n\n{}\n",
+                            result.task_id, provider, result.format,
+                            result.status, result.retry_count,
+                            result.timestamp.format("%Y-%m-%dT%H:%M:%SZ"),
+                            error
+                        );
+                        std::fs::write(errors_dir.join(&filename), &content)?;
+                        error_count += 1;
+                    }
+                }
+            }
+        }
+
+        if error_count > 0 {
+            println!("Error logs written to: {} ({} files)", errors_dir.display(), error_count);
+        }
     }
 
     Ok(())

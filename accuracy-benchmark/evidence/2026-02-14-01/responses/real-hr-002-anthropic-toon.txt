@@ -1,0 +1,140 @@
+# JOLTS 2025 Labor Market Analysis
+
+## 1. Industries by Average Job Openings Rate
+
+**HIGHEST 3:**
+1. **Accommodation and food services: 5.83%** 
+2. **Leisure and hospitality: 5.73%**
+3. **Health care and social assistance: 5.68%**
+
+**LOWEST 3:**
+1. **Construction: 2.90%**
+2. **Manufacturing: 3.19%**
+3. **Government: 3.41%**
+
+**Interpretation:** The highest rates in consumer-facing service sectors (hospitality, food service, healthcare) suggest persistent labor shortages driven by high turnover, demanding work conditions, and possibly wage competition. The lowest rates in construction, manufacturing, and government reflect more stable employment, specialized skill requirements, and in government's case, structured hiring processes that limit vacancy posting.
+
+---
+
+## 2. Labor Market Churn Rankings (Annual Average)
+
+Churn = (Hires Level + Total Separations Level) / 2
+
+| Rank | Industry | Avg Monthly Churn (thousands) |
+|------|----------|-------------------------------|
+| 1 | Total nonfarm | 5,316.9 |
+| 2 | Total private | 4,945.7 |
+| 3 | Professional and business services | 1,025.8 |
+| 4 | Leisure and hospitality | 960.3 |
+| 5 | Accommodation and food services | 794.8 |
+| 6 | Health care and social assistance | 692.8 |
+| 7 | Retail trade | 591.8 |
+| 8 | Construction | 338.8 |
+| 9 | Government | 333.6 |
+| 10 | Manufacturing | 310.2 |
+| 11 | Financial activities | 205.9 |
+| 12 | Information | 85.9 |
+
+---
+
+## 3. Net Hiring Rate by Industry (Hire Rate - Separation Rate)
+
+**GROWING INDUSTRIES (Positive Net Hiring):**
+- Health care and social assistance: **+0.30%** (strongest growth)
+- Leisure and hospitality: +0.19%
+- Accommodation and food services: +0.16%
+- Construction: +0.12%
+- Financial activities: +0.09%
+- Total nonfarm: +0.06%
+- Total private: +0.06%
+- Government: +0.06%
+
+**SHRINKING INDUSTRIES (Negative Net Hiring):**
+- Information: **-0.06%**
+- Manufacturing: -0.04%
+- Professional and business services: -0.03%
+- Retail trade: -0.01%
+
+**Note:** Healthcare shows the strongest employment growth, reflecting demographic trends and care demand. Information sector contraction likely reflects tech sector adjustments and efficiency gains.
+
+---
+
+## 4. Leisure & Hospitality vs Professional & Business Services Comparison
+
+| Metric | Leisure & Hospitality | Professional & Business Services | Difference |
+|--------|----------------------|----------------------------------|------------|
+| **JO Rate** | 5.73% | 5.39% | +0.34% |
+| **HI Rate** | 5.72% | 4.54% | +1.18% |
+| **TS Rate** | 5.53% | 4.57% | +0.96% |
+| **QU Rate** | 3.99% | 2.34% | +1.65% |
+| **LD Rate** | 1.43% | 1.99% | -0.56% |
+| **OS Rate** | 0.13% | 0.23% | -0.10% |
+
+**Structural Differences:**
+
+1. **Turnover Dynamics:** Leisure & hospitality has dramatically higher voluntary quit rates (3.99% vs 2.34%), indicating lower job attachment, more transient workforce, and likely lower wages/benefits.
+
+2. **Hiring Velocity:** Leisure & hospitality hires at 5.72% vs 4.54%, showing continuous recruitment needs to backfill high voluntary departures.
+
+3. **Layoff Patterns:** Professional services has higher layoffs (1.99% vs 1.43%), suggesting more project-based work, economic sensitivity, and restructuring in white-collar sectors.
+
+4. **Job Quality Indicators:** The quit differential of 1.65 percentage points suggests Leisure & hospitality workers actively seek better opportunities, reflecting lower satisfaction, limited advancement, or wage competition.
+
+5. **Labor Market Equilibrium:** Both sectors show similar modest net hiring (~+0.19% vs -0.03%), but achieve it through vastly different churn dynamics—high-volume replacement hiring vs. more selective, lower-turnover employment.
+
+---
+
+## 5. Construction Seasonality Analysis
+
+**Highest Hires Month:** April (364,000)
+**Lowest Hires Month:** March (306,000)
+**Range:** 58,000 (18.9% variation)
+
+**Seasonal Pattern:** The March low followed by April surge likely reflects:
+- Weather constraints in early spring limiting project starts
+- Fiscal/planning cycle timing (projects approved and starting post-Q1)
+- April surge as conditions improve and spring construction season begins
+
+Note: July shows elevated openings (303k, highest rate at 3.5%) but not highest hires, suggesting recruitment challenges during peak season.
+
+---
+
+## 6. Separation Composition by Industry (% of Total Separations)
+
+| Industry | Quits % | Layoffs % | Other % |
+|----------|---------|-----------|---------|
+| Accommodation and food services | **79.1%** | 18.6% | 2.3% |
+| Leisure and hospitality | 72.2% | 25.6% | 2.3% |
+| Retail trade | 69.1% | 27.0% | 3.9% |
+| Health care and social assistance | 66.8% | 23.2% | 5.1% |
+| Total nonfarm | 61.1% | 33.6% | 5.7% |
+| Financial activities | 60.1% | 28.4% | 11.3% |
+| Manufacturing | 56.6% | 37.2% | 6.2% |
+| Government | 55.5% | 25.2% | **19.2%** |
+| Professional and business services | 51.5% | 43.5% | 5.1% |
+| Information | 44.3% | 47.6% | 8.3% |
+| **Construction** | 44.1% | **51.2%** | 4.5% |
+
+**Key Findings:**
+- **Highest Quit Share:** Accommodation and food services (79.1%) - workers vote with their feet
+- **Highest Layoff Share:** Construction (51.2%) - reflects project-based, cyclical nature
+- **Highest Other Share:** Government (19.2%) - retirement-eligible workforce and structured transitions
+- **Layoff-Dominated:** Only Construction and Information have layoffs exceeding quits, indicating involuntary separation patterns
+
+---
+
+## 7. Labor Market Tightness - Total Nonfarm
+
+**Average Monthly Job Openings:** 7,243,200
+**Average Job Openings Rate:** 4.39%
+
+**Tightness Interpretation:** 
+
+With 7.24 million openings representing 4.4% of employment, the labor market shows moderately tight conditions. The declining trend (7,762k in January → 6,542k in December, -15.7% drop) suggests gradual cooling through 2025.
+
+**Vacancy-to-Unemployment Context:**
+- Pre-pandemic norm: ~0.6-0.7 vacancies per unemployed person
+- 2022 peak tightness: ~2.0 vacancies per unemployed  
+- Current implied tightness: While actual unemployment data isn't provided, the 4.4% opening rate with gradually declining trend suggests normalization toward balanced conditions
+
+The **4.39% average opening rate** suggests moderate difficulty filling positions economy-wide, with sector-specific tightness in hospitality/healthcare (>5.5%) and relative ease in construction/manufacturing (<3.2%).

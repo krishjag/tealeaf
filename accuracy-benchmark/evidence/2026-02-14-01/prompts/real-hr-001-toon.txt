@@ -1,0 +1,2968 @@
+=== API Request: HR-001 (TOON format) ===
+Task ID:     HR-001
+Category:    hr
+Complexity:  Complex
+Output Type: Calculation
+Format:      TOON
+Max Tokens:  8192
+Temperature: 0.3
+==================================================
+=== PROMPT ===
+
+You are a labor economist analyzing the BLS Job Openings and Labor Turnover Survey (JOLTS) data.
+The data contains monthly seasonally adjusted job openings, hires, and separations for 12 US industries in 2025.
+Levels are in thousands; rates are percent of employment.
+
+source: BLS Job Openings and Labor Turnover Survey (JOLTS)
+license: US Government Public Domain
+url: "https://www.bls.gov/jts/"
+description: "Monthly seasonally adjusted job openings, hires, and separations data for 12 industries, 2025. Levels in thousands; rates as percent of employment."
+year: 2025
+seasonal_adjustment: Seasonally Adjusted
+unit_level: Thousands
+unit_rate: Percent
+data_elements[6]{id,key,name,description}:
+  JO,job_openings,Job Openings,Unfilled positions on the last business day of the month
+  HI,hires,Hires,Workers added to payroll during the month
+  TS,total_separations,Total Separations,Workers who left or were removed from payroll during the month
+  QU,quits,Quits,Workers who left voluntarily (excludes retirements and transfers)
+  LD,layoffs_discharges,Layoffs and Discharges,Involuntary separations initiated by the employer
+  OS,other_separations,Other Separations,"Retirements, transfers, disability, and deaths"
+industries[12]:
+  - code: "000000"
+    name: Total nonfarm
+    hierarchy_level: "0"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 7762
+        rate: 4.7
+      hires:
+        level: 5371
+        rate: 3.4
+      total_separations:
+        level: 5272
+        rate: 3.3
+      quits:
+        level: 3256
+        rate: 2
+      layoffs_discharges:
+        level: 1674
+        rate: 1.1
+      other_separations:
+        level: 342
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 7480
+        rate: 4.5
+      hires:
+        level: 5370
+        rate: 3.4
+      total_separations:
+        level: 5316
+        rate: 3.3
+      quits:
+        level: 3250
+        rate: 2
+      layoffs_discharges:
+        level: 1780
+        rate: 1.1
+      other_separations:
+        level: 286
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 7200
+        rate: 4.3
+      hires:
+        level: 5404
+        rate: 3.4
+      total_separations:
+        level: 5183
+        rate: 3.3
+      quits:
+        level: 3344
+        rate: 2.1
+      layoffs_discharges:
+        level: 1590
+        rate: 1
+      other_separations:
+        level: 248
+        rate: 0.2
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 7395
+        rate: 4.4
+      hires:
+        level: 5615
+        rate: 3.5
+      total_separations:
+        level: 5313
+        rate: 3.3
+      quits:
+        level: 3215
+        rate: 2
+      layoffs_discharges:
+        level: 1789
+        rate: 1.1
+      other_separations:
+        level: 309
+        rate: 0.2
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 7712
+        rate: 4.6
+      hires:
+        level: 5465
+        rate: 3.4
+      total_separations:
+        level: 5213
+        rate: 3.3
+      quits:
+        level: 3270
+        rate: 2
+      layoffs_discharges:
+        level: 1611
+        rate: 1
+      other_separations:
+        level: 332
+        rate: 0.2
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 7357
+        rate: 4.4
+      hires:
+        level: 5267
+        rate: 3.3
+      total_separations:
+        level: 5341
+        rate: 3.3
+      quits:
+        level: 3209
+        rate: 2
+      layoffs_discharges:
+        level: 1796
+        rate: 1.1
+      other_separations:
+        level: 335
+        rate: 0.2
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 7208
+        rate: 4.3
+      hires:
+        level: 5240
+        rate: 3.3
+      total_separations:
+        level: 5221
+        rate: 3.3
+      quits:
+        level: 3166
+        rate: 2
+      layoffs_discharges:
+        level: 1787
+        rate: 1.1
+      other_separations:
+        level: 269
+        rate: 0.2
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 7227
+        rate: 4.3
+      hires:
+        level: 5126
+        rate: 3.2
+      total_separations:
+        level: 5111
+        rate: 3.2
+      quits:
+        level: 3091
+        rate: 1.9
+      layoffs_discharges:
+        level: 1725
+        rate: 1.1
+      other_separations:
+        level: 295
+        rate: 0.2
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 7658
+        rate: 4.6
+      hires:
+        level: 5367
+        rate: 3.4
+      total_separations:
+        level: 5264
+        rate: 3.3
+      quits:
+        level: 3128
+        rate: 2
+      layoffs_discharges:
+        level: 1781
+        rate: 1.1
+      other_separations:
+        level: 354
+        rate: 0.2
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 7449
+        rate: 4.5
+      hires:
+        level: 5368
+        rate: 3.4
+      total_separations:
+        level: 5069
+        rate: 3.2
+      quits:
+        level: 2973
+        rate: 1.9
+      layoffs_discharges:
+        level: 1850
+        rate: 1.2
+      other_separations:
+        level: 246
+        rate: 0.2
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 6928
+        rate: 4.2
+      hires:
+        level: 5121
+        rate: 3.2
+      total_separations:
+        level: 5144
+        rate: 3.2
+      quits:
+        level: 3193
+        rate: 2
+      layoffs_discharges:
+        level: 1701
+        rate: 1.1
+      other_separations:
+        level: 249
+        rate: 0.2
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 6542
+        rate: 3.9
+      hires:
+        level: 5293
+        rate: 3.3
+      total_separations:
+        level: 5251
+        rate: 3.3
+      quits:
+        level: 3204
+        rate: 2
+      layoffs_discharges:
+        level: 1762
+        rate: 1.1
+      other_separations:
+        level: 285
+        rate: 0.2
+  - code: "100000"
+    name: Total private
+    hierarchy_level: "1"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 6860
+        rate: 4.8
+      hires:
+        level: 5000
+        rate: 3.7
+      total_separations:
+        level: 4959
+        rate: 3.7
+      quits:
+        level: 3078
+        rate: 2.3
+      layoffs_discharges:
+        level: 1596
+        rate: 1.2
+      other_separations:
+        level: 285
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 6588
+        rate: 4.6
+      hires:
+        level: 5020
+        rate: 3.7
+      total_separations:
+        level: 4966
+        rate: 3.7
+      quits:
+        level: 3054
+        rate: 2.3
+      layoffs_discharges:
+        level: 1680
+        rate: 1.2
+      other_separations:
+        level: 232
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 6342
+        rate: 4.5
+      hires:
+        level: 5055
+        rate: 3.7
+      total_separations:
+        level: 4845
+        rate: 3.6
+      quits:
+        level: 3159
+        rate: 2.3
+      layoffs_discharges:
+        level: 1490
+        rate: 1.1
+      other_separations:
+        level: 197
+        rate: 0.1
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 6562
+        rate: 4.6
+      hires:
+        level: 5259
+        rate: 3.9
+      total_separations:
+        level: 4981
+        rate: 3.7
+      quits:
+        level: 3032
+        rate: 2.2
+      layoffs_discharges:
+        level: 1712
+        rate: 1.3
+      other_separations:
+        level: 236
+        rate: 0.2
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 6876
+        rate: 4.8
+      hires:
+        level: 5109
+        rate: 3.8
+      total_separations:
+        level: 4860
+        rate: 3.6
+      quits:
+        level: 3083
+        rate: 2.3
+      layoffs_discharges:
+        level: 1521
+        rate: 1.1
+      other_separations:
+        level: 256
+        rate: 0.2
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 6536
+        rate: 4.6
+      hires:
+        level: 4935
+        rate: 3.6
+      total_separations:
+        level: 5016
+        rate: 3.7
+      quits:
+        level: 3026
+        rate: 2.2
+      layoffs_discharges:
+        level: 1717
+        rate: 1.3
+      other_separations:
+        level: 273
+        rate: 0.2
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 6401
+        rate: 4.5
+      hires:
+        level: 4918
+        rate: 3.6
+      total_separations:
+        level: 4907
+        rate: 3.6
+      quits:
+        level: 2984
+        rate: 2.2
+      layoffs_discharges:
+        level: 1711
+        rate: 1.3
+      other_separations:
+        level: 212
+        rate: 0.2
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 6457
+        rate: 4.5
+      hires:
+        level: 4805
+        rate: 3.5
+      total_separations:
+        level: 4781
+        rate: 3.5
+      quits:
+        level: 2908
+        rate: 2.1
+      layoffs_discharges:
+        level: 1644
+        rate: 1.2
+      other_separations:
+        level: 228
+        rate: 0.2
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 6871
+        rate: 4.8
+      hires:
+        level: 5021
+        rate: 3.7
+      total_separations:
+        level: 4898
+        rate: 3.6
+      quits:
+        level: 2918
+        rate: 2.1
+      layoffs_discharges:
+        level: 1702
+        rate: 1.3
+      other_separations:
+        level: 278
+        rate: 0.2
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 6665
+        rate: 4.7
+      hires:
+        level: 5027
+        rate: 3.7
+      total_separations:
+        level: 4743
+        rate: 3.5
+      quits:
+        level: 2800
+        rate: 2.1
+      layoffs_discharges:
+        level: 1754
+        rate: 1.3
+      other_separations:
+        level: 189
+        rate: 0.1
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 6227
+        rate: 4.4
+      hires:
+        level: 4826
+        rate: 3.5
+      total_separations:
+        level: 4855
+        rate: 3.6
+      quits:
+        level: 3034
+        rate: 2.2
+      layoffs_discharges:
+        level: 1626
+        rate: 1.2
+      other_separations:
+        level: 194
+        rate: 0.1
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 5804
+        rate: 4.1
+      hires:
+        level: 4978
+        rate: 3.7
+      total_separations:
+        level: 4932
+        rate: 3.6
+      quits:
+        level: 3029
+        rate: 2.2
+      layoffs_discharges:
+        level: 1696
+        rate: 1.2
+      other_separations:
+        level: 207
+        rate: 0.2
+  - code: "230000"
+    name: Construction
+    hierarchy_level: "2"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 242
+        rate: 2.8
+      hires:
+        level: 346
+        rate: 4.2
+      total_separations:
+        level: 333
+        rate: 4
+      quits:
+        level: 164
+        rate: 2
+      layoffs_discharges:
+        level: 149
+        rate: 1.8
+      other_separations:
+        level: 19
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 286
+        rate: 3.3
+      hires:
+        level: 347
+        rate: 4.2
+      total_separations:
+        level: 348
+        rate: 4.2
+      quits:
+        level: 180
+        rate: 2.2
+      layoffs_discharges:
+        level: 149
+        rate: 1.8
+      other_separations:
+        level: 18
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 251
+        rate: 2.9
+      hires:
+        level: 306
+        rate: 3.7
+      total_separations:
+        level: 322
+        rate: 3.9
+      quits:
+        level: 166
+        rate: 2
+      layoffs_discharges:
+        level: 150
+        rate: 1.8
+      other_separations:
+        level: 5
+        rate: 0.1
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 242
+        rate: 2.8
+      hires:
+        level: 364
+        rate: 4.4
+      total_separations:
+        level: 357
+        rate: 4.3
+      quits:
+        level: 162
+        rate: 2
+      layoffs_discharges:
+        level: 180
+        rate: 2.2
+      other_separations:
+        level: 14
+        rate: 0.2
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 232
+        rate: 2.7
+      hires:
+        level: 358
+        rate: 4.3
+      total_separations:
+        level: 358
+        rate: 4.3
+      quits:
+        level: 174
+        rate: 2.1
+      layoffs_discharges:
+        level: 167
+        rate: 2
+      other_separations:
+        level: 17
+        rate: 0.2
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 242
+        rate: 2.8
+      hires:
+        level: 348
+        rate: 4.2
+      total_separations:
+        level: 356
+        rate: 4.3
+      quits:
+        level: 154
+        rate: 1.9
+      layoffs_discharges:
+        level: 183
+        rate: 2.2
+      other_separations:
+        level: 19
+        rate: 0.2
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 303
+        rate: 3.5
+      hires:
+        level: 331
+        rate: 4
+      total_separations:
+        level: 316
+        rate: 3.8
+      quits:
+        level: 90
+        rate: 1.1
+      layoffs_discharges:
+        level: 212
+        rate: 2.6
+      other_separations:
+        level: 14
+        rate: 0.2
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 188
+        rate: 2.2
+      hires:
+        level: 353
+        rate: 4.3
+      total_separations:
+        level: 351
+        rate: 4.2
+      quits:
+        level: 146
+        rate: 1.8
+      layoffs_discharges:
+        level: 183
+        rate: 2.2
+      other_separations:
+        level: 22
+        rate: 0.3
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 231
+        rate: 2.7
+      hires:
+        level: 355
+        rate: 4.3
+      total_separations:
+        level: 340
+        rate: 4.1
+      quits:
+        level: 136
+        rate: 1.6
+      layoffs_discharges:
+        level: 197
+        rate: 2.4
+      other_separations:
+        level: 7
+        rate: 0.1
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 202
+        rate: 2.4
+      hires:
+        level: 331
+        rate: 4
+      total_separations:
+        level: 288
+        rate: 3.5
+      quits:
+        level: 110
+        rate: 1.3
+      layoffs_discharges:
+        level: 161
+        rate: 1.9
+      other_separations:
+        level: 16
+        rate: 0.2
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 284
+        rate: 3.3
+      hires:
+        level: 335
+        rate: 4
+      total_separations:
+        level: 299
+        rate: 3.6
+      quits:
+        level: 140
+        rate: 1.7
+      layoffs_discharges:
+        level: 145
+        rate: 1.7
+      other_separations:
+        level: 14
+        rate: 0.2
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 292
+        rate: 3.4
+      hires:
+        level: 347
+        rate: 4.2
+      total_separations:
+        level: 342
+        rate: 4.1
+      quits:
+        level: 148
+        rate: 1.8
+      layoffs_discharges:
+        level: 177
+        rate: 2.1
+      other_separations:
+        level: 17
+        rate: 0.2
+  - code: "300000"
+    name: Manufacturing
+    hierarchy_level: "2"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 513
+        rate: 3.9
+      hires:
+        level: 332
+        rate: 2.6
+      total_separations:
+        level: 337
+        rate: 2.6
+      quits:
+        level: 185
+        rate: 1.4
+      layoffs_discharges:
+        level: 132
+        rate: 1
+      other_separations:
+        level: 20
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 445
+        rate: 3.4
+      hires:
+        level: 318
+        rate: 2.5
+      total_separations:
+        level: 323
+        rate: 2.5
+      quits:
+        level: 179
+        rate: 1.4
+      layoffs_discharges:
+        level: 121
+        rate: 0.9
+      other_separations:
+        level: 23
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 397
+        rate: 3
+      hires:
+        level: 319
+        rate: 2.5
+      total_separations:
+        level: 311
+        rate: 2.4
+      quits:
+        level: 184
+        rate: 1.4
+      layoffs_discharges:
+        level: 106
+        rate: 0.8
+      other_separations:
+        level: 21
+        rate: 0.2
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 392
+        rate: 3
+      hires:
+        level: 330
+        rate: 2.6
+      total_separations:
+        level: 316
+        rate: 2.5
+      quits:
+        level: 180
+        rate: 1.4
+      layoffs_discharges:
+        level: 119
+        rate: 0.9
+      other_separations:
+        level: 18
+        rate: 0.1
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 425
+        rate: 3.2
+      hires:
+        level: 279
+        rate: 2.2
+      total_separations:
+        level: 283
+        rate: 2.2
+      quits:
+        level: 148
+        rate: 1.2
+      layoffs_discharges:
+        level: 111
+        rate: 0.9
+      other_separations:
+        level: 24
+        rate: 0.2
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 396
+        rate: 3
+      hires:
+        level: 293
+        rate: 2.3
+      total_separations:
+        level: 315
+        rate: 2.5
+      quits:
+        level: 175
+        rate: 1.4
+      layoffs_discharges:
+        level: 112
+        rate: 0.9
+      other_separations:
+        level: 28
+        rate: 0.2
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 438
+        rate: 3.3
+      hires:
+        level: 301
+        rate: 2.4
+      total_separations:
+        level: 306
+        rate: 2.4
+      quits:
+        level: 175
+        rate: 1.4
+      layoffs_discharges:
+        level: 116
+        rate: 0.9
+      other_separations:
+        level: 15
+        rate: 0.1
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 409
+        rate: 3.1
+      hires:
+        level: 305
+        rate: 2.4
+      total_separations:
+        level: 313
+        rate: 2.5
+      quits:
+        level: 172
+        rate: 1.4
+      layoffs_discharges:
+        level: 121
+        rate: 1
+      other_separations:
+        level: 20
+        rate: 0.2
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 385
+        rate: 2.9
+      hires:
+        level: 320
+        rate: 2.5
+      total_separations:
+        level: 327
+        rate: 2.6
+      quits:
+        level: 189
+        rate: 1.5
+      layoffs_discharges:
+        level: 117
+        rate: 0.9
+      other_separations:
+        level: 21
+        rate: 0.2
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 414
+        rate: 3.2
+      hires:
+        level: 317
+        rate: 2.5
+      total_separations:
+        level: 319
+        rate: 2.5
+      quits:
+        level: 178
+        rate: 1.4
+      layoffs_discharges:
+        level: 128
+        rate: 1
+      other_separations:
+        level: 13
+        rate: 0.1
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 399
+        rate: 3
+      hires:
+        level: 282
+        rate: 2.2
+      total_separations:
+        level: 301
+        rate: 2.4
+      quits:
+        level: 182
+        rate: 1.4
+      layoffs_discharges:
+        level: 104
+        rate: 0.8
+      other_separations:
+        level: 15
+        rate: 0.1
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 433
+        rate: 3.3
+      hires:
+        level: 287
+        rate: 2.3
+      total_separations:
+        level: 311
+        rate: 2.4
+      quits:
+        level: 184
+        rate: 1.4
+      layoffs_discharges:
+        level: 111
+        rate: 0.9
+      other_separations:
+        level: 16
+        rate: 0.1
+  - code: "440000"
+    name: Retail trade
+    hierarchy_level: "3"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 656
+        rate: 4
+      hires:
+        level: 637
+        rate: 4.1
+      total_separations:
+        level: 597
+        rate: 3.8
+      quits:
+        level: 395
+        rate: 2.5
+      layoffs_discharges:
+        level: 171
+        rate: 1.1
+      other_separations:
+        level: 31
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 528
+        rate: 3.3
+      hires:
+        level: 601
+        rate: 3.9
+      total_separations:
+        level: 645
+        rate: 4.1
+      quits:
+        level: 404
+        rate: 2.6
+      layoffs_discharges:
+        level: 229
+        rate: 1.5
+      other_separations:
+        level: 12
+        rate: 0.1
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 538
+        rate: 3.3
+      hires:
+        level: 632
+        rate: 4.1
+      total_separations:
+        level: 652
+        rate: 4.2
+      quits:
+        level: 473
+        rate: 3
+      layoffs_discharges:
+        level: 162
+        rate: 1
+      other_separations:
+        level: 17
+        rate: 0.1
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 561
+        rate: 3.5
+      hires:
+        level: 575
+        rate: 3.7
+      total_separations:
+        level: 555
+        rate: 3.6
+      quits:
+        level: 386
+        rate: 2.5
+      layoffs_discharges:
+        level: 136
+        rate: 0.9
+      other_separations:
+        level: 33
+        rate: 0.2
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 466
+        rate: 2.9
+      hires:
+        level: 575
+        rate: 3.7
+      total_separations:
+        level: 581
+        rate: 3.7
+      quits:
+        level: 412
+        rate: 2.6
+      layoffs_discharges:
+        level: 149
+        rate: 1
+      other_separations:
+        level: 21
+        rate: 0.1
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 629
+        rate: 3.9
+      hires:
+        level: 587
+        rate: 3.8
+      total_separations:
+        level: 607
+        rate: 3.9
+      quits:
+        level: 419
+        rate: 2.7
+      layoffs_discharges:
+        level: 162
+        rate: 1
+      other_separations:
+        level: 26
+        rate: 0.2
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 548
+        rate: 3.4
+      hires:
+        level: 583
+        rate: 3.7
+      total_separations:
+        level: 582
+        rate: 3.7
+      quits:
+        level: 375
+        rate: 2.4
+      layoffs_discharges:
+        level: 169
+        rate: 1.1
+      other_separations:
+        level: 38
+        rate: 0.2
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 603
+        rate: 3.7
+      hires:
+        level: 572
+        rate: 3.7
+      total_separations:
+        level: 580
+        rate: 3.7
+      quits:
+        level: 398
+        rate: 2.6
+      layoffs_discharges:
+        level: 149
+        rate: 1
+      other_separations:
+        level: 32
+        rate: 0.2
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 620
+        rate: 3.8
+      hires:
+        level: 576
+        rate: 3.7
+      total_separations:
+        level: 516
+        rate: 3.3
+      quits:
+        level: 317
+        rate: 2
+      layoffs_discharges:
+        level: 168
+        rate: 1.1
+      other_separations:
+        level: 30
+        rate: 0.2
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 651
+        rate: 4
+      hires:
+        level: 578
+        rate: 3.7
+      total_separations:
+        level: 570
+        rate: 3.7
+      quits:
+        level: 403
+        rate: 2.6
+      layoffs_discharges:
+        level: 158
+        rate: 1
+      other_separations:
+        level: 9
+        rate: 0.1
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 726
+        rate: 4.5
+      hires:
+        level: 571
+        rate: 3.7
+      total_separations:
+        level: 578
+        rate: 3.7
+      quits:
+        level: 428
+        rate: 2.7
+      layoffs_discharges:
+        level: 138
+        rate: 0.9
+      other_separations:
+        level: 12
+        rate: 0.1
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 531
+        rate: 3.3
+      hires:
+        level: 589
+        rate: 3.8
+      total_separations:
+        level: 664
+        rate: 4.3
+      quits:
+        level: 515
+        rate: 3.3
+      layoffs_discharges:
+        level: 135
+        rate: 0.9
+      other_separations:
+        level: 14
+        rate: 0.1
+  - code: "510000"
+    name: Information
+    hierarchy_level: "2"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 130
+        rate: 4.2
+      hires:
+        level: 80
+        rate: 2.7
+      total_separations:
+        level: 81
+        rate: 2.7
+      quits:
+        level: 43
+        rate: 1.5
+      layoffs_discharges:
+        level: 30
+        rate: 1
+      other_separations:
+        level: 8
+        rate: 0.3
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 131
+        rate: 4.2
+      hires:
+        level: 79
+        rate: 2.7
+      total_separations:
+        level: 85
+        rate: 2.9
+      quits:
+        level: 30
+        rate: 1
+      layoffs_discharges:
+        level: 47
+        rate: 1.6
+      other_separations:
+        level: 7
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 154
+        rate: 5
+      hires:
+        level: 83
+        rate: 2.8
+      total_separations:
+        level: 76
+        rate: 2.6
+      quits:
+        level: 35
+        rate: 1.2
+      layoffs_discharges:
+        level: 33
+        rate: 1.1
+      other_separations:
+        level: 8
+        rate: 0.3
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 165
+        rate: 5.3
+      hires:
+        level: 89
+        rate: 3
+      total_separations:
+        level: 78
+        rate: 2.7
+      quits:
+        level: 33
+        rate: 1.1
+      layoffs_discharges:
+        level: 35
+        rate: 1.2
+      other_separations:
+        level: 10
+        rate: 0.3
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 177
+        rate: 5.7
+      hires:
+        level: 84
+        rate: 2.9
+      total_separations:
+        level: 82
+        rate: 2.8
+      quits:
+        level: 37
+        rate: 1.2
+      layoffs_discharges:
+        level: 35
+        rate: 1.2
+      other_separations:
+        level: 11
+        rate: 0.4
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 189
+        rate: 6
+      hires:
+        level: 99
+        rate: 3.4
+      total_separations:
+        level: 97
+        rate: 3.3
+      quits:
+        level: 45
+        rate: 1.5
+      layoffs_discharges:
+        level: 46
+        rate: 1.6
+      other_separations:
+        level: 6
+        rate: 0.2
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 180
+        rate: 5.8
+      hires:
+        level: 86
+        rate: 2.9
+      total_separations:
+        level: 91
+        rate: 3.1
+      quits:
+        level: 40
+        rate: 1.4
+      layoffs_discharges:
+        level: 43
+        rate: 1.5
+      other_separations:
+        level: 8
+        rate: 0.3
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 172
+        rate: 5.5
+      hires:
+        level: 77
+        rate: 2.6
+      total_separations:
+        level: 85
+        rate: 2.9
+      quits:
+        level: 40
+        rate: 1.4
+      layoffs_discharges:
+        level: 38
+        rate: 1.3
+      other_separations:
+        level: 7
+        rate: 0.2
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 203
+        rate: 6.5
+      hires:
+        level: 76
+        rate: 2.6
+      total_separations:
+        level: 81
+        rate: 2.8
+      quits:
+        level: 28
+        rate: 1
+      layoffs_discharges:
+        level: 48
+        rate: 1.6
+      other_separations:
+        level: 5
+        rate: 0.2
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 124
+        rate: 4.1
+      hires:
+        level: 73
+        rate: 2.5
+      total_separations:
+        level: 93
+        rate: 3.2
+      quits:
+        level: 38
+        rate: 1.3
+      layoffs_discharges:
+        level: 47
+        rate: 1.6
+      other_separations:
+        level: 8
+        rate: 0.3
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 89
+        rate: 3
+      hires:
+        level: 84
+        rate: 2.9
+      total_separations:
+        level: 82
+        rate: 2.8
+      quits:
+        level: 32
+        rate: 1.1
+      layoffs_discharges:
+        level: 46
+        rate: 1.6
+      other_separations:
+        level: 5
+        rate: 0.2
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 101
+        rate: 3.4
+      hires:
+        level: 111
+        rate: 3.8
+      total_separations:
+        level: 109
+        rate: 3.7
+      quits:
+        level: 60
+        rate: 2
+      layoffs_discharges:
+        level: 47
+        rate: 1.6
+      other_separations:
+        level: 3
+        rate: 0.1
+  - code: "510099"
+    name: Financial activities
+    hierarchy_level: "2"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 516
+        rate: 5.3
+      hires:
+        level: 201
+        rate: 2.2
+      total_separations:
+        level: 181
+        rate: 2
+      quits:
+        level: 123
+        rate: 1.3
+      layoffs_discharges:
+        level: 35
+        rate: 0.4
+      other_separations:
+        level: 22
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 431
+        rate: 4.5
+      hires:
+        level: 217
+        rate: 2.3
+      total_separations:
+        level: 190
+        rate: 2.1
+      quits:
+        level: 116
+        rate: 1.3
+      layoffs_discharges:
+        level: 54
+        rate: 0.6
+      other_separations:
+        level: 21
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 428
+        rate: 4.4
+      hires:
+        level: 244
+        rate: 2.6
+      total_separations:
+        level: 223
+        rate: 2.4
+      quits:
+        level: 138
+        rate: 1.5
+      layoffs_discharges:
+        level: 65
+        rate: 0.7
+      other_separations:
+        level: 19
+        rate: 0.2
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 418
+        rate: 4.3
+      hires:
+        level: 217
+        rate: 2.3
+      total_separations:
+        level: 239
+        rate: 2.6
+      quits:
+        level: 127
+        rate: 1.4
+      layoffs_discharges:
+        level: 92
+        rate: 1
+      other_separations:
+        level: 20
+        rate: 0.2
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 490
+        rate: 5
+      hires:
+        level: 220
+        rate: 2.4
+      total_separations:
+        level: 201
+        rate: 2.2
+      quits:
+        level: 132
+        rate: 1.4
+      layoffs_discharges:
+        level: 47
+        rate: 0.5
+      other_separations:
+        level: 21
+        rate: 0.2
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 366
+        rate: 3.8
+      hires:
+        level: 205
+        rate: 2.2
+      total_separations:
+        level: 192
+        rate: 2.1
+      quits:
+        level: 112
+        rate: 1.2
+      layoffs_discharges:
+        level: 58
+        rate: 0.6
+      other_separations:
+        level: 21
+        rate: 0.2
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 404
+        rate: 4.2
+      hires:
+        level: 209
+        rate: 2.3
+      total_separations:
+        level: 213
+        rate: 2.3
+      quits:
+        level: 133
+        rate: 1.4
+      layoffs_discharges:
+        level: 58
+        rate: 0.6
+      other_separations:
+        level: 21
+        rate: 0.2
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 390
+        rate: 4
+      hires:
+        level: 212
+        rate: 2.3
+      total_separations:
+        level: 210
+        rate: 2.3
+      quits:
+        level: 114
+        rate: 1.2
+      layoffs_discharges:
+        level: 72
+        rate: 0.8
+      other_separations:
+        level: 25
+        rate: 0.3
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 449
+        rate: 4.6
+      hires:
+        level: 219
+        rate: 2.4
+      total_separations:
+        level: 219
+        rate: 2.4
+      quits:
+        level: 135
+        rate: 1.5
+      layoffs_discharges:
+        level: 57
+        rate: 0.6
+      other_separations:
+        level: 27
+        rate: 0.3
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 342
+        rate: 3.6
+      hires:
+        level: 208
+        rate: 2.3
+      total_separations:
+        level: 184
+        rate: 2
+      quits:
+        level: 105
+        rate: 1.1
+      layoffs_discharges:
+        level: 52
+        rate: 0.6
+      other_separations:
+        level: 27
+        rate: 0.3
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 354
+        rate: 3.7
+      hires:
+        level: 167
+        rate: 1.8
+      total_separations:
+        level: 189
+        rate: 2
+      quits:
+        level: 109
+        rate: 1.2
+      layoffs_discharges:
+        level: 55
+        rate: 0.6
+      other_separations:
+        level: 24
+        rate: 0.3
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 256
+        rate: 2.7
+      hires:
+        level: 207
+        rate: 2.2
+      total_separations:
+        level: 175
+        rate: 1.9
+      quits:
+        level: 108
+        rate: 1.2
+      layoffs_discharges:
+        level: 41
+        rate: 0.4
+      other_separations:
+        level: 26
+        rate: 0.3
+  - code: "540099"
+    name: Professional and business services
+    hierarchy_level: "2"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 1211
+        rate: 5.1
+      hires:
+        level: 962
+        rate: 4.3
+      total_separations:
+        level: 1038
+        rate: 4.6
+      quits:
+        level: 589
+        rate: 2.6
+      layoffs_discharges:
+        level: 379
+        rate: 1.7
+      other_separations:
+        level: 70
+        rate: 0.3
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 1336
+        rate: 5.6
+      hires:
+        level: 1056
+        rate: 4.7
+      total_separations:
+        level: 1023
+        rate: 4.5
+      quits:
+        level: 576
+        rate: 2.6
+      layoffs_discharges:
+        level: 412
+        rate: 1.8
+      other_separations:
+        level: 35
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 1249
+        rate: 5.2
+      hires:
+        level: 1042
+        rate: 4.6
+      total_separations:
+        level: 988
+        rate: 4.4
+      quits:
+        level: 558
+        rate: 2.5
+      layoffs_discharges:
+        level: 394
+        rate: 1.7
+      other_separations:
+        level: 36
+        rate: 0.2
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 1386
+        rate: 5.8
+      hires:
+        level: 1112
+        rate: 4.9
+      total_separations:
+        level: 1063
+        rate: 4.7
+      quits:
+        level: 545
+        rate: 2.4
+      layoffs_discharges:
+        level: 465
+        rate: 2.1
+      other_separations:
+        level: 53
+        rate: 0.2
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 1302
+        rate: 5.4
+      hires:
+        level: 1069
+        rate: 4.7
+      total_separations:
+        level: 1000
+        rate: 4.4
+      quits:
+        level: 528
+        rate: 2.3
+      layoffs_discharges:
+        level: 401
+        rate: 1.8
+      other_separations:
+        level: 71
+        rate: 0.3
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 1365
+        rate: 5.7
+      hires:
+        level: 1010
+        rate: 4.5
+      total_separations:
+        level: 1016
+        rate: 4.5
+      quits:
+        level: 404
+        rate: 1.8
+      layoffs_discharges:
+        level: 545
+        rate: 2.4
+      other_separations:
+        level: 67
+        rate: 0.3
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 1274
+        rate: 5.3
+      hires:
+        level: 1032
+        rate: 4.6
+      total_separations:
+        level: 1059
+        rate: 4.7
+      quits:
+        level: 595
+        rate: 2.6
+      layoffs_discharges:
+        level: 418
+        rate: 1.9
+      other_separations:
+        level: 46
+        rate: 0.2
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 1235
+        rate: 5.2
+      hires:
+        level: 1015
+        rate: 4.5
+      total_separations:
+        level: 1076
+        rate: 4.8
+      quits:
+        level: 574
+        rate: 2.5
+      layoffs_discharges:
+        level: 452
+        rate: 2
+      other_separations:
+        level: 51
+        rate: 0.2
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 1502
+        rate: 6.3
+      hires:
+        level: 1030
+        rate: 4.6
+      total_separations:
+        level: 1122
+        rate: 5
+      quits:
+        level: 571
+        rate: 2.5
+      layoffs_discharges:
+        level: 469
+        rate: 2.1
+      other_separations:
+        level: 82
+        rate: 0.4
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 1300
+        rate: 5.5
+      hires:
+        level: 1008
+        rate: 4.5
+      total_separations:
+        level: 1031
+        rate: 4.6
+      quits:
+        level: 543
+        rate: 2.4
+      layoffs_discharges:
+        level: 463
+        rate: 2.1
+      other_separations:
+        level: 26
+        rate: 0.1
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 1273
+        rate: 5.3
+      hires:
+        level: 992
+        rate: 4.4
+      total_separations:
+        level: 1074
+        rate: 4.8
+      quits:
+        level: 514
+        rate: 2.3
+      layoffs_discharges:
+        level: 512
+        rate: 2.3
+      other_separations:
+        level: 48
+        rate: 0.2
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 1016
+        rate: 4.3
+      hires:
+        level: 940
+        rate: 4.2
+      total_separations:
+        level: 862
+        rate: 3.8
+      quits:
+        level: 363
+        rate: 1.6
+      layoffs_discharges:
+        level: 459
+        rate: 2
+      other_separations:
+        level: 41
+        rate: 0.2
+  - code: "620000"
+    name: Health care and social assistance
+    hierarchy_level: "3"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 1498
+        rate: 6.1
+      hires:
+        level: 743
+        rate: 3.2
+      total_separations:
+        level: 664
+        rate: 2.9
+      quits:
+        level: 457
+        rate: 2
+      layoffs_discharges:
+        level: 163
+        rate: 0.7
+      other_separations:
+        level: 44
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 1405
+        rate: 5.7
+      hires:
+        level: 709
+        rate: 3.1
+      total_separations:
+        level: 654
+        rate: 2.8
+      quits:
+        level: 438
+        rate: 1.9
+      layoffs_discharges:
+        level: 164
+        rate: 0.7
+      other_separations:
+        level: 51
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 1368
+        rate: 5.6
+      hires:
+        level: 731
+        rate: 3.2
+      total_separations:
+        level: 656
+        rate: 2.8
+      quits:
+        level: 483
+        rate: 2.1
+      layoffs_discharges:
+        level: 125
+        rate: 0.5
+      other_separations:
+        level: 48
+        rate: 0.2
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 1547
+        rate: 6.2
+      hires:
+        level: 783
+        rate: 3.4
+      total_separations:
+        level: 704
+        rate: 3
+      quits:
+        level: 490
+        rate: 2.1
+      layoffs_discharges:
+        level: 185
+        rate: 0.8
+      other_separations:
+        level: 29
+        rate: 0.1
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 1615
+        rate: 6.5
+      hires:
+        level: 679
+        rate: 2.9
+      total_separations:
+        level: 605
+        rate: 2.6
+      quits:
+        level: 446
+        rate: 1.9
+      layoffs_discharges:
+        level: 141
+        rate: 0.6
+      other_separations:
+        level: 19
+        rate: 0.1
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 1435
+        rate: 5.8
+      hires:
+        level: 704
+        rate: 3
+      total_separations:
+        level: 638
+        rate: 2.7
+      quits:
+        level: 455
+        rate: 1.9
+      layoffs_discharges:
+        level: 143
+        rate: 0.6
+      other_separations:
+        level: 40
+        rate: 0.2
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 1297
+        rate: 5.3
+      hires:
+        level: 689
+        rate: 2.9
+      total_separations:
+        level: 609
+        rate: 2.6
+      quits:
+        level: 432
+        rate: 1.8
+      layoffs_discharges:
+        level: 156
+        rate: 0.7
+      other_separations:
+        level: 20
+        rate: 0.1
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 1378
+        rate: 5.5
+      hires:
+        level: 689
+        rate: 2.9
+      total_separations:
+        level: 667
+        rate: 2.8
+      quits:
+        level: 500
+        rate: 2.1
+      layoffs_discharges:
+        level: 149
+        rate: 0.6
+      other_separations:
+        level: 17
+        rate: 0.1
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 1375
+        rate: 5.5
+      hires:
+        level: 826
+        rate: 3.5
+      total_separations:
+        level: 737
+        rate: 3.1
+      quits:
+        level: 517
+        rate: 2.2
+      layoffs_discharges:
+        level: 177
+        rate: 0.8
+      other_separations:
+        level: 43
+        rate: 0.2
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 1401
+        rate: 5.6
+      hires:
+        level: 760
+        rate: 3.2
+      total_separations:
+        level: 690
+        rate: 2.9
+      quits:
+        level: 443
+        rate: 1.9
+      layoffs_discharges:
+        level: 206
+        rate: 0.9
+      other_separations:
+        level: 41
+        rate: 0.2
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 1341
+        rate: 5.4
+      hires:
+        level: 671
+        rate: 2.8
+      total_separations:
+        level: 620
+        rate: 2.6
+      quits:
+        level: 434
+        rate: 1.8
+      layoffs_discharges:
+        level: 153
+        rate: 0.6
+      other_separations:
+        level: 33
+        rate: 0.1
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 1249
+        rate: 5
+      hires:
+        level: 728
+        rate: 3.1
+      total_separations:
+        level: 671
+        rate: 2.8
+      quits:
+        level: 462
+        rate: 2
+      layoffs_discharges:
+        level: 169
+        rate: 0.7
+      other_separations:
+        level: 40
+        rate: 0.2
+  - code: "700000"
+    name: Leisure and hospitality
+    hierarchy_level: "2"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 1057
+        rate: 5.9
+      hires:
+        level: 901
+        rate: 5.3
+      total_separations:
+        level: 892
+        rate: 5.3
+      quits:
+        level: 607
+        rate: 3.6
+      layoffs_discharges:
+        level: 246
+        rate: 1.4
+      other_separations:
+        level: 39
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 1030
+        rate: 5.7
+      hires:
+        level: 888
+        rate: 5.2
+      total_separations:
+        level: 939
+        rate: 5.5
+      quits:
+        level: 641
+        rate: 3.8
+      layoffs_discharges:
+        level: 266
+        rate: 1.6
+      other_separations:
+        level: 33
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 960
+        rate: 5.4
+      hires:
+        level: 919
+        rate: 5.4
+      total_separations:
+        level: 880
+        rate: 5.2
+      quits:
+        level: 673
+        rate: 4
+      layoffs_discharges:
+        level: 196
+        rate: 1.2
+      other_separations:
+        level: 12
+        rate: 0.1
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 914
+        rate: 5.1
+      hires:
+        level: 1037
+        rate: 6.1
+      total_separations:
+        level: 955
+        rate: 5.6
+      quits:
+        level: 688
+        rate: 4
+      layoffs_discharges:
+        level: 242
+        rate: 1.4
+      other_separations:
+        level: 24
+        rate: 0.1
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 1199
+        rate: 6.6
+      hires:
+        level: 1128
+        rate: 6.6
+      total_separations:
+        level: 1027
+        rate: 6
+      quits:
+        level: 768
+        rate: 4.5
+      layoffs_discharges:
+        level: 220
+        rate: 1.3
+      other_separations:
+        level: 38
+        rate: 0.2
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 1034
+        rate: 5.7
+      hires:
+        level: 1013
+        rate: 5.9
+      total_separations:
+        level: 1056
+        rate: 6.2
+      quits:
+        level: 818
+        rate: 4.8
+      layoffs_discharges:
+        level: 217
+        rate: 1.3
+      other_separations:
+        level: 21
+        rate: 0.1
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 995
+        rate: 5.5
+      hires:
+        level: 948
+        rate: 5.6
+      total_separations:
+        level: 979
+        rate: 5.7
+      quits:
+        level: 722
+        rate: 4.2
+      layoffs_discharges:
+        level: 242
+        rate: 1.4
+      other_separations:
+        level: 14
+        rate: 0.1
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 1092
+        rate: 6
+      hires:
+        level: 917
+        rate: 5.4
+      total_separations:
+        level: 817
+        rate: 4.8
+      quits:
+        level: 560
+        rate: 3.3
+      layoffs_discharges:
+        level: 234
+        rate: 1.4
+      other_separations:
+        level: 24
+        rate: 0.1
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 1181
+        rate: 6.5
+      hires:
+        level: 957
+        rate: 5.6
+      total_separations:
+        level: 887
+        rate: 5.2
+      quits:
+        level: 618
+        rate: 3.6
+      layoffs_discharges:
+        level: 254
+        rate: 1.5
+      other_separations:
+        level: 15
+        rate: 0.1
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 1155
+        rate: 6.3
+      hires:
+        level: 982
+        rate: 5.7
+      total_separations:
+        level: 867
+        rate: 5.1
+      quits:
+        level: 546
+        rate: 3.2
+      layoffs_discharges:
+        level: 306
+        rate: 1.8
+      other_separations:
+        level: 14
+        rate: 0.1
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 884
+        rate: 4.9
+      hires:
+        level: 1001
+        rate: 5.8
+      total_separations:
+        level: 1014
+        rate: 5.9
+      quits:
+        level: 761
+        rate: 4.4
+      layoffs_discharges:
+        level: 239
+        rate: 1.4
+      other_separations:
+        level: 14
+        rate: 0.1
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 950
+        rate: 5.2
+      hires:
+        level: 1035
+        rate: 6
+      total_separations:
+        level: 1009
+        rate: 5.9
+      quits:
+        level: 766
+        rate: 4.5
+      layoffs_discharges:
+        level: 234
+        rate: 1.4
+      other_separations:
+        level: 10
+        rate: 0.1
+  - code: "720000"
+    name: Accommodation and food services
+    hierarchy_level: "3"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 901
+        rate: 5.9
+      hires:
+        level: 742
+        rate: 5.2
+      total_separations:
+        level: 745
+        rate: 5.2
+      quits:
+        level: 536
+        rate: 3.7
+      layoffs_discharges:
+        level: 175
+        rate: 1.2
+      other_separations:
+        level: 35
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 900
+        rate: 5.9
+      hires:
+        level: 711
+        rate: 5
+      total_separations:
+        level: 765
+        rate: 5.4
+      quits:
+        level: 564
+        rate: 4
+      layoffs_discharges:
+        level: 172
+        rate: 1.2
+      other_separations:
+        level: 29
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 825
+        rate: 5.5
+      hires:
+        level: 746
+        rate: 5.2
+      total_separations:
+        level: 708
+        rate: 5
+      quits:
+        level: 602
+        rate: 4.2
+      layoffs_discharges:
+        level: 99
+        rate: 0.7
+      other_separations:
+        level: 7
+        rate: 0
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 727
+        rate: 4.8
+      hires:
+        level: 854
+        rate: 6
+      total_separations:
+        level: 787
+        rate: 5.5
+      quits:
+        level: 615
+        rate: 4.3
+      layoffs_discharges:
+        level: 152
+        rate: 1.1
+      other_separations:
+        level: 20
+        rate: 0.1
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 1062
+        rate: 6.9
+      hires:
+        level: 923
+        rate: 6.4
+      total_separations:
+        level: 851
+        rate: 5.9
+      quits:
+        level: 691
+        rate: 4.8
+      layoffs_discharges:
+        level: 125
+        rate: 0.9
+      other_separations:
+        level: 35
+        rate: 0.2
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 864
+        rate: 5.7
+      hires:
+        level: 848
+        rate: 5.9
+      total_separations:
+        level: 892
+        rate: 6.2
+      quits:
+        level: 752
+        rate: 5.3
+      layoffs_discharges:
+        level: 125
+        rate: 0.9
+      other_separations:
+        level: 15
+        rate: 0.1
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 880
+        rate: 5.8
+      hires:
+        level: 798
+        rate: 5.6
+      total_separations:
+        level: 799
+        rate: 5.6
+      quits:
+        level: 664
+        rate: 4.6
+      layoffs_discharges:
+        level: 122
+        rate: 0.9
+      other_separations:
+        level: 12
+        rate: 0.1
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 986
+        rate: 6.4
+      hires:
+        level: 748
+        rate: 5.2
+      total_separations:
+        level: 686
+        rate: 4.8
+      quits:
+        level: 524
+        rate: 3.7
+      layoffs_discharges:
+        level: 142
+        rate: 1
+      other_separations:
+        level: 20
+        rate: 0.1
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 1019
+        rate: 6.6
+      hires:
+        level: 788
+        rate: 5.5
+      total_separations:
+        level: 754
+        rate: 5.2
+      quits:
+        level: 598
+        rate: 4.2
+      layoffs_discharges:
+        level: 144
+        rate: 1
+      other_separations:
+        level: 12
+        rate: 0.1
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 985
+        rate: 6.4
+      hires:
+        level: 807
+        rate: 5.6
+      total_separations:
+        level: 708
+        rate: 4.9
+      quits:
+        level: 486
+        rate: 3.4
+      layoffs_discharges:
+        level: 213
+        rate: 1.5
+      other_separations:
+        level: 9
+        rate: 0.1
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 724
+        rate: 4.8
+      hires:
+        level: 827
+        rate: 5.7
+      total_separations:
+        level: 835
+        rate: 5.8
+      quits:
+        level: 699
+        rate: 4.8
+      layoffs_discharges:
+        level: 128
+        rate: 0.9
+      other_separations:
+        level: 9
+        rate: 0.1
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 809
+        rate: 5.3
+      hires:
+        level: 884
+        rate: 6.1
+      total_separations:
+        level: 870
+        rate: 6
+      quits:
+        level: 706
+        rate: 4.9
+      layoffs_discharges:
+        level: 155
+        rate: 1.1
+      other_separations:
+        level: 9
+        rate: 0.1
+  - code: "900000"
+    name: Government
+    hierarchy_level: "1"
+    monthly_data[12]:
+    - month: 1
+      month_name: January
+      job_openings:
+        level: 902
+        rate: 3.7
+      hires:
+        level: 371
+        rate: 1.6
+      total_separations:
+        level: 313
+        rate: 1.3
+      quits:
+        level: 178
+        rate: 0.8
+      layoffs_discharges:
+        level: 78
+        rate: 0.3
+      other_separations:
+        level: 57
+        rate: 0.2
+    - month: 2
+      month_name: February
+      job_openings:
+        level: 892
+        rate: 3.6
+      hires:
+        level: 350
+        rate: 1.5
+      total_separations:
+        level: 350
+        rate: 1.5
+      quits:
+        level: 197
+        rate: 0.8
+      layoffs_discharges:
+        level: 100
+        rate: 0.4
+      other_separations:
+        level: 53
+        rate: 0.2
+    - month: 3
+      month_name: March
+      job_openings:
+        level: 858
+        rate: 3.5
+      hires:
+        level: 349
+        rate: 1.5
+      total_separations:
+        level: 337
+        rate: 1.4
+      quits:
+        level: 186
+        rate: 0.8
+      layoffs_discharges:
+        level: 100
+        rate: 0.4
+      other_separations:
+        level: 51
+        rate: 0.2
+    - month: 4
+      month_name: April
+      job_openings:
+        level: 833
+        rate: 3.4
+      hires:
+        level: 357
+        rate: 1.5
+      total_separations:
+        level: 333
+        rate: 1.4
+      quits:
+        level: 183
+        rate: 0.8
+      layoffs_discharges:
+        level: 77
+        rate: 0.3
+      other_separations:
+        level: 72
+        rate: 0.3
+    - month: 5
+      month_name: May
+      job_openings:
+        level: 836
+        rate: 3.4
+      hires:
+        level: 356
+        rate: 1.5
+      total_separations:
+        level: 353
+        rate: 1.5
+      quits:
+        level: 187
+        rate: 0.8
+      layoffs_discharges:
+        level: 90
+        rate: 0.4
+      other_separations:
+        level: 76
+        rate: 0.3
+    - month: 6
+      month_name: June
+      job_openings:
+        level: 821
+        rate: 3.4
+      hires:
+        level: 331
+        rate: 1.4
+      total_separations:
+        level: 324
+        rate: 1.4
+      quits:
+        level: 183
+        rate: 0.8
+      layoffs_discharges:
+        level: 79
+        rate: 0.3
+      other_separations:
+        level: 62
+        rate: 0.3
+    - month: 7
+      month_name: July
+      job_openings:
+        level: 807
+        rate: 3.3
+      hires:
+        level: 321
+        rate: 1.4
+      total_separations:
+        level: 315
+        rate: 1.3
+      quits:
+        level: 181
+        rate: 0.8
+      layoffs_discharges:
+        level: 76
+        rate: 0.3
+      other_separations:
+        level: 57
+        rate: 0.2
+    - month: 8
+      month_name: August
+      job_openings:
+        level: 770
+        rate: 3.2
+      hires:
+        level: 321
+        rate: 1.4
+      total_separations:
+        level: 331
+        rate: 1.4
+      quits:
+        level: 183
+        rate: 0.8
+      layoffs_discharges:
+        level: 81
+        rate: 0.3
+      other_separations:
+        level: 67
+        rate: 0.3
+    - month: 9
+      month_name: September
+      job_openings:
+        level: 787
+        rate: 3.2
+      hires:
+        level: 346
+        rate: 1.5
+      total_separations:
+        level: 365
+        rate: 1.5
+      quits:
+        level: 211
+        rate: 0.9
+      layoffs_discharges:
+        level: 80
+        rate: 0.3
+      other_separations:
+        level: 75
+        rate: 0.3
+    - month: 10
+      month_name: October
+      job_openings:
+        level: 784
+        rate: 3.2
+      hires:
+        level: 341
+        rate: 1.5
+      total_separations:
+        level: 326
+        rate: 1.4
+      quits:
+        level: 173
+        rate: 0.7
+      layoffs_discharges:
+        level: 96
+        rate: 0.4
+      other_separations:
+        level: 57
+        rate: 0.2
+    - month: 11
+      month_name: November
+      job_openings:
+        level: 701
+        rate: 2.9
+      hires:
+        level: 295
+        rate: 1.3
+      total_separations:
+        level: 289
+        rate: 1.2
+      quits:
+        level: 159
+        rate: 0.7
+      layoffs_discharges:
+        level: 75
+        rate: 0.3
+      other_separations:
+        level: 55
+        rate: 0.2
+    - month: 12
+      month_name: December
+      job_openings:
+        level: 738
+        rate: 3.1
+      hires:
+        level: 314
+        rate: 1.3
+      total_separations:
+        level: 319
+        rate: 1.4
+      quits:
+        level: 175
+        rate: 0.7
+      layoffs_discharges:
+        level: 66
+        rate: 0.3
+      other_separations:
+        level: 78
+        rate: 0.3
+
+Perform the following calculations and analysis:
+1. For each industry, calculate the average monthly job openings level and hires level for the full year
+2. Compute the job openings-to-hires ratio (average JO level / average HI level) for each industry. Which industry has the highest ratio (hardest to fill positions)?
+3. Calculate the quit rate minus the layoff rate (QU rate - LD rate) for each industry, averaged over the year. This measures voluntary vs involuntary turnover balance. Rank industries from highest to lowest
+4. For Total nonfarm, compute the month-over-month change in job openings level for each month. In which month was the largest increase? The largest decrease?
+5. Calculate total separations as the sum of quits + layoffs + other separations (using levels) for each industry. Verify this matches the reported TS level within rounding
+6. Which industry has the highest average quit rate? Which has the highest average layoff rate?
+7. Compare the private sector (Total private) to Government: which has higher hire rates, quit rates, and layoff rates on average?

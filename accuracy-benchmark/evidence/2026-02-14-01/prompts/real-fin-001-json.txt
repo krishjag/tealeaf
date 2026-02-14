@@ -1,0 +1,3793 @@
+=== API Request: FIN-001 (JSON format) ===
+Task ID:     FIN-001
+Category:    finance
+Complexity:  Complex
+Output Type: Calculation
+Format:      JSON
+Max Tokens:  8192
+Temperature: 0.3
+==================================================
+=== PROMPT ===
+
+You are a financial analyst reviewing annual 10-K filings from SEC EDGAR.
+The data contains balance sheet, income statement, cash flow, and other financial statement items for multiple public companies.
+
+{
+  "source": "SEC EDGAR Financial Statement Data Sets (2025Q4)",
+  "license": "US Government Public Domain",
+  "url": "https://www.sec.gov/dera/data/financial-statement-data-sets",
+  "description": "XBRL financial statement data from annual 10-K filings, joined across SUB/NUM/TAG/PRE tables",
+  "companies": [
+    {
+      "name": "APPLE INC",
+      "cik": "320193",
+      "sic": "3571",
+      "state": "CA",
+      "city": "CUPERTINO",
+      "filing": {
+        "adsh": "0000320193-25-000079",
+        "form": "10-K",
+        "period": "20250930",
+        "fiscal_year": "2025",
+        "fiscal_period": "FY",
+        "filed": "20251031"
+      },
+      "statements": [
+        {
+          "statement_type": "Balance Sheet",
+          "items": [
+            {
+              "tag": "CommonStockParOrStatedValuePerShare",
+              "label": "Common stock, par value (in dollars per share)",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "",
+              "definition": "Face amount or stated value per share of common stock."
+            },
+            {
+              "tag": "CashAndCashEquivalentsAtCarryingValue",
+              "label": "Cash and cash equivalents",
+              "value": 35934000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash and cash equivalent. Cash includes, but is not limited to, currency on hand, demand deposit with financial institution, and account with general characteristic of demand deposit. Cash e..."
+            },
+            {
+              "tag": "MarketableSecuritiesCurrent",
+              "label": "Marketable securities",
+              "value": 18763000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of investment in marketable security, classified as current."
+            },
+            {
+              "tag": "AccountsReceivableNetCurrent",
+              "label": "Accounts receivable, net",
+              "value": 39777000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount, after allowance for credit loss, of right to consideration from customer for product sold and service rendered in normal course of business, classified as current."
+            },
+            {
+              "tag": "NontradeReceivablesCurrent",
+              "label": "Vendor non-trade receivables",
+              "value": 33180000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "The sum of amounts currently receivable other than from customers. For classified balance sheets, represents the current amount receivable, that is amounts expected to be collected within one year or ..."
+            },
+            {
+              "tag": "InventoryNet",
+              "label": "Inventories",
+              "value": 5718000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount after valuation and LIFO reserves of inventory expected to be sold, or consumed within one year or operating cycle, if longer."
+            },
+            {
+              "tag": "OtherAssetsCurrent",
+              "label": "Other current assets",
+              "value": 14585000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of current assets classified as other."
+            },
+            {
+              "tag": "AssetsCurrent",
+              "label": "Total current assets",
+              "value": 147957000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of asset recognized for present right to economic benefit, classified as current."
+            },
+            {
+              "tag": "MarketableSecuritiesNoncurrent",
+              "label": "Marketable securities",
+              "value": 77723000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of investment in marketable security, classified as noncurrent."
+            },
+            {
+              "tag": "PropertyPlantAndEquipmentNet",
+              "label": "Property, plant and equipment, net",
+              "value": 49834000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount after accumulated depreciation, depletion and amortization of physical assets used in the normal conduct of business to produce goods and services and not intended for resale. Examples include,..."
+            },
+            {
+              "tag": "OtherAssetsNoncurrent",
+              "label": "Other non-current assets",
+              "value": 83727000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of noncurrent assets classified as other."
+            },
+            {
+              "tag": "AssetsNoncurrent",
+              "label": "Total non-current assets",
+              "value": 211284000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Sum of the carrying amounts as of the balance sheet date of all assets that are expected to be realized in cash, sold or consumed after one year or beyond the normal operating cycle, if longer."
+            },
+            {
+              "tag": "Assets",
+              "label": "Total assets",
+              "value": 359241000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of asset recognized for present right to economic benefit."
+            },
+            {
+              "tag": "AccountsPayableCurrent",
+              "label": "Accounts payable",
+              "value": 69860000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Carrying value as of the balance sheet date of liabilities incurred (and for which invoices have typically been received) and payable to vendors for goods and services received that are used in an ent..."
+            },
+            {
+              "tag": "OtherLiabilitiesCurrent",
+              "label": "Other current liabilities",
+              "value": 66387000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities classified as other, due within one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "ContractWithCustomerLiabilityCurrent",
+              "label": "Deferred revenue",
+              "value": 9055000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of obligation to transfer good or service to customer for which consideration has been received or is receivable, classified as current."
+            },
+            {
+              "tag": "CommercialPaper",
+              "label": "Commercial paper",
+              "value": 7979000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Carrying value as of the balance sheet date of short-term borrowings using unsecured obligations issued by banks, corporations and other borrowers to investors. The maturities of these money market se..."
+            },
+            {
+              "tag": "LongTermDebtCurrent",
+              "label": "Term debt",
+              "value": 12350000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after deduction of unamortized premium (discount) and debt issuance cost, of long-term debt classified as current. Excludes lease obligation."
+            },
+            {
+              "tag": "LiabilitiesCurrent",
+              "label": "Total current liabilities",
+              "value": 165631000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Total obligations incurred as part of normal operations that are expected to be paid during the following twelve months or within one business cycle, if longer."
+            },
+            {
+              "tag": "LongTermDebtNoncurrent",
+              "label": "Term debt",
+              "value": 78328000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after deduction of unamortized premium (discount) and debt issuance cost, of long-term debt classified as noncurrent. Excludes lease obligation."
+            },
+            {
+              "tag": "OtherLiabilitiesNoncurrent",
+              "label": "Other non-current liabilities",
+              "value": 41549000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities classified as other, due after one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "LiabilitiesNoncurrent",
+              "label": "Total non-current liabilities",
+              "value": 119877000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of obligation due after one year or beyond the normal operating cycle, if longer."
+            },
+            {
+              "tag": "Liabilities",
+              "label": "Total liabilities",
+              "value": 285508000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liability recognized for present obligation requiring transfer or otherwise providing economic benefit to others."
+            },
+            {
+              "tag": "CommonStocksIncludingAdditionalPaidInCapital",
+              "label": "Common stock and additional paid-in capital, $0.00001 par value: 50,400,000 shares authorized; 14,773,260 and 15,116,786 shares issued and outstanding, respectively",
+              "value": 93568000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of par value plus amounts in excess of par value or issuance value for common stock issued."
+            },
+            {
+              "tag": "RetainedEarningsAccumulatedDeficit",
+              "label": "Accumulated deficit",
+              "value": -14264000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of accumulated undistributed earnings (deficit)."
+            },
+            {
+              "tag": "AccumulatedOtherComprehensiveIncomeLossNetOfTax",
+              "label": "Accumulated other comprehensive loss",
+              "value": -5571000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax, of accumulated increase (decrease) in equity from transaction and other event and circumstance from nonowner source."
+            },
+            {
+              "tag": "StockholdersEquity",
+              "label": "Total shareholders equity",
+              "value": 73733000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of equity (deficit) attributable to parent. Excludes temporary equity and equity attributable to noncontrolling interest."
+            },
+            {
+              "tag": "LiabilitiesAndStockholdersEquity",
+              "label": "Total liabilities and shareholders equity",
+              "value": 359241000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities and equity items, including the portion of equity attributable to noncontrolling interests, if any."
+            }
+          ]
+        },
+        {
+          "statement_type": "Cash Flows",
+          "items": [
+            {
+              "tag": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+              "label": "Cash, cash equivalents, and restricted cash and cash equivalents, beginning balances",
+              "value": 35934000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; attributable to continuing operation. Cash includes, but is not limited to, currency on hand, demand..."
+            },
+            {
+              "tag": "NetIncomeLoss",
+              "label": "Net income",
+              "value": 112010000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "DepreciationDepletionAndAmortization",
+              "label": "Depreciation and amortization",
+              "value": 11698000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate expense recognized in the current period that allocates the cost of tangible assets, intangible assets, or depleting assets to periods that benefit from use of the assets."
+            },
+            {
+              "tag": "ShareBasedCompensation",
+              "label": "Share-based compensation expense",
+              "value": 12863000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of noncash expense for share-based payment arrangement."
+            },
+            {
+              "tag": "OtherNoncashIncomeExpense",
+              "label": "Other",
+              "value": 89000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of income (expense) included in net income that results in no cash inflow (outflow), classified as other."
+            },
+            {
+              "tag": "IncreaseDecreaseInAccountsReceivable",
+              "label": "Accounts receivable, net",
+              "value": 6682000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The increase (decrease) during the reporting period in amount due within one year (or one business cycle) from customers for the credit sale of goods and services."
+            },
+            {
+              "tag": "IncreaseDecreaseInOtherReceivables",
+              "label": "Vendor non-trade receivables",
+              "value": 347000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of increase (decrease) in receivables classified as other."
+            },
+            {
+              "tag": "IncreaseDecreaseInInventories",
+              "label": "Inventories",
+              "value": -1400000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The increase (decrease) during the reporting period in the aggregate value of all inventory held by the reporting entity, associated with underlying transactions that are classified as operating activ..."
+            },
+            {
+              "tag": "IncreaseDecreaseInOtherOperatingAssets",
+              "label": "Other current and non-current assets",
+              "value": 9197000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of increase (decrease) in operating assets classified as other."
+            },
+            {
+              "tag": "IncreaseDecreaseInAccountsPayable",
+              "label": "Accounts payable",
+              "value": 902000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The increase (decrease) during the reporting period in the aggregate amount of liabilities incurred (and for which invoices have typically been received) and payable to vendors for goods and services ..."
+            },
+            {
+              "tag": "IncreaseDecreaseInOtherOperatingLiabilities",
+              "label": "Other current and non-current liabilities",
+              "value": -11076000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) in operating liabilities classified as other."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInOperatingActivities",
+              "label": "Cash generated by operating activities",
+              "value": 111482000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Amount of cash inflow (outflow) from operating activity, including, but not limited to, discontinued operation. Operating activity includes, but is not limited to, transaction, adjustment, and change ..."
+            },
+            {
+              "tag": "PaymentsToAcquireAvailableForSaleSecuritiesDebt",
+              "label": "Purchases of marketable securities",
+              "value": 24407000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow to acquire investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (available-for-sale)."
+            },
+            {
+              "tag": "ProceedsFromMaturitiesPrepaymentsAndCallsOfAvailableForSaleSecurities",
+              "label": "Proceeds from maturities of marketable securities",
+              "value": 40907000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow from maturity, prepayment and call of investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (available-for-sale)."
+            },
+            {
+              "tag": "ProceedsFromSaleOfAvailableForSaleSecuritiesDebt",
+              "label": "Proceeds from sales of marketable securities",
+              "value": 12890000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow from sale of investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (available-for-sale)."
+            },
+            {
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment",
+              "label": "Payments for acquisition of property, plant and equipment",
+              "value": 12715000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow associated with the acquisition of long-lived, physical assets that are used in the normal conduct of business to produce goods and services and not intended for resale; includes cash..."
+            },
+            {
+              "tag": "PaymentsForProceedsFromOtherInvestingActivities",
+              "label": "Other",
+              "value": 1480000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash (inflow) outflow from investing activity, classified as other."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInInvestingActivities",
+              "label": "Cash generated by investing activities",
+              "value": 15195000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from investing activity, including, but not limited to, discontinued operation. Investing activity includes, but is not limited to, making and collecting loan, acquirin..."
+            },
+            {
+              "tag": "PaymentsRelatedToTaxWithholdingForShareBasedCompensation",
+              "label": "Payments for taxes related to net share settlement of equity awards",
+              "value": 5960000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow to satisfy grantee's tax withholding obligation for award under share-based payment arrangement."
+            },
+            {
+              "tag": "PaymentsOfDividends",
+              "label": "Payments for dividends and dividend equivalents",
+              "value": 15421000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Cash outflow in the form of capital distributions and dividends to common shareholders, preferred shareholders and noncontrolling interests."
+            },
+            {
+              "tag": "PaymentsForRepurchaseOfCommonStock",
+              "label": "Repurchases of common stock",
+              "value": 90711000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow to reacquire common stock during the period."
+            },
+            {
+              "tag": "ProceedsFromIssuanceOfLongTermDebt",
+              "label": "Proceeds from issuance of term debt, net",
+              "value": 4481000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow from a debt initially having maturity due after one year or beyond the operating cycle, if longer."
+            },
+            {
+              "tag": "RepaymentsOfLongTermDebt",
+              "label": "Repayments of term debt",
+              "value": 10932000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow for debt initially having maturity due after one year or beyond the normal operating cycle, if longer."
+            },
+            {
+              "tag": "ProceedsFromRepaymentsOfCommercialPaper",
+              "label": "Proceeds from/(Repayments of) commercial paper, net",
+              "value": -2032000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The net cash inflow or cash outflow from issuing (borrowing) and repaying commercial paper."
+            },
+            {
+              "tag": "ProceedsFromPaymentsForOtherFinancingActivities",
+              "label": "Other",
+              "value": -111000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from financing activity, classified as other."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInFinancingActivities",
+              "label": "Cash used in financing activities",
+              "value": -120686000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from financing activity, including, but not limited to, discontinued operation. Financing activity includes, but is not limited to, obtaining resource from owner and pr..."
+            },
+            {
+              "tag": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
+              "label": "Increase/(Decrease) in cash, cash equivalents, and restricted cash and cash equivalents",
+              "value": 5991000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) in cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; including effect from exchange rate change and including, but not limited to,..."
+            },
+            {
+              "tag": "IncomeTaxesPaidNet",
+              "label": "Cash paid for income taxes, net",
+              "value": 43369000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after refund, of cash paid to foreign, federal, state, and local jurisdictions as income tax."
+            }
+          ]
+        },
+        {
+          "statement_type": "Comprehensive Income",
+          "items": [
+            {
+              "tag": "NetIncomeLoss",
+              "label": "Net income",
+              "value": 112010000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentNetOfTax",
+              "label": "Change in foreign currency translation, net of tax",
+              "value": -267000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax and reclassification adjustments of gain (loss) on foreign currency translation adjustments, foreign currency transactions designated and effective as economic hedges of a net investm..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossCashFlowHedgeGainLossBeforeReclassificationAfterTax",
+              "label": "Change in fair value of derivative instruments",
+              "value": 849000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax and before reclassification, of gain (loss) from derivative instrument designated and qualifying as cash flow hedge included in assessment of hedge effectiveness."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossDerivativeInstrumentGainLossbeforeReclassificationafterTax",
+              "label": "Change in fair value of derivative instruments",
+              "value": -832000000.0,
+              "period_end": "20240930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax and before reclassification, of gain (loss) from derivative instrument designated and qualifying as accounting hedge."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossCashFlowHedgeGainLossReclassificationAfterTax",
+              "label": "Adjustment for net (gains)/losses realized and included in net income",
+              "value": 212000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount, after tax, of reclassification of gain (loss) from accumulated other comprehensive income (AOCI) for derivative instrument designated and qualifying as cash flow hedge included in assessment o..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossDerivativeInstrumentGainLossReclassificationAfterTax",
+              "label": "Adjustment for net (gains)/losses realized and included in net income",
+              "value": 1337000000.0,
+              "period_end": "20240930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount, after tax, of reclassification of gain (loss) from accumulated other comprehensive income (AOCI) for derivative instrument designated and qualifying as accounting hedge."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossCashFlowHedgeGainLossAfterReclassificationAndTax",
+              "label": "Total change in unrealized gains/losses on derivative instruments",
+              "value": 637000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax and reclassification, of gain (loss) from derivative instrument designated and qualifying as cash flow hedge included in assessment of hedge effectiveness."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossDerivativeInstrumentGainLossafterReclassificationandTax",
+              "label": "Total change in unrealized gains/losses on derivative instruments",
+              "value": -2169000000.0,
+              "period_end": "20240930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after reclassification, of tax expense (benefit) for gain (loss) from derivative instrument designated and qualifying as accounting hedge."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeUnrealizedHoldingGainLossOnSecuritiesArisingDuringPeriodNetOfTax",
+              "label": "Change in fair value of marketable debt securities",
+              "value": 817000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax and before adjustment, of unrealized holding gain (loss) on investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (ava..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossReclassificationAdjustmentFromAOCIForSaleOfSecuritiesNetOfTax",
+              "label": "Adjustment for net (gains)/losses realized and included in net income",
+              "value": -414000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount after tax of reclassification adjustment from accumulated other comprehensive income for unrealized gain (loss) realized upon the sale of available-for-sale securities."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossAvailableForSaleSecuritiesAdjustmentNetOfTax",
+              "label": "Total change in unrealized gains/losses on marketable debt securities",
+              "value": 1231000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax and adjustment, of unrealized gain (loss) on investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (available-for-sale..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossNetOfTaxPortionAttributableToParent",
+              "label": "Total other comprehensive income/(loss)",
+              "value": 1601000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax of other comprehensive income (loss) attributable to parent entity."
+            },
+            {
+              "tag": "ComprehensiveIncomeNetOfTax",
+              "label": "Total comprehensive income",
+              "value": 113611000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax of increase (decrease) in equity from transactions and other events and circumstances from net income and other comprehensive income, attributable to parent entity. Excludes changes i..."
+            }
+          ]
+        },
+        {
+          "statement_type": "Stockholders Equity",
+          "items": [
+            {
+              "tag": "NetIncomeLoss",
+              "label": "Net income",
+              "value": 112010000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "StockRepurchasedAndRetiredDuringPeriodValue",
+              "label": "Common stock repurchased",
+              "value": 89300000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Equity impact of the value of stock that has been repurchased and retired during the period. The excess of the purchase price over par value can be charged against retained earnings (once the excess i..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossNetOfTaxPortionAttributableToParent",
+              "label": "Other comprehensive income/(loss)",
+              "value": 1601000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax of other comprehensive income (loss) attributable to parent entity."
+            },
+            {
+              "tag": "StockholdersEquity",
+              "label": "Ending balances",
+              "value": 73733000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of equity (deficit) attributable to parent. Excludes temporary equity and equity attributable to noncontrolling interest."
+            },
+            {
+              "tag": "CommonStockDividendsPerShareDeclared",
+              "label": "Dividends and dividend equivalents declared per share or RSU (in dollars per share or RSU)",
+              "value": 1.02,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Aggregate dividends declared during the period for each share of common stock outstanding."
+            }
+          ]
+        },
+        {
+          "statement_type": "Income Statement",
+          "items": [
+            {
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax",
+              "label": "Net sales",
+              "value": 416161000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, excluding tax collected from customer, of revenue from satisfaction of performance obligation by transferring promised good or service to customer. Tax collected from customer is tax assessed ..."
+            },
+            {
+              "tag": "CostOfGoodsAndServicesSold",
+              "label": "Cost of sales",
+              "value": 220960000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate costs related to goods produced and sold and services rendered by an entity during the reporting period. This excludes costs incurred during the reporting period related to financial ser..."
+            },
+            {
+              "tag": "GrossProfit",
+              "label": "Gross margin",
+              "value": 195201000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Aggregate revenue less cost of goods and services sold or operating expenses directly attributable to the revenue generation activity."
+            },
+            {
+              "tag": "ResearchAndDevelopmentExpense",
+              "label": "Research and development",
+              "value": 34550000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of expense for research and development. Includes, but is not limited to, cost for computer software product to be sold, leased, or otherwise marketed and writeoff of research and development a..."
+            },
+            {
+              "tag": "SellingGeneralAndAdministrativeExpense",
+              "label": "Selling, general and administrative",
+              "value": 27601000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate total costs related to selling a firm's product and services, as well as all other general and administrative expenses. Direct selling expenses (for example, credit, warranty, and advert..."
+            },
+            {
+              "tag": "OperatingExpenses",
+              "label": "Total operating expenses",
+              "value": 62151000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Generally recurring costs associated with normal operations except for the portion of these expenses which can be clearly related to production and included in cost of sales or services. Includes sell..."
+            },
+            {
+              "tag": "OperatingIncomeLoss",
+              "label": "Operating income",
+              "value": 133050000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The net result for the period of deducting operating expenses from operating revenues."
+            },
+            {
+              "tag": "NonoperatingIncomeExpense",
+              "label": "Other income/(expense), net",
+              "value": -321000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The aggregate amount of income or expense from ancillary business-related activities (that is to say, excluding major activities considered part of the normal operations of the business)."
+            },
+            {
+              "tag": "IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+              "label": "Income before provision for income taxes",
+              "value": 132729000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of income (loss) from continuing operations, including income (loss) from equity method investments, before deduction of income tax expense (benefit), and income (loss) attributable to noncontr..."
+            },
+            {
+              "tag": "IncomeTaxExpenseBenefit",
+              "label": "Provision for income taxes",
+              "value": 20719000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of current income tax expense (benefit) and deferred income tax expense (benefit) pertaining to continuing operations."
+            },
+            {
+              "tag": "NetIncomeLoss",
+              "label": "Net income",
+              "value": 112010000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "EarningsPerShareBasic",
+              "label": "Basic (in dollars per share)",
+              "value": 7.49,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "The amount of net income (loss) for the period per each share of common stock or unit outstanding during the reporting period."
+            },
+            {
+              "tag": "EarningsPerShareDiluted",
+              "label": "Diluted (in dollars per share)",
+              "value": 7.46,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "The amount of net income (loss) for the period available to each share of common stock or common unit outstanding during the reporting period and to each share or unit that would have been outstanding..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VISA INC.",
+      "cik": "1403161",
+      "sic": "7389",
+      "state": "CA",
+      "city": "SAN FRANCISCO",
+      "filing": {
+        "adsh": "0001403161-25-000089",
+        "form": "10-K",
+        "period": "20250930",
+        "fiscal_year": "2025",
+        "fiscal_period": "FY",
+        "filed": "20251106"
+      },
+      "statements": [
+        {
+          "statement_type": "Balance Sheet",
+          "items": [
+            {
+              "tag": "CashAndCashEquivalentsAtCarryingValue",
+              "label": "Cash and cash equivalents",
+              "value": 17164000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash and cash equivalent. Cash includes, but is not limited to, currency on hand, demand deposit with financial institution, and account with general characteristic of demand deposit. Cash e..."
+            },
+            {
+              "tag": "PreferredStockParOrStatedValuePerShare",
+              "label": "Preferred stock, par value (in dollars per share)",
+              "value": 0.0001,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "",
+              "definition": "Face amount or stated value per share of preferred stock nonredeemable or redeemable solely at the option of the issuer."
+            },
+            {
+              "tag": "RestrictedCashAndCashEquivalentsU.S.LitigationEscrow",
+              "label": "Restricted cash equivalentsU.S. litigation escrow",
+              "value": 2990000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Restricted Cash And Cash Equivalents, U.S. Litigation Escrow"
+            },
+            {
+              "tag": "Investments",
+              "label": "Investment securities",
+              "value": 1833000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Sum of the carrying amounts as of the balance sheet date of all investments."
+            },
+            {
+              "tag": "SettlementReceivable",
+              "label": "Settlement receivable",
+              "value": 4191000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "The Company operates systems for clearing and settling customer payment transactions. Net settlements are generally cleared within one to two business days, resulting in amounts due to and from financ..."
+            },
+            {
+              "tag": "AccountsReceivableNetCurrent",
+              "label": "Accounts receivable",
+              "value": 3126000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount, after allowance for credit loss, of right to consideration from customer for product sold and service rendered in normal course of business, classified as current."
+            },
+            {
+              "tag": "CustomerCollateralAssets",
+              "label": "Customer collateral",
+              "value": 3625000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "The Company holds cash deposits and other noncash assets from certain customers in order to ensure their performance of settlement obligations arising from credit, debit and travelers cheque product c..."
+            },
+            {
+              "tag": "ClientIncentivesAssetsCurrent",
+              "label": "Current portion of client incentives",
+              "value": 2158000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "The Company enters into long-term contracts with financial institution clients, merchants and strategic partners for various programs designed to increase revenue by growing payments volume, increasin..."
+            },
+            {
+              "tag": "PrepaidExpenseAndOtherAssetsCurrent",
+              "label": "Prepaid expenses and other current assets",
+              "value": 2679000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of asset related to consideration paid in advance for costs that provide economic benefits in future periods, and amount of other assets that are expected to be realized or consumed within one ..."
+            },
+            {
+              "tag": "AssetsCurrent",
+              "label": "Total current assets",
+              "value": 37766000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of asset recognized for present right to economic benefit, classified as current."
+            },
+            {
+              "tag": "LongTermInvestments",
+              "label": "Investment securities",
+              "value": 999000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "The total amount of investments that are intended to be held for an extended period of time (longer than one operating cycle)."
+            },
+            {
+              "tag": "ClientIncentivesAssetsNoncurrent",
+              "label": "Client incentives",
+              "value": 5157000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Client incentives which are expected to be recorded as a reduction to operating revenues after one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "PropertyPlantAndEquipmentNet",
+              "label": "Property, equipment and technology, net",
+              "value": 4236000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount after accumulated depreciation, depletion and amortization of physical assets used in the normal conduct of business to produce goods and services and not intended for resale. Examples include,..."
+            },
+            {
+              "tag": "Goodwill",
+              "label": "Goodwill",
+              "value": 19879000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount, after accumulated impairment loss, of asset representing future economic benefit arising from other asset acquired in business combination or from joint venture formation or both, that is not ..."
+            },
+            {
+              "tag": "IntangibleAssetsNetExcludingGoodwill",
+              "label": "Intangible assets, net",
+              "value": 27646000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Sum of the carrying amounts of all intangible assets, excluding goodwill, as of the balance sheet date, net of accumulated amortization and impairment charges."
+            },
+            {
+              "tag": "OtherAssetsNoncurrent",
+              "label": "Other assets",
+              "value": 3944000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of noncurrent assets classified as other."
+            },
+            {
+              "tag": "Assets",
+              "label": "Total assets",
+              "value": 99627000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of asset recognized for present right to economic benefit."
+            },
+            {
+              "tag": "AccountsPayableCurrent",
+              "label": "Accounts payable",
+              "value": 555000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Carrying value as of the balance sheet date of liabilities incurred (and for which invoices have typically been received) and payable to vendors for goods and services received that are used in an ent..."
+            },
+            {
+              "tag": "SettlementPayable",
+              "label": "Settlement payable",
+              "value": 4568000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "The Company operates systems for clearing and settling customer payment transactions. Net settlements are generally cleared within one to two business days, resulting in amounts due to and from financ..."
+            },
+            {
+              "tag": "CustomerCollateralLiabilities",
+              "label": "Customer collateral",
+              "value": 3625000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "The Company holds cash deposits and other noncash assets from certain customers in order to ensure their performance of settlement obligations arising from credit, debit and travelers cheque product c..."
+            },
+            {
+              "tag": "EmployeeRelatedLiabilitiesCurrent",
+              "label": "Accrued compensation and benefits",
+              "value": 1863000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Total of the carrying values as of the balance sheet date of obligations incurred through that date and payable for obligations related to services received from employees, such as accrued salaries an..."
+            },
+            {
+              "tag": "ClientIncentivesLiabilitiesCurrent",
+              "label": "Client incentives",
+              "value": 10369000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "The Company enters into incentive agreements with financial institution customers, merchants, and other business partners designed to build payments volume and to increase product acceptance. Incentiv..."
+            },
+            {
+              "tag": "AccruedLiabilitiesCurrent",
+              "label": "Accrued liabilities",
+              "value": 5466000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Carrying value as of the balance sheet date of obligations incurred and payable, pertaining to costs that are statutory in nature, are incurred on contractual obligations, or accumulate over time and ..."
+            },
+            {
+              "tag": "LongTermDebtCurrent",
+              "label": "Current maturities of debt",
+              "value": 5569000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after deduction of unamortized premium (discount) and debt issuance cost, of long-term debt classified as current. Excludes lease obligation."
+            },
+            {
+              "tag": "LitigationReserveCurrent",
+              "label": "Accrued litigation",
+              "value": 3033000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Carrying amount of reserve for known or estimated probable loss from litigation, which may include attorneys' fees and other litigation costs, which is expected to be paid within one year of the date ..."
+            },
+            {
+              "tag": "LiabilitiesCurrent",
+              "label": "Total current liabilities",
+              "value": 35048000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Total obligations incurred as part of normal operations that are expected to be paid during the following twelve months or within one business cycle, if longer."
+            },
+            {
+              "tag": "LongTermDebtNoncurrent",
+              "label": "Long-term debt",
+              "value": 19602000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after deduction of unamortized premium (discount) and debt issuance cost, of long-term debt classified as noncurrent. Excludes lease obligation."
+            },
+            {
+              "tag": "DeferredIncomeTaxLiabilitiesNet",
+              "label": "Deferred tax liabilities",
+              "value": 5549000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after deferred tax asset, of deferred tax liability attributable to taxable differences with jurisdictional netting."
+            },
+            {
+              "tag": "OtherLiabilitiesNoncurrent",
+              "label": "Other liabilities",
+              "value": 1519000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities classified as other, due after one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "Liabilities",
+              "label": "Total liabilities",
+              "value": 61718000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liability recognized for present obligation requiring transfer or otherwise providing economic benefit to others."
+            },
+            {
+              "tag": "PreferredStockValueOutstanding",
+              "label": "Preferred stock, $0.0001 par value, 5 shares issued and outstanding as of September 30, 2025 and 2024",
+              "value": 745000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Value of nonredeemable preferred shares and preferred shares redeemable solely at option of issuer, held by shareholders. Excludes preferred shares repurchased and held as treasury shares."
+            },
+            {
+              "tag": "RightToRecoverForCoveredLosses",
+              "label": "Right to recover for covered losses",
+              "value": 124000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Right To Recover For Covered Losses"
+            },
+            {
+              "tag": "AdditionalPaidInCapital",
+              "label": "Additional paid-in capital",
+              "value": 21934000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of excess of issue price over par or stated value of stock and from other transaction involving stock or stockholder. Includes, but is not limited to, additional paid-in capital (APIC) for comm..."
+            },
+            {
+              "tag": "RetainedEarningsAccumulatedDeficit",
+              "label": "Accumulated income",
+              "value": 15106000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of accumulated undistributed earnings (deficit)."
+            },
+            {
+              "tag": "AccumulatedOtherComprehensiveIncomeLossAvailableForSaleSecuritiesAdjustmentNetOfTax",
+              "label": "Investment securities",
+              "value": 12000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax, of accumulated unrealized gain (loss) on investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (available-for-sale)."
+            },
+            {
+              "tag": "AccumulatedOtherComprehensiveIncomeLossDefinedBenefitPensionAndOtherPostretirementPlansNetOfTax",
+              "label": "Defined benefit pension and other postretirement plans",
+              "value": 32000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount, after tax, of accumulated other comprehensive (income) loss for defined benefit plan, that has not been recognized in net periodic benefit cost (credit)."
+            },
+            {
+              "tag": "AociLossCashFlowHedgeCumulativeGainLossAfterTax",
+              "label": "Derivative instruments",
+              "value": -307000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax, of accumulated gain (loss) on derivative instrument designated and qualifying as cash flow hedge included in assessment of hedge effectiveness."
+            },
+            {
+              "tag": "AccumulatedOtherComprehensiveIncomeLossForeignCurrencyTranslationAdjustmentNetOfTax",
+              "label": "Foreign currency translation adjustments",
+              "value": 575000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Accumulated adjustment, net of tax, that results from the process of translating subsidiary financial statements and foreign equity investments into the reporting currency from the functional currency..."
+            },
+            {
+              "tag": "AccumulatedOtherComprehensiveIncomeLossNetOfTax",
+              "label": "Total accumulated other comprehensive income (loss)",
+              "value": 248000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax, of accumulated increase (decrease) in equity from transaction and other event and circumstance from nonowner source."
+            },
+            {
+              "tag": "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+              "label": "Total equity",
+              "value": 37909000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of equity (deficit) attributable to parent and noncontrolling interest. Excludes temporary equity."
+            },
+            {
+              "tag": "LiabilitiesAndStockholdersEquity",
+              "label": "Total liabilities and equity",
+              "value": 99627000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities and equity items, including the portion of equity attributable to noncontrolling interests, if any."
+            }
+          ]
+        },
+        {
+          "statement_type": "Cash Flows",
+          "items": [
+            {
+              "tag": "IncomeTaxesPaidFederalTaxCredits",
+              "label": "Cash paid for transferable tax credits",
+              "value": 1900000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Income Taxes Paid, Federal Tax Credits"
+            },
+            {
+              "tag": "ProfitLoss",
+              "label": "Net income",
+              "value": 20058000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The consolidated profit or loss for the period, net of income taxes, including the portion attributable to the noncontrolling interest."
+            },
+            {
+              "tag": "AmortizationOfClientIncentives",
+              "label": "Client incentives",
+              "value": 15751000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The net change in volume and support incentives due to amortization or adjustments recognized on the consolidated statements of operations."
+            },
+            {
+              "tag": "ShareBasedCompensation",
+              "label": "Share-based compensation",
+              "value": 897000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of noncash expense for share-based payment arrangement."
+            },
+            {
+              "tag": "DepreciationAndAmortization",
+              "label": "Depreciation and amortization",
+              "value": 1220000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The current period expense charged against earnings on long-lived, physical assets not used in production, and which are not intended for resale, to allocate or recognize the cost of such assets over ..."
+            },
+            {
+              "tag": "DeferredIncomeTaxExpenseBenefit",
+              "label": "Deferred income taxes",
+              "value": 152000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of deferred income tax expense (benefit) pertaining to income (loss) from continuing operations."
+            },
+            {
+              "tag": "VETerritoryCoveredLossesIncurredPostAcquisition",
+              "label": "VE territory covered losses",
+              "value": -28000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "VE Territory Covered Losses Incurred, Post Acquisition"
+            },
+            {
+              "tag": "IncomeLossFromEquityMethodInvestmentsAndFairMarketValueAlternativeInvestments",
+              "label": "(Gains) losses on equity investments, net",
+              "value": -87000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Income (Loss) From Equity Method Investments And Fair Market Value Alternative Investments"
+            },
+            {
+              "tag": "OtherNoncashIncomeExpense",
+              "label": "Other",
+              "value": -94000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of income (expense) included in net income that results in no cash inflow (outflow), classified as other."
+            },
+            {
+              "tag": "IncreaseDecreaseInSettlementReceivable",
+              "label": "Settlement receivable",
+              "value": -374000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The net change during the reporting period in settlement receivable."
+            },
+            {
+              "tag": "IncreaseDecreaseInAccountsReceivable",
+              "label": "Accounts receivable",
+              "value": 542000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The increase (decrease) during the reporting period in amount due within one year (or one business cycle) from customers for the credit sale of goods and services."
+            },
+            {
+              "tag": "IncreaseDecreaseInClientIncentives",
+              "label": "Client incentives",
+              "value": 15314000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The net change in volume and support incentives for net payments made during the period."
+            },
+            {
+              "tag": "IncreaseDecreaseInOtherOperatingAssets",
+              "label": "Other assets",
+              "value": -160000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of increase (decrease) in operating assets classified as other."
+            },
+            {
+              "tag": "IncreaseDecreaseInAccountsPayable",
+              "label": "Accounts payable",
+              "value": 67000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The increase (decrease) during the reporting period in the aggregate amount of liabilities incurred (and for which invoices have typically been received) and payable to vendors for goods and services ..."
+            },
+            {
+              "tag": "IncreaseDecreaseInSettlementPayable",
+              "label": "Settlement payable",
+              "value": -847000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The net change during the reporting period in settlement payable."
+            },
+            {
+              "tag": "IncreaseDecreaseInAccruedLiabilitiesAndOtherOperatingLiabilities",
+              "label": "Accrued and other liabilities",
+              "value": -373000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) in accrued expenses, and obligations classified as other."
+            },
+            {
+              "tag": "IncreaseDecreaseInAccruedLitigation",
+              "label": "Accrued litigation",
+              "value": 1303000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Litigation payments made during the period."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInOperatingActivities",
+              "label": "Net cash provided by (used in) operating activities",
+              "value": 23059000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Amount of cash inflow (outflow) from operating activity, including, but not limited to, discontinued operation. Operating activity includes, but is not limited to, transaction, adjustment, and change ..."
+            },
+            {
+              "tag": "PaymentsToAcquireProductiveAssets",
+              "label": "Purchases of property, equipment and technology",
+              "value": 1482000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow for purchases of and capital improvements on property, plant and equipment (capital expenditures), software, and other intangible assets."
+            },
+            {
+              "tag": "PaymentsToAcquireAvailableForSaleSecuritiesDebt",
+              "label": "Purchases of investment securities",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow to acquire investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (available-for-sale)."
+            },
+            {
+              "tag": "ProceedsFromSaleAndMaturityOfAvailableForSaleSecurities",
+              "label": "Proceeds from maturities and sales of investment securities",
+              "value": 3024000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow from sale, maturity, prepayment and call of investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (available-for-s..."
+            },
+            {
+              "tag": "PaymentsToAcquireBusinessesNetOfCashAcquired",
+              "label": "Acquisitions, net of cash and restricted cash acquired",
+              "value": 887000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow associated with the acquisition of a business, net of the cash acquired from the purchase."
+            },
+            {
+              "tag": "PaymentsToAcquireOtherInvestments",
+              "label": "Purchases of other investments",
+              "value": 68000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow to acquire investments classified as other."
+            },
+            {
+              "tag": "PaymentsForProceedsFromDerivativeInstrumentInvestingActivities",
+              "label": "Proceeds from settlement of derivative instruments",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The net cash outflow or inflow from derivative instruments during the period, which are classified as investing activities, excluding those designated as hedging instruments."
+            },
+            {
+              "tag": "PaymentsForProceedsFromOtherInvestingActivities",
+              "label": "Other investing activities",
+              "value": -121000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash (inflow) outflow from investing activity, classified as other."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInInvestingActivities",
+              "label": "Net cash provided by (used in) investing activities",
+              "value": 708000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from investing activity, including, but not limited to, discontinued operation. Investing activity includes, but is not limited to, making and collecting loan, acquirin..."
+            },
+            {
+              "tag": "PaymentsForRepurchaseOfCommonStock",
+              "label": "Repurchases of class A common stock",
+              "value": 18316000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow to reacquire common stock during the period."
+            },
+            {
+              "tag": "RepaymentsOfLongTermDebt",
+              "label": "Repayments of debt",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow for debt initially having maturity due after one year or beyond the normal operating cycle, if longer."
+            },
+            {
+              "tag": "PaymentsOfDividends",
+              "label": "Dividends paid",
+              "value": 4634000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Cash outflow in the form of capital distributions and dividends to common shareholders, preferred shareholders and noncontrolling interests."
+            },
+            {
+              "tag": "ProceedsFromIssuanceOfDebt",
+              "label": "Proceeds from issuance of senior notes",
+              "value": 3924000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow during the period from additional borrowings in aggregate debt. Includes proceeds from short-term and long-term debt."
+            },
+            {
+              "tag": "ProceedsFromStockOptionsExercised",
+              "label": "Proceeds from stock issued under equity plans",
+              "value": 396000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow from exercise of option under share-based payment arrangement."
+            },
+            {
+              "tag": "PaymentsRelatedToTaxWithholdingForShareBasedCompensation",
+              "label": "Taxes paid related to stock issued under equity plans",
+              "value": 281000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow to satisfy grantee's tax withholding obligation for award under share-based payment arrangement."
+            },
+            {
+              "tag": "ProceedsFromPaymentsForOtherFinancingActivities",
+              "label": "Other financing activities",
+              "value": -52000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from financing activity, classified as other."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInFinancingActivities",
+              "label": "Net cash provided by (used in) financing activities",
+              "value": -18963000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from financing activity, including, but not limited to, discontinued operation. Financing activity includes, but is not limited to, obtaining resource from owner and pr..."
+            },
+            {
+              "tag": "EffectOfExchangeRateOnCashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+              "label": "Effect of exchange rate changes on cash, cash equivalents, restricted cash and restricted cash equivalents",
+              "value": 420000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) from effect of exchange rate change on cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; held in foreign currency; attributable to..."
+            },
+            {
+              "tag": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
+              "label": "Increase (decrease) in cash, cash equivalents, restricted cash and restricted cash equivalents",
+              "value": 5224000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) in cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; including effect from exchange rate change and including, but not limited to,..."
+            },
+            {
+              "tag": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+              "label": "Cash, cash equivalents, restricted cash and restricted cash equivalents as of end of period",
+              "value": 24987000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; attributable to continuing operation. Cash includes, but is not limited to, currency on hand, demand..."
+            },
+            {
+              "tag": "IncomeTaxesPaidNet",
+              "label": "Cash paid for income taxes, net",
+              "value": 4541000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after refund, of cash paid to foreign, federal, state, and local jurisdictions as income tax."
+            },
+            {
+              "tag": "InterestPaidNet",
+              "label": "Interest payments on debt",
+              "value": 587000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash paid for interest, excluding capitalized interest, classified as operating activity. Includes, but is not limited to, payment to settle zero-coupon bond for accreted interest of debt di..."
+            },
+            {
+              "tag": "CapitalExpendituresIncurredButNotYetPaid",
+              "label": "Accruals related to purchases of property, equipment and technology",
+              "value": 59000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Future cash outflow to pay for purchases of fixed assets that have occurred."
+            }
+          ]
+        },
+        {
+          "statement_type": "Comprehensive Income",
+          "items": [
+            {
+              "tag": "ProfitLoss",
+              "label": "Net income",
+              "value": 20058000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The consolidated profit or loss for the period, net of income taxes, including the portion attributable to the noncontrolling interest."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeUnrealizedHoldingGainLossOnSecuritiesArisingDuringPeriodBeforeTax",
+              "label": "Net unrealized gain (loss)",
+              "value": -23000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, before tax and adjustment, of unrealized holding gain (loss) on investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (available..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeUnrealizedHoldingGainLossOnSecuritiesArisingDuringPeriodTax",
+              "label": "Income tax effect",
+              "value": -5000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount, before adjustment, of tax expense (benefit) for unrealized holding gain (loss) on investment in debt security measured at fair value with change in fair value recognized in other comprehensive..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossPensionAndOtherPostretirementBenefitPlansAdjustmentBeforeReclassificationAdjustmentsAndTax",
+              "label": "Net unrealized actuarial gain (loss) and prior service credit (cost)",
+              "value": 20000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount, before tax and reclassification adjustment, of (increase) decrease in accumulated other comprehensive income of defined benefit plan, that has not been recognized in net periodic benefit cost ..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossPensionAndOtherPostretirementBenefitPlansBeforeReclassificationAdjustmentsTax",
+              "label": "Income tax effect",
+              "value": 4000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, before reclassification adjustment, of tax (expense) benefit for (increase) decrease in accumulated other comprehensive income for defined benefit plan."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossAmortizationAdjustmentFromAOCIPensionAndOtherPostretirementBenefitPlansForNetPriorServiceCostCreditBeforeTax",
+              "label": "Reclassification adjustments",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, before tax, of reclassification adjustment from accumulated other comprehensive (income) loss for prior service cost (credit) of defined benefit plan."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossAmortizationAdjustmentFromAOCIPensionAndOtherPostretirementBenefitPlansForNetPriorServiceCostCreditTax",
+              "label": "Income tax effect",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of tax (expense) benefit of reclassification adjustment from accumulated other comprehensive (income) loss for prior service cost (credit) of defined benefit plan."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossCashFlowHedgeGainLossBeforeReclassificationAndTax",
+              "label": "Net unrealized gain (loss)",
+              "value": -172000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, before tax and reclassification, of gain (loss) from derivative instrument designated and qualifying cash flow hedge included in assessment of hedge effectiveness."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossCashFlowHedgeGainLossBeforeReclassificationTax",
+              "label": "Income tax effect",
+              "value": -36000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount, before reclassification, of tax expense (benefit) for gain (loss) from derivative instrument designated and qualifying as cash flow hedge included in assessment of hedge effectiveness."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossCashFlowHedgeGainLossReclassificationBeforeTax",
+              "label": "Reclassification adjustments",
+              "value": -55000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount, before tax, of reclassification of gain (loss) from accumulated other comprehensive income (AOCI) for derivative instrument designated and qualifying as cash flow hedge included in assessment ..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossCashFlowHedgeGainLossReclassificationTax",
+              "label": "Income tax effect",
+              "value": -13000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of tax expense (benefit) for reclassification of gain (loss) from accumulated other comprehensive income (AOCI) for derivative instrument designated and qualifying as cash flow hedge included i..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentBeforeTax",
+              "label": "Translation adjustments",
+              "value": 583000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount before tax, after reclassification adjustments of gain (loss) on foreign currency translation adjustments, foreign currency transactions designated and effective as economic hedges of a net inv..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossForeignCurrencyTranslationAdjustmentTax",
+              "label": "Income tax effect",
+              "value": -101000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of tax expense (benefit), after reclassification adjustments of gain (loss) on foreign currency translation adjustments, foreign currency transactions designated and effective as economic hedge..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossNetOfTax",
+              "label": "Other comprehensive income (loss)",
+              "value": 556000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax and reclassification adjustments of other comprehensive income (loss)."
+            },
+            {
+              "tag": "ComprehensiveIncomeNetOfTaxIncludingPortionAttributableToNoncontrollingInterest",
+              "label": "Comprehensive income",
+              "value": 20614000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax of increase (decrease) in equity from transactions and other events and circumstances from net income and other comprehensive income. Excludes changes in equity resulting from investm..."
+            }
+          ]
+        },
+        {
+          "statement_type": "Stockholders Equity",
+          "items": [
+            {
+              "tag": "CommonStockDividendsPerShareCashPaid",
+              "label": "Dividends paid, quarterly, per share (in dollars per share)",
+              "value": 0.59,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Aggregate dividends paid during the period for each share of common stock outstanding."
+            },
+            {
+              "tag": "CommonStockDividendsPerShareDeclared",
+              "label": "Dividends declared, quarterly, per share (in dollars per share)",
+              "value": 0.59,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Aggregate dividends declared during the period for each share of common stock outstanding."
+            },
+            {
+              "tag": "PreferredStockValueOutstanding",
+              "label": "Book value of preferred stock",
+              "value": 745000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Value of nonredeemable preferred shares and preferred shares redeemable solely at option of issuer, held by shareholders. Excludes preferred shares repurchased and held as treasury shares."
+            },
+            {
+              "tag": "ProfitLoss",
+              "label": "Net income",
+              "value": 20058000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The consolidated profit or loss for the period, net of income taxes, including the portion attributable to the noncontrolling interest."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossNetOfTax",
+              "label": "Other comprehensive income (loss)",
+              "value": 556000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax and reclassification adjustments of other comprehensive income (loss)."
+            },
+            {
+              "tag": "VETerritoryCoveredLossesIncurred",
+              "label": "VE territory covered losses",
+              "value": 28000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "VE Territory Covered Losses Incurred"
+            },
+            {
+              "tag": "RecoveryThroughConversionRateAdjustments",
+              "label": "Recovery through conversion rate adjustments",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Recovery Through Conversion Rate Adjustments"
+            },
+            {
+              "tag": "ConversionOfStockAmountConverted1",
+              "label": "Conversions to class A common stock",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The value of the stock converted in a noncash (or part noncash) transaction. Noncash is defined as transactions during a period that do not result in cash receipts or cash payments in the period. \"Par..."
+            },
+            {
+              "tag": "StockIssuedDuringPeriodValueStockExchangeOffer",
+              "label": "Class B-1 common stock exchange offer",
+              "value": 0.0,
+              "period_end": "20240930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Stock Issued During Period, Value, Stock Exchange Offer"
+            },
+            {
+              "tag": "AdjustmentsToAdditionalPaidInCapitalSharebasedCompensationRequisiteServicePeriodRecognitionValue",
+              "label": "Share-based compensation",
+              "value": 897000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of increase to additional paid-in capital (APIC) for recognition of cost for award under share-based payment arrangement."
+            },
+            {
+              "tag": "StockIssuedDuringPeriodValueNewIssues",
+              "label": "Stock issued under equity plans",
+              "value": 396000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Equity impact of the value of new stock issued during the period. Includes shares issued in an initial public offering or a secondary public offering."
+            },
+            {
+              "tag": "AdjustmentsRelatedToTaxWithholdingForShareBasedCompensation",
+              "label": "Shares withheld for taxes related to stock issued under equity plans",
+              "value": 281000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of decrease to equity for grantee's tax withholding obligation for award under share-based payment arrangement."
+            },
+            {
+              "tag": "DividendsCash",
+              "label": "Cash dividends declared and paid, at a quarterly amount per class A common stock",
+              "value": 4634000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of paid and unpaid cash dividends declared for classes of stock, for example, but not limited to, common and preferred."
+            },
+            {
+              "tag": "StockRepurchasedAndRetiredDuringPeriodValue",
+              "label": "Repurchases of class A common stock",
+              "value": 18185000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Equity impact of the value of stock that has been repurchased and retired during the period. The excess of the purchase price over par value can be charged against retained earnings (once the excess i..."
+            },
+            {
+              "tag": "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+              "label": "Balance as of end of period",
+              "value": 37909000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of equity (deficit) attributable to parent and noncontrolling interest. Excludes temporary equity."
+            }
+          ]
+        },
+        {
+          "statement_type": "Income Statement",
+          "items": [
+            {
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax",
+              "label": "Net revenue",
+              "value": 40000000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, excluding tax collected from customer, of revenue from satisfaction of performance obligation by transferring promised good or service to customer. Tax collected from customer is tax assessed ..."
+            },
+            {
+              "tag": "LaborAndRelatedExpense",
+              "label": "Personnel",
+              "value": 6961000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of expense for salary, wage, profit sharing; incentive and equity-based compensation; and other employee benefit."
+            },
+            {
+              "tag": "MarketingAndAdvertisingExpense",
+              "label": "Marketing",
+              "value": 1684000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The total expense recognized in the period for promotion, public relations, and brand or product advertising."
+            },
+            {
+              "tag": "CommunicationsAndInformationTechnology",
+              "label": "Network and processing",
+              "value": 894000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The amount of expense in the period for communications and data processing expense."
+            },
+            {
+              "tag": "ProfessionalFees",
+              "label": "Professional fees",
+              "value": 759000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "A fee charged for services from professionals such as doctors, lawyers and accountants. The term is often expanded to include other professions, for example, pharmacists charging to maintain a medicin..."
+            },
+            {
+              "tag": "DepreciationAndAmortization",
+              "label": "Depreciation and amortization",
+              "value": 1220000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The current period expense charged against earnings on long-lived, physical assets not used in production, and which are not intended for resale, to allocate or recognize the cost of such assets over ..."
+            },
+            {
+              "tag": "GeneralAndAdministrativeExpense",
+              "label": "General and administrative",
+              "value": 1926000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate total of expenses of managing and administering the affairs of an entity, including affiliates of the reporting entity, which are not directly or indirectly associated with the manufactu..."
+            },
+            {
+              "tag": "LossContingencyLossInPeriod",
+              "label": "Litigation provision",
+              "value": 2562000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The amount of loss pertaining to the specified contingency that was charged against earnings in the period, including the effects of revisions in previously reported estimates."
+            },
+            {
+              "tag": "CostsAndExpenses",
+              "label": "Total operating expenses",
+              "value": 16006000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Total costs of sales and operating expenses for the period."
+            },
+            {
+              "tag": "OperatingIncomeLoss",
+              "label": "Operating income",
+              "value": 23994000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The net result for the period of deducting operating expenses from operating revenues."
+            },
+            {
+              "tag": "InterestExpenseNonoperating",
+              "label": "Interest expense",
+              "value": 589000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of interest expense classified as nonoperating."
+            },
+            {
+              "tag": "OtherNonoperatingIncomeExpense",
+              "label": "Investment income (expense) and other",
+              "value": 789000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of income (expense) related to nonoperating activities, classified as other."
+            },
+            {
+              "tag": "NonoperatingIncomeExpense",
+              "label": "Total non-operating income (expense)",
+              "value": 200000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The aggregate amount of income or expense from ancillary business-related activities (that is to say, excluding major activities considered part of the normal operations of the business)."
+            },
+            {
+              "tag": "IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+              "label": "Income before income taxes",
+              "value": 24194000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of income (loss) from continuing operations, including income (loss) from equity method investments, before deduction of income tax expense (benefit), and income (loss) attributable to noncontr..."
+            },
+            {
+              "tag": "IncomeTaxExpenseBenefit",
+              "label": "Income tax provision",
+              "value": 4136000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of current income tax expense (benefit) and deferred income tax expense (benefit) pertaining to continuing operations."
+            },
+            {
+              "tag": "ProfitLoss",
+              "label": "Net income",
+              "value": 20058000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The consolidated profit or loss for the period, net of income taxes, including the portion attributable to the noncontrolling interest."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "COSTCO WHOLESALE CORP /NEW",
+      "cik": "909832",
+      "sic": "5331",
+      "state": "WA",
+      "city": "ISSAQUAH",
+      "filing": {
+        "adsh": "0000909832-25-000101",
+        "form": "10-K",
+        "period": "20250831",
+        "fiscal_year": "2025",
+        "fiscal_period": "FY",
+        "filed": "20251008"
+      },
+      "statements": [
+        {
+          "statement_type": "Balance Sheet",
+          "items": [
+            {
+              "tag": "PreferredStockParOrStatedValuePerShare",
+              "label": "Preferred stock, par value (in dollars per share)",
+              "value": 0.005,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "",
+              "definition": "Face amount or stated value per share of preferred stock nonredeemable or redeemable solely at the option of the issuer."
+            },
+            {
+              "tag": "CashAndCashEquivalentsAtCarryingValue",
+              "label": "Cash and cash equivalents",
+              "value": 14161000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash and cash equivalent. Cash includes, but is not limited to, currency on hand, demand deposit with financial institution, and account with general characteristic of demand deposit. Cash e..."
+            },
+            {
+              "tag": "ShortTermInvestments",
+              "label": "Short-term investments",
+              "value": 1123000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of investments including trading securities, available-for-sale securities, held-to-maturity securities, and short-term investments classified as other and current."
+            },
+            {
+              "tag": "ReceivablesNetCurrent",
+              "label": "Receivables, net",
+              "value": 3203000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "The total amount due to the entity within one year of the balance sheet date (or one operating cycle, if longer) from outside sources, including trade accounts receivable, notes and loans receivable, ..."
+            },
+            {
+              "tag": "CommonStockParOrStatedValuePerShare",
+              "label": "Common stock, par value (in dollars per share)",
+              "value": 0.005,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "",
+              "definition": "Face amount or stated value per share of common stock."
+            },
+            {
+              "tag": "InventoryNet",
+              "label": "Merchandise inventories",
+              "value": 18116000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount after valuation and LIFO reserves of inventory expected to be sold, or consumed within one year or operating cycle, if longer."
+            },
+            {
+              "tag": "OtherAssetsCurrent",
+              "label": "Other current assets",
+              "value": 1777000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of current assets classified as other."
+            },
+            {
+              "tag": "AssetsCurrent",
+              "label": "Total current assets",
+              "value": 38380000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of asset recognized for present right to economic benefit, classified as current."
+            },
+            {
+              "tag": "PropertyPlantAndEquipmentNet",
+              "label": "Property and equipment, net",
+              "value": 31909000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount after accumulated depreciation, depletion and amortization of physical assets used in the normal conduct of business to produce goods and services and not intended for resale. Examples include,..."
+            },
+            {
+              "tag": "OperatingLeaseRightOfUseAsset",
+              "label": "Operating lease right-of-use assets",
+              "value": 2725000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of lessee's right to use underlying asset under operating lease."
+            },
+            {
+              "tag": "OtherAssetsNoncurrent",
+              "label": "Other long-term assets",
+              "value": 4085000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of noncurrent assets classified as other."
+            },
+            {
+              "tag": "Assets",
+              "label": "Total assets",
+              "value": 77099000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of asset recognized for present right to economic benefit."
+            },
+            {
+              "tag": "AccountsPayableCurrent",
+              "label": "Accounts payable",
+              "value": 19783000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Carrying value as of the balance sheet date of liabilities incurred (and for which invoices have typically been received) and payable to vendors for goods and services received that are used in an ent..."
+            },
+            {
+              "tag": "EmployeeRelatedLiabilitiesCurrent",
+              "label": "Accrued salaries and benefits",
+              "value": 5205000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Total of the carrying values as of the balance sheet date of obligations incurred through that date and payable for obligations related to services received from employees, such as accrued salaries an..."
+            },
+            {
+              "tag": "AccruedLiabilitiesCurrent",
+              "label": "Accrued member rewards",
+              "value": 2677000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Carrying value as of the balance sheet date of obligations incurred and payable, pertaining to costs that are statutory in nature, are incurred on contractual obligations, or accumulate over time and ..."
+            },
+            {
+              "tag": "DeferredRevenueCurrent",
+              "label": "Deferred membership fees",
+              "value": 2854000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of deferred income and obligation to transfer product and service to customer for which consideration has been received or is receivable, classified as current."
+            },
+            {
+              "tag": "OtherLiabilitiesCurrent",
+              "label": "Other current liabilities",
+              "value": 6589000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities classified as other, due within one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "LiabilitiesCurrent",
+              "label": "Total current liabilities",
+              "value": 37108000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Total obligations incurred as part of normal operations that are expected to be paid during the following twelve months or within one business cycle, if longer."
+            },
+            {
+              "tag": "LongTermDebtNoncurrent",
+              "label": "Long-term debt, excluding current portion",
+              "value": 5713000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after deduction of unamortized premium (discount) and debt issuance cost, of long-term debt classified as noncurrent. Excludes lease obligation."
+            },
+            {
+              "tag": "OperatingLeaseLiabilityNoncurrent",
+              "label": "Long-term operating lease liabilities",
+              "value": 2460000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Present value of lessee's discounted obligation for lease payments from operating lease, classified as noncurrent."
+            },
+            {
+              "tag": "OtherLiabilitiesNoncurrent",
+              "label": "Other long-term liabilities",
+              "value": 2654000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities classified as other, due after one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "Liabilities",
+              "label": "TOTAL LIABILITIES",
+              "value": 47935000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liability recognized for present obligation requiring transfer or otherwise providing economic benefit to others."
+            },
+            {
+              "tag": "PreferredStockValue",
+              "label": "Preferred stock $.005 par value; 100,000,000 shares authorized; no shares issued and outstanding",
+              "value": 0.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Aggregate par or stated value of issued nonredeemable preferred stock (or preferred stock redeemable solely at the option of the issuer). This item includes treasury stock repurchased by the entity. N..."
+            },
+            {
+              "tag": "CommonStockValue",
+              "label": "Common Stock $.005 par value; 900,000,000 shares authorized; 443,237,000 and 442,126,000 shares issued and outstanding",
+              "value": 2000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Aggregate par or stated value of issued nonredeemable common stock (or common stock redeemable solely at the option of the issuer). This item includes treasury stock repurchased by the entity. Note: e..."
+            },
+            {
+              "tag": "AdditionalPaidInCapitalCommonStock",
+              "label": "Additional paid-in capital",
+              "value": 8282000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Value received from shareholders in common stock-related transactions that are in excess of par value or stated value and amounts received from other stock-related transactions. Includes only common s..."
+            },
+            {
+              "tag": "AccumulatedOtherComprehensiveIncomeLossNetOfTax",
+              "label": "Accumulated other comprehensive loss",
+              "value": -1770000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax, of accumulated increase (decrease) in equity from transaction and other event and circumstance from nonowner source."
+            },
+            {
+              "tag": "RetainedEarningsAccumulatedDeficit",
+              "label": "Retained earnings",
+              "value": 22650000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of accumulated undistributed earnings (deficit)."
+            },
+            {
+              "tag": "StockholdersEquity",
+              "label": "TOTAL EQUITY",
+              "value": 29164000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of equity (deficit) attributable to parent. Excludes temporary equity and equity attributable to noncontrolling interest."
+            },
+            {
+              "tag": "LiabilitiesAndStockholdersEquity",
+              "label": "TOTAL LIABILITIES AND EQUITY",
+              "value": 77099000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities and equity items, including the portion of equity attributable to noncontrolling interests, if any."
+            }
+          ]
+        },
+        {
+          "statement_type": "Cash Flows",
+          "items": [
+            {
+              "tag": "NetIncomeLoss",
+              "label": "NET INCOME",
+              "value": 8099000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "DepreciationDepletionAndAmortization",
+              "label": "Depreciation and amortization",
+              "value": 2426000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate expense recognized in the current period that allocates the cost of tangible assets, intangible assets, or depleting assets to periods that benefit from use of the assets."
+            },
+            {
+              "tag": "OperatingandFinancingLeaseRightofUseAssetAmortization",
+              "label": "Non-cash lease expense",
+              "value": 303000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of Amortization expense attributable to right-of-use asset from operating and finance lease."
+            },
+            {
+              "tag": "ShareBasedCompensation",
+              "label": "Stock-based compensation",
+              "value": 860000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of noncash expense for share-based payment arrangement."
+            },
+            {
+              "tag": "ImpairmentOfAssetsAndOtherNonCashOperatingActivitiesNet",
+              "label": "Impairment of assets and other non-cash operating activities, net",
+              "value": 117000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Impairment of assets and other non-cash operating activities, net"
+            },
+            {
+              "tag": "IncreaseDecreaseInInventories",
+              "label": "Merchandise inventories",
+              "value": -559000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The increase (decrease) during the reporting period in the aggregate value of all inventory held by the reporting entity, associated with underlying transactions that are classified as operating activ..."
+            },
+            {
+              "tag": "IncreaseDecreaseInAccountsPayable",
+              "label": "Accounts payable",
+              "value": 404000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The increase (decrease) during the reporting period in the aggregate amount of liabilities incurred (and for which invoices have typically been received) and payable to vendors for goods and services ..."
+            },
+            {
+              "tag": "IncreaseDecreaseInOtherOperatingCapitalNet",
+              "label": "Other operating assets and liabilities, net",
+              "value": -801000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of increase (decrease) in operating assets after deduction of operating liabilities classified as other."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInOperatingActivities",
+              "label": "Net cash provided by operating activities",
+              "value": 13335000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Amount of cash inflow (outflow) from operating activity, including, but not limited to, discontinued operation. Operating activity includes, but is not limited to, transaction, adjustment, and change ..."
+            },
+            {
+              "tag": "PaymentsToAcquirePropertyPlantAndEquipment",
+              "label": "Additions to property and equipment",
+              "value": 5498000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow associated with the acquisition of long-lived, physical assets that are used in the normal conduct of business to produce goods and services and not intended for resale; includes cash..."
+            },
+            {
+              "tag": "PaymentsToAcquireShortTermInvestments",
+              "label": "Purchases of short-term investments",
+              "value": 1028000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow for securities or other assets acquired, which qualify for treatment as an investing activity and are to be liquidated, if necessary, within the current operating cycle. Includes cash..."
+            },
+            {
+              "tag": "ProceedsFromSaleAndMaturityOfMarketableSecurities",
+              "label": "Maturities of short-term investments",
+              "value": 1141000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow associated with the aggregate amount received by the entity through sale or maturity of marketable securities (held-to-maturity or available-for-sale) during the period."
+            },
+            {
+              "tag": "PaymentsForProceedsFromOtherInvestingActivities",
+              "label": "Other investing activities, net",
+              "value": -74000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash (inflow) outflow from investing activity, classified as other."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInInvestingActivities",
+              "label": "Net cash used in investing activities",
+              "value": -5311000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from investing activity, including, but not limited to, discontinued operation. Investing activity includes, but is not limited to, making and collecting loan, acquirin..."
+            },
+            {
+              "tag": "RepaymentsOfShortTermDebt",
+              "label": "Repayments of short-term borrowings",
+              "value": 862000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow for a borrowing having initial term of repayment within one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "ProceedsFromShortTermDebt",
+              "label": "Proceeds from short-term borrowings",
+              "value": 816000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow from a borrowing having initial term of repayment within one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "RepaymentsOfLongTermDebt",
+              "label": "Repayments of long-term debt",
+              "value": 103000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow for debt initially having maturity due after one year or beyond the normal operating cycle, if longer."
+            },
+            {
+              "tag": "ProceedsFromIssuanceOfLongTermDebt",
+              "label": "Proceeds from issuance of long-term debt",
+              "value": 0.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow from a debt initially having maturity due after one year or beyond the operating cycle, if longer."
+            },
+            {
+              "tag": "PaymentsRelatedToTaxWithholdingForShareBasedCompensation",
+              "label": "Tax withholdings on stock-based awards",
+              "value": 393000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow to satisfy grantee's tax withholding obligation for award under share-based payment arrangement."
+            },
+            {
+              "tag": "PaymentsForRepurchaseOfCommonStock",
+              "label": "Repurchases of common stock",
+              "value": 903000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow to reacquire common stock during the period."
+            },
+            {
+              "tag": "PaymentsOfDividendsCommonStock",
+              "label": "Cash dividend payments",
+              "value": 2183000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow in the form of ordinary dividends to common shareholders of the parent entity."
+            },
+            {
+              "tag": "FinancingLeasePaymentsAndOtherFinancingActivitiesNet",
+              "label": "Financing lease payments and other financing activities, net",
+              "value": 147000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Financing lease payments and other financing activities, net"
+            },
+            {
+              "tag": "NetCashProvidedByUsedInFinancingActivities",
+              "label": "Net cash used in financing activities",
+              "value": -3775000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from financing activity, including, but not limited to, discontinued operation. Financing activity includes, but is not limited to, obtaining resource from owner and pr..."
+            },
+            {
+              "tag": "EffectOfExchangeRateOnCashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+              "label": "EFFECT OF EXCHANGE RATE CHANGES ON CASH AND CASH EQUIVALENTS",
+              "value": 6000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) from effect of exchange rate change on cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; held in foreign currency; attributable to..."
+            },
+            {
+              "tag": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
+              "label": "Net change in cash and cash equivalents",
+              "value": 4255000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) in cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; including effect from exchange rate change and including, but not limited to,..."
+            },
+            {
+              "tag": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+              "label": "CASH AND CASH EQUIVALENTS BEGINNING OF YEAR",
+              "value": 14161000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; attributable to continuing operation. Cash includes, but is not limited to, currency on hand, demand..."
+            },
+            {
+              "tag": "InterestPaidNet",
+              "label": "Interest",
+              "value": 106000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash paid for interest, excluding capitalized interest, classified as operating activity. Includes, but is not limited to, payment to settle zero-coupon bond for accreted interest of debt di..."
+            },
+            {
+              "tag": "IncomeTaxesPaid",
+              "label": "Income taxes paid, net",
+              "value": 2917000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, before refund, of cash paid to foreign, federal, state, and local jurisdictions as income tax."
+            },
+            {
+              "tag": "DividendsPayableCurrent",
+              "label": "Cash dividend declared, but not yet paid",
+              "value": 0.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Carrying value as of the balance sheet date of dividends declared but unpaid on equity securities issued by the entity and outstanding. Used to reflect the current portion of the liabilities (due with..."
+            },
+            {
+              "tag": "CapitalExpendituresIncurredButNotYetPaid",
+              "label": "Capital expenditures included in liabilities",
+              "value": 193000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Future cash outflow to pay for purchases of fixed assets that have occurred."
+            }
+          ]
+        },
+        {
+          "statement_type": "Comprehensive Income",
+          "items": [
+            {
+              "tag": "NetIncomeLoss",
+              "label": "NET INCOME",
+              "value": 8099000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentNetOfTax",
+              "label": "Foreign-currency translation adjustment and other, net",
+              "value": 58000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax and reclassification adjustments of gain (loss) on foreign currency translation adjustments, foreign currency transactions designated and effective as economic hedges of a net investm..."
+            },
+            {
+              "tag": "ComprehensiveIncomeNetOfTax",
+              "label": "COMPREHENSIVE INCOME",
+              "value": 8157000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax of increase (decrease) in equity from transactions and other events and circumstances from net income and other comprehensive income, attributable to parent entity. Excludes changes i..."
+            }
+          ]
+        },
+        {
+          "statement_type": "Stockholders Equity",
+          "items": [
+            {
+              "tag": "ProfitLoss",
+              "label": "Net income",
+              "value": 8099000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The consolidated profit or loss for the period, net of income taxes, including the portion attributable to the noncontrolling interest."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossForeignCurrencyTransactionAndTranslationAdjustmentNetOfTax",
+              "label": "Foreign-currency translation adjustment and other, net",
+              "value": 58000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax and reclassification adjustments of gain (loss) on foreign currency translation adjustments, foreign currency transactions designated and effective as economic hedges of a net investm..."
+            },
+            {
+              "tag": "AdjustmentsToAdditionalPaidInCapitalSharebasedCompensationRequisiteServicePeriodRecognitionValue",
+              "label": "Stock-based compensation",
+              "value": 864000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of increase to additional paid-in capital (APIC) for recognition of cost for award under share-based payment arrangement."
+            },
+            {
+              "tag": "StockIssuedDuringPeriodValueRestrictedStockAwardGross",
+              "label": "Release of vested RSUs, including tax effects",
+              "value": 393000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Aggregate value of stock related to Restricted Stock Awards issued during the period."
+            },
+            {
+              "tag": "StockRepurchasedAndRetiredDuringPeriodValue",
+              "label": "Repurchases of common stock, value",
+              "value": 903000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Equity impact of the value of stock that has been repurchased and retired during the period. The excess of the purchase price over par value can be charged against retained earnings (once the excess i..."
+            },
+            {
+              "tag": "DividendsCash",
+              "label": "Cash dividends declared and other",
+              "value": 2183000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of paid and unpaid cash dividends declared for classes of stock, for example, but not limited to, common and preferred."
+            },
+            {
+              "tag": "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+              "label": "Equity at end of period",
+              "value": 29164000000.0,
+              "period_end": "20250831",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of equity (deficit) attributable to parent and noncontrolling interest. Excludes temporary equity."
+            }
+          ]
+        },
+        {
+          "statement_type": "Income Statement",
+          "items": [
+            {
+              "tag": "RevenueFromContractWithCustomerExcludingAssessedTax",
+              "label": "Total revenue",
+              "value": 275235000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, excluding tax collected from customer, of revenue from satisfaction of performance obligation by transferring promised good or service to customer. Tax collected from customer is tax assessed ..."
+            },
+            {
+              "tag": "CostOfGoodsAndServicesSold",
+              "label": "Merchandise costs",
+              "value": 239886000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate costs related to goods produced and sold and services rendered by an entity during the reporting period. This excludes costs incurred during the reporting period related to financial ser..."
+            },
+            {
+              "tag": "SellingGeneralAndAdministrativeExpense",
+              "label": "Selling, general and administrative",
+              "value": 24966000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate total costs related to selling a firm's product and services, as well as all other general and administrative expenses. Direct selling expenses (for example, credit, warranty, and advert..."
+            },
+            {
+              "tag": "OperatingIncomeLoss",
+              "label": "Operating income",
+              "value": 10383000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The net result for the period of deducting operating expenses from operating revenues."
+            },
+            {
+              "tag": "InterestExpense",
+              "label": "Interest expense",
+              "value": 154000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of interest expense classified as operating and nonoperating. Includes, but is not limited to, cost of borrowing accounted for as interest expense."
+            },
+            {
+              "tag": "InterestAndOtherIncome",
+              "label": "Interest income and other, net",
+              "value": 589000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The amount of interest income and other income recognized during the period. Included in this element is interest derived from investments in debt securities, cash and cash equivalents, and other inve..."
+            },
+            {
+              "tag": "IncomeLossAttributableToParent",
+              "label": "INCOME BEFORE INCOME TAXES",
+              "value": 10818000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, before tax, of income (loss) attributable to parent. Includes, but is not limited to, income (loss) from continuing operations, discontinued operations and equity method investments."
+            },
+            {
+              "tag": "IncomeTaxExpenseBenefit",
+              "label": "Provision for income taxes",
+              "value": 2719000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of current income tax expense (benefit) and deferred income tax expense (benefit) pertaining to continuing operations."
+            },
+            {
+              "tag": "NetIncomeLoss",
+              "label": "NET INCOME",
+              "value": 8099000000.0,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "EarningsPerShareBasic",
+              "label": "Basic",
+              "value": 18.24,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "The amount of net income (loss) for the period per each share of common stock or unit outstanding during the reporting period."
+            },
+            {
+              "tag": "EarningsPerShareDiluted",
+              "label": "Diluted",
+              "value": 18.21,
+              "period_end": "20250831",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "The amount of net income (loss) for the period available to each share of common stock or common unit outstanding during the reporting period and to each share or unit that would have been outstanding..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "QUALCOMM INC/DE",
+      "cik": "804328",
+      "sic": "3663",
+      "state": "CA",
+      "city": "SAN DIEGO",
+      "filing": {
+        "adsh": "0000804328-25-000085",
+        "form": "10-K",
+        "period": "20250930",
+        "fiscal_year": "2025",
+        "fiscal_period": "FY",
+        "filed": "20251105"
+      },
+      "statements": [
+        {
+          "statement_type": "Balance Sheet",
+          "items": [
+            {
+              "tag": "CashAndCashEquivalentsAtCarryingValue",
+              "label": "Cash and cash equivalents",
+              "value": 5520000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash and cash equivalent. Cash includes, but is not limited to, currency on hand, demand deposit with financial institution, and account with general characteristic of demand deposit. Cash e..."
+            },
+            {
+              "tag": "RestrictedCashCurrent",
+              "label": "Restricted cash",
+              "value": 2323000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash restricted as to withdrawal or usage, classified as current. Cash includes, but is not limited to, currency on hand, demand deposits with banks or financial institutions, and other acco..."
+            },
+            {
+              "tag": "MarketableSecuritiesCurrent",
+              "label": "Marketable securities",
+              "value": 4635000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of investment in marketable security, classified as current."
+            },
+            {
+              "tag": "AccountsAndOtherReceivablesNetCurrent",
+              "label": "Accounts receivable, net",
+              "value": 4315000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount, after allowance, receivable from customers, clients, or other third-parties, and receivables classified as other due within one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "InventoryNet",
+              "label": "Inventories",
+              "value": 6526000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount after valuation and LIFO reserves of inventory expected to be sold, or consumed within one year or operating cycle, if longer."
+            },
+            {
+              "tag": "OtherAssetsCurrent",
+              "label": "Other current assets",
+              "value": 2435000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of current assets classified as other."
+            },
+            {
+              "tag": "AssetsCurrent",
+              "label": "Total current assets",
+              "value": 25754000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of asset recognized for present right to economic benefit, classified as current."
+            },
+            {
+              "tag": "DeferredIncomeTaxAssetsNet",
+              "label": "Deferred tax assets",
+              "value": 743000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount, after allocation of valuation allowances and deferred tax liability, of deferred tax asset attributable to deductible differences and carryforwards, with jurisdictional netting."
+            },
+            {
+              "tag": "PropertyPlantAndEquipmentNet",
+              "label": "Property, plant and equipment, net",
+              "value": 4690000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount after accumulated depreciation, depletion and amortization of physical assets used in the normal conduct of business to produce goods and services and not intended for resale. Examples include,..."
+            },
+            {
+              "tag": "Goodwill",
+              "label": "Goodwill",
+              "value": 11358000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount, after accumulated impairment loss, of asset representing future economic benefit arising from other asset acquired in business combination or from joint venture formation or both, that is not ..."
+            },
+            {
+              "tag": "IntangibleAssetsNetExcludingGoodwill",
+              "label": "Other intangible assets, net",
+              "value": 1148000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Sum of the carrying amounts of all intangible assets, excluding goodwill, as of the balance sheet date, net of accumulated amortization and impairment charges."
+            },
+            {
+              "tag": "OtherAssetsNoncurrent",
+              "label": "Other assets",
+              "value": 6450000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of noncurrent assets classified as other."
+            },
+            {
+              "tag": "Assets",
+              "label": "Total assets",
+              "value": 50143000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of asset recognized for present right to economic benefit."
+            },
+            {
+              "tag": "AccountsPayableCurrent",
+              "label": "Trade accounts payable",
+              "value": 2791000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Carrying value as of the balance sheet date of liabilities incurred (and for which invoices have typically been received) and payable to vendors for goods and services received that are used in an ent..."
+            },
+            {
+              "tag": "EmployeeRelatedLiabilitiesCurrent",
+              "label": "Payroll and other benefits related liabilities",
+              "value": 1839000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Total of the carrying values as of the balance sheet date of obligations incurred through that date and payable for obligations related to services received from employees, such as accrued salaries an..."
+            },
+            {
+              "tag": "DeferredRevenueCurrent",
+              "label": "Unearned revenues",
+              "value": 358000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of deferred income and obligation to transfer product and service to customer for which consideration has been received or is receivable, classified as current."
+            },
+            {
+              "tag": "DebtCurrent",
+              "label": "Short-term debt",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of debt and lease obligation, classified as current."
+            },
+            {
+              "tag": "OtherLiabilitiesCurrent",
+              "label": "Other current liabilities",
+              "value": 4156000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities classified as other, due within one year or the normal operating cycle, if longer."
+            },
+            {
+              "tag": "LiabilitiesCurrent",
+              "label": "Total current liabilities",
+              "value": 9144000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Total obligations incurred as part of normal operations that are expected to be paid during the following twelve months or within one business cycle, if longer."
+            },
+            {
+              "tag": "DeferredRevenueNoncurrent",
+              "label": "Unearned revenues",
+              "value": 71000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of deferred income and obligation to transfer product and service to customer for which consideration has been received or is receivable, classified as noncurrent."
+            },
+            {
+              "tag": "LongTermDebt",
+              "label": "Long-term debt",
+              "value": 14811000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after deduction of unamortized premium (discount) and debt issuance cost, of long-term debt. Excludes lease obligation."
+            },
+            {
+              "tag": "OtherLiabilities",
+              "label": "Other liabilities",
+              "value": 4911000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities classified as other."
+            },
+            {
+              "tag": "Liabilities",
+              "label": "Total liabilities",
+              "value": 28937000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liability recognized for present obligation requiring transfer or otherwise providing economic benefit to others."
+            },
+            {
+              "tag": "PreferredStockValue",
+              "label": "Preferred stock, $0.0001 par value; 8 shares authorized; none outstanding",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Aggregate par or stated value of issued nonredeemable preferred stock (or preferred stock redeemable solely at the option of the issuer). This item includes treasury stock repurchased by the entity. N..."
+            },
+            {
+              "tag": "PreferredStockParOrStatedValuePerShare",
+              "label": "Preferred Stock, Par or Stated Value Per Share",
+              "value": 0.0001,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "",
+              "definition": "Face amount or stated value per share of preferred stock nonredeemable or redeemable solely at the option of the issuer."
+            },
+            {
+              "tag": "CommonStocksIncludingAdditionalPaidInCapital",
+              "label": "Common stock and paid-in capital, $0.0001 par value; 6,000 shares authorized; 1,074 and 1,113 shares issued and outstanding, respectively",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of par value plus amounts in excess of par value or issuance value for common stock issued."
+            },
+            {
+              "tag": "CommonStockParOrStatedValuePerShare",
+              "label": "Common Stock, Par or Stated Value Per Share",
+              "value": 0.0001,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "",
+              "definition": "Face amount or stated value per share of common stock."
+            },
+            {
+              "tag": "RetainedEarningsAccumulatedDeficit",
+              "label": "Retained earnings",
+              "value": 20646000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of accumulated undistributed earnings (deficit)."
+            },
+            {
+              "tag": "AccumulatedOtherComprehensiveIncomeLossNetOfTax",
+              "label": "Accumulated other comprehensive income",
+              "value": 560000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax, of accumulated increase (decrease) in equity from transaction and other event and circumstance from nonowner source."
+            },
+            {
+              "tag": "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+              "label": "Total stockholders equity",
+              "value": 21206000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of equity (deficit) attributable to parent and noncontrolling interest. Excludes temporary equity."
+            },
+            {
+              "tag": "LiabilitiesAndStockholdersEquity",
+              "label": "Total liabilities and stockholders equity",
+              "value": 50143000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of liabilities and equity items, including the portion of equity attributable to noncontrolling interests, if any."
+            }
+          ]
+        },
+        {
+          "statement_type": "Cash Flows",
+          "items": [
+            {
+              "tag": "IncomeLossFromContinuingOperations",
+              "label": "Income from continuing operations",
+              "value": 5541000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax of income (loss) from continuing operations attributable to the parent."
+            },
+            {
+              "tag": "DepreciationDepletionAndAmortization",
+              "label": "Depreciation and amortization expense",
+              "value": 1602000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate expense recognized in the current period that allocates the cost of tangible assets, intangible assets, or depleting assets to periods that benefit from use of the assets."
+            },
+            {
+              "tag": "AssetImpairmentCharges",
+              "label": "Indefinite and long-lived asset impairment charges",
+              "value": 17000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of write-down of assets recognized in the income statement. Includes, but is not limited to, losses from tangible assets, intangible assets and goodwill."
+            },
+            {
+              "tag": "IncomeTaxProvisionLessThanInExcessOfIncomeTaxPayments",
+              "label": "Income tax provision in excess of (less than) income tax payments",
+              "value": 3980000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "This element represents the income tax provision (less than) in excess of income tax payment."
+            },
+            {
+              "tag": "ShareBasedCompensation",
+              "label": "Share-based compensation expense",
+              "value": 2783000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of noncash expense for share-based payment arrangement."
+            },
+            {
+              "tag": "GainLossOnInvestments",
+              "label": "Net gains on marketable securities and other investments",
+              "value": 381000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of realized and unrealized gain (loss) on investment."
+            },
+            {
+              "tag": "ImpairmentLossesOnOtherInvestmentsWithoutReadilyDeterminableFairValue",
+              "label": "Impairment losses on other investments",
+              "value": 113000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Impairment losses on other investments without readily determinable fair value"
+            },
+            {
+              "tag": "OtherNoncashIncomeExpense",
+              "label": "Other items",
+              "value": 57000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of income (expense) included in net income that results in no cash inflow (outflow), classified as other."
+            },
+            {
+              "tag": "IncreaseDecreaseInReceivables",
+              "label": "Accounts receivable, net",
+              "value": 365000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The increase (decrease) during the reporting period in the total amount due within one year (or one operating cycle) from all parties, associated with underlying transactions that are classified as op..."
+            },
+            {
+              "tag": "IncreaseDecreaseInInventories",
+              "label": "Inventories",
+              "value": 138000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The increase (decrease) during the reporting period in the aggregate value of all inventory held by the reporting entity, associated with underlying transactions that are classified as operating activ..."
+            },
+            {
+              "tag": "IncreaseDecreaseInOtherOperatingAssets",
+              "label": "Other assets",
+              "value": -971000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of increase (decrease) in operating assets classified as other."
+            },
+            {
+              "tag": "IncreaseDecreaseInAccountsPayableTrade",
+              "label": "Trade accounts payable",
+              "value": 119000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Change in recurring obligations of a business that arise from the acquisition of merchandise, materials, supplies and services used in the production and sale of goods and services."
+            },
+            {
+              "tag": "IncreaseDecreaseInAccruedLiabilities",
+              "label": "Payroll, benefits and other liabilities",
+              "value": -235000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The increase (decrease) during the reporting period in the aggregate amount of expenses incurred but not yet paid."
+            },
+            {
+              "tag": "IncreaseDecreaseInDeferredRevenue",
+              "label": "Unearned revenues",
+              "value": 62000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) in deferred income and obligation to transfer product and service to customer for which consideration has been received or is receivable."
+            },
+            {
+              "tag": "CashProvidedByUsedInOperatingActivitiesDiscontinuedOperations",
+              "label": "Net cash used by operating activities from discontinued operations",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from operating activity attributable to discontinued operation. Operating activity includes, but is not limited to, transaction, adjustment, and change in value not def..."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInOperatingActivities",
+              "label": "Net cash provided by operating activities",
+              "value": 14012000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Amount of cash inflow (outflow) from operating activity, including, but not limited to, discontinued operation. Operating activity includes, but is not limited to, transaction, adjustment, and change ..."
+            },
+            {
+              "tag": "PaymentsToAcquireProductiveAssets",
+              "label": "Capital expenditures",
+              "value": 1192000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow for purchases of and capital improvements on property, plant and equipment (capital expenditures), software, and other intangible assets."
+            },
+            {
+              "tag": "PaymentsToAcquireMarketableSecurities",
+              "label": "Purchases of debt and equity marketable securities",
+              "value": 4694000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow for purchase of marketable security."
+            },
+            {
+              "tag": "ProceedsFromSaleAndMaturityOfMarketableSecurities",
+              "label": "Proceeds from sales and maturities of debt and equity marketable securities",
+              "value": 5755000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow associated with the aggregate amount received by the entity through sale or maturity of marketable securities (held-to-maturity or available-for-sale) during the period."
+            },
+            {
+              "tag": "AcquisitionsAndOtherInvestmentsNetofCashAcquired",
+              "label": "Acquisitions and other investments, net of cash acquired",
+              "value": 743000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow associated with the acquisition of a business, net of the cash acquired from the purchase and the cash outflow associated with other investments held by the entity for investment purp..."
+            },
+            {
+              "tag": "ProceedsFromSaleOfPropertyPlantAndEquipment",
+              "label": "Proceeds from sales of property, plant and equipment",
+              "value": 14000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow from the sale of long-lived, physical assets that are used in the normal conduct of business to produce goods and services and not intended for resale."
+            },
+            {
+              "tag": "Proceedsfromotherinvestments",
+              "label": "Proceeds from other investments",
+              "value": 61000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Proceeds from other investments"
+            },
+            {
+              "tag": "PaymentsForProceedsFromOtherInvestingActivities",
+              "label": "Other items",
+              "value": 1000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash (inflow) outflow from investing activity, classified as other."
+            },
+            {
+              "tag": "CashProvidedByUsedInInvestingActivitiesDiscontinuedOperations",
+              "label": "Net cash provided by investing activities from discontinued operations",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from investing activity attributable to discontinued operation. Investing activity includes, but is not limited to, making and collecting loan, acquiring and disposing ..."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInInvestingActivities",
+              "label": "Net cash (used) provided by investing activities",
+              "value": -800000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from investing activity, including, but not limited to, discontinued operation. Investing activity includes, but is not limited to, making and collecting loan, acquirin..."
+            },
+            {
+              "tag": "ProceedsFromIssuanceOfCommercialPaper",
+              "label": "Proceeds from short-term debt",
+              "value": 998000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow from borrowing by issuing commercial paper."
+            },
+            {
+              "tag": "RepaymentsOfCommercialPaper",
+              "label": "Repayment of short-term debt",
+              "value": 998000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow due to repaying amounts borrowed by issuing commercial paper."
+            },
+            {
+              "tag": "ProceedsFromIssuanceOfLongTermDebt",
+              "label": "Proceeds from long-term debt",
+              "value": 1487000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow from a debt initially having maturity due after one year or beyond the operating cycle, if longer."
+            },
+            {
+              "tag": "RepaymentsOfOtherLongTermDebt",
+              "label": "Repayment of long-term debt",
+              "value": 1365000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow for the payment of debt classified as other, maturing after one year or the operating cycle, if longer."
+            },
+            {
+              "tag": "ProceedsFromIssuanceOfCommonStock",
+              "label": "Proceeds from issuance of common stock",
+              "value": 404000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The cash inflow from the additional capital contribution to the entity."
+            },
+            {
+              "tag": "PaymentsForRepurchaseOfCommonStock",
+              "label": "Repurchases and retirements of common stock",
+              "value": 8791000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The cash outflow to reacquire common stock during the period."
+            },
+            {
+              "tag": "PaymentsOfOrdinaryDividends",
+              "label": "Dividends paid",
+              "value": 3805000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Cash outflow in the form of ordinary dividends to common shareholders, preferred shareholders and noncontrolling interests, generally out of earnings."
+            },
+            {
+              "tag": "PaymentsRelatedToTaxWithholdingForShareBasedCompensation",
+              "label": "Payments of tax withholdings related to vesting of share-based awards",
+              "value": 1115000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of cash outflow to satisfy grantee's tax withholding obligation for award under share-based payment arrangement."
+            },
+            {
+              "tag": "ProceedsFromPaymentsForOtherFinancingActivities",
+              "label": "Other items",
+              "value": -11000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from financing activity, classified as other."
+            },
+            {
+              "tag": "CashProvidedByUsedInFinancingActivitiesDiscontinuedOperations",
+              "label": "Net cash provided (used) by financing activities from discontinued operations",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from financing activity attributable to discontinued operation. Financing activity includes, but is not limited to, obtaining resource from owner and providing return o..."
+            },
+            {
+              "tag": "NetCashProvidedByUsedInFinancingActivities",
+              "label": "Net cash used by financing activities",
+              "value": -13196000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of cash inflow (outflow) from financing activity, including, but not limited to, discontinued operation. Financing activity includes, but is not limited to, obtaining resource from owner and pr..."
+            },
+            {
+              "tag": "EffectOfExchangeRateOnCashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsIncludingDisposalGroupAndDiscontinuedOperations",
+              "label": "Effect of exchange rate changes on cash and cash equivalents",
+              "value": -22000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) from effect of exchange rate change on cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; held in foreign currency; including, but ..."
+            },
+            {
+              "tag": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
+              "label": "Net (decrease) increase in total cash, cash equivalents and restricted cash",
+              "value": -6000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of increase (decrease) in cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; including effect from exchange rate change and including, but not limited to,..."
+            },
+            {
+              "tag": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsIncludingDisposalGroupAndDiscontinuedOperations",
+              "label": "Total cash and cash equivalents at end of period (including $2,323 classified as restricted cash at September 28, 2025 and $77 classified as held for sale at September 24, 2023)",
+              "value": 7843000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash and cash equivalent, and cash and cash equivalent restricted to withdrawal or usage; including, but not limited to, discontinued operation. Cash includes, but is not limited to, currenc..."
+            },
+            {
+              "tag": "DisposalGroupIncludingDiscontinuedOperationCashAndCashEquivalents",
+              "label": "Beginning Balance - Disposal Group, Including Discontinued Operation, Cash and Cash Equivalents",
+              "value": 77000000.0,
+              "period_end": "20230930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount classified as cash and cash equivalents attributable to disposal group held for sale or disposed of."
+            },
+            {
+              "tag": "RestrictedCashCurrent",
+              "label": "Ending Balance - Restricted Cash",
+              "value": 2323000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "debit",
+              "definition": "Amount of cash restricted as to withdrawal or usage, classified as current. Cash includes, but is not limited to, currency on hand, demand deposits with banks or financial institutions, and other acco..."
+            }
+          ]
+        },
+        {
+          "statement_type": "Comprehensive Income",
+          "items": [
+            {
+              "tag": "NetIncomeLoss",
+              "label": "Net income",
+              "value": 5541000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeForeignCurrencyTransactionAndTranslationGainLossArisingDuringPeriodNetOfTax",
+              "label": "Foreign currency translation gains",
+              "value": 60000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax, before reclassification adjustments of gain (loss) on foreign currency translation adjustments, foreign currency transactions designated and effective as economic hedges of a net inv..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeUnrealizedHoldingGainLossOnSecuritiesArisingDuringPeriodNetOfTax",
+              "label": "Net unrealized (losses) gains on certain available-for-sale debt securities",
+              "value": -29000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax and before adjustment, of unrealized holding gain (loss) on investment in debt security measured at fair value with change in fair value recognized in other comprehensive income (ava..."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossCashFlowHedgeGainLossBeforeReclassificationAfterTax",
+              "label": "Net unrealized (losses) gains on derivative instruments",
+              "value": -36000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount, after tax and before reclassification, of gain (loss) from derivative instrument designated and qualifying as cash flow hedge included in assessment of hedge effectiveness."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeOtherNetOfTax",
+              "label": "Other gains (losses)",
+              "value": 9000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of increase (decrease) in other comprehensive income, after tax, from changes classified as other."
+            },
+            {
+              "tag": "ReclassificationFromAccumulatedOtherComprehensiveIncomeCurrentPeriodNetOfTax",
+              "label": "Other reclassifications included in net income",
+              "value": 31000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount after tax of reclassification adjustments of other comprehensive income (loss)."
+            },
+            {
+              "tag": "OtherComprehensiveIncomeLossNetOfTax",
+              "label": "Total other comprehensive (loss) income",
+              "value": -27000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax and reclassification adjustments of other comprehensive income (loss)."
+            },
+            {
+              "tag": "ComprehensiveIncomeNetOfTax",
+              "label": "Comprehensive income",
+              "value": 5514000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax of increase (decrease) in equity from transactions and other events and circumstances from net income and other comprehensive income, attributable to parent entity. Excludes changes i..."
+            }
+          ]
+        },
+        {
+          "statement_type": "Stockholders Equity",
+          "items": [
+            {
+              "tag": "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+              "label": "Balance at beginning of period",
+              "value": 21206000000.0,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "credit",
+              "definition": "Amount of equity (deficit) attributable to parent and noncontrolling interest. Excludes temporary equity."
+            },
+            {
+              "tag": "NetIncomeLoss",
+              "label": "Net income",
+              "value": 5541000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "CommonStockDividendsPerShareDeclared",
+              "label": "Dividends per share announced",
+              "value": 3.48,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Aggregate dividends declared during the period for each share of common stock outstanding."
+            }
+          ]
+        },
+        {
+          "statement_type": "Income Statement",
+          "items": [
+            {
+              "tag": "EquipmentAndServices",
+              "label": "Equipment and services",
+              "value": 37869000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Aggregate revenue during the period from equipment and services rendered in the normal course of business, after deducting allowances and discounts and the aggregate revenue during the period from the..."
+            },
+            {
+              "tag": "LicensingRevenues",
+              "label": "Licensing",
+              "value": 6415000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Revenue earned during the period relating to consideration received from another party for the right to use, but not own, certain of the entity's intangible assets. Licensing arrangements include, but..."
+            },
+            {
+              "tag": "Revenues",
+              "label": "Total revenues",
+              "value": 44284000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of revenue recognized from goods sold, services rendered, insurance premiums, or other activities that constitute an earning process. Includes, but is not limited to, investment and interest in..."
+            },
+            {
+              "tag": "CostOfRevenue",
+              "label": "Cost of revenues",
+              "value": 19738000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate cost of goods produced and sold and services rendered during the reporting period."
+            },
+            {
+              "tag": "ResearchAndDevelopmentExpense",
+              "label": "Research and development",
+              "value": 9042000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of expense for research and development. Includes, but is not limited to, cost for computer software product to be sold, leased, or otherwise marketed and writeoff of research and development a..."
+            },
+            {
+              "tag": "SellingGeneralAndAdministrativeExpense",
+              "label": "Selling, general and administrative",
+              "value": 3110000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "The aggregate total costs related to selling a firm's product and services, as well as all other general and administrative expenses. Direct selling expenses (for example, credit, warranty, and advert..."
+            },
+            {
+              "tag": "OtherOperatingIncomeExpenseNet",
+              "label": "Other (Note 2)",
+              "value": -39000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The net amount of other operating income and expenses, the components of which are not separately disclosed on the income statement, from items that are associated with the entity's normal revenue pro..."
+            },
+            {
+              "tag": "CostsAndExpenses",
+              "label": "Total costs and expenses",
+              "value": 31929000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Total costs of sales and operating expenses for the period."
+            },
+            {
+              "tag": "OperatingIncomeLoss",
+              "label": "Operating income",
+              "value": 12355000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The net result for the period of deducting operating expenses from operating revenues."
+            },
+            {
+              "tag": "InterestExpense",
+              "label": "Interest expense",
+              "value": 664000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of interest expense classified as operating and nonoperating. Includes, but is not limited to, cost of borrowing accounted for as interest expense."
+            },
+            {
+              "tag": "NonoperatingIncomeExpense",
+              "label": "Investment and other income, net",
+              "value": 972000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The aggregate amount of income or expense from ancillary business-related activities (that is to say, excluding major activities considered part of the normal operations of the business)."
+            },
+            {
+              "tag": "IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+              "label": "Income from continuing operations before income taxes",
+              "value": 12663000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount of income (loss) from continuing operations, including income (loss) from equity method investments, before deduction of income tax expense (benefit), and income (loss) attributable to noncontr..."
+            },
+            {
+              "tag": "IncomeTaxExpenseBenefit",
+              "label": "Income tax expense",
+              "value": 7122000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "debit",
+              "definition": "Amount of current income tax expense (benefit) and deferred income tax expense (benefit) pertaining to continuing operations."
+            },
+            {
+              "tag": "IncomeLossFromContinuingOperations",
+              "label": "Income from continuing operations",
+              "value": 5541000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax of income (loss) from continuing operations attributable to the parent."
+            },
+            {
+              "tag": "IncomeLossFromDiscontinuedOperationsNetOfTaxAttributableToReportingEntity",
+              "label": "Discontinued operations, net of income taxes",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "Amount after tax of income (loss) from a discontinued operation attributable to the parent. Includes, but is not limited to, the income (loss) from operations during the phase-out period, gain (loss) ..."
+            },
+            {
+              "tag": "NetIncomeLoss",
+              "label": "Net income",
+              "value": 5541000000.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "credit",
+              "definition": "The portion of profit or loss for the period, net of income taxes, which is attributable to the parent."
+            },
+            {
+              "tag": "IncomeLossFromContinuingOperationsPerBasicShare",
+              "label": "Basic earnings per share, Continuing operations",
+              "value": 5.05,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "The amount of net income (loss) from continuing operations per each share of common stock or unit outstanding during the reporting period."
+            },
+            {
+              "tag": "DiscontinuedOperationIncomeLossFromDiscontinuedOperationNetOfTaxPerBasicShare",
+              "label": "Basic earnings per share, Discontinued operations",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Per basic share amount, after tax, of income (loss) from the day-to-day business activities of the discontinued operation."
+            },
+            {
+              "tag": "EarningsPerShareBasic",
+              "label": "Earnings Per Share, Basic, Total",
+              "value": 5.05,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "The amount of net income (loss) for the period per each share of common stock or unit outstanding during the reporting period."
+            },
+            {
+              "tag": "IncomeLossFromContinuingOperationsPerDilutedShare",
+              "label": "Diluted earnings per share, Continuing operations",
+              "value": 5.01,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "The amount of net income (loss) derived from continuing operations during the period available to each share of common stock or common unit outstanding during the reporting period and to each share or..."
+            },
+            {
+              "tag": "DiscontinuedOperationIncomeLossFromDiscontinuedOperationNetOfTaxPerDilutedShare",
+              "label": "Diluted earnings per share, Discontinued operations",
+              "value": 0.0,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "Per diluted share amount, after tax, of income (loss) from the day-to-day business activities of the discontinued operation."
+            },
+            {
+              "tag": "EarningsPerShareDiluted",
+              "label": "Earnings Per Share, Diluted, Total",
+              "value": 5.01,
+              "period_end": "20250930",
+              "quarters": 4,
+              "normal_balance": "",
+              "definition": "The amount of net income (loss) for the period available to each share of common stock or common unit outstanding during the reporting period and to each share or unit that would have been outstanding..."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+For each company in the dataset:
+1. Calculate total current assets and total current liabilities from the Balance Sheet
+2. Compute the current ratio (current assets / current liabilities)
+3. Identify total revenue and net income from the Income Statement
+4. Calculate the net profit margin (net income / revenue)
+5. Extract operating cash flow from Cash Flows
+
+Then compare across all companies:
+6. Rank companies by current ratio (strongest liquidity first)
+7. Rank companies by net profit margin
+8. Which company has the highest operating cash flow?

@@ -1,0 +1,1524 @@
+=== API Request: LEGAL-001 (TOON format) ===
+Task ID:     LEGAL-001
+Category:    legal
+Complexity:  Complex
+Output Type: Calculation
+Format:      TOON
+Max Tokens:  8192
+Temperature: 0.3
+==================================================
+=== PROMPT ===
+
+You are a legal analyst reviewing Wisconsin Circuit Court case data from the WCCA system.
+The data contains a criminal case with charges, sentencing, docket entries, defendant information, and financial receivables.
+
+source: Wisconsin Circuit Court Access (WCCA)
+url: "https://wcca.wicourts.gov"
+license: Public Record — Wisconsin Supreme Court Rule 72
+description: "Circuit court case data from 1 Wisconsin criminal case(s). Includes charges with nested sentencing structures, docket entries, defendant information, and financial receivables."
+note: Data manually captured from WCCA (requires hCaptcha). See README.md for reproduction steps.
+case_count: 1
+cases[1]:
+  - county: Columbia
+    countyNo: 11
+    caseNo: 2016CF000031
+    daCaseNo: 2015CO001313
+    caseType: CF
+    classType: Criminal
+    caption: State of Wisconsin vs. Luis A Ramirez  #244212
+    status: Closed
+    filingDate: "2016-02-01"
+    isCriminal: true
+    wcisClsCode: Battery
+    branchId: "2"
+    respCtofc: "Voigt, W. Andrew"
+    prosAtty: "Yaskal, Brenda L."
+    prosAgency: District Attorney
+    balanceDue: 0
+    execSummary: "The defendant Luis A Ramirez #244212 was found guilty of the following charge(s) in this case. Battery by Prisoners [Modifiers: Repeater, Use of a Dangerous Weapon], a class H felony, Wisconsin Statutes 940.20(1). Disorderly Conduct [Modifiers: Repeater], a class B misdemeanor, Wisconsin Statutes 947.01(1). Notice to employers: It may be a violation of state law to discriminate against a job applicant because of an arrest or conviction record. Generally speaking, an employer may refuse to hire an applicant on the basis of a conviction only if the circumstances of the conviction substantially relate to the particular job. For more information, see Wisconsin Statute 111.335 and the Department of Workforce Development's publication, Arrest and Conviction Records under the Law ."
+    defendant:
+      name: "Ramirez  #244212, Luis A"
+      dob: "1975-06-12"
+      effDate: "2022-11-29"
+      sex: Male
+      race: Caucasian
+      status: null
+      address: "P.O. Box 100, Wisconsin Secure Program Facility, Boscobel, WI 53805"
+      type: Defendant
+      attorneys[3]{name,withdrawn,isGal,entered}:
+        "Dolch, Leonie C","2016-07-07",false,"2016-03-15"
+        "Benavides, Ronald Gabriel","2020-03-12",false,"2016-07-07"
+        "Lohr, Jennifer A","2025-10-02",false,"2020-05-20"
+      aliases[2]{name,descr,dob}:
+        "Ramirez  #244212, Luis A",Changed case name,"1975-06-12"
+        "Ramirez, Luis A",Changed case name,"1975-06-12"
+    charges[2]:
+    - judgments[1]:
+        - supervisions[2]:
+            - descr: State Prison
+              notes: "Consecutive to: Any other sentence currently serving."
+              time: 12 Years
+              conditions[0]:
+            - descr: Extended Supervision
+              notes: "Consecutive to: Any other sentence currently serving"
+              time: 3 Years
+              conditions[2]{descr,notes}:
+              Costs,"If probation is revoked or will discharge with outstanding financial obligations due, a civil judgment shall be entered for the balance due."
+              Other,Submit DNA sample. No contact with the victim of this case.
+          orderDate: "2019-12-04"
+          isModified: false
+          dispoCtofc: "Voigt, W. Andrew"
+          dispoDesc: null
+          sentDate: "2020-02-24"
+          action: Found Guilty at Jury Trial
+      pleaDate: "2019-12-04"
+      descr: Battery by Prisoners
+      offenseDate: "2015-05-05"
+      pleaDescr: Not Guilty
+      dispoDesc: Found Guilty at Jury Trial
+      statuteCite: 940.20(1)
+      severity: Felony H
+      chargeNo: 1
+      modifiers[2]{modSeqNo,statuteCite,descr}:
+      1,939.62(1)(b),Repeater
+      2,939.63(1)(b),Use of a Dangerous Weapon
+    - judgments[1]:
+        - supervisions[2]:
+            - descr: State Prison
+              notes: "Concurrent with: Ct. 1"
+              time: 1 Years
+              conditions[0]:
+            - descr: Extended Supervision
+              notes: "Concurrent with: Ct. 1"
+              time: 6 Months
+              conditions[1]{descr,notes}:
+              Costs,Same conditions as Ct. 1.
+          orderDate: "2019-12-04"
+          isModified: false
+          dispoCtofc: "Voigt, W. Andrew"
+          dispoDesc: With use of a dangerous weapon enhancer dismissed.
+          sentDate: "2020-02-24"
+          action: Found Guilty at Jury Trial
+      pleaDate: "2019-12-04"
+      descr: Disorderly Conduct
+      offenseDate: "2015-05-05"
+      pleaDescr: Not Guilty
+      dispoDesc: Found Guilty at Jury Trial
+      statuteCite: 947.01(1)
+      severity: Misd. B
+      chargeNo: 2
+      modifiers[1]{modSeqNo,statuteCite,descr}:
+      1,939.62(1)(a),Repeater
+    chargeHistory[2]{replacedBy,descr,seqNo,dispoDesc,statuteCite,severity,chargeNo}:
+    Information Filed,Battery by Prisoners,1,null,940.20(1),Felony H,1
+    Information Filed,Disorderly Conduct,2,null,947.01(1),Misd. B,2
+    docketEntries[231]:
+    - addlTxt: null
+      descr: Complaint filed
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-02-01"
+      courtRptr: null
+    - addlTxt: null
+      descr: Initial appearance
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-02-11"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: with felony conds.
+      parties[1]{sealed,name}:
+      false,"Ramirez  #244212, Luis A"
+      descr: Signature bond set
+      amount: 5000
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-02-11"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "Defendant, Luis A Ramirez  #244212, appeared via video conferencing from Waupun Correctional. Troy D Cross appeared for the State of Wisconsin. Right to attorney recited. Reading waived. $5,000 recog. bond with felony conds. Time limits not waived.  Preliminary hearing scheduled for February 25, 2016 at 09:00 am."
+      descr: Hearing
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-02-11"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "Letter to defendant with attachments - copy of bond for signature and notice of hearing."
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2016-02-15"
+      courtRptr: null
+    - addlTxt: "Preliminary hearing at 02-18-2016 09:00 am"
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2016-02-15"
+      courtRptr: null
+    - addlTxt: with Petition for Writ of Habeas Corpus for 2/25/16
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-02-16"
+      courtRptr: null
+    - addlTxt: with Petition for Writ of Habeas Corpus for 2/18/16
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-02-16"
+      courtRptr: null
+    - addlTxt: "Defendant Luis A Ramirez  #244212 in court, in custody.  Jane Kohlwey appeared for the State of Wisconsin.  Defendant stated he did not have enough time to get attorney.  Preliminary hearing scheduled for March 3, 2016 at 09:00 am."
+      descr: Hearing
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-02-18"
+      courtRptr: "Sisco, Cheryl"
+    - addlTxt: "with Petition for Writ of Habeas Corpus for March 3, 2016"
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-02-24"
+      courtRptr: null
+    - addlTxt: and filed.
+      descr: Signature bond signed
+      amount: 5000
+      ctofc: null
+      date: "2016-02-25"
+      courtRptr: null
+    - addlTxt: "Defendant Luis A Ramirez  #244212 in court, in custody.  Jane Kohley appeared for the State of Wisconsin.  Defendant has applied for attorney with SPD office.  Reset requested.  Time limits waived.  Pre-trial conference scheduled for April 8, 2016 at 11:30 am.  Return date scheduled for May 10, 2016 at 02:45 pm."
+      descr: Hearing
+      amount: null
+      ctofc: "White, Alan J"
+      date: "2016-03-03"
+      courtRptr: "Champeau, Chris"
+    - addlTxt: "with Petition for Writ of Habeas Corpus for Waupun Correctional Institution on 5/10/16 at 2:45 P.M."
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-03-14"
+      courtRptr: null
+    - addlTxt: attorney Leonie Dolch
+      descr: Public defender order appointing counsel
+      amount: null
+      ctofc: null
+      date: "2016-03-15"
+      courtRptr: null
+    - addlTxt: and Petition For Leave to File Additional Motions filed by Atty. Dolch
+      descr: Demand for discovery
+      amount: null
+      ctofc: null
+      date: "2016-03-15"
+      courtRptr: null
+    - addlTxt: "and Notice of DNA and Witness List, with Petition for Leave to file Additional Motions filed by DA Kohlwey"
+      descr: Motion and demand for discovery
+      amount: null
+      ctofc: null
+      date: "2016-03-28"
+      courtRptr: null
+    - addlTxt: DA Kohlwey discovery letter to Atty. Dolch
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2016-03-28"
+      courtRptr: null
+    - addlTxt: "Atty. Dolch requests May 10 return be reset - still needs discovery - fax"
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2016-05-05"
+      courtRptr: null
+    - addlTxt: "Return date on July 20, 2016 at 02:45 pm."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2016-05-06"
+      courtRptr: null
+    - addlTxt: "with Petition for Writ of Habeas Corpus for July 20, 2016 at 2:45"
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-06-08"
+      courtRptr: null
+    - addlTxt: attorney Ronald Benavides
+      descr: Public defender order appointing counsel
+      amount: null
+      ctofc: null
+      date: "2016-07-07"
+      courtRptr: null
+    - addlTxt: "Defendant Luis A Ramirez in court, in custody from Green Bay Correcitonal, with attorney Ronald Gabriel Benavides.  Jane E. Kohlwey appeared for the State of Wisconsin.   Reset requested. Just appointed.  Preliminary hearing scheduled for August 4, 2016 at 09:00 am."
+      descr: Return date
+      amount: null
+      ctofc: "Hepler, Todd J."
+      date: "2016-07-20"
+      courtRptr: "Braunschweig, Cathy"
+    - addlTxt: "ADDRESS INFO for Luis A Ramirez\nCurrent: PO Box 19033, Green Bay Correctional Institution, Green Bay, WI 54307 United States  (Effective: 07-21-2016)\nPrior: 200 S Madison Street PO Box 351, Waupun Correctional, Waupun, WI 53963 United States\n"
+      parties[1]{sealed,name}:
+      false,"Ramirez  #244212, Luis A"
+      descr: Change of address notification
+      amount: null
+      ctofc: null
+      date: "2016-07-21"
+      courtRptr: null
+    - addlTxt: with Petition for Writ of Habeas Corpus
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-07-22"
+      courtRptr: null
+    - addlTxt: null
+      descr: Notice mailed
+      amount: null
+      ctofc: null
+      date: "2016-08-03"
+      courtRptr: null
+    - addlTxt: null
+      descr: Case Converted to Electronic Filing
+      amount: null
+      ctofc: null
+      date: "2016-08-03"
+      courtRptr: null
+    - addlTxt: "9:58 A.M., Defendant Luis A Ramirez  #244212 in court, in custody with attorney Ronald Gabriel Benavides.  Jane E. Kohlwey appeared for the State of Wisconsin. State calls Witness Detective Lieutenant Roger Brandner, Columbia County Sheriff's Office, sworn, 9:59 A.M., testimony taken, 10:10 A.M. Witness excused, Court finds probable cause, bound over, Information filed, matter to be set for Arraignment,  Arraignment scheduled for October 26, 2016 at 02:45 pm."
+      descr: Preliminary hearing
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-08-04"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "Writ for Oct. 24, 2016"
+      descr: Order
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-08-10"
+      courtRptr: null
+    - addlTxt: filed by Atty Kohlwey
+      descr: Information
+      amount: null
+      ctofc: null
+      date: "2016-08-10"
+      courtRptr: null
+    - addlTxt: null
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2016-08-10"
+      courtRptr: null
+    - addlTxt: "Writ for Oct. 24, 2016"
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2016-08-10"
+      courtRptr: null
+    - addlTxt: "writ for 10/26/16 at 2:45"
+      descr: Order
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-08-17"
+      courtRptr: null
+    - addlTxt: filed by DA's office
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2016-08-17"
+      courtRptr: null
+    - addlTxt: "writ for 10/26/16 at 2:45"
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2016-08-17"
+      courtRptr: null
+    - addlTxt: "Defendant Luis A Ramirez  #244212 in court, in custody with attorney Ronald Gabriel Benavides.  Troy D Cross appeared for the State of Wisconsin.  Information filed, reading waived. Defendant stood mute. Court entered not guilty plea, jury trial to be set. Bond continued."
+      descr: Arraignment
+      amount: null
+      ctofc: "Hepler, Todd J."
+      date: "2016-10-26"
+      courtRptr: "Braunschweig, Cathy"
+    - addlTxt: Scheduling Order
+      descr: Order
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2016-12-21"
+      courtRptr: null
+    - addlTxt: "Jury trial on April 13, 2017 at 08:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2016-12-21"
+      courtRptr: null
+    - addlTxt: Filed by District Attorney Jane Kohlwey
+      descr: "Witness list - plaintiff"
+      amount: null
+      ctofc: null
+      date: "2017-02-17"
+      courtRptr: null
+    - addlTxt: "Filed by District Attorney Jane Kohlwey, requesting the jury trial on 4-13-17 be reset.  Witness is unavailable.  Atty Benavides does not object."
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2017-02-17"
+      courtRptr: null
+    - addlTxt: "Filed by District Attorney Jane Kohlwey, requesting 3 day jury trial not 1 day, and a reset of teh 4-13-17 jury trial."
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2017-03-03"
+      courtRptr: null
+    - addlTxt: "Scheduling conference on March 27, 2017 at 08:45 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2017-03-06"
+      courtRptr: null
+    - addlTxt: null
+      descr: Status conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2017-03-27"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "Jury trial on September 26, 2017 at 08:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2017-03-30"
+      courtRptr: null
+    - addlTxt: "Filed by District Attorney Jane Kohlwey, Letter regarding jury trial scheduling conflict."
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2017-08-04"
+      courtRptr: null
+    - addlTxt: Filed by District Attorney Jane Kohlwey
+      descr: "Witness list - plaintiff"
+      amount: null
+      ctofc: null
+      date: "2017-08-08"
+      courtRptr: null
+    - addlTxt: Filed by DA Office
+      descr: Affidavit/Declaration of mailing
+      amount: null
+      ctofc: null
+      date: "2017-08-10"
+      courtRptr: null
+    - addlTxt: "Scheduling conference on August 16, 2017 at 11:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2017-08-11"
+      courtRptr: null
+    - addlTxt: "Jury trial on April 4, 2018 at 08:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2017-08-16"
+      courtRptr: null
+    - addlTxt: Filed by District Attorney Jane Kohlwey
+      descr: "Witness list - plaintiff"
+      amount: null
+      ctofc: null
+      date: "2017-09-07"
+      courtRptr: null
+    - addlTxt: Filed by DA Office
+      descr: Affidavit/Declaration of mailing
+      amount: null
+      ctofc: null
+      date: "2017-09-12"
+      courtRptr: null
+    - addlTxt: null
+      descr: Records of prosec. are converted data. See file.
+      amount: null
+      ctofc: null
+      date: "2017-11-15"
+      courtRptr: null
+    - addlTxt: Filed by DA Office
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2018-02-22"
+      courtRptr: null
+    - addlTxt: null
+      descr: Proposed Order
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-02-22"
+      courtRptr: null
+    - addlTxt: Filed by DA Office
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2018-02-22"
+      courtRptr: null
+    - addlTxt: null
+      descr: Proposed Order
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-02-22"
+      courtRptr: null
+    - addlTxt: null
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-02-23"
+      courtRptr: null
+    - addlTxt: null
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-02-23"
+      courtRptr: null
+    - addlTxt: Motion for Continuance filed by atty Benavides
+      descr: Motion
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-03-06"
+      courtRptr: null
+    - addlTxt: "Motion hearing on March 12, 2018 at 11:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2018-03-07"
+      courtRptr: null
+    - addlTxt: "Status conference on May 21, 2018 at 11:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2018-03-12"
+      courtRptr: null
+    - addlTxt: "Attorney Ronald Gabriel Benavides in courtroom. Mary Ellen Karst appeared for the State of Wisconsin. Clerk had difficulties connecting by video with defendant. Court felt it was acceptable to proceed without the defendant with this hearing. State had no objection to the motion for continuance. Court removed the trial for April 4,5, & 6 from calendar. Status conf. to be held with counsel only. 11:56/12:04  Status conference scheduled for May 21, 2018 at 11:30 am."
+      descr: Motion hearing
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-03-12"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: null
+      descr: Status conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-05-21"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "from Atty Karst to Atty Riek re: discovery material"
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2018-06-05"
+      courtRptr: null
+    - addlTxt: "Scheduling conference on August 6, 2018 at 08:45 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2018-06-14"
+      courtRptr: null
+    - addlTxt: null
+      descr: Scheduling conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-08-06"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "Copy of Letter from ADA Mary Ellen Karst to Atty Ronald Benavides    re:  Discovery."
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2018-08-07"
+      courtRptr: null
+    - addlTxt: "Scheduling conference on December 5, 2018 at 01:00 pm."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2018-08-10"
+      courtRptr: null
+    - addlTxt: filed by defendant
+      descr: Demand for speedy trial
+      amount: null
+      ctofc: null
+      date: "2018-09-26"
+      courtRptr: null
+    - addlTxt: "Telephone conference on October 3, 2018 at 11:30 am. (duplicate, document removed)"
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2018-10-01"
+      courtRptr: null
+    - addlTxt: "Telephone conference on October 3, 2018 at 11:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2018-10-01"
+      courtRptr: null
+    - addlTxt: null
+      descr: Telephone conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-10-03"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "Filed by Atty Ron Benavides. Update to Court, earliest telephone conf. is on 10/11/18 at 8:30 am, he will update the court after."
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2018-10-08"
+      courtRptr: null
+    - addlTxt: "Scheduling conference on December 5, 2018 at 01:00 pm."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2018-11-01"
+      courtRptr: null
+    - addlTxt: "Jury trial on April 3, 2019 at 09:00 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2018-12-05"
+      courtRptr: null
+    - addlTxt: "Scheduled as a #2 two day jury trial for April 3-4, 2019."
+      descr: Scheduling conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2018-12-05"
+      courtRptr: null
+    - addlTxt: "from Atty Smith requesting adjournment for the 4/3/19, 4/4/19 Jury Trial\n\nReset request filed on 3/26/19 by Attorney Smith is granted. The 2-day jury trial will be reset at a telephone scheduling conference to be scheduled by Br. 2 JA.  bbr"
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2019-03-26"
+      courtRptr: null
+    - addlTxt: in Limine and Motions in Limine filed by Atty Benavides
+      descr: Notice of motion
+      amount: null
+      ctofc: null
+      date: "2019-03-26"
+      courtRptr: null
+    - addlTxt: Notice of Additional Motions in Limine and Additional Motions in Limine to Exclude Statements filed by Atty Benavides
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2019-03-26"
+      courtRptr: null
+    - addlTxt: "Telephone scheduling conference on April 3, 2019 at 09:00 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2019-03-28"
+      courtRptr: null
+    - addlTxt: "Jury trial on December 3, 2019 at 09:00 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2019-04-03"
+      courtRptr: null
+    - addlTxt: "2-day jury trial rescheduled to December 3-4, 2019."
+      descr: Telephone scheduling conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2019-04-03"
+      courtRptr: null
+    - addlTxt: to Dismiss filed by defendant
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2019-04-15"
+      courtRptr: null
+    - addlTxt: "Motion hearing on June 17, 2019 at 10:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2019-05-01"
+      courtRptr: null
+    - addlTxt: Green Bay Correctional
+      descr: Video conferencing
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2019-06-17"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "10:31 AM Defendant Luis A Ramirez  #244212 in court by video means with attorney Ronald Gabriel Benavides in the courtroom. Sheila Smith appeared for the State of Wisconsin. Atty. Benavides made statement. State objected to a dismissal. Atty. Benavides questioned video whereabouts. Court noted ADA Karst stated there was none. Defendant stated there are four cameras. He reviewed them at disciplinary hearing. Motion to Dismiss denied. Crt. adj. 11:00 a.m."
+      descr: Motion hearing
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2019-06-17"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: null
+      descr: Telephone conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2019-12-02"
+      courtRptr: null
+    - addlTxt: null
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2019-12-02"
+      courtRptr: null
+    - addlTxt: null
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2019-12-02"
+      courtRptr: null
+    - addlTxt: null
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2019-12-02"
+      courtRptr: null
+    - addlTxt: #1 Pencil in brown bag (stored in evidence box).
+      descr: Exhibit
+      amount: null
+      ctofc: null
+      date: "2019-12-03"
+      courtRptr: null
+    - addlTxt: "Exhibit #2 - Offender Telephone Call Tracking Log from the 12/03/2019 Jury Trial - Retained Electronically"
+      descr: Exhibit
+      amount: null
+      ctofc: null
+      date: "2019-12-03"
+      courtRptr: null
+    - addlTxt: 33 jurors summoned; 30 appeared; 23 seated for voir dire; no jurors excused for cause; 13 jurors seated and sworn.
+      descr: Jury selection
+      amount: null
+      ctofc: null
+      date: "2019-12-03"
+      courtRptr: null
+    - addlTxt: "1st day of trial - 09:01AM  Defendant Luis A Ramirez in court, in custody, with Attorney Ronald Gabriel Benavides.   DA Brenda L. Yaskal appeared for the State of Wisconsin. Jury not present. Motions in limine discussed. Court in recess 9:55/10:23  Court resumed; appearances the same; potential jurors present and sworn. 23 jurors seated for voir dire; Court questioned jurors. 10:45  Counsel questioned jurors; peremptory strikes-5 each; 13 jurors selected and sworn; prospective jurors released.  Jurors removed. Sidebar discussed. Court in recess. 11:28/11:55  Court resumed; appearances the same; Court gave add'l jury instructions. Court in recess 12:05/1:11 Court resumed. Appearances the same. DA Yaskal stated the information charges as repeater and use of dangerous weapon, questioned the jury instructions. Agreement reached on how to proceed. 1:17 Jurors returned.  Opening arguments by counsel.  1:24 State called witness T. Judd, sworn.  Direct examination. 2:04 Cross examination. Exhibit #2 marked, witness unable to identify Exhibit #2, State objected to the use of the document, Court granted objection.  Cross continued. Redirect. Exhibit #1 marked. Witness excused.  Exhibit #1 offered & receivded.  2:25 State called witness M. Biedermann, ER Dr. at DHS; sworn.  Direct. Cross. Redirect. Recross. Witness excused. 2:36 State called witness E. Starck, nurse; sworn. Direct. Cross.  Witness excused. 2:48 State called witness, T. Anderson, nurse, sworn. Direct. Cross.  Witness excused. 3:00 Jurors removed; Court in recess 3:00/3:15 Court resumed. Appearances the same. Jurors returned.  3:20 State called witness M. Babcock, CCI officer; sworn. Direct. Cross.  Witness excused. 3:43 State called witness S. Darling-Jezyt, CCI officer; sworn.  Direct. Cross. Redirect. 4:09 Witness excused. Court excused jurors until 8:45 am tomorrow.  Court will resume tomorrow at 9:00 am.  Court in recess 4:13 pm."
+      descr: Jury trial
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2019-12-03"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "Telephone conference on December 2, 2019 at 11:45 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2019-12-03"
+      courtRptr: null
+    - addlTxt: null
+      descr: Jury instructions
+      amount: null
+      ctofc: null
+      date: "2019-12-04"
+      courtRptr: null
+    - addlTxt: "Verdict forms :  2 signed - Guilty; 2 unsigned - Not Guilty."
+      descr: Verdict
+      amount: null
+      ctofc: null
+      date: "2019-12-04"
+      courtRptr: null
+    - addlTxt: "Exhibit #3 Calendar for Year 2015 from the 12/04/2019 Jury Trial - Retained Electronically"
+      descr: Exhibit
+      amount: null
+      ctofc: null
+      date: "2019-12-04"
+      courtRptr: null
+    - addlTxt: "Exhibits 1 - 3 from the 12/04/2025 Jury Trial - Retained Electronically"
+      descr: Exhibit list
+      amount: null
+      ctofc: null
+      date: "2019-12-04"
+      courtRptr: null
+    - addlTxt: "2nd day of trial - 09:00 AM Defendant Luis A Ramirez  #244212 in court, in custody with attorney Ronald Gabriel Benavides.  Brenda L. Yaskal appeared for the State of Wisconsin. Discussion on procedure.  9:04 Jurors returned to courtroom. State called witness B. Slaney, former CCI officer; sworn. Direct examination. Cross examination. Redirect. Recross. Witness excused. 9:32 State called witness Z. Graff, CCI officer; sworn.  Direct examination. Cross examination.  Witness excused. 9:38 State called witness P. Hooper, former CCI officer; sworn.  Direct. Cross.  Witness excused. State rested. 9:44 Jurors removed.  Atty Benavides motioned for dismissal based on evidence. State had no position. Court found no basis for the motion. Motion denied. Court reviewed rights to testify with defendant.  Court in recess 9:53/10:14 Court resumed, appearances the same. Jurors returned.  Defense called witness, defendant Ramirez; sworn. Direct examination. Exhibit # 3 marked, offered & received.  Exhibit #2 offered and received. Direct continued. Cross examination.  Witness excused. 10:53 Jurors removed.  Proposed jury instructions and verdict forms discussed.  Court to be present by 12:45; Court in recess 11:27/12:55 Court resumed, appearances the same. Court and counsel reviewed jury instructions. 1:21 Jurors returned; alternate Juror drawn. Court read jury instructions. 1:42 Closing statements by counsel 2:21 Court read final jury instructions and review verdict forms with jury.  Bailiffs sworn.  2:25 Jurors removed to deliberate. Court in recess 2:28/3:12 Court resumed; appearances the same.  Jurors returned.  Guilty verdict on count 1 - Battery by Prisoner with the use of a dangerous weapon & Guilty on count 2, Disorderly Conduct without the use of a dangerous weapon.  Jury polled and released.  DA Yaskal motioned for judgment on verdicts, motion granted, Judgment entered. Sentencing to be set for a separate hearing.\nCourt adjourned 3:30"
+      descr: Jury trial
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2019-12-04"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "Sentencing hearing on February 24, 2020 at 11:00 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2019-12-16"
+      courtRptr: null
+    - addlTxt: null
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2019-12-17"
+      courtRptr: null
+    - addlTxt: "Filed by DA Office re: 2-24-20 at 11:00 am"
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2019-12-17"
+      courtRptr: null
+    - addlTxt: "Filed by DA Brenda Yaskal, regarding jury issue."
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2019-12-17"
+      courtRptr: null
+    - addlTxt: "2-24-20 at 11:00 am"
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2019-12-18"
+      courtRptr: null
+    - addlTxt: Copy of DA Yaskal's discovery letter to Atty. Benavides
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2019-12-27"
+      courtRptr: null
+    - addlTxt: null
+      descr: Subpoena
+      amount: null
+      ctofc: null
+      date: "2020-01-08"
+      courtRptr: null
+    - addlTxt: "To: Green Bay Correctional"
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2020-02-17"
+      courtRptr: null
+    - addlTxt: "Filed by DA Office re: 2/24/20 at 11:00 am"
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2020-02-17"
+      courtRptr: null
+    - addlTxt: null
+      descr: Order
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2020-02-20"
+      courtRptr: null
+    - addlTxt: Filed by Atty Ron Benavides.
+      descr: Appeal rights/info on postconviction relief
+      amount: null
+      ctofc: null
+      date: "2020-02-24"
+      courtRptr: null
+    - addlTxt: "Ct. 1 12 years initial confinement, consecutive to any other sentence, 3 years extended supervision. Ct. 2 1 year initial confinement, concurrent with Ct. 1, 6 months extended supervision."
+      descr: Written explanation of determinate sentence
+      amount: null
+      ctofc: null
+      date: "2020-02-24"
+      courtRptr: null
+    - addlTxt: "Exhibit #1 - Copy of JOC from Milwaukee County case no:  97CF974862 from the 02/24/2020 Sentencing Hearing - Retained Electronically"
+      descr: Exhibit
+      amount: null
+      ctofc: null
+      date: "2020-02-24"
+      courtRptr: null
+    - addlTxt: null
+      descr: Dispositional order/judgment
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2020-02-24"
+      courtRptr: null
+    - addlTxt: "11:11 AM Defendant Luis A Ramirez  #244212 in court, in custody with attorney Ronald Gabriel Benavides.  Kevin R. Calkins appeared for the State of Wisconsin. State filed a copy of the JOC from defendants conviction in the Milwaukee County case. Victim made a statement. Sentencing recommendations argued. Defendant made a statement to the Court. Court sentenced the defendant on Ct. 1 to serve 15 years in prison, consecutive to any other sentence. 12 years initial confinement and 3 years extended supervision, consecutive to any other sentence currently serving. $518.00 costs. Submit DNA sample. Ct. 2 Court sentenced the defendant to serve 1.5 years in prison, concurrent to Ct. 1; 1 year initial confinement and 6 months extended supervison, concurrent to Ct. 1. $243.00 costs. No contact with the victim of this case. No jail credit. Defendant requested his glasses be returned to him. Atty Benavides will follow up on the glasses. Defendant is not eligible for the challenge incarceration program or substance abuse program. 11:55 AM"
+      descr: Sentencing hearing
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2020-02-24"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: null
+      descr: Assessment Report
+      amount: null
+      ctofc: null
+      date: "2020-02-25"
+      courtRptr: null
+    - addlTxt: null
+      descr: Judgment of conviction
+      amount: null
+      ctofc: "Bescup, Melissa R"
+      date: "2020-02-25"
+      courtRptr: null
+    - addlTxt: Filed by Atty Ron Benavides.
+      descr: "Notice of intent to pursue post-conviction relief"
+      amount: null
+      ctofc: null
+      date: "2020-03-12"
+      courtRptr: null
+    - addlTxt: "Copy of CCAP court record, Notice of Intent to Pursue Post-Conviction Relief, and Judgment mailed to State Public Defender, Appellate Division today."
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2020-03-13"
+      courtRptr: null
+    - addlTxt: Attorney Jennifer Lohr appointed
+      descr: Public defender order appointing counsel
+      amount: null
+      ctofc: null
+      date: "2020-05-20"
+      courtRptr: null
+    - addlTxt: "submitted by Appellate Division, State Public Defender"
+      descr: Request for court record
+      amount: null
+      ctofc: null
+      date: "2020-05-20"
+      courtRptr: null
+    - addlTxt: "3-3-2016 Preliminary Hearing Time Limit Waiver filed by Court Reporter Chris Champeau"
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-05-26"
+      courtRptr: null
+    - addlTxt: 2/18/2016 Hearing filed by Court Reporter Cheryl Sisco
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-05-26"
+      courtRptr: null
+    - addlTxt: "for the 10/26/16 Arraignment filed by Court Reporter Catherine Thimm -Braunschweig"
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-05-27"
+      courtRptr: null
+    - addlTxt: "for the 07/20/16 Return Date filed by Court Reporter Catherine Thimm -Braunschweig"
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-05-27"
+      courtRptr: null
+    - addlTxt: "filed by Appellate Attorney Joseph Ehmann - Motion to Extend the Time for Appointing Postconviction Counsel and Ordering Transcripts"
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2020-06-11"
+      courtRptr: null
+    - addlTxt: "The deadline for the state public defender to appoint postconviction counsel and to order transcripts is extended through May 20, 2020"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2020-06-15"
+      courtRptr: null
+    - addlTxt: of Sentencing Hearing on 2/24/20 filed by Court Reporter Marjorie Kurtz
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-06-22"
+      courtRptr: null
+    - addlTxt: "for the 12/4/19 Jury Trial, Day Two filed by Court Reporter Marjorie Kurtz"
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-08-18"
+      courtRptr: null
+    - addlTxt: for the 12/3/19 Jury Trial filed by Court Reporter Marjorie Kurtz
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-08-18"
+      courtRptr: null
+    - addlTxt: for the 6/17/19 Motion Hearing filed by Court Reporter Marjorie Kurtz
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-08-18"
+      courtRptr: null
+    - addlTxt: for the 8/4/16 Preliminary Hearing filed by Court Reporter Marjorie Kurtz
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-08-18"
+      courtRptr: null
+    - addlTxt: for the 2/11/16 Initial Appearance filed by Court Reporter Marjorie Kurtz
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2020-08-18"
+      courtRptr: null
+    - addlTxt: Copy of Motion to Extend the Time for Filing a Postconviction Motion or Notice of Appeal filed with Court of Appeals filed by Jennifer Lohr
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2020-10-21"
+      courtRptr: null
+    - addlTxt: "The time to file a postconviction motion or notice of appeal is extended to December 21, 2020"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2020-10-27"
+      courtRptr: null
+    - addlTxt: Copy of Second Motion to Extend the Time for Filing a Postconviction Motion or Notice of Appeal filed with the Court of Appeals by Attorney Lohr
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2020-12-18"
+      courtRptr: null
+    - addlTxt: "The time to file a notice of appeal or postconviction motion is extended to February 19, 2021"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2020-12-23"
+      courtRptr: null
+    - addlTxt: Copy of Third Motion to Extend the Time for Filing a Postconviction Motion or Notice of Appeal filed with Court of Appeals by Jennifer Lohr
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2021-02-18"
+      courtRptr: null
+    - addlTxt: "The time to file a postconviction motion or notice of appeal is extended to April 20, 2021"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2021-02-22"
+      courtRptr: null
+    - addlTxt: "To the Court of Appeals - Fourth Motion to Extend the Time for Filing A Postconviction Motion or Notice of Appeal filed by Atty Lohr"
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2021-04-20"
+      courtRptr: null
+    - addlTxt: "The time to file a postconviction motion or notice of appeal is extended to June 21, 2021"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2021-04-21"
+      courtRptr: null
+    - addlTxt: Defendant's Postconviction Motion to Vacate Conviction and Dismiss Case for Speedy Trial Violation filed by Atty Lohr
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2021-06-21"
+      courtRptr: null
+    - addlTxt: "Scheduling conference on July 29, 2021 at 01:15 pm."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2021-07-01"
+      courtRptr: null
+    - addlTxt: "Evidentiary hearing on September 10, 2021 at 10:00 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2021-07-29"
+      courtRptr: null
+    - addlTxt: "In person evidentiary hearing set 9/10/21 from 10 - 11 AM."
+      descr: Scheduling conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2021-07-29"
+      courtRptr: null
+    - addlTxt: null
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2021-08-16"
+      courtRptr: null
+    - addlTxt: "for Green Bay Correctional Institution on 09/10/21 at 10:00 a.m. filed by DA's office"
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2021-08-16"
+      courtRptr: null
+    - addlTxt: null
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2021-08-16"
+      courtRptr: null
+    - addlTxt: "for Wisconsin Secure Program Facility for 09/10/21 at 10:00 a.m."
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2021-08-16"
+      courtRptr: null
+    - addlTxt: "for Wisconsin Secure Program Facility on 09/10/21 at 10:00 a.m."
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2021-08-17"
+      courtRptr: null
+    - addlTxt: "for Green Bay Correctional Institution on 09/10/21 at 10:00 a.m."
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2021-08-17"
+      courtRptr: null
+    - addlTxt: "10:33 AM Prosecuting attorney Brenda L. Yaskal appeared in court for the State of Wisconsin, Defendant Luis A Ramirez  #244212 appeared in court, in custody, Attorney Jennifer A Lohr appeared in court for Luis A Ramirez  #244212. Court/Counsel discussion regarding proceeding today, defendant is not feeling well. This will be rescheduled. 10:39 AM\nEvidentiary hearing scheduled for October 15, 2021 at 11:00 am."
+      descr: Evidentiary hearing
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2021-09-10"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: Letter from Attorney Lohr requesting a document be added to the court record
+      descr: Request
+      amount: null
+      ctofc: null
+      date: "2021-10-12"
+      courtRptr: null
+    - addlTxt: "Responsive letter from Clerk of Court to Attorney Lohr re: request to add a document to the official court record"
+      descr: Response/reply
+      amount: null
+      ctofc: null
+      date: "2021-10-14"
+      courtRptr: null
+    - addlTxt: "The time for the circuit court to decide the defendant's postconviction motion is extended to December 20, 2021"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2021-10-19"
+      courtRptr: null
+    - addlTxt: "Evidentiary hearing on November 29, 2021 at 11:00 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2021-10-20"
+      courtRptr: null
+    - addlTxt: null
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2021-10-27"
+      courtRptr: null
+    - addlTxt: "Green Bay Correctional Institution on 11/29/21 at 11:00 a.m."
+      descr: Petition for writ of habeas corpus
+      amount: null
+      ctofc: null
+      date: "2021-10-27"
+      courtRptr: null
+    - addlTxt: "Notice of 11-29-21 evidentiary hearing mailed to defendant @ Green Bay Correctional Institution, P O Box 19033, Green Bay WI 54307 returned \"60 day forwarding period expired\""
+      descr: Return of unclaimed/undelivered mail service
+      amount: null
+      ctofc: null
+      date: "2021-10-29"
+      courtRptr: null
+    - addlTxt: "for Green Bay Correctional Institution on 11/29/21 at 11:00 A.M."
+      descr: Writ of Habeas Corpus
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2021-11-02"
+      courtRptr: null
+    - addlTxt: "11:05 AM Prosecuting attorney Brenda L. Yaskal appeared in court for the State of Wisconsin, Defendant Luis A Ramirez appeared in court, in custody, Attorney Jennifer A Lohr appeared in court for Luis A Ramirez.  Attorney Lohr called defendant to the stand, sworn. Direct exam. Cross exam. Witness excused.  Evidence closed for today. State's response to motion is to be filed by 1/14/22; Attorney Lohr to reply by 2/14/22. Court in recess. 11:38 AM"
+      descr: Evidentiary hearing
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2021-11-29"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "The time to decide the postconviction motion is extended to March 14, 2022"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2021-12-14"
+      courtRptr: null
+    - addlTxt: Copy of Third Motion to Extend the Time for Circuit Court to Issue Order Determining Postconviction Motion filed with the Court of Appeals by Attorney Jennifer Lohr
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2021-12-14"
+      courtRptr: null
+    - addlTxt: Copy of Motion to Extend the Time for Circuit Court to Issue Order Determining Postconviction Motion filed with the Court of Appeals by Attorney Jennifer Lohr
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2021-12-14"
+      courtRptr: null
+    - addlTxt: for the 11/29/21 Motion Hearing filed by Court Reporter Marjorie Kurtz
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2021-12-15"
+      courtRptr: null
+    - addlTxt: Defendant's Further Brief in Support of Postconviction Motion to Vacate Conviction & Dismiss Case for Speedy Trial Violation filed by Atty Lohr
+      descr: Brief
+      amount: null
+      ctofc: null
+      date: "2022-02-14"
+      courtRptr: null
+    - addlTxt: Copy of Fourth Motion to Extend the Time for Circuit Court to Issue Order Determining Postconviction Motion filed in the Wi Court of Appeals by Attorney Jennifer Lohr
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2022-03-11"
+      courtRptr: null
+    - addlTxt: "The time to decide the postconviction motion is extended to May 31, 2022"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2022-03-14"
+      courtRptr: null
+    - addlTxt: "State' Brief in Opposition to Defendant's Post- Conviction Motion filed by DA Yaskal"
+      descr: Brief
+      amount: null
+      ctofc: null
+      date: "2022-03-15"
+      courtRptr: null
+    - addlTxt: "Filed by DA Brenda Yaskal re: filing of brief"
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2022-03-15"
+      courtRptr: null
+    - addlTxt: "Oral ruling on May 13, 2022 at 10:00 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2022-03-15"
+      courtRptr: null
+    - addlTxt: denying defendant's postconviction motion
+      descr: Order
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2022-05-13"
+      courtRptr: null
+    - addlTxt: null
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2022-05-13"
+      courtRptr: null
+    - addlTxt: null
+      descr: Video conferencing
+      amount: null
+      ctofc: null
+      date: "2022-05-13"
+      courtRptr: null
+    - addlTxt: "10:02 AM Prosecuting attorney Brenda L. Yaskal in court for the State of Wisconsin. Defendant Luis A Ramirez  #244212 appeared by video in custody from the Green Bay Correctional Institution. Attorney Jennifer A Lohr appeared by video for Luis A Ramirez. Hearing is in re: defense motion right to speedy trial. Statements by Court, motion denied. 10:14 AM"
+      descr: Oral ruling
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2022-05-13"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: filed by Attorney Jennifer Lohr
+      descr: Notice of appeal
+      amount: null
+      ctofc: null
+      date: "2022-06-02"
+      courtRptr: null
+    - addlTxt: Notice of Appeal and Circuit Court Docket Entries received by the Wisconsin Court of Appeals
+      descr: Acknowledgment from Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2022-06-07"
+      courtRptr: null
+    - addlTxt: null
+      descr: Other papers
+      amount: null
+      ctofc: null
+      date: "2022-06-07"
+      courtRptr: null
+    - addlTxt: filed by Atty Lohr
+      descr: Statement on transcript
+      amount: null
+      ctofc: null
+      date: "2022-06-16"
+      courtRptr: null
+    - addlTxt: "Appeals Document Index saved for: 2022AP000959 by: Nicole Saley"
+      descr: Index
+      amount: null
+      ctofc: null
+      date: "2022-07-01"
+      courtRptr: null
+    - addlTxt: null
+      descr: Other papers
+      amount: null
+      ctofc: null
+      date: "2022-07-01"
+      courtRptr: null
+    - addlTxt: "from Attorney Jennifer Lohr re: appellate index"
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2022-07-06"
+      courtRptr: null
+    - addlTxt: from Lohr Law Office requesting specific documents to be added to the index
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2022-07-07"
+      courtRptr: null
+    - addlTxt: "Appeals Document Index: 2022AP000959 sent to Court of Appeals by: Nicole Saley"
+      descr: Transmittal of record to court of appeals
+      amount: null
+      ctofc: null
+      date: "2022-07-11"
+      courtRptr: null
+    - addlTxt: Copy of letter from Wisconsin Court of Appeals to court reporter M. Kurtz directing the filing of the transcript forthwith
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2022-07-12"
+      courtRptr: null
+    - addlTxt: null
+      descr: Acknowledgment from Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2022-07-15"
+      courtRptr: null
+    - addlTxt: "Appeals Document Index: 2022AP000959 sent to Court of Appeals by: Nicole Saley"
+      descr: Transmittal of record to court of appeals
+      amount: null
+      ctofc: null
+      date: "2022-07-15"
+      courtRptr: null
+    - addlTxt: for the 5/13/22 Oral Ruling filed by Court Reporter Marjorie Kurtz
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2022-07-15"
+      courtRptr: null
+    - addlTxt: for the 12/4/19 Jury Trial filed by Court Reporter Marjorie Kurtz
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2022-07-26"
+      courtRptr: null
+    - addlTxt: Transcript for the 12/3/19 Jury Trial filed by Court Reporter Marjorie Kurtz
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2022-07-26"
+      courtRptr: null
+    - addlTxt: null
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2022-09-07"
+      courtRptr: null
+    - addlTxt: "It is ordered thst this Corrt retains jurisdiction over this appeal and remands for the appellant to file a supplemental postconviction motion.  The motion shall be filed by October 31, 2022.  It is ordered that the circuit court shall hold any necessary proceedings and enter an order deciding the supplemental postconviction motion within ninety days of the filing of the motion.  It is ordered that a transcript of any hearing on the supplemental postconviction motion, if necessary for this appeal, shall be requested within eleven days of the entry of the order disposing of the motion.  The transcript shall be filed within thirty days of the date requested, and the party requesting the transcript shall advise the court reporter of this deadline.  It is ordered that the record shall be transmitted back to this court within five days of entry of the order disposing of the supplemental postconviction motion or the filing of the transcript if requested.  The record shall include the proceedings on remand.  It is ordered that the time to file the appellant's brief is extended to forty days after the return of the record to this court."
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2022-09-30"
+      courtRptr: null
+    - addlTxt: Exhibits in Support of Supplemental Postconviction Motion filed by Atty Lohr
+      descr: Other papers
+      amount: null
+      ctofc: null
+      date: "2022-10-28"
+      courtRptr: null
+    - addlTxt: Defendant's Supplemental Postconviction Motion/Motion to Reconsider Denial of Postconviction Motion filed by Atty Lohr
+      descr: Motion
+      amount: null
+      ctofc: null
+      date: "2022-10-28"
+      courtRptr: null
+    - addlTxt: "Status conference on January 6, 2023 at 08:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2022-11-29"
+      courtRptr: null
+    - addlTxt: "ADDRESS INFO for Luis A Ramirez  #244212\nCurrent: P.O. Box 100, Wisconsin Secure Program Facility, Boscobel, WI 53805 United States  (Effective: 11-29-2022)\nPrior: PO Box 19033, Green Bay Correctional Institution, Green Bay, WI 54307 United States\n"
+      parties[1]{sealed,name}:
+      false,"Ramirez  #244212, Luis A"
+      descr: Change of address notification
+      amount: null
+      ctofc: null
+      date: "2022-11-29"
+      courtRptr: null
+    - addlTxt: Change of Address Notification filed by Atty Lohr
+      parties[1]{sealed,name}:
+      false,"Ramirez  #244212, Luis A"
+      descr: Change of address notification
+      amount: null
+      ctofc: null
+      date: "2022-11-29"
+      courtRptr: null
+    - addlTxt: null
+      parties[1]{sealed,name}:
+      false,"Ramirez  #244212, Luis A"
+      descr: Status conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2023-01-06"
+      courtRptr: null
+    - addlTxt: MOTION TO EXTEND THE TIME FOR CIRCUIT COURT TO ISSUE ORDER DETERMINING SUPPLEMENTAL POSTCONVICTION MOTION
+      descr: Motion in court of appeals
+      amount: null
+      ctofc: null
+      date: "2023-01-09"
+      courtRptr: null
+    - addlTxt: "Order of Court of Appeals - Circuit Court to decided pending postconviction motion is extended to May 22, 2023"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2023-01-10"
+      courtRptr: null
+    - addlTxt: "Appeals Document Index saved for: 2022AP000959 by: Nicole Saley"
+      descr: Index
+      amount: null
+      ctofc: null
+      date: "2023-01-17"
+      courtRptr: null
+    - addlTxt: Notification of Filing of Circuit Court Record
+      descr: Acknowledgment from Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2023-01-26"
+      courtRptr: null
+    - addlTxt: "Appeals Document Index: 2022AP000959 sent to Court of Appeals by: Nicole Saley"
+      descr: Transmittal of record to court of appeals
+      amount: null
+      ctofc: null
+      date: "2023-01-26"
+      courtRptr: null
+    - addlTxt: null
+      parties[1]{sealed,name}:
+      false,"Ramirez  #244212, Luis A"
+      descr: Other papers
+      amount: null
+      ctofc: null
+      date: "2023-01-26"
+      courtRptr: null
+    - addlTxt: "Atty Yaskal re: extension to file Brief"
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2023-01-30"
+      courtRptr: null
+    - addlTxt: "filed by Sheila Reiff, Clerk of Court of Appeals"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2023-02-07"
+      courtRptr: null
+    - addlTxt: "Atty Yaskal re: response to defendant's motion to reconsider"
+      descr: Letters/correspondence
+      amount: null
+      ctofc: null
+      date: "2023-02-24"
+      courtRptr: null
+    - addlTxt: State's Response to Defendant's Motion to Reconsider filed by Atty Yaskal
+      descr: Response/reply
+      amount: null
+      ctofc: null
+      date: "2023-02-24"
+      courtRptr: null
+    - addlTxt: Defendant's Reply in Support of Supplemental Postconviction Motion/Motion to Reconsider Denial of Postconviction Motion filed by Atty Lohr
+      descr: Response/reply
+      amount: null
+      ctofc: null
+      date: "2023-03-07"
+      courtRptr: null
+    - addlTxt: "Oral ruling on May 16, 2023 at 01:00 pm."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2023-03-28"
+      courtRptr: null
+    - addlTxt: null
+      descr: Video conferencing
+      amount: null
+      ctofc: null
+      date: "2023-05-16"
+      courtRptr: null
+    - addlTxt: "1:07 PM Defendant Luis A Ramirez  #244212 appeared by video Zoom in custody from the Wisconsin Secure Program Facility.  Attorney Jennifer A Lohr in court for Luis A Ramirez  #244212.  Attorney Brenda L. Yaskal in court for State of Wisconsin. Court makes ruling on defendant's motion to reconsider, Court denies motion to reconsider, Atty Lohr to submit Order to the Court, 1:15 P.M."
+      descr: Oral ruling
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2023-05-16"
+      courtRptr: "Kurtz, Marjorie"
+    - addlTxt: "Filed by Atty Lohr - Postconviction motion to reconsider is denied"
+      descr: Proposed Order
+      amount: null
+      ctofc: null
+      date: "2023-05-17"
+      courtRptr: null
+    - addlTxt: Supplemental postconviction motion/motion to reconsider is denied
+      descr: Order
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2023-05-18"
+      courtRptr: null
+    - addlTxt: "Order of Court of Appeals - order to file the appellant's brief is extended"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2023-06-01"
+      courtRptr: null
+    - addlTxt: "Oral Ruling 5-16-23 filed by Court Reporter Marjorie Kurtz"
+      descr: Transcript
+      amount: null
+      ctofc: null
+      date: "2023-06-05"
+      courtRptr: null
+    - addlTxt: "Appeals Document Index saved for: 2022AP000959 by: Nicole Saley"
+      descr: Supplemental Index
+      amount: null
+      ctofc: null
+      date: "2023-06-23"
+      courtRptr: null
+    - addlTxt: "Appeals Document Index: 2022AP000959 sent to Court of Appeals by: Nicole Saley"
+      descr: Transmittal of record to court of appeals
+      amount: null
+      ctofc: null
+      date: "2023-06-23"
+      courtRptr: null
+    - addlTxt: For the supplement to the appeal record
+      descr: Other papers
+      amount: null
+      ctofc: null
+      date: "2023-06-23"
+      courtRptr: null
+    - addlTxt: "Order of Court of Appeals - transmittal of record - due within eleven (11) days of order"
+      descr: Order of Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2023-06-26"
+      courtRptr: null
+    - addlTxt: Supplemental Circuit Court Case Record filed.
+      descr: Acknowledgment from Court of Appeals
+      amount: null
+      ctofc: null
+      date: "2023-06-26"
+      courtRptr: null
+    - addlTxt: Reverse the Judgment of Conviction and Circuit Court Orders Denying Postconviction Motions and remand for the Circuit Court to Dismiss the Complaint
+      descr: Court of Appeals decision & order reversing
+      amount: null
+      ctofc: null
+      date: "2024-04-25"
+      courtRptr: null
+    - addlTxt: null
+      descr: Instructions for How to Appear Remotely
+      amount: null
+      ctofc: null
+      date: "2024-05-02"
+      courtRptr: null
+    - addlTxt: "Status conference on June 6, 2024 at 08:30 am."
+      descr: Notice of hearing
+      amount: null
+      ctofc: null
+      date: "2024-05-02"
+      courtRptr: null
+    - addlTxt: "for Review - Supreme Court"
+      descr: Acknowledgment from Supreme Court
+      amount: null
+      ctofc: null
+      date: "2024-05-28"
+      courtRptr: null
+    - addlTxt: Held.
+      descr: Status conference
+      amount: null
+      ctofc: "Voigt, W. Andrew"
+      date: "2024-06-06"
+      courtRptr: null
+    - addlTxt: null
+      descr: Order of the Supreme Court
+      amount: null
+      ctofc: null
+      date: "2024-10-07"
+      courtRptr: null
+    - addlTxt: "If is ordered that the motion is granted.  Plaintiff-respondent-petition's opening brief shall be served and filed on or before December 6, 2024"
+      descr: Order of the Supreme Court
+      amount: null
+      ctofc: null
+      date: "2024-11-11"
+      courtRptr: null
+    - addlTxt: It is ordered that the motion is granted and that the defendant/appellant/respondent's brief is accepted for filing
+      descr: Order of the Supreme Court
+      amount: null
+      ctofc: null
+      date: "2025-01-03"
+      courtRptr: null
+    - addlTxt: Review of Decision of the Court of Appeals/Supreme Court decision
+      descr: Supreme Court decision filed
+      amount: null
+      ctofc: null
+      date: "2025-06-27"
+      courtRptr: null
+    - addlTxt: "Remittitur - Petition for Review Case"
+      descr: Remittitur
+      amount: null
+      ctofc: null
+      date: "2025-09-05"
+      courtRptr: null
+    - addlTxt: Atty Lohr
+      descr: Notice of Completion
+      amount: null
+      ctofc: null
+      date: "2025-10-02"
+      courtRptr: null
+    receivables[1]{amountDue,pmtsAllowed,atCollections,adjust,rcvblNo,countyNo,probAmt,paid,dueDate,type,atSdc,balanceDue,docCollected}:
+    761,true,false,0,278739,11,409,352,null,R,false,0,true
+
+Perform the following calculations and analysis:
+1. Calculate the total time from offense date to sentencing date. How many years and months elapsed?
+2. For each charge, extract the sentence components: prison time and extended supervision time. What is the total combined incarceration (prison + ES) for each charge? Are the sentences concurrent or consecutive?
+3. How many defense attorneys represented the defendant? Calculate the duration (in months) each attorney was on the case
+4. Count the total docket entries per year (2016-2025). Which year had the most activity?
+5. How many docket entries are related to appeals (Court of Appeals or Supreme Court references)? What percentage of total docket entries are appeal-related?
+6. From the receivables, calculate: total amount due, total paid, remaining balance, and what percentage has been collected
+7. The bond was set at what amount? Identify the bond-related docket entries and their dates

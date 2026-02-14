@@ -225,6 +225,7 @@ impl LLMProvider for OpenAIClient {
 
         let latency_ms = start.elapsed().as_millis() as u64;
         let status = response.status();
+        let http_status = status.as_u16();
 
         if status == 429 {
             let retry_after = response
@@ -289,6 +290,14 @@ impl LLMProvider for OpenAIClient {
             .first()
             .ok_or_else(|| ProviderError::Parse("No choices in response".to_string()))?;
 
+        if choice.message.content.trim().is_empty() {
+            return Err(ProviderError::Parse(format!(
+                "Empty response from OpenAI (finish_reason: {}, completion_tokens: {})",
+                choice.finish_reason.as_deref().unwrap_or("none"),
+                api_response.usage.completion_tokens,
+            )));
+        }
+
         Ok(CompletionResponse {
             content: choice.message.content.clone(),
             model: api_response.model,
@@ -296,6 +305,7 @@ impl LLMProvider for OpenAIClient {
             output_tokens: api_response.usage.completion_tokens,
             finish_reason: choice.finish_reason.clone().unwrap_or_else(|| "unknown".to_string()),
             latency_ms,
+            http_status,
         })
     }
 

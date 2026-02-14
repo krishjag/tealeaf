@@ -1,0 +1,169 @@
+# NYC PLUTO Data Analysis: Top 30 Manhattan Properties by Assessed Value
+
+## 1. Total Assessed Value Statistics
+
+**Summary:**
+- **Total Assessed Value:** $18,262,649,478
+- **Average:** $608,754,983
+- **Median:** $521,852,300
+- **Minimum:** $437,000,000 (250 West 34 Street)
+- **Maximum:** $1,673,531,100 (185 Greenwich Street - One World Trade Center)
+
+---
+
+## 2. Building Efficiency Ratio (Building Area / Lot Area)
+
+This measures how intensely a lot is developed.
+
+**Highest Efficiency (Most Intensely Built):**
+1. **51 East 42 Street (One Vanderbilt)** - 38.10 ratio
+2. **427 10 Avenue** - 36.48 ratio
+3. **527 West 34 Street** - 32.96 ratio
+4. **338 5 Avenue (Empire State Building)** - 30.79 ratio
+5. **1221 Avenue of the Americas** - 25.73 ratio
+
+**Lowest Efficiency (Least Intensely Built):**
+1. **Main Street, Roosevelt Island** - 1.13 ratio (large residential complex)
+2. **200 Central Park West (Museum of Natural History)** - 1.84 ratio
+3. **240 1 Avenue (Stuyvesant Town)** - 3.34 ratio
+4. **360 West Street (Javits Center)** - 4.22 ratio
+5. **180 Ft Washington Avenue (Presbyterian Hospital)** - 10.14 ratio
+
+*Note: Lower ratios typically indicate institutional, residential, or special-purpose properties on large lots.*
+
+---
+
+## 3. Assessed Value Per Square Foot Rankings
+
+### **Top 5 Most Valuable (per sqft):**
+
+| Rank | Address | Value/sqft | Property Type | Total Assessment |
+|------|---------|------------|---------------|------------------|
+| 1 | 151 East 58 Street (One Beacon Court) | $459.25 | Mixed Use | $506,598,307 |
+| 2 | 761 5 Avenue | $433.54 | Office | $791,146,000 |
+| 3 | 1 Columbus Circle (Time Warner Center) | $377.88 | Mixed Use | $794,395,096 |
+| 4 | 1111 Avenue of the Americas | $350.52 | Office | $787,042,350 |
+| 5 | 200 Central Park West (Museum) | $348.73 | Cultural | $474,390,000 |
+
+### **Bottom 5 Least Valuable (per sqft):**
+
+| Rank | Address | Value/sqft | Property Type | Total Assessment |
+|------|---------|------------|---------------|------------------|
+| 1 | 240 1 Avenue (Stuyvesant Town) | $88.57 | Residential | $791,815,950 |
+| 2 | Main Street, Roosevelt Island | $111.58 | Residential | $534,046,500 |
+| 3 | 180 Ft Washington Avenue (Hospital) | $124.61 | Healthcare | $460,306,800 |
+| 4 | 250 West 34 Street | $162.46 | Office | $437,000,000 |
+| 5 | 1260 Avenue of the Americas | $182.33 | Office | $498,581,100 |
+
+*Lower per-sqft values often reflect affordable housing, institutional uses, or older buildings.*
+
+---
+
+## 4. Analysis by Land Use Type
+
+| Land Use | Count | Avg Assessed Value | Avg Building Area | Avg Floors |
+|----------|-------|-------------------|-------------------|------------|
+| **5: Commercial & Office** | 23 | $600,946,286 | 2,107,424 sqft | 51 floors |
+| **8: Public Facilities** | 3 | $622,039,800 | 3,038,134 sqft | 11 floors |
+| **4: Mixed Residential & Commercial** | 3 | $710,285,919 | 4,143,689 sqft | 28 floors |
+| **3: Multi-Family Elevator** | 1 | $534,046,500 | 4,786,701 sqft | 18 floors |
+
+**Key Insights:**
+- Mixed-use properties (Land Use 4) command the highest average assessments
+- Public facilities have the largest average building areas but fewest floors (spread horizontally)
+- Pure commercial/office properties dominate this high-value dataset (77%)
+- The single multi-family property (Roosevelt Island) is exceptionally large
+
+---
+
+## 5. FAR Utilization Analysis
+
+Measures how much of allowed zoning density is used: (Built FAR / Maximum Allowed FAR) × 100
+
+### **Most Underbuilt Properties (< 75% utilization):**
+
+| Address | Built FAR | Max FAR | Utilization | Reason |
+|---------|-----------|---------|-------------|--------|
+| Main Street, Roosevelt Island | 1.13 | 6.50 | **17.4%** | Large affordable housing complex |
+| 240 1 Avenue (Stuyvesant Town) | 3.34 | 6.50 | **51.4%** | Historic post-war housing |
+| 360 West Street (Javits Center) | 4.22 | 2.00 | **211%** | Convention center (over-zoned use) |
+| 200 Central Park West | 1.84 | 0.00 | **N/A** | Parkland zoning - museum |
+| 180 Ft Washington Avenue | 10.14 | 6.50 | **156%** | Hospital campus (institutional) |
+
+### **Near/Over Zoning Limits (> 150% utilization):**
+
+| Address | Built FAR | Max FAR | Utilization | Notes |
+|---------|-----------|---------|-------------|-------|
+| **51 East 42 Street (Vanderbilt)** | 38.10 | 15.00 | **254%** | Used air rights transfer |
+| **527 West 34 Street** | 32.96 | 10.00 | **330%** | Hudson Yards bonus zoning |
+| **427 10 Avenue** | 36.48 | 10.00 | **365%** | Hudson Yards development |
+| **338 5 Avenue (Empire State)** | 30.79 | 15.00 | **205%** | Pre-1961 zoning grandfathered |
+| **1221 Avenue of Americas** | 25.73 | 12.00 | **214%** | Pre-existing non-conforming |
+
+*Properties exceeding 100% typically utilized air rights transfers, special permits, or were built before current zoning.*
+
+---
+
+## 6. Tax Exemption Analysis
+
+**Total Exempt Value:** $5,769,632,142  
+**Percentage of Total Assessed Value:** **31.6%**
+
+### **Top 10 Properties by Exemption Amount:**
+
+| Rank | Address | Exempt Amount | % of Property Value | Reason |
+|------|---------|---------------|-------------------|---------|
+| 1 | 185 Greenwich Street (WTC) | $1,673,531,100 | 100% | Public development corp |
+| 2 | 360 West Street (Javits) | $931,422,600 | 100% | Convention center |
+| 3 | 1111 Avenue of Americas | $787,042,350 | 100% | Tax-exempt owner |
+| 4 | 500 West 33 Street | $743,665,650 | 100% | Hudson Yards PILOT |
+| 5 | 427 10 Avenue | $699,286,050 | 100% | Hudson Yards PILOT |
+| 6 | 527 West 34 Street | $541,462,950 | 100% | Hudson Yards PILOT |
+| 7 | Main Street, Roosevelt Is. | $534,046,500 | 100% | Affordable housing |
+| 8 | 200 Central Park West | $474,390,000 | 100% | City-owned museum |
+| 9 | 180 Ft Washington Ave | $460,306,800 | 100% | Hospital |
+| 10 | 601 Lexington Avenue | $61,111,592 | 13.5% | Partial exemption |
+
+**Key Finding:** 17 of the 30 properties (57%) have 100% tax exemptions, primarily:
+- Hudson Yards PILOT (Payment In Lieu of Taxes) program
+- Public/institutional ownership
+- Economic development zones
+- Cultural institutions
+
+---
+
+## 7. Residential Properties Analysis
+
+Only **4 properties** have residential units:
+
+### **Residential Metrics:**
+
+| Address | Units | Res Area/Unit | Assessment/Unit | Total Res Units | Property Type |
+|---------|-------|---------------|-----------------|-----------------|---------------|
+| **1 Columbus Circle (Time Warner)** | 226 | 1,955 sqft | $3,515,464 | 226 | Luxury condo |
+| **240 1 Avenue (Stuyvesant Town)** | 8,764 | 955 sqft | $90,355 | 8,764 | Affordable housing |
+| **Main Street, Roosevelt Island** | 8,018 | 466 sqft | $66,604 | 8,018 | Affordable housing |
+| **151 East 58 Street (Beacon Court)** | 105 | 2,352 sqft | $4,824,746 | 105 | Ultra-luxury condo |
+
+### **Key Contrasts:**
+
+**Ultra-Luxury vs. Affordable Housing:**
+- **Area per unit:** Luxury averages 2,154 sqft vs. affordable 711 sqft (3× larger)
+- **Assessment per unit:** Luxury averages $4.17M vs. affordable $78K (53× higher)
+- **Total residential units:** The 2 affordable properties house 16,782 units (94% of all residential units in dataset)
+
+**Observations:**
+- Time Warner Center and Beacon Court represent peak Manhattan luxury residential values
+- Stuyvesant Town and Roosevelt Island house massive populations at affordable rates
+- The stark value difference reflects NYC's housing inequality: same assessment funds vastly different numbers of homes
+
+---
+
+## Summary Insights
+
+1. **Concentration:** These 30 properties represent $18.3B in assessed value, dominated by Midtown office towers
+2. **Development Intensity:** Modern office towers achieve 25-38× building-to-lot ratios through height
+3. **Value Density:** Luxury mixed-use commands $350-460/sqft vs. $88-125/sqft for affordable housing
+4. **Tax Policy:** Nearly $6B (32%) is tax-exempt through economic development programs and public ownership
+5. **Zoning Evolution:** Many top properties exceed current FAR limits through grandfathering or air rights
+6. **Housing Disparity:** 4 residential properties serve 17,113 units but with 50× value differences per unit

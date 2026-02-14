@@ -1,0 +1,127 @@
+## 1) Time from offense date to sentencing date (years/months)
+
+- **Offense date (both charges):** 2015-05-05  
+- **Sentencing date:** 2020-02-24  
+
+Elapsed time from **2015-05-05 → 2020-02-24**:
+- **4 years, 9 months** (and **19 days**)
+
+(Computed as 4 full years to 2019-05-05, plus 9 months to 2020-02-05, plus 19 days to 2020-02-24.)
+
+---
+
+## 2) Sentence components by charge (IC + ES), totals, and concurrency
+
+### Charge 1 — Battery by Prisoners (940.20(1)), Felony H  
+**Judgment action:** Found Guilty at Jury Trial  
+**Sentence (02/24/2020):**
+- **Initial confinement / prison:** **12 years**
+- **Extended supervision:** **3 years**
+- **Relationship:** **Consecutive to any other sentence currently serving** (i.e., consecutive to other cases/sentences)
+
+**Total combined incarceration (IC + ES):** **15 years**  
+**Concurrent/consecutive (within this case):** Charge 2 is ordered **concurrent with Ct. 1**, so Ct. 1 is the controlling sentence inside this case.
+
+---
+
+### Charge 2 — Disorderly Conduct (947.01(1)), Misd. B  
+**Judgment action:** Found Guilty at Jury Trial  
+**Sentence (02/24/2020):**
+- **Initial confinement / prison:** **1 year**
+- **Extended supervision:** **6 months**
+- **Relationship:** **Concurrent with Ct. 1**
+- Note in judgment: “With use of a dangerous weapon enhancer dismissed.”
+
+**Total combined incarceration (IC + ES):** **1 year, 6 months**  
+**Concurrent/consecutive:** **Concurrent with Charge 1**
+
+---
+
+## 3) Defense attorneys and duration on the case (months)
+
+Attorneys listed for defendant:
+
+1) **Leonie C. Dolch**  
+- **Entered:** 2016-03-15  
+- **Withdrawn:** 2016-07-07  
+- Duration: **~4 months** (2016-03-15 → 2016-07-07 ≈ 3.8 months)
+
+2) **Ronald Gabriel Benavides**  
+- **Entered:** 2016-07-07  
+- **Withdrawn:** 2020-03-12  
+- Duration: **~44 months** (2016-07-07 → 2020-03-12 ≈ 44.2 months)
+
+3) **Jennifer A. Lohr**  
+- **Entered:** 2020-05-20  
+- **Withdrawn:** 2025-10-02  
+- Duration: **~64 months** (2020-05-20 → 2025-10-02 ≈ 64.4 months)
+
+**Total defense attorneys:** **3**
+
+(There is a gap between Benavides’ withdrawal date 2020-03-12 and Lohr’s entry 2020-05-20.)
+
+---
+
+## 4) Total docket entries per year (2016–2025) and most active year
+
+Counted from the provided docket entry list:
+
+- **2016:** 31  
+- **2017:** 12  
+- **2018:** 21  
+- **2019:** 26  
+- **2020:** 21  
+- **2021:** 22  
+- **2022:** 22  
+- **2023:** 18  
+- **2024:** 6  
+- **2025:** 4  
+
+**Most activity:** **2016 (31 entries)**
+
+---
+
+## 5) Appeal-related docket entries and percentage of total
+
+Appeal-related = entries that reference **Court of Appeals** or **Supreme Court** (including “Order of Court of Appeals,” “Acknowledgment from Court of Appeals,” “Court of Appeals decision,” “Motion in court of appeals,” “Supreme Court decision,” etc.).
+
+- **Appeal-related entries:** **27**
+- **Total docket entries (all years):** **183**
+
+**Percentage appeal-related:**  
+- 27 / 183 ≈ **14.8%**
+
+---
+
+## 6) Receivables: totals due/paid/balance and % collected
+
+Receivable record (single line item):
+- **Amount due:** 761.00  
+- **Paid:** 352.00  
+- **Balance due:** 0.00  
+- (Also shows **probAmt 409**, **adjust 0**, and **docCollected true**)
+
+### Calculations
+- **Total amount due:** **$761.00**
+- **Total paid:** **$352.00**
+- **Remaining balance (computed as due − paid):** **$409.00**
+- **% collected (paid / due):** 352 / 761 ≈ **46.3%**
+
+Important note: the receivable field **“balanceDue: 0”** conflicts with the arithmetic (**761 − 352 = 409**) and also conflicts with the presence of **probAmt = 409**. Based strictly on the numeric fields:
+- **Collected:** $352  
+- **Uncollected:** $409  
+But WCCA’s “balanceDue” field here indicates **$0**, which may reflect a transfer/collection status, a different accounting bucket, or a data capture inconsistency.
+
+---
+
+## 7) Bond amount and bond-related docket entries (dates)
+
+**Bond amount set:** **$5,000** (signature/recognizance bond with felony conditions)
+
+Bond-related docket entries in the data:
+
+1) **2016-02-11** — **“Signature bond set”** — **$5,000** (with felony conditions)  
+2) **2016-02-25** — **“Signature bond signed”** — **$5,000**  
+3) **2016-10-26** — Arraignment entry notes **“Bond continued.”** (no amount stated there, but it is bond-related)
+
+If you want, I can also (a) break out “appeal-related” entries by Court of Appeals vs Supreme Court, or (b) compute attorney durations in whole-month rounding rules you specify (floor/ceil/nearest).

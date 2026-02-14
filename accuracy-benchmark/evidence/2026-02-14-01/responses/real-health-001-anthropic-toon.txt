@@ -1,0 +1,122 @@
+# Public Health Analysis: Washington State County Health Indicators
+
+## 1. Top 3 Most Prevalent Health Outcomes by County (HLTHOUT Category)
+
+**King County** (Urban):
+- High Cholesterol: 34.0% (32.1-35.8)
+- High Blood Pressure: 26.7% (25.1-28.5)
+- Depression: 23.5% (21.7-25.3)
+
+**Pierce County**:
+- Obesity: 36.9% (33.7-40.2)
+- High Cholesterol: 35.5% (33.3-37.7)
+- High Blood Pressure: 32.3% (30.1-34.5)
+
+**Spokane County**:
+- High Cholesterol: 34.7% (32.1-37.2)
+- Obesity: 34.7% (31.1-38.4)
+- High Blood Pressure: 31.1% (28.6-33.5)
+
+**Clark County**:
+- Obesity: 35.3% (31.9-38.7)
+- High Cholesterol: 33.5% (31.2-35.8)
+- High Blood Pressure: 31.1% (28.7-33.4)
+
+**Yakima County**:
+- Obesity: 39.7% (35.3-44.1)
+- High Cholesterol: 34.7% (31.9-37.7)
+- High Blood Pressure: 32.7% (29.9-35.5)
+
+**Whatcom County**:
+- High Cholesterol: 33.1% (30.2-35.8)
+- Depression: 29.5% (26.5-32.7)
+- High Blood Pressure: 28.4% (25.9-31.1)
+
+**Benton County**:
+- High Cholesterol: 36.4% (33.5-39.2)
+- Obesity: 36.2% (32.0-40.2)
+- High Blood Pressure: 29.2% (26.5-31.8)
+
+**Island County**:
+- High Cholesterol: 36.8% (33.4-40.2)
+- High Blood Pressure: 34.7% (31.4-38.1)
+- Obesity: 31.3% (26.5-36.3)
+
+**Ferry County** (Rural):
+- High Cholesterol: 41.2% (37.0-45.7)
+- High Blood Pressure: 41.1% (36.9-45.4)
+- Obesity: 40.2% (33.4-47.9)
+
+**Garfield County** (Rural):
+- High Cholesterol: 38.5% (34.5-42.6)
+- High Blood Pressure: 37.7% (33.8-41.8)
+- Arthritis: 31.5% (28.2-35.0)
+
+## 2. Obesity Rate Extremes
+
+**Highest:** Ferry County at **40.2%** (33.4-47.9)
+
+**Lowest:** King County at **22.6%** (20.4-24.9)
+
+**Disparity:** Ferry County's obesity rate is 1.8 times higher than King County's.
+
+## 3. Diabetes Prevalence Rankings (Highest to Lowest)
+
+1. **Ferry County**: 15.1% (13.1-17.5)
+2. **Yakima County**: 12.9% (11.4-14.5)
+3. **Garfield County**: 11.5% (9.8-13.4)
+4. **Pierce County**: 10.6% (9.3-11.8)
+5. **Benton County**: 10.4% (9.1-11.8)
+6. **Spokane County**: 10.2% (8.9-11.5)
+7. **Island County**: 10.2% (8.8-11.9)
+8. **Clark County**: 9.6% (8.4-10.8)
+9. **Whatcom County**: 8.8% (7.6-10.1)
+10. **King County**: 7.3% (6.6-8.2)
+
+**Note:** Ferry County's diabetes rate is more than double that of King County (15.1% vs 7.3%).
+
+## 4. Urban vs. Rural Comparison: King County vs. Ferry County
+
+| Measure | King County (Urban) | Ferry County (Rural) | Ratio (Rural/Urban) |
+|---------|---------------------|----------------------|---------------------|
+| **Smoking (CSMOKING)** | 7.2% (5.8-8.9) | 16.0% (13.5-19.0) | **2.2x higher** |
+| **Obesity (OBESITY)** | 22.6% (20.4-24.9) | 40.2% (33.4-47.9) | **1.8x higher** |
+| **Depression (DEPRESSION)** | 23.5% (21.7-25.3) | 25.0% (21.7-28.8) | **1.1x higher** |
+| **Lack of Insurance (ACCESS2)** | 6.8% (5.5-8.4) | 8.5% (6.9-10.4) | **1.3x higher** |
+
+**Key Findings:** Rural Ferry County shows substantially higher rates of smoking and obesity, while depression rates are relatively similar. The uninsured rate is moderately higher in Ferry County.
+
+## 5. Widest Health Risk Behavior Disparity
+
+**Physical Inactivity (LPA)** shows the widest disparity at **14.0 percentage points**:
+
+- **Highest:** Yakima County at 27.9% (24.2-31.7)
+- **Lowest:** King County at 13.9% (12.1-15.8)
+- **Ratio:** 2.0x higher in Yakima
+
+Other RISKBEH disparities:
+- **Current Smoking:** 8.8 percentage points (Ferry 16.0% vs King 7.2%)
+- **Short Sleep Duration:** 8.0 percentage points (Pierce 37.0% vs King 29.0%)
+- **Binge Drinking:** 3.7 percentage points (Whatcom 17.9% vs Island 14.2%)
+
+## 6. Counties with More Than 3 Health Outcomes Exceeding 10-County Average by 5+ Points
+
+**Only Ferry County** meets this criterion with **4 health outcomes** significantly above average:
+
+1. **Arthritis**: 38.0% (county average: 26.8%) - **+11.2 points**
+2. **High Blood Pressure**: 41.1% (county average: 32.5%) - **+8.6 points**
+3. **High Cholesterol**: 41.2% (county average: 35.8%) - **+5.4 points**
+4. **Obesity**: 40.2% (county average: 33.4%) - **+6.8 points**
+
+**Additional county with elevated outcomes (but ≤3):**
+- **Yakima County**: 2 outcomes exceed by 5+ points (Obesity +6.3, Teeth Lost +6.5)
+
+---
+
+## Summary Insights
+
+1. **High cholesterol, high blood pressure, and obesity** dominate as the most prevalent health outcomes across all counties
+2. **Sharp urban-rural divide**: Ferry County (smallest, most rural) consistently shows the worst health outcomes
+3. **King County** (largest, most urban) generally shows the healthiest metrics, particularly for obesity, diabetes, and smoking
+4. **Physical inactivity** shows the largest behavioral disparity, potentially linked to rural vs. urban infrastructure differences
+5. **Ferry County's health crisis**: This small rural county shows systemic health challenges across multiple domains, warranting targeted intervention

@@ -1,0 +1,64 @@
+## 1) Balance sheet leverage (Debt, Equity, Debt/Equity)
+
+**Notes on definitions used**
+- **Total debt** = short-term borrowings (e.g., commercial paper/current maturities/short-term debt) **+** long-term debt (noncurrent).
+- **Equity** = total stockholders’ equity as reported (for Visa and Qualcomm, the filing shows “total equity/stockholders equity including noncontrolling interest”; Apple/Costco show parent equity).
+- **Debt/Equity** = Total debt ÷ Total equity.
+
+| Company (FY end) | Short-term debt | Long-term debt | **Total debt** | **Total equity** | **Debt/Equity** |
+|---|---:|---:|---:|---:|---:|
+| **Apple (2025-09-30)** | Commercial paper **$7.979B** + current term debt **$12.350B** | Noncurrent term debt **$78.328B** | **$98.657B** | **$73.733B** | **1.34x** |
+| **Visa (2025-09-30)** | Current maturities **$5.569B** | Long-term debt **$19.602B** | **$25.171B** | **$37.909B** | **0.66x** |
+| **Costco (2025-08-31)** | (Not shown in BS items provided) | Long-term debt **$5.713B** | **$5.713B** | **$29.164B** | **0.20x** |
+| **Qualcomm (2025-09-30)** | Short-term debt **$0.000B** | Long-term debt **$14.811B** | **$14.811B** | **$21.206B** | **0.70x** |
+
+---
+
+## 2) Cash flow mix + Free cash flow (FCF)
+
+**Notes**
+- **Operating / Investing / Financing cash flow** taken directly from the Cash Flow statement line items provided.
+- **Capital expenditures (capex)**: used the cash outflow line for PP&E/productive assets.
+- **Free cash flow (FCF)** = Operating cash flow − Capex.
+
+| Company | CFO (Operating) | CFI (Investing) | CFF (Financing) | Capex | **FCF** |
+|---|---:|---:|---:|---:|---:|
+| **Apple** | **$111.482B** | **$15.195B** | **($120.686B)** | $12.715B | **$98.767B** |
+| **Visa** | **$23.059B** | **$0.708B** | **($18.963B)** | $1.482B | **$21.577B** |
+| **Costco** | **$13.335B** | **($5.311B)** | **($3.775B)** | $5.498B | **$7.837B** |
+| **Qualcomm** | **$14.012B** | **($0.800B)** | **($13.196B)** | $1.192B | **$12.820B** |
+
+---
+
+## 3) Interest expense + Interest coverage (Operating income / Interest expense)
+
+**Notes**
+- Interest expense is taken from the Income Statement line item labeled interest expense (or interest expense, nonoperating).
+- **Interest coverage** = Operating income ÷ Interest expense.
+
+| Company | Operating income | Interest expense | **Interest coverage** |
+|---|---:|---:|---:|
+| **Apple** | $133.050B | *(not provided in the Income Statement items shown)* | **N/A (missing interest expense tag in provided extract)** |
+| **Visa** | $23.994B | $0.589B | **40.7x** |
+| **Costco** | $10.383B | $0.154B | **67.4x** |
+| **Qualcomm** | $12.355B | $0.664B | **18.6x** |
+
+---
+
+# Summary conclusions (6–8)
+
+## 6) Strongest balance sheet (lowest leverage)
+**Costco** has the **lowest leverage** by debt-to-equity at **~0.20x**, making it the strongest balance sheet on this metric.
+
+## 7) Most free cash flow
+**Apple** generates the most free cash flow: **~$98.8B** (CFO $111.5B minus capex $12.7B), far exceeding the others.
+
+## 8) Flags: concerning debt levels or negative free cash flow
+- **Apple**: **Higher leverage** vs peers here (**~1.34x D/E**). Not a liquidity issue in this snapshot (very large FCF), but balance-sheet leverage is the highest of the group.
+- **Visa**: Moderate leverage (**~0.66x**) and strong FCF; **no negative FCF flag**.
+- **Costco**: Low leverage (**~0.20x**) and positive FCF; **no flag**.
+- **Qualcomm**: Moderate leverage (**~0.70x**) and positive FCF; **no negative FCF flag**.
+
+**Negative free cash flow:** None of the companies show negative FCF based on the provided cash flow and capex lines.
+
+**Data gap to note:** Apple’s **interest expense** is not included in the Income Statement items provided, so **Apple’s interest coverage cannot be computed from this extract**. If you provide Apple’s interest expense tag/value (often `InterestExpense` or disclosed in notes), I can compute coverage consistently.

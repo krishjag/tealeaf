@@ -1,0 +1,173 @@
+# Epidemiological Analysis of Washington State Counties
+## CDC PLACES Dataset 2023
+
+---
+
+## 1. Adult Population Percentage by County
+
+| County | Total Population | Adult Population | % Adults (18+) |
+|--------|-----------------|------------------|----------------|
+| **Island** | 86,267 | 71,614 | **83.01%** |
+| **Ferry** | 7,497 | 6,217 | **82.93%** |
+| **Whatcom** | 231,919 | 189,784 | **81.84%** |
+| **King** | 2,271,380 | 1,836,529 | **80.86%** |
+| **Garfield** | 2,363 | 1,865 | **78.93%** |
+| **Spokane** | 551,455 | 433,863 | **78.68%** |
+| **Clark** | 521,150 | 405,348 | **77.78%** |
+| **Pierce** | 928,696 | 716,813 | **77.18%** |
+| **Benton** | 215,219 | 159,518 | **74.11%** |
+| **Yakima** | 256,643 | 183,160 | **71.37%** |
+
+---
+
+## 2 & 3. Chronic Disease Burden Score Rankings
+
+**Methodology:** Average of 6 key chronic conditions (ARTHRITIS, BPHIGH, DIABETES, CHD, COPD, STROKE)
+
+| Rank | County | Burden Score | Key Findings |
+|------|--------|--------------|--------------|
+| 1 | **Ferry** | **19.87%** | Highest across all measures |
+| 2 | **Garfield** | 16.55% | Small rural county, elevated risk |
+| 3 | **Island** | 15.08% | High despite suburban character |
+| 4 | **Yakima** | 14.25% | Highest diabetes (12.9%) |
+| 5 | **Spokane** | 13.82% | Urban center, moderate burden |
+| 6 | **Pierce** | 13.70% | Similar to Spokane |
+| 7 | **Clark** | 13.38% | Suburban Vancouver area |
+| 8 | **Benton** | 13.08% | Tri-Cities region |
+| 9 | **Whatcom** | 12.60% | Lower burden, younger pop |
+| 10 | **King** | **10.52%** | **Lowest burden - Seattle metro** |
+
+**Key Insight:** Rural counties (Ferry, Garfield) have **nearly double** the chronic disease burden of urban King County, representing a significant health disparity.
+
+---
+
+## 4. Disability Burden Analysis
+
+**Average of 7 disability measures** (COGNITION, DISABILITY, HEARING, INDEPLIVE, MOBILITY, SELFCARE, VISION)
+
+| Rank | County | Avg Disability % | Standout Measures |
+|------|--------|------------------|-------------------|
+| 1 | **Ferry** | **15.40%** | Any disability: 38.7%, Mobility: 19.4% |
+| 2 | **Yakima** | 13.84% | Mobility: 15.4%, Cognition: 17.7% |
+| 3 | **Garfield** | 11.71% | Any disability: 30.4% |
+| 4 | **Pierce** | 11.43% | Any disability: 30.9% |
+| 5 | **Spokane** | 11.20% | Consistent across types |
+| 6 | **Benton** | 11.13% | Similar to Spokane |
+| 7 | **Whatcom** | 11.01% | Slightly below average |
+| 8 | **Island** | 10.76% | Moderate burden |
+| 9 | **Clark** | 10.56% | Below state average |
+| 10 | **King** | **7.77%** | Lowest disability burden |
+
+**Critical Finding:** Ferry County has the **highest disability burden (15.40%)**, nearly **double** that of King County (7.77%). This correlates strongly with its chronic disease burden.
+
+---
+
+## 5. Preventive Service Utilization - Top Performers
+
+### Dental Visits (Past Year)
+**Winner: King County (71.8%)**
+- Island: 70.5%
+- Clark: 69.1%
+- **Lowest:** Yakima (55.0%)
+- **Gap:** 16.8 percentage points
+
+### Mammography (Women 50-74)
+**Winner: Spokane County (76.9%)**
+- King: 75.6%
+- Clark & Garfield: 75.2% (tied)
+- **Lowest:** Ferry (62.7%)
+- **Gap:** 14.2 percentage points
+
+### Cholesterol Screening
+**Winner: Garfield County (86.4%)**
+- Island: 85.9%
+- Ferry: 85.5%
+- King: 85.6%
+- **Lowest:** Yakima (79.2%)
+- **Gap:** 7.2 percentage points
+
+**Notable:** Small rural counties (Garfield, Ferry) excel at cholesterol screening despite poor health outcomes, suggesting access issues may not be universal but rather condition-specific.
+
+---
+
+## 6. Population-Weighted Obesity Prevalence
+
+### Calculation across all 10 counties (weighted by adult population):
+
+**Population-Weighted Average: 29.50%**
+
+#### County Comparison:
+- **Below average:** King (22.6%), Whatcom (26.5%)
+- **Above average:** Pierce (36.9%), Spokane (34.7%), Clark (35.3%), Yakima (39.7%), Benton (36.2%), Island (31.3%), Ferry (40.2%), Garfield (31.0%)
+
+**Highest:** Ferry County (40.2%) - nearly **double** King County (22.6%)
+
+**Urban-Rural Disparity:** King County's low obesity rate (22.6%) significantly pulls down the state average due to its large population (1.8M adults), masking higher rates in smaller counties.
+
+---
+
+## 7. Highest Average Prevalence Measures by Category
+
+### **HLTHOUT (Health Outcomes):**
+**HIGH CHOLESTEROL: 35.84% average**
+- Affects more than 1 in 3 screened adults statewide
+- Range: 33.1% (Whatcom) to 41.2% (Ferry)
+
+### **HLTHSTAT (Health Status):**
+**FAIR/POOR GENERAL HEALTH: 18.30% average**
+- Nearly 1 in 5 adults rate their health as fair/poor
+- Range: 12.5% (King) to 26.4% (Yakima)
+
+### **PREVENT (Prevention):**
+**CHOLESTEROL SCREENING: 83.77% average**
+- Best preventive service uptake
+- High compliance across all counties (79-86%)
+
+### **RISKBEH (Risk Behaviors):**
+**SHORT SLEEP DURATION: 31.51% average**
+- Nearly 1 in 3 adults get insufficient sleep
+- Range: 29.0% (King, Island) to 37.0% (Pierce)
+
+### **DISABLT (Disability):**
+**ANY DISABILITY: 29.90% average**
+- 3 in 10 adults report some form of disability
+- Range: 20.9% (King) to 38.7% (Ferry)
+
+---
+
+## Key Epidemiological Findings
+
+### 1. **Severe Urban-Rural Health Disparities**
+- Ferry and Garfield counties consistently show 1.5-2x worse health outcomes than King County
+- Geographic isolation and socioeconomic factors likely contributors
+
+### 2. **The "Prevention Paradox"**
+- Rural counties with worst health outcomes (Ferry, Garfield) have highest screening rates
+- Suggests access to preventive care exists, but upstream social determinants drive poor outcomes
+
+### 3. **Yakima's Unique Profile**
+- Highest diabetes (12.9%) and obesity (39.7%)
+- Lowest dental visits (55.0%) and colorectal screening (55.9%)
+- Highest uninsured rate (18.8%) - more than **2.5x** King County
+- Points to health equity challenges in agricultural communities
+
+### 4. **Mental Health Crisis Statewide**
+- Depression averages 25.11% across counties
+- Whatcom County highest at 29.5%
+- Affects all county types - urban, suburban, rural
+
+### 5. **Sleep Deprivation Epidemic**
+- Short sleep affects 31.51% statewide
+- Pierce County worst at 37%
+- Links to chronic disease, mental health outcomes
+
+---
+
+## Public Health Recommendations
+
+1. **Targeted chronic disease interventions** in Ferry, Garfield, and Yakima counties
+2. **Health insurance expansion** focus on Yakima (18.8% uninsured)
+3. **Obesity prevention programs** prioritizing rural counties
+4. **Mental health services** expansion, especially in Whatcom and urban centers
+5. **Sleep health education** campaigns statewide
+6. **Dental access programs** for Yakima, Ferry counties

@@ -1,0 +1,135 @@
+# Legal Analysis: Wisconsin Circuit Court Case 2016CF000031
+
+## 1. Time from Offense to Sentencing
+
+**Offense Date:** May 5, 2015  
+**Sentencing Date:** February 24, 2020  
+
+**Total Elapsed Time:** **4 years, 9 months, 19 days**
+
+---
+
+## 2. Sentence Analysis by Charge
+
+### Charge 1: Battery by Prisoners (Felony H)
+- **Initial Confinement (Prison):** 12 years
+- **Extended Supervision:** 3 years
+- **Total Incarceration:** **15 years**
+- **Type:** **CONSECUTIVE** to any other sentence currently serving
+
+### Charge 2: Disorderly Conduct (Misdemeanor B)
+- **Initial Confinement (Prison):** 1 year
+- **Extended Supervision:** 6 months (0.5 years)
+- **Total Incarceration:** **1.5 years**
+- **Type:** **CONCURRENT** with Count 1
+
+**Effective Total Sentence:** 15 years (since Charge 2 runs concurrent with Charge 1)
+
+---
+
+## 3. Defense Attorney Analysis
+
+**Total Attorneys:** 3
+
+| Attorney | Entry Date | Withdrawal Date | Duration |
+|----------|------------|-----------------|----------|
+| **Leonie C Dolch** | March 15, 2016 | July 7, 2016 | **3.7 months** |
+| **Ronald Gabriel Benavides** | July 7, 2016 | March 12, 2020 | **44.2 months** (3 yrs, 8 mos) |
+| **Jennifer A Lohr** | May 20, 2020 | October 2, 2025 | **64.4 months** (5 yrs, 4 mos) |
+
+**Total case duration across all attorneys:** 112.3 months (~9.4 years)
+
+---
+
+## 4. Docket Entry Activity by Year
+
+| Year | Number of Entries | Percentage |
+|------|-------------------|------------|
+| **2016** | 30 | 19.7% |
+| **2017** | 9 | 5.9% |
+| **2018** | 16 | 10.5% |
+| **2019** | 21 | 13.8% |
+| **2020** | 22 | 14.5% |
+| **2021** | 18 | 11.8% |
+| **2022** | 17 | 11.2% |
+| **2023** | 13 | 8.6% |
+| **2024** | 5 | 3.3% |
+| **2025** | 1 | 0.7% |
+| **TOTAL** | **152** | 100% |
+
+**Year with Most Activity:** **2020** (22 entries) - the sentencing year and beginning of post-conviction proceedings
+
+---
+
+## 5. Appeals-Related Docket Entries
+
+**Appeal-Related Entries Identified:** 41 entries
+
+### Key Appeal Events:
+- Notice of Intent to Pursue Post-Conviction Relief: March 12, 2020
+- Notice of Appeal filed: June 2, 2022
+- Court of Appeals Orders: 13 entries
+- Supreme Court Petition for Review: May 28, 2024
+- Court of Appeals Decision Reversing: April 25, 2024
+- Supreme Court Decision: June 27, 2025
+- Remittitur: September 5, 2025
+
+**Appeal-Related Entries:** 41 of 152 total  
+**Percentage of Docket:** **27.0%**
+
+### Appeal Outcome:
+The Court of Appeals **REVERSED** the judgment of conviction and remanded for dismissal of the complaint (April 25, 2024). This was reviewed by the Supreme Court (decision filed June 27, 2025).
+
+---
+
+## 6. Financial Receivables Analysis
+
+| Category | Amount |
+|----------|---------|
+| **Total Amount Due** | $761.00 |
+| **Total Paid** | $352.00 |
+| **Adjustments** | $0.00 |
+| **Balance Due** | $0.00 |
+| **Probable Amount** | $409.00 |
+
+**Collection Rate:** 46.25% ($352 paid of $761 due)
+
+**Status Notes:**
+- At Collections: NO
+- At SDC: NO  
+- DOC Collected: YES
+- Balance Due shows $0.00 despite only $352 paid on $761 due
+
+**Analysis:** The discrepancy between amount paid ($352) and zero balance suggests the remaining $409 may have been written off, waived, or satisfied through other means after the conviction was reversed.
+
+---
+
+## 7. Bond Information
+
+### Bond Amount: **$5,000.00**
+
+### Bond-Related Docket Entries:
+
+1. **February 11, 2016** - "Signature bond set" - $5,000 (with felony conditions)
+   - Set by Judge Voigt at initial appearance
+   - Defendant appeared via video from Waupun Correctional
+   - Recognizance bond with felony conditions
+   
+2. **February 15, 2016** - Letter to defendant with copy of bond for signature
+   
+3. **February 25, 2016** - "Signature bond signed and filed" - $5,000
+
+**Bond Type:** Signature/Recognizance Bond  
+**Conditions:** Felony conditions (defendant was already in custody on other charges)  
+**Status:** Bond continued throughout proceedings (defendant remained in custody on other sentences)
+
+---
+
+## Summary Observations
+
+1. **Lengthy proceedings:** Nearly 10 years from filing to final Supreme Court decision
+2. **Incarcerated defendant:** Already serving other sentences throughout the case
+3. **Successful appeal:** Conviction ultimately reversed and remanded for dismissal
+4. **Multiple delays:** Numerous continuances and motions to extend time (particularly 2020-2023)
+5. **Speedy trial issue:** Defense motion centered on speedy trial violation, ultimately successful
+6. **Financial impact minimal:** Only 46% of costs collected before reversal

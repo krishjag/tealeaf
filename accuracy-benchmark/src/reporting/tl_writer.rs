@@ -125,6 +125,7 @@ fn write_schemas(file: &mut std::fs::File, include_format_comparison: bool) -> s
             file,
             "@struct api_response (task_id: string, provider: string, format: string, model: string?, \
              input_tokens: int, output_tokens: int, latency_ms: int, \
+             http_status: int, retry_count: int, response_length: int, \
              timestamp: timestamp, status: string)"
         )?;
         writeln!(
@@ -154,6 +155,7 @@ fn write_schemas(file: &mut std::fs::File, include_format_comparison: bool) -> s
             file,
             "@struct api_response (task_id: string, provider: string, model: string?, \
              input_tokens: int, output_tokens: int, latency_ms: int, \
+             http_status: int, retry_count: int, response_length: int, \
              timestamp: timestamp, status: string)"
         )?;
         writeln!(
@@ -186,16 +188,18 @@ fn write_task_results(
             if let Some(response) = &result.response {
                 writeln!(
                     file,
-                    "    (\"{}\", \"{}\", \"{}\", {}, {}, {}, {}, \"{}\"),",
+                    "    (\"{}\", \"{}\", \"{}\", {}, {}, {}, {}, {}, {}, {}, \"{}\"),",
                     result.task_id, provider, response.model,
                     response.input_tokens, response.output_tokens, response.latency_ms,
+                    response.http_status, result.retry_count, response.response_length,
                     format_timestamp(&result.timestamp), status
                 )?;
             } else {
                 writeln!(
                     file,
-                    "    (\"{}\", \"{}\", ~, 0, 0, 0, {}, \"{}\"),",
+                    "    (\"{}\", \"{}\", ~, 0, 0, 0, 0, {}, 0, {}, \"{}\"),",
                     result.task_id, provider,
+                    result.retry_count,
                     format_timestamp(&result.timestamp), status
                 )?;
             }
@@ -264,16 +268,18 @@ fn write_task_results_with_format(
         if let Some(response) = &result.response {
             writeln!(
                 file,
-                "    (\"{}\", \"{}\", \"{}\", \"{}\", {}, {}, {}, {}, \"{}\"),",
+                "    (\"{}\", \"{}\", \"{}\", \"{}\", {}, {}, {}, {}, {}, {}, {}, \"{}\"),",
                 result.task_id, key.provider, fmt, response.model,
                 response.input_tokens, response.output_tokens, response.latency_ms,
+                response.http_status, result.retry_count, response.response_length,
                 format_timestamp(&result.timestamp), status
             )?;
         } else {
             writeln!(
                 file,
-                "    (\"{}\", \"{}\", \"{}\", ~, 0, 0, 0, {}, \"{}\"),",
+                "    (\"{}\", \"{}\", \"{}\", ~, 0, 0, 0, 0, {}, 0, {}, \"{}\"),",
                 result.task_id, key.provider, fmt,
+                result.retry_count,
                 format_timestamp(&result.timestamp), status
             )?;
         }

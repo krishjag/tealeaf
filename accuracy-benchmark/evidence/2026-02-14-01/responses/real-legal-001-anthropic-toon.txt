@@ -1,0 +1,138 @@
+# Legal Analysis: Wisconsin v. Luis A Ramirez (2016CF000031)
+
+## 1. Timeline: Offense to Sentencing
+
+**Calculation:**
+- **Offense Date:** May 5, 2015
+- **Sentencing Date:** February 24, 2020
+- **Total Elapsed Time:** **4 years, 9 months, 19 days** (57 months)
+
+This is a significant delay that became a central issue in subsequent appeals.
+
+---
+
+## 2. Sentence Structure Analysis
+
+### Charge 1: Battery by Prisoners (Felony H)
+- **Initial Confinement:** 12 years
+- **Extended Supervision:** 3 years
+- **Total:** **15 years**
+- **Structure:** CONSECUTIVE to any other sentence currently serving
+
+### Charge 2: Disorderly Conduct (Misd. B)
+- **Initial Confinement:** 1 year
+- **Extended Supervision:** 6 months
+- **Total:** 1.5 years
+- **Structure:** CONCURRENT with Count 1
+
+### Combined Sentence Analysis:
+Since Count 2 runs **concurrent** with Count 1, the **effective total sentence is 15 years** (12 years prison + 3 years extended supervision). However, this entire sentence runs **consecutive** to any other sentence the defendant was already serving at the time.
+
+---
+
+## 3. Defense Attorney Representation Timeline
+
+**Total Defense Attorneys: 3**
+
+| Attorney | Entered | Withdrawn | Duration | Months |
+|----------|---------|-----------|----------|--------|
+| **Leonie C. Dolch** | March 15, 2016 | July 7, 2016 | 3.7 months | ~**4 months** |
+| **Ronald Gabriel Benavides** | July 7, 2016 | March 12, 2020 | 3 yrs, 8 mos | ~**44 months** |
+| **Jennifer A. Lohr** | May 20, 2020 | October 2, 2025* | 5 yrs, 4 mos | ~**64 months** |
+
+*Note: Attorney Lohr's representation extended through post-conviction appeals to the Wisconsin Supreme Court
+
+---
+
+## 4. Docket Activity by Year
+
+| Year | Docket Entries | Key Events |
+|------|----------------|------------|
+| **2016** | **41** | Complaint filed, preliminary hearings, arraignment |
+| **2017** | **12** | Trial continuances, scheduling conferences |
+| **2018** | **16** | More continuances, speedy trial demand filed |
+| **2019** | **27** | Motion hearings, **jury trial (Dec 3-4)** |
+| **2020** | **23** | **Sentencing**, notice of appeal filed, transcripts |
+| **2021** | **17** | Post-conviction motions, evidentiary hearings |
+| **2022** | **24** | Appeals process, oral rulings, notice of appeal |
+| **2023** | **18** | Supplemental motions, Court of Appeals activity |
+| **2024** | **7** | **Court of Appeals reversal**, Supreme Court review |
+| **2025** | **4** | **Supreme Court decision**, remittitur |
+
+**Most Active Year: 2016 (41 entries)** - Initial case processing and multiple preliminary proceedings
+
+---
+
+## 5. Appeal-Related Docket Entries
+
+**Appeal-Related Entries: 45 out of 231 total**
+
+### Breakdown:
+- Court of Appeals orders/decisions: 18
+- Supreme Court orders/decisions: 8
+- Appeal transcripts: 11
+- Appeal briefs and motions: 8
+- Notice of appeal filings: 2
+- Transmittal of records: 6
+- Other appeal documentation: 12
+
+**Percentage of Total Docket: 19.5%** (45/231)
+
+### Key Appeal Milestones:
+- **June 2, 2022:** Notice of Appeal filed
+- **April 25, 2024:** Court of Appeals **REVERSES** conviction (speedy trial violation)
+- **May 28, 2024:** State petitions Supreme Court for review
+- **June 27, 2025:** Supreme Court decision filed
+- **September 5, 2025:** Remittitur issued
+
+---
+
+## 6. Financial Receivables Analysis
+
+**From Receivables Data:**
+- **Total Amount Due:** $761.00
+- **Amount Paid:** $352.00
+- **Adjustments:** $0.00
+- **Balance Due:** $0.00
+- **Status:** Collected (docCollected: true)
+
+### Financial Summary:
+| Metric | Amount | Percentage |
+|--------|--------|------------|
+| Original Amount Due | $761.00 | 100% |
+| Direct Payments | $352.00 | 46.3% |
+| Probable Amount* | $409.00 | 53.7% |
+| Remaining Balance | $0.00 | 0% |
+
+**Collection Rate: 100%** (balance satisfied)
+
+*Note: The "probAmt" field of $409 likely represents amounts satisfied through alternative means (adjusted through DOC, time-served credits, or administrative resolution), bringing the balance to zero despite direct payments only covering 46.3%.
+
+---
+
+## 7. Bond Information
+
+**Bond Amount: $5,000**
+**Bond Type:** Signature Bond (Recognizance) with felony conditions
+
+### Bond-Related Docket Entries:
+
+| Date | Entry | Description |
+|------|-------|-------------|
+| **Feb 11, 2016** | Signature bond set | $5,000 with felony conditions |
+| **Feb 11, 2016** | Hearing | Bond conditions established at initial appearance |
+| **Feb 25, 2016** | Signature bond signed | Bond signed and filed |
+
+**Bond Status:** The defendant was in custody throughout proceedings (appearing from various correctional institutions), suggesting bond was not posted or was revoked, as he was serving another sentence concurrently.
+
+---
+
+## Notable Case Observations:
+
+1. **Speedy Trial Issue:** The 4+ year delay from offense to trial became grounds for appeal, ultimately resulting in the Court of Appeals reversing the conviction in 2024.
+
+2. **Extended Litigation:** The case remained active for **9+ years** (2016-2025), with post-conviction proceedings lasting longer than the trial phase.
+
+3. **Incarceration Status:** Defendant appeared from custody throughout (Waupun, Green Bay Correctional, Wisconsin Secure Program Facility), indicating he was serving another sentence during these proceedings.
+
+4. **Ultimate Outcome:** Based on the 2024 Court of Appeals reversal and subsequent Supreme Court involvement, the case's final disposition appears to involve potential dismissal or significant modification of the conviction.

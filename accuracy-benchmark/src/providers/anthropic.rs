@@ -235,6 +235,7 @@ impl LLMProvider for AnthropicClient {
 
         let latency_ms = start.elapsed().as_millis() as u64;
         let status = response.status();
+        let http_status = status.as_u16();
 
         if status == 429 {
             let retry_after = response
@@ -300,6 +301,14 @@ impl LLMProvider for AnthropicClient {
             .collect::<Vec<_>>()
             .join("");
 
+        if content.trim().is_empty() {
+            return Err(ProviderError::Parse(format!(
+                "Empty response from Anthropic (stop_reason: {}, output_tokens: {})",
+                api_response.stop_reason.as_deref().unwrap_or("none"),
+                api_response.usage.output_tokens,
+            )));
+        }
+
         Ok(CompletionResponse {
             content,
             model: api_response.model,
@@ -307,6 +316,7 @@ impl LLMProvider for AnthropicClient {
             output_tokens: api_response.usage.output_tokens,
             finish_reason: api_response.stop_reason.unwrap_or_else(|| "unknown".to_string()),
             latency_ms,
+            http_status,
         })
     }
 

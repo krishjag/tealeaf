@@ -82,6 +82,7 @@ pub struct CompletionResponse {
     pub output_tokens: u32,
     pub finish_reason: String,
     pub latency_ms: u64,
+    pub http_status: u16,
 }
 
 /// Error types for provider operations

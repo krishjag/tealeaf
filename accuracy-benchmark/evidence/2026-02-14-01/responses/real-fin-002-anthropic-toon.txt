@@ -1,0 +1,153 @@
+# Credit Analysis Summary: Financial Health Assessment
+
+## Detailed Company Metrics
+
+### 1. **APPLE INC** (FY 2025)
+**Balance Sheet:**
+- Short-term debt: $12,350M (term debt) + $7,979M (commercial paper) = $20,329M
+- Long-term debt: $78,328M
+- **Total Debt: $98,657M**
+- Total Stockholders' Equity: $73,733M
+- **Debt-to-Equity Ratio: 1.34**
+
+**Cash Flow:**
+- Operating Cash Flow: $111,482M
+- Investing Cash Flow: $15,195M (inflow)
+- Financing Cash Flow: ($120,686M)
+- Capital Expenditures: $12,715M
+- **Free Cash Flow: $98,767M** ✅
+
+**Interest Coverage:**
+- Operating Income: $133,050M
+- Interest expense not separately disclosed in income statement items
+
+---
+
+### 2. **VISA INC.** (FY 2025)
+**Balance Sheet:**
+- Short-term debt: $5,569M
+- Long-term debt: $19,602M
+- **Total Debt: $25,171M**
+- Total Stockholders' Equity: $37,909M
+- **Debt-to-Equity Ratio: 0.66** ✅
+
+**Cash Flow:**
+- Operating Cash Flow: $23,059M
+- Investing Cash Flow: $708M (inflow)
+- Financing Cash Flow: ($18,963M)
+- Capital Expenditures: $1,482M
+- **Free Cash Flow: $21,577M** ✅
+
+**Interest Coverage:**
+- Operating Income: $23,994M
+- Interest Expense: $589M
+- **Interest Coverage Ratio: 40.7x** ✅ (Excellent)
+
+---
+
+### 3. **COSTCO WHOLESALE CORP** (FY 2025)
+**Balance Sheet:**
+- Short-term debt: $0
+- Long-term debt: $5,713M
+- **Total Debt: $5,713M**
+- Total Stockholders' Equity: $29,164M
+- **Debt-to-Equity Ratio: 0.20** ✅✅ (Strongest)
+
+**Cash Flow:**
+- Operating Cash Flow: $13,335M
+- Investing Cash Flow: ($5,311M)
+- Financing Cash Flow: ($3,775M)
+- Capital Expenditures: $5,498M
+- **Free Cash Flow: $7,837M** ✅
+
+**Interest Coverage:**
+- Operating Income: $10,383M
+- Interest Expense: $154M
+- **Interest Coverage Ratio: 67.4x** ✅✅ (Best)
+
+---
+
+### 4. **QUALCOMM INC/DE** (FY 2025)
+**Balance Sheet:**
+- Short-term debt: $0
+- Long-term debt: $14,811M
+- **Total Debt: $14,811M**
+- Total Stockholders' Equity: $21,206M
+- **Debt-to-Equity Ratio: 0.70** ✅
+
+**Cash Flow:**
+- Operating Cash Flow: $14,012M
+- Investing Cash Flow: ($800M)
+- Financing Cash Flow: ($13,196M)
+- Capital Expenditures: $1,192M
+- **Free Cash Flow: $12,820M** ✅
+
+**Interest Coverage:**
+- Operating Income: $12,355M
+- Interest Expense: $664M
+- **Interest Coverage Ratio: 18.6x** ✅
+
+---
+
+## Summary Analysis
+
+### 6. **Strongest Balance Sheet (Lowest Leverage):**
+🏆 **COSTCO WHOLESALE CORP**
+- Debt-to-Equity: **0.20** (minimal leverage)
+- Interest Coverage: **67.4x** (exceptional)
+- Conservative capital structure with only $5.7B in long-term debt
+
+**Rankings:**
+1. Costco: 0.20
+2. Visa: 0.66
+3. Qualcomm: 0.70
+4. Apple: 1.34
+
+---
+
+### 7. **Most Free Cash Flow Generation:**
+🏆 **APPLE INC**
+- Free Cash Flow: **$98.8B** (highest absolute amount)
+- Operating Cash Flow: $111.5B with minimal capex needs (11.4% of OCF)
+
+**Rankings by Absolute FCF:**
+1. Apple: $98.8B
+2. Visa: $21.6B
+3. Qualcomm: $12.8B
+4. Costco: $7.8B
+
+**Rankings by FCF Margin (FCF/Revenue):**
+1. Visa: 54% ($21.6B / $40B)
+2. Apple: 24% ($98.8B / $416.2B)
+3. Qualcomm: 29% ($12.8B / $44.3B)
+4. Costco: 2.8% ($7.8B / $275.2B)
+
+---
+
+### 8. **Risk Flags & Concerns:**
+
+✅ **ALL COMPANIES HEALTHY - No Major Concerns**
+
+**Observations:**
+- ✅ **No negative free cash flow** - All four companies generate strong positive FCF
+- ✅ **No concerning debt levels** - All maintain investment-grade profiles
+- ✅ **Strong interest coverage** - All can easily service debt obligations
+
+**Minor Considerations:**
+
+⚠️ **Apple** (Lowest concern):
+- Highest leverage at 1.34 D/E, but still manageable
+- Massive cash generation ($99B FCF) more than covers debt service
+- $90.7B stock buybacks show confidence and strong capital position
+
+⚠️ **Costco** (Informational only):
+- Lowest FCF margin (2.8%) reflects low-margin retail business model
+- Heavy capex for warehouse expansion ($5.5B)
+- Business model prioritizes growth over margins - this is normal
+
+**Credit Quality Assessment:**
+- **Costco & Visa**: AAA/AA tier - Fortress balance sheets
+- **Qualcomm**: AA/A tier - Strong financial position
+- **Apple**: A tier - Elevated leverage offset by exceptional cash generation
+
+All four companies demonstrate **excellent financial health** with strong cash generation, manageable debt levels, and robust interest coverage ratios.

@@ -1,0 +1,41 @@
+## 1–5) Key metrics by company (FY 2025 from provided 10-K items)
+
+All dollar amounts in **USD**.
+
+| Company | Total current assets | Total current liabilities | Current ratio | Total revenue | Net income | Net profit margin | Operating cash flow (CFO) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| **APPLE INC** | 147,957,000,000 | 165,631,000,000 | **0.89** | 416,161,000,000 | 112,010,000,000 | **26.91%** | **111,482,000,000** |
+| **VISA INC.** | 37,766,000,000 | 35,048,000,000 | **1.08** | 40,000,000,000 | 20,058,000,000 | **50.15%** | **23,059,000,000** |
+| **COSTCO WHOLESALE CORP /NEW** | 38,380,000,000 | 37,108,000,000 | **1.03** | 275,235,000,000 | 8,099,000,000 | **2.94%** | **13,335,000,000** |
+| **QUALCOMM INC/DE** | 25,754,000,000 | 9,144,000,000 | **2.82** | 44,284,000,000 | 5,541,000,000 | **12.51%** | **14,012,000,000** |
+
+**Line items used (as tagged in your dataset):**
+- Current assets: `AssetsCurrent`
+- Current liabilities: `LiabilitiesCurrent`
+- Revenue: `RevenueFromContractWithCustomerExcludingAssessedTax` (or `Revenues` where applicable; Qualcomm uses `Revenues`)
+- Net income: `NetIncomeLoss` (Apple/Costco/Qualcomm) and `ProfitLoss` (Visa)
+- Operating cash flow: `NetCashProvidedByUsedInOperatingActivities`
+
+---
+
+## 6) Rank by current ratio (strongest liquidity first)
+
+1. **QUALCOMM INC/DE** — **2.82**
+2. **VISA INC.** — **1.08**
+3. **COSTCO WHOLESALE CORP /NEW** — **1.03**
+4. **APPLE INC** — **0.89**
+
+---
+
+## 7) Rank by net profit margin (net income / revenue)
+
+1. **VISA INC.** — **50.15%**
+2. **APPLE INC** — **26.91%**
+3. **QUALCOMM INC/DE** — **12.51%**
+4. **COSTCO WHOLESALE CORP /NEW** — **2.94%**
+
+---
+
+## 8) Highest operating cash flow (CFO)
+
+**APPLE INC** has the highest operating cash flow at **$111,482,000,000**.

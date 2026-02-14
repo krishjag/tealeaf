@@ -1,0 +1,123 @@
+# Legal Analysis: Wisconsin Circuit Court Case 2016CF000031
+
+## 1. **Time from Offense to Sentencing**
+
+- **Offense Date:** May 5, 2015
+- **Sentencing Date:** February 24, 2020
+- **Total Elapsed Time:** **4 years and 9 months, 19 days**
+
+This represents a significant delay, which became a central issue in the defendant's appeals regarding speedy trial rights.
+
+---
+
+## 2. **Sentence Components by Charge**
+
+### **Charge 1: Battery by Prisoners (Felony H)**
+- Initial Confinement: 12 years
+- Extended Supervision: 3 years
+- **Total: 15 years**
+- **Type: CONSECUTIVE** to any other sentence currently serving
+
+### **Charge 2: Disorderly Conduct (Misd. B)**
+- Initial Confinement: 1 year
+- Extended Supervision: 6 months
+- **Total: 1.5 years**
+- **Type: CONCURRENT** with Count 1
+
+### **Combined Total Incarceration**
+Since Charge 2 runs concurrent with Charge 1, the **effective total sentence is 15 years** (12 years initial confinement + 3 years extended supervision), all consecutive to any sentence the defendant was already serving.
+
+---
+
+## 3. **Defense Attorneys and Duration**
+
+| Attorney | Entered | Withdrawn | Duration |
+|----------|---------|-----------|----------|
+| **Leonie C. Dolch** | 2016-03-15 | 2016-07-07 | **~4 months** |
+| **Ronald Gabriel Benavides** | 2016-07-07 | 2020-03-12 | **~44 months** (3.7 years) |
+| **Jennifer A. Lohr** | 2020-05-20 | 2025-10-02 | **~64 months** (5.3 years) |
+
+**Total: 3 defense attorneys** represented the defendant over the course of the case.
+
+---
+
+## 4. **Docket Entries Per Year**
+
+| Year | Number of Entries |
+|------|-------------------|
+| 2016 | 36 |
+| 2017 | 11 |
+| 2018 | 15 |
+| 2019 | 18 |
+| 2020 | 20 |
+| 2021 | 22 |
+| **2022** | **23** ⭐ |
+| 2023 | 14 |
+| 2024 | 7 |
+| 2025 | 3 |
+| **Total** | **169** |
+
+**Year with Most Activity: 2022** (23 entries) - This was during the appellate process with multiple transcript filings and Court of Appeals proceedings.
+
+---
+
+## 5. **Appeal-Related Docket Entries**
+
+**Appeal-related entries include:**
+- Notice of appeal
+- Court of Appeals orders, decisions, and acknowledgments
+- Supreme Court orders and decisions
+- Transmittal of records to appellate courts
+- Appellate briefs and motions
+- Remittitur
+
+**Count of Appeal-Related Entries:** Approximately **34 entries**
+
+**Percentage of Total Docket:** 34/169 = **20.1%**
+
+**Key Appeal Timeline:**
+- Notice of Appeal filed: June 2, 2022
+- Court of Appeals Decision (reversing conviction): April 25, 2024
+- Supreme Court Review granted: 2024
+- Supreme Court Decision: June 27, 2025
+- Remittitur: September 5, 2025
+
+---
+
+## 6. **Financial Receivables Analysis**
+
+| Category | Amount |
+|----------|--------|
+| **Total Amount Assessed** | $761.00 |
+| **Amount Paid** | $352.00 |
+| **Prob Amount** | $409.00 |
+| **Current Balance Due** | $0.00 |
+
+**Percentage Collected:** $352/$761 = **46.2%**
+
+**Note:** The receivable shows "docCollected: true" despite only 46.2% being paid. The $409 "probAmt" likely represents an amount written off, forgiven, or converted to a civil judgment. The notation states: "If probation is revoked or will discharge with outstanding financial obligations due, a civil judgment shall be entered for the balance due."
+
+---
+
+## 7. **Bond Information**
+
+### **Bond Amount:** $5,000.00 (Signature/Recognizance Bond)
+
+### **Bond-Related Docket Entries:**
+
+1. **February 11, 2016** - "Signature bond set" 
+   - Amount: $5,000.00
+   - Conditions: With felony conditions
+   - Type: Recognizance bond (defendant's signature, no cash required upfront)
+
+2. **February 25, 2016** - "Signature bond signed and filed"
+   - Amount: $5,000.00
+   - Defendant signed and returned bond documents
+
+**Context:** The defendant was incarcerated at Waupun Correctional Institution at the time, so the bond was set but the defendant remained in custody on other charges. The bond conditions included standard felony restrictions.
+
+---
+
+## **Case Outcome Summary**
+
+This case ultimately resulted in the **conviction being reversed** by the Court of Appeals on April 25, 2024, with a remand to dismiss the complaint. After the State's petition for Supreme Court review, the Supreme Court issued its decision on June 27, 2025. The remittitur was filed September 5, 2025, and Attorney Lohr filed a Notice of Completion on October 2, 2025, concluding her representation after over 5 years on the case.

@@ -1,0 +1,244 @@
+Below is an analytic read of the **30 highest-assessed Manhattan tax lots** you provided. Important caveat: the excerpt shown in your message includes **~24 of the 30 records** (it cuts off at “250 WEST 34 STREET …”). I can compute everything exactly for the records visible; for the full 30, you’d want to re-run the same calculations on the complete list.
+
+---
+
+## 1) Zoning district distribution (zonedist1) + what it implies
+
+### Frequency (from the records visible)
+Most common **zonedist1** values among these high-value lots:
+
+- **C6-4** (very frequent): appears at least at  
+  185 Greenwich St; 500 W 33 St; 427 10 Ave; 527 W 34 St; 388 Greenwich St; 250 W 34 St (and likely more in the truncated portion).
+- **C5-2.5 / C5-3** (very frequent in Midtown core): appears at least at  
+  761 5 Ave (C5-3); 1250 AoA (C5-2.5); 1290 AoA (C5-2.5); 1260 AoA (C5-2.5); 345 Park (C5-2.5); 9 W 57 (C5-2.5); 666 5 Ave (C5-2.5); 51 E 42 (C5-3); 338 5 Ave (C5-3); etc.
+- **C6-6 / C6-5.5 / C6-6.5 / C6-7** (common): e.g., 1 Columbus Circle (C6-6), 1111 AoA (C6-6), 1221 AoA (C6-5.5), 1271 AoA (C6-6.5), 1631 Broadway (C6-7), 601 Lexington (C6-6).
+- Less common:
+  - **M2-3**: 360 West St (Javits Center)
+  - **M1-5**: 111 8 Ave
+  - **R7-2**: 240 1 Ave; Main Street (Roosevelt Island)
+  - **R8**: 180 Ft Washington Ave
+  - **PARK**: 200 Central Park West (AMNH)
+
+### What the zoning indicates (high-level)
+- **C5 and C6 districts (Commercial)**: Manhattan’s highest-intensity commercial districts. These typically permit **large office towers, hotels, and high-density mixed commercial/residential** (depending on mapped FAR and special district rules). The prevalence of **C5-2.5 / C5-3 / C6-6 / C6-7** is exactly what you’d expect for the top assessed-value properties: these are Midtown and Downtown core business districts.
+- **M districts (Manufacturing)**:
+  - **M2-3** (Javits Center): heavy manufacturing district; in practice, large-scale facilities/transport/utility and special uses are common.
+  - **M1-5** (111 8 Ave): light manufacturing; in Manhattan these often host large commercial/office conversions (tech/office) even if the underlying district is manufacturing.
+- **R districts (Residential)**:
+  - **R7-2** and **R8**: medium/high-density residential districts. In your list these correspond to **very large residential complexes / institutional uses** with huge building areas and high total assessments.
+- **PARK**: special mapped park zoning; major civic/cultural institutions.
+
+### Properties by zone type (from visible records)
+- **Manufacturing (M)**:  
+  - 360 WEST STREET (M2-3) — P9 (convention center)  
+  - 111 8 AVENUE (M1-5) — O6 (office)
+- **Commercial (C)**: the majority (C5-*, C6-*), including most O4/RC towers in Midtown and Downtown.
+- **Residential (R)**:  
+  - 240 1 AVENUE (R7-2) — D7 (large residential complex)  
+  - MAIN STREET (R7-2) — D4 (large residential complex)  
+  - 180 FT WASHINGTON AVENUE (R8) — I1 (institutional/medical)
+- **Other**:  
+  - 200 CENTRAL PARK WEST (PARK) — P7 (museum)
+
+---
+
+## 2) Building age profile by decade + assessed value relationship
+
+### Decade grouping (visible records)
+- **1930s**: 1931 (Empire State Building), 1931 (111 8 Ave), 1932 (1260 AoA), 1937 (1250 AoA)
+- **1940s**: 1945 (240 1 Ave)
+- **1950s**: 1958 (666 5 Ave)
+- **1960s**: 1961 (1271 AoA), 1963 (Javits), 1963 (1290 AoA), 1968 (761 5 Ave), 1969 (345 Park)
+- **1970s**: 1970 (1251 AoA), 1971 (1221 AoA), 1971 (9 W 57), 1972 (1631 Broadway), 1972 (250 W 34), 1973 (1211 AoA), 1975 (Main Street/Roosevelt Island), 1978 (601 Lex)
+- **1980s**: 1989 (388 Greenwich)
+- **1990s**: 1998 (AMNH addition)
+- **2000s**: 2001 (151 E 58), 2004 (1 Columbus Circle), 2005 (1111 AoA), 2009 (185 Greenwich)
+- **2010s**: 2015 (500 W 33), 2017 (One Vanderbilt), 2018 (527 W 34), 2019 (427 10)
+
+### Do newer buildings have higher assessments?
+**Not monotonically.** The single highest assessment in the list is **2009 (185 Greenwich / WTC site)**, and several very high assessments are **2010s Hudson Yards / One Vanderbilt**—but **iconic older buildings** (1931 Empire State Building; 1930s Rockefeller Center building; 1960s–70s Midtown towers) also sit very high.
+
+This is typical in Manhattan: **location + allowable density + income-producing potential + landmark status + assemblage scale** often dominate “newness.”
+
+### Average assessed value per decade (computed from visible records only)
+(assesstot in USD; averages are simple means within decade)
+
+- **1930s (n=4)**:  
+  1931 ESB 534.0M; 1931 111 8 Ave 531.1M; 1932 1260 AoA 498.6M; 1937 1250 AoA 619.0M  
+  **Avg ≈ $545.7M**
+- **1940s (n=1)**:  
+  1945 240 1 Ave 791.8M  
+  **Avg ≈ $791.8M**
+- **1950s (n=1)**:  
+  1958 666 5 Ave 449.8M  
+  **Avg ≈ $449.8M**
+- **1960s (n=5)**:  
+  1961 1271 AoA 470.0M; 1963 Javits 931.4M; 1963 1290 AoA 525.4M; 1968 761 5 Ave 791.1M; 1969 345 Park 489.5M  
+  **Avg ≈ $641.5M**
+- **1970s (n=8)**:  
+  1970 1251 AoA 511.2M; 1971 1221 AoA 570.8M; 1971 9 W 57 469.3M; 1972 1631 Bway 492.3M; 1972 250 W 34 437.0M; 1973 1211 AoA 440.0M; 1975 Main St 534.0M; 1978 601 Lex 451.8M  
+  **Avg ≈ $488.3M**
+- **1980s (n=1)**:  
+  1989 388 Greenwich 520.0M  
+  **Avg ≈ $520.0M**
+- **1990s (n=1)**:  
+  1998 AMNH 474.4M  
+  **Avg ≈ $474.4M**
+- **2000s (n=4)**:  
+  2001 151 E 58 506.6M; 2004 Time Warner 794.4M; 2005 One Bryant Park 787.0M; 2009 185 Greenwich 1,673.5M  
+  **Avg ≈ $940.4M**
+- **2010s (n=4)**:  
+  2015 500 W 33 743.7M; 2017 One Vanderbilt 523.7M; 2018 527 W 34 541.5M; 2019 427 10 699.3M  
+  **Avg ≈ $627.0M**
+
+**Takeaway:** 2000s average is highest here due to the extreme outlier (WTC site). Without that, 2000s would still be high but closer to the 1960s/2010s range.
+
+---
+
+## 3) Area composition (% of bldgarea) + mixed-use vs single-purpose
+
+Method: for each lot, compute shares:
+- commercial share = comarea / bldgarea (often equals 100% for office towers)
+- residential share = resarea / bldgarea
+- office share = officearea / bldgarea
+- retail share = retailarea / bldgarea
+- “other” share = (bldgarea - officearea - retailarea - resarea - etc.) / bldgarea (or use otherarea if consistent)
+
+### Mostly single-purpose (dominant one use)
+- **Pure/near-pure office-commercial towers (comarea=bldgarea; office dominates)**:
+  - 388 Greenwich (office 100%)
+  - 527 W 34 (office 100%)
+  - 111 8 Ave (office 100%)
+  - Many Midtown O4 towers: 345 Park, 1290 AoA, 1221 AoA, 1631 Broadway, etc. (often office-heavy with small retail)
+- **Pure institutional/civic**:
+  - 200 Central Park West (PARK; “otherarea” dominates—museum)
+  - 360 West St (Javits; storage/other dominates)
+
+### Most mixed-use (multiple area types > 0 and meaningful shares)
+- **1 Columbus Circle (Time Warner Center condo)**: strong mix of **office + retail + residential + garage + other**.
+- **185 Greenwich Street (WTC site / complex)**: office + retail + substantial “otherarea” (likely concourse/obs/decks/mech allocations).
+- **240 1 Avenue**: overwhelmingly residential, but has non-trivial commercial + garage + some office/retail.
+- **Main Street (Roosevelt Island)**: residential + large commercial/retail + garage + other.
+
+If you want a strict ranking, a good “mixed-use index” is: count of positive components among {resarea, officearea, retailarea, garagearea, otherarea, strgearea}. By that measure, **Time Warner Center, WTC, Roosevelt Island complex, and 240 1 Ave** are the clearest mixed programs in the visible set.
+
+---
+
+## 4) numfloors vs bldgarea + average floor plate (bldgarea/numfloors)
+
+Compute **avg floor plate = bldgarea / numfloors** (sq ft per floor, rough—PLUTO floors can be inconsistent for multi-building sites).
+
+Largest floor plates (visible records; approximate):
+- **240 1 AVENUE**: 8,942,176 / 13 ≈ **687,860 sf/floor** (site with many buildings; floors not comparable to a single tower)
+- **360 WEST STREET (Javits)**: 4,060,596 / 4 ≈ **1,015,149 sf/floor** (huge convention halls; very large plates)
+- **111 8 AVENUE**: 2,161,994 / 17 ≈ **127,176 sf/floor** (classic large-floorplate building)
+- **1260 AVENUE OF THE AMER**: 2,734,038 / 31 ≈ **88,195 sf/floor**
+- **388 GREENWICH**: 2,354,289 / 39 ≈ **60,366 sf/floor**
+- **Empire State Building**: 2,812,739 / 102 ≈ **27,576 sf/floor**
+- **One Vanderbilt**: 1,678,135 / 60 ≈ **27,969 sf/floor**
+- **427 10 AVE (HY)**: 2,521,850 / 58 ≈ **43,480 sf/floor**
+- **185 Greenwich (WTC site)**: 8,966,500 / 104 ≈ **86,216 sf/floor** (multi-building campus; again not a single plate)
+
+### Pattern with building class
+- **P9 (convention center)** and large **campus-style lots** produce the **largest implied plates**.
+- **O6** (often loft/large commercial) tends to have **bigger plates** than supertall office towers.
+- **O4** high-rise offices: plates vary widely, but many cluster in the **25k–60k sf/floor** range in this subset.
+
+---
+
+## 5) Top 5 owners by total assessed value (and concentration)
+
+From the visible records, owners that clearly rank high:
+1. **LOWER MANHATTAN DEVELOPMENT CORPORATION** (185 Greenwich) ≈ **$1.673B** (dominant #1)
+2. **NEW YORK CONVENTION CENTER** (360 West) ≈ **$0.931B**
+3. **TIME WARNER CENTER CONDOMINIUM** ≈ **$0.794B**
+4. **BPP ST OWNER LLC** (240 1 Ave) ≈ **$0.792B**
+5. **767 FIFTH PARTNERS LLC** (761 5 Ave) ≈ **$0.791B**
+(Closely followed by **ONE BRYANT PARK** ≈ $0.787B)
+
+### Concentration / repeats
+- In the visible set, **most owners appear once** (because these are individual trophy assets).
+- There *is* some repeat presence via **Rockefeller Center-related entities**:
+  - “ROCKEFELLER CENTER PROPERTIES (RCP)” (1250 AoA)
+  - “ROCKEFELLER CTR NORTH INC” (1271 AoA)
+These are not identical strings, but they indicate **portfolio concentration in Midtown**.
+
+To quantify concentration properly (e.g., Herfindahl index or top-5 share), we need the full 30 owners and values; with the visible set, the top 2 alone exceed ~$2.6B.
+
+---
+
+## 6) Lot vs building dimensions + lot coverage ratio
+
+Method requested: **coverage ≈ (bldgfront × bldgdepth) / lotarea**.  
+Caveats:
+- PLUTO’s **bldgfront/bldgdepth** can be missing/0 for some lots (several are 0 here), and multi-building campuses make this misleading.
+- Still useful for “typical” single-tower lots.
+
+Examples (approx):
+- **1111 AoA (One Bryant Park)**: footprint ≈ 201 × 437 = 87,837 sf; lotarea 87,863 → **~100%** coverage (very high; consistent with full-lot tower base)
+- **338 5 Ave (Empire State Building)**: 198 × 425 = 84,150; lotarea 91,351 → **~92%**
+- **761 5 Ave**: 200.67 × 314.67 ≈ 63,150; lotarea 84,350 → **~75%**
+- **360 West (Javits)**: 1227.5 × 389 ≈ 477,498; lotarea 962,250 → **~50%**
+- **111 8 Ave**: 207 × 800 = 165,600; lotarea 165,200 → **~100%** (rounding/measurement artifacts; effectively full-lot)
+
+Lowest coverage (where dimensions are present) tends to be **large-campus lots** (Javits, Roosevelt Island, 240 1 Ave) because lotarea is enormous relative to any single implied footprint.
+
+Properties where coverage can’t be computed as requested due to **0 bldgfront/bldgdepth** in the record: e.g., 527 W 34, Main Street, 180 Ft Washington, 151 E 58, 601 Lex (bldgfront 0).
+
+---
+
+## 7) Geographic clustering (lat/long): Midtown vs Lower Manhattan vs other
+
+Using your latitude heuristic:
+
+### Lower Manhattan / Downtown (≈ 40.70–40.72)
+- **185 Greenwich St** (40.7116) — WTC/LMDC (very high assessed value; large-scale office/retail complex)
+- **388 Greenwich St** (40.7209) — large office
+
+**Pattern:** Downtown entries are **C6-4** and heavily **office/commercial**.
+
+### Midtown core (≈ 40.75–40.76)
+A very large share of the list clusters here:
+- 1111 AoA (40.7556)
+- 500 W 33 (40.7535)
+- 427 10 Ave (40.7545)
+- 527 W 34 (40.7552)
+- 1250 AoA (40.7591)
+- 1221 AoA (40.7594)
+- 1251 AoA (40.7600)
+- 1290 AoA (40.7605)
+- 1271 AoA (40.7605)
+- 1260 AoA (40.7595)
+- 345 Park (40.7578)
+- 601 Lex (40.7584)
+- 338 5 Ave / ESB (40.7485) is slightly south of the 40.75–40.76 band but still Midtown.
+
+**Pattern:** Midtown cluster is overwhelmingly **C5/C6 zoning** and **O4/RC building classes**, i.e., trophy office towers with some retail.
+
+### Upper West / Central Park West (≈ 40.78)
+- 200 Central Park West (40.7814) — museum (PARK zoning; institutional)
+
+### Upper Manhattan (≈ 40.84)
+- 180 Ft Washington (40.8407) — institutional/medical (R8; I1)
+
+### East Side / Roosevelt Island (≈ 40.766, long -73.946)
+- Main Street (40.7662) — very large residential complex (R7-2; D4)
+
+### Relationship between location and type/value
+- **Midtown and Downtown** dominate the top assessed list because they combine:
+  - highest commercial zoning intensity (C5/C6),
+  - highest rent potential,
+  - large built FAR and tall buildings.
+- **Non-core locations** appear when the asset is **enormous in scale** (large residential complexes, hospitals, major cultural institutions), even if zoning is residential or special-purpose.
+
+---
+
+## If you want, I can produce exact tables for all 30
+To fully satisfy items (3)–(6) “for each property” and compute exact rankings (mixed-use, floor plates, coverage extremes, top owners) across **all 30**, paste the remaining 6 records (or provide the full JSON/CSV), and I’ll return:
+- zonedist1 frequency table
+- decade-by-decade averages (with/without outliers)
+- per-lot area composition percentages
+- floor plate ranking + by bldgclass summary stats
+- owner concentration metrics (top-5 share, HHI)
+- coverage ratio ranking with flags for unreliable/zero dimensions
+- Midtown/Downtown clustering counts and value comparisons
