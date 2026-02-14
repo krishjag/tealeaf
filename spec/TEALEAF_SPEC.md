@@ -31,6 +31,8 @@ For an introduction, usage guide, API reference, and comparison with other forma
    - [1.16 File Includes](#116-file-includes)
    - [1.17 Root Array](#117-root-array)
    - [1.18 Extensibility](#118-extensibility)
+   - [1.19 Limits and Constraints](#119-limits-and-constraints)
+   - [1.20 File Encoding](#120-file-encoding)
 2. [Type System](#2-type-system)
    - [2.1 Primitive Types](#21-primitive-types)
    - [2.2 Type Modifiers](#22-type-modifiers)
@@ -319,7 +321,7 @@ config: @map {
 }
 ```
 
-Maps preserve insertion order and support heterogeneous key types.
+Maps preserve insertion order and support heterogeneous key types. Map keys are restricted to hashable types: `string`, `int`, and `uint`. Float, bool, timestamp, and composite types (objects, arrays, maps) are not valid as map keys. The binary format encodes each key with an explicit `key_type: u8` byte (see §4.8).
 
 ### 1.13 References
 
@@ -340,6 +342,13 @@ edges: [
 nodes: [!node_a, !node_b]
 ```
 
+**Reference semantics:**
+- References are resolved at **compile time** (text → binary). The compiler interns the reference name into the string table and encodes it as a `name_idx: u32`.
+- References must be **defined before use** (no forward declarations). The parser processes the document top-to-bottom; using `!name` before its `!name: value` definition is an error.
+- References **may be used multiple times** but the runtime value is not inlined — the binary stores the name index, and resolution to the referenced value is the **reader's responsibility**.
+- **Circular references** are permitted in the text format (e.g., `!a` referencing an object that contains `!b`, which itself references `!a`). The binary format stores only name indices, so no infinite recursion occurs at encode time. Applications consuming the decoded values must handle cycles.
+- **Scope:** References are document-global. A reference defined at any nesting level is visible throughout the document.
+
 ### 1.14 Tagged Values
 
 For discriminated unions:
@@ -351,6 +360,12 @@ events: [
   :keypress {key: "Enter"},
 ]
 ```
+
+Tagged values work without any schema definition — `:click {x: 100}` is valid without a `@union` for `click`. The binary encodes the tag name and value inline (type code `0x31`).
+
+When a `@union` is defined, it provides schema metadata: variant names, field names, and field types are stored in the schema table (§4.5). Schema-typed tagged values (fields declared as a union type in a `@struct`) validate against the union definition at compile time and use positional encoding for variant fields, matching struct behavior.
+
+**In summary:** Untyped tagged values are self-describing (tag + arbitrary value). Union-typed tagged values are schema-validated with positional field encoding.
 
 ### 1.15 Unions
 
@@ -411,6 +426,28 @@ The directive takes no arguments. It is emitted automatically by `from-json` and
 Unknown directives (e.g., `@custom`) at the document top level are silently ignored. If a same-line argument follows the directive (e.g., `@custom foo` or `@custom [1,2,3]`), it is consumed and discarded. Arguments on the next line are not consumed — they are parsed as normal statements. This enables forward compatibility: files authored for a newer spec version can be partially parsed by older implementations that do not recognize new directives.
 
 When an unknown directive appears as a value (e.g., `key: @unknown [1,2,3]`), it is treated as `null`. The argument expression is consumed but discarded.
+
+### 1.19 Limits and Constraints
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| Max nesting depth | 256 levels | Parser and reader both enforce |
+| Max object fields | 65,535 (u16) | Binary field count is u16 |
+| Max array elements | ~4 billion (u32) | Binary count is u32 |
+| Max string length | ~4 GB (u32) | String table offset/length are u32 |
+| Max sections | ~4 billion (u32) | Header section count is u32 |
+| Max schemas | 65,535 (u16) | Schema table counts are u16 |
+| Max decompressed section | 256 MB | Reader safety limit |
+
+**Empty collections:** An empty array `[]` encodes as count (u32) = 0 with no element type byte. An empty object `{}` encodes as field count (u16) = 0. An empty map `@map {}` encodes as count (u32) = 0 with no key-value entries.
+
+### 1.20 File Encoding
+
+**Text format:** Files must be valid UTF-8. A UTF-8 BOM (`U+FEFF`) at the start of the file is treated as whitespace and silently consumed. No other byte order marks are recognized.
+
+**Binary format:** The binary container uses little-endian byte order for all multi-byte integers. All strings within the string table must be valid UTF-8.
+
+**Whitespace:** Between tokens, any amount of whitespace (spaces, tabs, newlines, carriage returns) and comments is allowed and ignored. Whitespace is required only where needed to separate adjacent identifiers or keywords (e.g., `@struct` followed by a name). Within quoted strings, whitespace is literal.
 
 ---
 
@@ -481,6 +518,8 @@ Automatic safe conversions when reading:
 - `Value::String` arrays: string table indices (u32)
 - All other top-level arrays (including `Value::Int` exceeding i32, `Value::UInt`, `Value::Float`, `Value::Bool`, `Value::Timestamp`, mixed types): heterogeneous encoding with per-element type tags
 
+This asymmetry is intentional. The top-level array encoder optimizes for the two most common untyped array patterns (integer arrays and string arrays). For other element types, per-element type tags add minimal overhead (1 byte per element) while keeping the encoder simple. Schema-typed arrays (§4.8) use homogeneous packed encoding for **all** element types including float, bool, uint, and timestamp — so the heterogeneous fallback only applies to untyped top-level arrays.
+
 ### 2.5 Type Coercion at Compile Time
 
 When compiling schema-bound data, type mismatches use default values rather than erroring:
@@ -490,6 +529,8 @@ When compiling schema-bound data, type mismatches use default values rather than
 - Timestamp fields: non-timestamp becomes epoch (0)
 
 This "best effort" approach prioritizes successful compilation over strict validation. For strict type checking, validate at the application level before compilation.
+
+**Note:** Silent coercion (e.g., non-numeric string → `0` for an int field) is designed for the LLM context use case where data should flow through without halting on minor mismatches. For configuration files or other use cases where type errors must be caught, validate data before compilation using the `validate` CLI command or the programmatic API, which reports type mismatches as warnings.
 
 ---
 
@@ -600,6 +641,8 @@ All unique strings are deduplicated and stored once:
 
 Strings are referenced by 32-bit index throughout the file.
 
+**Lookup:** Strings are accessed by index in O(1) time — the reader loads the offset and length arrays into memory, then reads the string data at `offsets[idx]` with `lengths[idx]` bytes. No hash table is needed for index-based access. For key-by-name lookups (e.g., finding a section by name), the reader performs a linear scan of the section index; applications that need repeated name-based access should build their own lookup table.
+
 ### 4.5 Schema Table
 
 The schema table stores both struct and union definitions:
@@ -680,6 +723,8 @@ Each union variant uses the same 8-byte field entry format as struct fields.
 > **Note:** `TUPLE` (0x24) is reserved but not currently emitted by the writer. Tuples in text format are parsed as arrays. The reader can decode this type code for forward compatibility.
 
 > **Note:** `JSONNUMBER` (0x12) stores arbitrary-precision numeric strings that exceed the range of i64, u64, or f64. It is used internally to preserve exact decimal representation during JSON round-trips (e.g., integers larger than `u64::MAX` or floats that overflow `f64`). The value is stored as a string table index, identical to `STRING` encoding. In the text format, `JSONNUMBER` values are written as bare numeric literals. Through FFI, `JSONNUMBER` is transparent — it reports as `String` type and is accessible via string accessors.
+
+> **Reserved ranges:** Type codes `0x0C`–`0x0F`, `0x13`–`0x1F`, `0x25`–`0x2F`, and `0x33`–`0xFF` are reserved for future use. Readers should treat unrecognized type codes as errors (not silently skip them).
 
 ### 4.7 Section Index
 
@@ -772,7 +817,7 @@ Rows: [
 The null bitmap tracks which fields are null:
 - Bit i set = field i is null
 - Only non-null values are stored in the data section
-- Bitmap size = ceil((field_count + 7) / 8)
+- Bitmap size = (field_count + 7) / 8 (integer division)
 
 **Maps:**
 ```
@@ -867,6 +912,10 @@ hex          = [ "-" ] ("0x" | "0X") hexdigit+ ;
 binary       = [ "-" ] ("0b" | "0B") ("0"|"1")+ ;
 bool         = "true" | "false" ;
 name         = (letter | "_") { letter | digit | "_" | "-" | "." } ;
+                 (* Note: hyphens and dots are unusual for identifiers. This is safe
+                    because TeaLeaf has no arithmetic or member-access expressions —
+                    a-b and a.b are always parsed as single names, never as operations.
+                    Key names containing these characters do not need quoting. *)
 comment      = "#" { any } newline ;
 
 chars        = { any_char | escape } ;
@@ -909,6 +958,8 @@ Type mappings:
 - ISO 8601 strings become plain Strings, not Timestamps
 
 For full round-trip fidelity with these types, use binary format (`.tlbx`) or reconstruct programmatically.
+
+**Round-trip note:** Because JSON import does not recognize special forms, a JSON → TL → JSON round-trip preserves data but loses type distinctions for refs, tags, maps, and timestamps. This is acceptable for the primary use case (JSON → TL for token savings in LLM contexts, where the data flows one-way). For bidirectional round-trip fidelity, use the binary format (`.tlbx`).
 
 ### 6.2 TeaLeaf to JSON
 
