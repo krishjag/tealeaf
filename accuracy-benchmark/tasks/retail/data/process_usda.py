@@ -17,6 +17,7 @@ Requirements:
 
 import argparse
 import json
+import os
 import time
 from pathlib import Path
 
@@ -25,8 +26,10 @@ import requests
 DATA_DIR = Path(__file__).parent
 
 USDA_API_BASE = "https://api.nal.usda.gov/fdc/v1/foods/search"
-# DEMO_KEY is rate-limited (30 requests/hour, 50/day) but sufficient for one-time fetch
-API_KEY = "DEMO_KEY"
+USDA_API_KEY = os.environ.get("USDA_API_KEY")
+if not USDA_API_KEY:
+    raise SystemExit("Error: USDA_API_KEY environment variable is required. "
+                     "Get a free key at https://fdc.nal.usda.gov/api-key-signup.html")
 
 
 def fetch_foods(
@@ -36,7 +39,7 @@ def fetch_foods(
     """Fetch branded food products from USDA FoodData Central API."""
 
     params = {
-        "api_key": API_KEY,
+        "api_key": USDA_API_KEY,
         "query": query,
         "dataType": "Branded",
         "pageSize": min(limit, 50),
