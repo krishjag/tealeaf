@@ -190,6 +190,8 @@ config: {
 
 Trailing commas are allowed.
 
+**Duplicate keys:** If an object contains duplicate keys (e.g., `{a: 1, a: 2}`), the last value wins. The resulting object contains only one entry for that key, with the value from the last occurrence. No error or warning is emitted.
+
 ### 1.7 Arrays
 
 ```tl
@@ -404,7 +406,7 @@ users: @table user [
 ]
 ```
 
-Paths are resolved relative to the including file.
+Paths are resolved relative to the including file. Includes are recursive — an included file may include other files. Circular includes are detected (via canonical path tracking) and produce an error. The maximum include depth is 32 levels. Schemas and unions defined in included files are available to the including file and to subsequent includes.
 
 ### 1.17 Root Array
 
@@ -530,7 +532,7 @@ When compiling schema-bound data, type mismatches use default values rather than
 
 This "best effort" approach prioritizes successful compilation over strict validation. For strict type checking, validate at the application level before compilation.
 
-**Note:** Silent coercion (e.g., non-numeric string → `0` for an int field) is designed for the LLM context use case where data should flow through without halting on minor mismatches. For configuration files or other use cases where type errors must be caught, validate data before compilation using the `validate` CLI command or the programmatic API, which reports type mismatches as warnings.
+**Note:** Silent coercion (e.g., non-numeric string → `0` for an int field) is designed for the LLM context use case where data should flow through without halting on minor mismatches. For configuration files or other use cases where type errors must be caught, validate data at the application level before compilation — the `validate` CLI command checks syntax and schema structure but does not flag type coercion.
 
 ---
 
@@ -1074,6 +1076,7 @@ Utilities:
 ```
 
 **Notes:**
+- `validate` performs full parsing: syntax validation, schema extraction, struct/union reference checking, and include resolution. It reports the first error encountered. It does not perform type coercion checks (see §2.5).
 - `from-json` automatically infers schemas from uniform arrays
 - `info` auto-detects whether file is text or binary format
 - `compile` enables compression by default
