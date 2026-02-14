@@ -1,0 +1,441 @@
+=== API Request: HEALTH-002 (TL format) ===
+Task ID:     HEALTH-002
+Category:    healthcare
+Complexity:  Complex
+Output Type: Calculation
+Format:      TL
+Max Tokens:  4096
+Temperature: 0.3
+==================================================
+=== PROMPT ===
+
+You are an epidemiologist analyzing population health data from the CDC PLACES dataset for Washington State counties.
+
+@struct category(id:string,name:string,description:string)
+@struct confidence_interval(low:float,high:float)
+@struct hlthout(measure_id:string,short_name:string,measure:string,value:float,confidence_interval:confidence_interval)
+@struct hlthstat(measure_id:string,short_name:string,measure:string,value:float,confidence_interval:confidence_interval)
+@struct prevent(measure_id:string,short_name:string,measure:string,value:float,confidence_interval:confidence_interval)
+@struct riskbeh(measure_id:string,short_name:string,measure:string,value:float,confidence_interval:confidence_interval)
+@struct disablt(measure_id:string,short_name:string,measure:string,value:float,confidence_interval:confidence_interval)
+@struct health_data(HLTHOUT:[]hlthout,HLTHSTAT:[]hlthstat,PREVENT:[]prevent,RISKBEH:[]riskbeh,DISABLT:[]disablt)
+@struct county(name:string,fips:string,population:int,adult_population:int,health_data:health_data)
+source:"CDC PLACES: Local Data for Better Health, County Data 2025 Release"
+license:"US Government Public Domain"
+url:"https://data.cdc.gov/500-Cities-Places/PLACES-Local-Data-for-Better-Health-County-Data-20/swc5-untb"
+description:"County-level crude prevalence estimates for 33 health measures from BRFSS. 10 Washington counties representing urban, suburban, and rural populations."
+year:2023
+state:Washington
+data_source:"Behavioral Risk Factor Surveillance System (BRFSS)"
+measure_count:33
+record_count:330
+categories:@table category[
+(HLTHOUT,"Health Outcomes","Chronic disease and condition prevalence"),
+(HLTHSTAT,"Health Status","Self-reported health and distress measures"),
+(PREVENT,Prevention,"Preventive service utilization"),
+(RISKBEH,"Health Risk Behaviors","Behavioral risk factors"),
+(DISABLT,Disability,"Disability prevalence measures"),
+(HRSN,"Health-Related Social Needs","Social determinants of health")
+]
+counties:@table county[
+(King,"53033",2271380,1836529,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",19.4,(18,20.8)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",26.7,(25.1,28.5)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",6.7,(6.2,7.3)),
+(CASTHMA,"Current Asthma","Current asthma among adults",9.7,(8.8,10.5)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",4,(3.6,4.5)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",3.4,(2.9,4.1)),
+(DEPRESSION,Depression,"Depression among adults",23.5,(21.7,25.3)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",7.3,(6.6,8.2)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",34,(32.1,35.8)),
+(OBESITY,Obesity,"Obesity among adults",22.6,(20.4,24.9)),
+(STROKE,Stroke,"Stroke among adults",2.3,(2,2.6)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",4.6,(3.9,5.4))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",12.5,(10.9,14.2)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",14.7,(13.2,16.2)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",9.7,(8.7,10.9))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",6.8,(5.5,8.4)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",68.1,(65.8,70.3)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",70,(67.9,72.2)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",85.6,(83.8,87.3)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",65.5,(63.3,67.6)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",71.8,(70,73.6)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",75.6,(72.1,78.9))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",17.1,(15.6,18.7)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",7.2,(5.8,8.9)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",13.9,(12.1,15.8)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",29,(26.9,31.2))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",11,(9.6,12.6)),
+(DISABILITY,"Any Disability","Any disability among adults",20.9,(18.7,23.2)),
+(HEARING,"Hearing Disability","Hearing disability among adults",4.6,(4.1,5.1)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",5.1,(4.4,5.9)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",7.3,(6.3,8.4)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",2.3,(2,2.7)),
+(VISION,"Vision Disability","Vision disability among adults",3.2,(2.8,3.7))
+])),
+(Pierce,"53053",928696,716813,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",25.8,(23.8,27.6)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",32.3,(30.1,34.5)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",7.4,(6.8,8.2)),
+(CASTHMA,"Current Asthma","Current asthma among adults",10.8,(9.8,12)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",5.3,(4.6,6)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",5.2,(4.3,6.2)),
+(DEPRESSION,Depression,"Depression among adults",26.5,(24.2,28.8)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",10.6,(9.3,11.8)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",35.5,(33.3,37.7)),
+(OBESITY,Obesity,"Obesity among adults",36.9,(33.7,40.2)),
+(STROKE,Stroke,"Stroke among adults",3,(2.6,3.4)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",13.8,(11.8,16.1))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",17.2,(15,19.7)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",18.1,(16.2,20.1)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",13.7,(12,15.3))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",8.6,(7,10.4)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",70.3,(67.8,72.5)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",70.4,(68,72.8)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",82.9,(80.9,84.9)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",65.2,(62.4,68)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",65.2,(62.9,67.6)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",74.9,(70.9,78.9))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",17.1,(15.4,18.9)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",11.6,(9.5,13.8)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",19,(16.4,21.7)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",37,(34.2,39.8))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",15.6,(13.6,17.7)),
+(DISABILITY,"Any Disability","Any disability among adults",30.9,(27.7,34.3)),
+(HEARING,"Hearing Disability","Hearing disability among adults",6.6,(5.8,7.4)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",7.5,(6.5,8.6)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",11.9,(10.2,13.6)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",3.2,(2.8,3.8)),
+(VISION,"Vision Disability","Vision disability among adults",4.3,(3.7,4.9))
+])),
+(Spokane,"53063",551455,433863,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",26.4,(24.2,28.5)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",31.1,(28.6,33.5)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",8.4,(7.7,9.2)),
+(CASTHMA,"Current Asthma","Current asthma among adults",11.5,(10.3,12.8)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",6,(5.2,6.8)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",6,(5,7.1)),
+(DEPRESSION,Depression,"Depression among adults",26.5,(23.9,29.1)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",10.2,(8.9,11.5)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",34.7,(32.1,37.2)),
+(OBESITY,Obesity,"Obesity among adults",34.7,(31.1,38.4)),
+(STROKE,Stroke,"Stroke among adults",3.2,(2.8,3.6)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",10.1,(8.3,12))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",17.6,(15.1,20.3)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",17.5,(15.3,19.6)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",13.1,(11.4,14.8))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",7.3,(5.9,9.3)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",70.1,(67.4,72.7)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",72.8,(70.4,75.4)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",82.9,(81,85)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",68.6,(65.3,71.8)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",65.4,(62.6,68)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",76.9,(72,81.3))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",17.4,(15.5,19.5)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",11.7,(9.3,14.1)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",19.3,(16.2,22.4)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",32.6,(29.5,35.8))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",14.8,(12.6,16.9)),
+(DISABILITY,"Any Disability","Any disability among adults",29,(25.6,32.3)),
+(HEARING,"Hearing Disability","Hearing disability among adults",7.1,(6.2,8)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",7.8,(6.6,9)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",11.9,(10,13.8)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",3.5,(2.9,4)),
+(VISION,"Vision Disability","Vision disability among adults",4.3,(3.7,5))
+])),
+(Clark,"53011",521150,405348,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",25.5,(23.4,27.5)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",31.1,(28.7,33.4)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",8.4,(7.6,9.2)),
+(CASTHMA,"Current Asthma","Current asthma among adults",11.6,(10.4,12.7)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",5.6,(4.9,6.3)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",5.5,(4.6,6.6)),
+(DEPRESSION,Depression,"Depression among adults",26.9,(24.5,29.3)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",9.6,(8.4,10.8)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",33.5,(31.2,35.8)),
+(OBESITY,Obesity,"Obesity among adults",35.3,(31.9,38.7)),
+(STROKE,Stroke,"Stroke among adults",3,(2.6,3.4)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",11,(9.1,13))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",16.9,(14.4,19.5)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",18.2,(16.2,20.2)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",13.1,(11.4,14.8))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",8,(6.3,9.9)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",72,(69.4,74.4)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",68.8,(66.2,71.4)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",83.8,(81.6,85.8)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",68.8,(65.7,71.7)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",69.1,(66.7,71.5)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",75.2,(70.2,79.5))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",16.4,(14.6,18.3)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",11,(8.8,13.1)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",19.8,(16.9,22.8)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",30,(27.2,33.1))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",13.8,(12,15.8)),
+(DISABILITY,"Any Disability","Any disability among adults",27.8,(24.5,30.9)),
+(HEARING,"Hearing Disability","Hearing disability among adults",6.5,(5.8,7.3)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",6.9,(5.9,8.1)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",11.8,(10,13.7)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",3.1,(2.7,3.6)),
+(VISION,"Vision Disability","Vision disability among adults",4,(3.4,4.6))
+])),
+(Yakima,"53077",256643,183160,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",23.3,(21.1,25.4)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",32.7,(29.9,35.5)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",6.8,(6.1,7.5)),
+(CASTHMA,"Current Asthma","Current asthma among adults",10.7,(9.6,11.9)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",6.5,(5.7,7.3)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",6.5,(5.5,7.6)),
+(DEPRESSION,Depression,"Depression among adults",22.6,(20,25.3)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",12.9,(11.4,14.5)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",34.7,(31.9,37.7)),
+(OBESITY,Obesity,"Obesity among adults",39.7,(35.3,44.1)),
+(STROKE,Stroke,"Stroke among adults",3.6,(3.2,4.1)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",17.2,(14.5,20))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",26.4,(23.1,30)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",17.8,(15.8,20)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",15.5,(13.6,17.4))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",18.8,(15.3,23.1)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",71.7,(68.8,74.3)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",68.4,(64.9,71.6)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",79.2,(76.4,81.8)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",55.9,(51.9,59.7)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",55,(51.9,57.9)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",67.8,(61.6,73.6))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",15.7,(13.4,18.1)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",12.9,(10.8,15)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",27.9,(24.2,31.7)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",30.7,(27.3,34.2))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",17.7,(15.5,20.3)),
+(DISABILITY,"Any Disability","Any disability among adults",34,(30.3,38.1)),
+(HEARING,"Hearing Disability","Hearing disability among adults",7.9,(7,8.9)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",9.8,(8.5,11.2)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",15.4,(13.4,17.6)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",4.9,(4.2,5.6)),
+(VISION,"Vision Disability","Vision disability among adults",7.2,(6.3,8.2))
+])),
+(Whatcom,"53073",231919,189784,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",24.3,(22.1,26.7)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",28.4,(25.9,31.1)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",8.6,(7.8,9.4)),
+(CASTHMA,"Current Asthma","Current asthma among adults",10.7,(9.5,12)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",5.7,(5,6.6)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",5.4,(4.4,6.6)),
+(DEPRESSION,Depression,"Depression among adults",29.5,(26.5,32.7)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",8.8,(7.6,10.1)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",33.1,(30.2,35.8)),
+(OBESITY,Obesity,"Obesity among adults",26.5,(22.8,30.4)),
+(STROKE,Stroke,"Stroke among adults",3,(2.7,3.5)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",9.8,(7.9,11.7))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",16.2,(13.9,19.2)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",17.9,(15.7,20.3)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",12.9,(11.3,14.9))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",7.8,(6.1,9.8)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",72,(68.9,74.7)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",70.3,(67.1,73.2)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",82.3,(79.9,84.6)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",68.3,(64.4,71.9)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",65.9,(63,68.7)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",73.9,(67.9,79.1))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",17.9,(15.6,20.4)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",10.8,(8.8,13.2)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",16.8,(14,20.1)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",29.1,(25.7,32.7))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",14.9,(12.7,17.3)),
+(DISABILITY,"Any Disability","Any disability among adults",29.5,(25.9,33.6)),
+(HEARING,"Hearing Disability","Hearing disability among adults",7,(6.1,8)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",7.4,(6.2,8.6)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",11,(9.2,12.9)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",3.2,(2.7,3.7)),
+(VISION,"Vision Disability","Vision disability among adults",4.1,(3.6,4.8))
+])),
+(Benton,"53005",215219,159518,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",24.4,(22.2,26.7)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",29.2,(26.5,31.8)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",8.3,(7.5,9.1)),
+(CASTHMA,"Current Asthma","Current asthma among adults",10.8,(9.7,12)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",5.8,(5.1,6.6)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",5.6,(4.6,6.7)),
+(DEPRESSION,Depression,"Depression among adults",24,(21.3,26.6)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",10.4,(9.1,11.8)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",36.4,(33.5,39.2)),
+(OBESITY,Obesity,"Obesity among adults",36.2,(32,40.2)),
+(STROKE,Stroke,"Stroke among adults",3.1,(2.7,3.5)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",10,(8.3,11.9))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",18.5,(15.6,21.3)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",16.2,(14.2,18.1)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",13.5,(11.8,15.4))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",10.6,(8.5,13)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",70.3,(67.5,73.1)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",71.1,(68.1,73.9)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",83.2,(81,85.3)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",64.3,(60.7,67.9)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",63.9,(61.1,66.8)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",72.3,(66.3,77.9))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",16.9,(14.8,19.3)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",10.4,(8.3,12.5)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",20.6,(17.3,23.9)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",31.3,(27.8,35))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",14.2,(12.1,16.2)),
+(DISABILITY,"Any Disability","Any disability among adults",29,(25.4,32.7)),
+(HEARING,"Hearing Disability","Hearing disability among adults",7,(6.2,7.9)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",7.4,(6.3,8.7)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",12.3,(10.4,14.3)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",3.4,(2.9,4)),
+(VISION,"Vision Disability","Vision disability among adults",4.6,(3.9,5.3))
+])),
+(Island,"53029",86267,71614,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",29.4,(26.5,32.4)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",34.7,(31.4,38.1)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",11,(9.9,12)),
+(CASTHMA,"Current Asthma","Current asthma among adults",10.4,(9.2,11.7)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",6.8,(5.9,7.9)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",5.9,(4.8,7.1)),
+(DEPRESSION,Depression,"Depression among adults",23.2,(20.2,26.3)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",10.2,(8.8,11.9)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",36.8,(33.4,40.2)),
+(OBESITY,Obesity,"Obesity among adults",31.3,(26.5,36.3)),
+(STROKE,Stroke,"Stroke among adults",3.5,(3,4)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",7,(5.7,8.5))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",15.6,(13,18.6)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",14.8,(12.9,16.9)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",12.8,(11,14.8))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",7.1,(5.6,8.8)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",75.7,(72.8,78.5)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",73.9,(70.5,77.1)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",85.9,(83.9,87.8)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",72.3,(68.2,76.1)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",70.5,(67.6,73.3)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",74.4,(67.9,79.9))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",14.2,(11.9,16.8)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",9.5,(7.5,11.7)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",16.1,(13,19.5)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",29,(25,33.4))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",12.5,(10.7,14.6)),
+(DISABILITY,"Any Disability","Any disability among adults",28.8,(24.9,33.1)),
+(HEARING,"Hearing Disability","Hearing disability among adults",7.8,(6.8,8.9)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",6.7,(5.6,7.9)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",12.5,(10.4,14.9)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",3.1,(2.6,3.7)),
+(VISION,"Vision Disability","Vision disability among adults",3.9,(3.3,4.6))
+])),
+(Ferry,"53019",7497,6217,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",38,(34.4,41.8)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",41.1,(36.9,45.4)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",11.4,(10.3,12.6)),
+(CASTHMA,"Current Asthma","Current asthma among adults",12.3,(11,13.8)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",10,(8.8,11.2)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",9.8,(8.3,11.6)),
+(DEPRESSION,Depression,"Depression among adults",25,(21.7,28.8)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",15.1,(13.1,17.5)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",41.2,(37,45.7)),
+(OBESITY,Obesity,"Obesity among adults",40.2,(33.4,47.9)),
+(STROKE,Stroke,"Stroke among adults",5.2,(4.6,5.9)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",13.7,(11.2,16.5))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",24.3,(20.9,28.3)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",17.4,(15.3,19.7)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",17.9,(15.7,20.5))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",8.5,(6.9,10.4)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",77.6,(74.5,80.6)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",73.6,(70,77.3)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",85.5,(83.6,87.3)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",65.2,(60.4,69.8)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",57.3,(53.7,61)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",62.7,(54.3,70.9))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",14,(11.7,16.8)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",16,(13.5,19)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",25.1,(20.7,30.2)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",35.2,(29.6,41.3))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",16.3,(14.2,18.7)),
+(DISABILITY,"Any Disability","Any disability among adults",38.7,(33.8,44)),
+(HEARING,"Hearing Disability","Hearing disability among adults",11.3,(10,12.7)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",10.2,(8.8,11.8)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",19.4,(16.5,22.6)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",5.3,(4.6,6.2)),
+(VISION,"Vision Disability","Vision disability among adults",6.6,(5.8,7.6))
+])),
+(Garfield,"53023",2363,1865,([
+(ARTHRITIS,Arthritis,"Arthritis among adults",31.5,(28.2,35)),
+(BPHIGH,"High Blood Pressure","High blood pressure among adults",37.7,(33.8,41.8)),
+(CANCER,"Cancer (non-skin) or Melanoma","Cancer (non-skin) or melanoma among adults",11.2,(10.1,12.3)),
+(CASTHMA,"Current Asthma","Current asthma among adults",11,(9.8,12.4)),
+(CHD,"Coronary Heart Disease","Coronary heart disease among adults",7.7,(6.6,8.8)),
+(COPD,COPD,"Chronic obstructive pulmonary disease among adults",7,(5.7,8.3)),
+(DEPRESSION,Depression,"Depression among adults",23.4,(20.1,26.8)),
+(DIABETES,Diabetes,"Diagnosed diabetes among adults",11.5,(9.8,13.4)),
+(HIGHCHOL,"High Cholesterol","High cholesterol among adults who have ever been screened",38.5,(34.5,42.6)),
+(OBESITY,Obesity,"Obesity among adults",31,(24.5,38.1)),
+(STROKE,Stroke,"Stroke among adults",3.9,(3.3,4.4)),
+(TEETHLOST,"All Teeth Lost","All teeth lost among adults aged >=65 years",9.5,(7.6,11.6))
+],[
+(GHLTH,"General Health","Fair or poor self-rated health status among adults",17.8,(14.9,21.1)),
+(MHLTH,"Frequent Mental Distress","Frequent mental distress among adults",15.4,(13.4,17.4)),
+(PHLTH,"Frequent Physical Distress","Frequent physical distress among adults",14.1,(12.1,16.3))
+],[
+(ACCESS2,"Health Insurance","Current lack of health insurance among adults aged 18-64 years",7.1,(5.5,9.1)),
+(BPMED,"High Blood Pressure Medication","Taking medicine to control high blood pressure among adults with high blood pressure",76.9,(74,79.7)),
+(CHECKUP,"Annual Checkup","Visits to doctor for routine checkup within the past year among adults",74.4,(70.6,77.9)),
+(CHOLSCREEN,"Cholesterol Screening","Cholesterol screening among adults",86.4,(84.4,88.2)),
+(COLON_SCREEN,"Colorectal Cancer Screening","Colorectal cancer screening among adults aged 45–75 years",65.7,(60.9,70.4)),
+(DENTAL,"Dental Visit","Visited dentist or dental clinic in the past year among adults",64.6,(61,68.1)),
+(MAMMOUSE,Mammography,"Mammography use among women aged 50-74 years",75.2,(67.5,81.7))
+],[
+(BINGE,"Binge Drinking","Binge drinking among adults",15,(12.5,17.8)),
+(CSMOKING,"Current Cigarette Smoking","Current cigarette smoking among adults",11.4,(9.1,14)),
+(LPA,"Physical Inactivity","No leisure-time physical activity among adults",19.7,(15.9,23.7)),
+(SLEEP,"Short Sleep Duration","Short sleep duration among adults",31.2,(25.6,37.3))
+],[
+(COGNITION,"Cognitive Disability","Cognitive disability among adults",13.3,(11.4,15.3)),
+(DISABILITY,"Any Disability","Any disability among adults",30.4,(26.1,35)),
+(HEARING,"Hearing Disability","Hearing disability among adults",8.9,(7.8,10.1)),
+(INDEPLIVE,"Independent Living Disability","Independent living disability among adults",7.4,(6.3,8.7)),
+(MOBILITY,"Mobility Disability","Mobility disability among adults",14,(11.7,16.6)),
+(SELFCARE,"Self-care Disability","Self-care disability among adults",3.6,(3,4.2)),
+(VISION,"Vision Disability","Vision disability among adults",4.4,(3.7,5.1))
+]))
+]
+
+
+Perform the following calculations and analysis:
+1. Using population and adult_population from each county, calculate the percentage of residents who are adults (18+)
+2. For each county, compute a composite "chronic disease burden" score: average the prevalence values for ARTHRITIS, BPHIGH, DIABETES, CHD, COPD, and STROKE
+3. Rank all 10 counties by their chronic disease burden score
+4. For disability measures (category DISABLT), calculate the average disability prevalence per county and identify which county has the highest disability burden
+5. Compare preventive service utilization (category PREVENT): which county has the highest dental visit rate (DENTAL)? The highest mammography rate (MAMMOUSE)? The highest cholesterol screening rate (CHOLSCREEN)?
+6. Calculate the population-weighted average for obesity (OBESITY) across all 10 counties (weight by adult_population)
+7. For each category, identify the single measure with the highest overall average prevalence across all counties

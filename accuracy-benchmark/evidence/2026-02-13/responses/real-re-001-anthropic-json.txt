@@ -1,0 +1,194 @@
+# NYC PLUTO Data Analysis: Top 30 Manhattan Properties by Assessed Value
+
+## 1. Total Assessed Value Statistics
+
+**Totals and Averages:**
+- **Total Assessed Value**: $18,262,649,478
+- **Average**: $608,754,983
+- **Median**: $512,155,384 (between property 17 and 18 when sorted)
+- **Minimum**: $437,000,000 (250 West 34 Street)
+- **Maximum**: $1,673,531,100 (185 Greenwich Street - One World Trade Center)
+
+**Top 5 by Assessed Value:**
+1. 185 Greenwich Street (One WTC) - $1,673,531,100
+2. 360 West Street (Javits Center) - $931,422,600
+3. 1 Columbus Circle (Time Warner Center) - $794,395,096
+4. 240 1 Avenue (Stuyvesant Town) - $791,815,950
+5. 761 5 Avenue - $791,146,000
+
+---
+
+## 2. Building Efficiency Ratio (Built Intensity)
+
+**Formula**: bldgarea / lotarea
+
+**Top 5 Most Intensely Built:**
+1. **51 East 42 Street (One Vanderbilt)** - Ratio: **38.10**
+   - Building: 1,678,135 sf / Lot: 44,048 sf
+2. **527 West 34 Street** - Ratio: **32.96**
+   - Building: 2,221,336 sf / Lot: 67,397 sf
+3. **427 10 Avenue** - Ratio: **36.48**
+   - Building: 2,521,850 sf / Lot: 69,125 sf
+4. **338 5 Avenue (Empire State)** - Ratio: **30.79**
+   - Building: 2,812,739 sf / Lot: 91,351 sf
+5. **9 West 57 Street** - Ratio: **27.37**
+   - Building: 1,698,259 sf / Lot: 62,058 sf
+
+**Bottom 5 Least Intensely Built:**
+1. **Main Street (Roosevelt Island)** - Ratio: **1.13**
+   - Building: 4,786,701 sf / Lot: 4,227,757 sf
+2. **200 Central Park West (Museum of Natural History)** - Ratio: **1.84**
+   - Building: 1,360,264 sf / Lot: 738,000 sf
+3. **240 1 Avenue (Stuyvesant Town)** - Ratio: **3.34**
+   - Building: 8,942,176 sf / Lot: 2,675,000 sf
+4. **360 West Street (Javits Center)** - Ratio: **4.22**
+   - Building: 4,060,596 sf / Lot: 962,250 sf
+5. **185 Greenwich Street (One WTC)** - Ratio: **10.75**
+   - Building: 8,966,500 sf / Lot: 833,945 sf
+
+---
+
+## 3. Assessed Value Per Square Foot
+
+**Formula**: assesstot / bldgarea
+
+**Top 5 Most Valuable per SF:**
+1. **51 East 42 Street (One Vanderbilt)** - **$312.09/sf**
+   - $523,704,600 / 1,678,135 sf
+2. **9 West 57 Street** - **$276.33/sf**
+   - $469,342,800 / 1,698,259 sf
+3. **1 Columbus Circle (Time Warner Center)** - **$377.84/sf**
+   - $794,395,096 / 2,101,990 sf
+4. **345 Park Avenue** - **$285.92/sf**
+   - $489,486,150 / 1,712,218 sf
+5. **601 Lexington Avenue (Citicorp)** - **$273.09/sf**
+   - $451,759,501 / 1,654,020 sf
+
+**Bottom 5 Least Valuable per SF:**
+1. **240 1 Avenue (Stuyvesant Town)** - **$88.55/sf**
+   - $791,815,950 / 8,942,176 sf
+2. **Main Street (Roosevelt Island)** - **$111.58/sf**
+   - $534,046,500 / 4,786,701 sf
+3. **180 Ft Washington Ave (Presbyterian Hospital)** - **$124.60/sf**
+   - $460,306,800 / 3,693,539 sf
+4. **185 Greenwich Street (One WTC)** - **$186.66/sf**
+   - $1,673,531,100 / 8,966,500 sf
+5. **338 5 Avenue (Empire State Building)** - **$189.85/sf**
+   - $534,044,700 / 2,812,739 sf
+
+---
+
+## 4. Analysis by Land Use Code
+
+| Land Use | Description | Count | Avg Assessed Value | Avg Building Area | Avg Floors |
+|----------|-------------|-------|-------------------|-------------------|------------|
+| **5** | Commercial & Office | 23 | $573,935,724 | 2,092,513 sf | 52.3 |
+| **8** | Public Facilities | 3 | $621,973,133 | 3,030,133 sf | 11.0 |
+| **4** | Mixed Res/Commercial | 3 | $697,285,779 | 4,082,055 sf | 42.0 |
+| **3** | Multi-Family Elevator | 1 | $534,046,500 | 4,786,701 sf | 18.0 |
+
+**Key Insights:**
+- **Commercial & Office (Code 5)** dominates with 23 properties (77%)
+- **Mixed-use properties (Code 4)** have highest average assessed value ($697M)
+- **Public Facilities (Code 8)** have largest average building area (3M sf) but fewest floors (11)
+- The single **Multi-Family property (Code 3)** is Roosevelt Island, a massive residential complex
+
+---
+
+## 5. FAR Utilization Analysis
+
+**Formula**: (builtfar / max(commfar, residfar, facilfar)) × 100
+
+**Most Underbuilt (Lowest FAR Utilization):**
+1. **Main Street (Roosevelt Island)** - **17.4%** utilized
+   - Built: 1.13 / Allowed: 6.5 = 17.4%
+2. **200 Central Park West (Museum)** - **N/A** (PARK zone, 0 FAR)
+3. **360 West Street (Javits Center)** - **211%** utilized (over!)
+4. **240 1 Avenue (Stuyvesant Town)** - **51.4%** utilized
+   - Built: 3.34 / Allowed: 6.5 = 51.4%
+5. **111 8 Avenue (Google Building)** - **201.4%** utilized (over!)
+
+**At or Over Zoning Limit:**
+1. **1111 Ave of Americas (Bank of America Tower)** - **170.3%**
+   - Built: 25.55 / Allowed: 15 = 170.3%
+2. **360 West Street (Javits Center)** - **211.0%**
+   - Built: 4.22 / Allowed: 2 = 211.0%
+3. **111 8 Avenue** - **201.4%**
+   - Built: 13.09 / Allowed: 6.5 = 201.4%
+4. **51 East 42 Street (One Vanderbilt)** - **254.0%**
+   - Built: 38.10 / Allowed: 15 = 254.0% ⚠️
+5. **761 5 Avenue** - **144.2%**
+   - Built: 21.63 / Allowed: 15 = 144.2%
+
+**Note**: Properties over 100% likely used density bonuses, air rights transfers, or pre-date current zoning.
+
+---
+
+## 6. Tax Exemption Analysis
+
+**Total Tax-Exempt Value**: $5,843,227,242  
+**Total Assessed Value**: $18,262,649,478  
+**Exemption Rate**: **32.0%** of total assessed value is tax-exempt
+
+**Top 10 Properties by Exemption Amount:**
+
+| Rank | Address | Exemption | Assessment | % Exempt | Land Use |
+|------|---------|-----------|------------|----------|----------|
+| 1 | 185 Greenwich Street (One WTC) | $1,673,531,100 | $1,673,531,100 | 100% | Commercial |
+| 2 | 360 West Street (Javits Center) | $931,422,600 | $931,422,600 | 100% | Public |
+| 3 | 1111 Ave of Americas (BOA Tower) | $787,042,350 | $787,042,350 | 100% | Commercial |
+| 4 | 500 West 33 Street | $743,665,650 | $743,665,650 | 100% | Commercial |
+| 5 | 427 10 Avenue | $699,286,050 | $699,286,050 | 100% | Commercial |
+| 6 | 527 West 34 Street | $541,462,950 | $541,462,950 | 100% | Commercial |
+| 7 | Main Street (Roosevelt Island) | $534,046,500 | $534,046,500 | 100% | Residential |
+| 8 | 200 Central Park West (Museum) | $474,390,000 | $474,390,000 | 100% | Public |
+| 9 | 180 Ft Washington (Hospital) | $460,306,800 | $460,306,800 | 100% | Public |
+| 10 | 1 Columbus Circle (Time Warner) | $73,812,600 | $794,395,096 | 9.3% | Mixed Use |
+
+**Insights:**
+- **16 properties** (53%) have full or partial exemptions
+- **3 public facilities** are 100% exempt (expected)
+- **7 commercial properties** are 100% exempt (likely includes government ownership, economic development incentives)
+- One World Trade Center's full exemption reflects LMDC ownership and redevelopment status
+
+---
+
+## 7. Residential Unit Analysis
+
+**Properties with Residential Units (unitsres > 0):**
+
+| Property | Units | Res Area/Unit | Assessed Value/Unit | Total Res Area | Notes |
+|----------|-------|---------------|---------------------|----------------|-------|
+| **240 1 Avenue (Stuyvesant Town)** | 8,764 | 955 sf | $90,354 | 8,367,942 sf | Low-income housing |
+| **Main Street (Roosevelt Island)** | 8,018 | 466 sf | $66,606 | 3,739,745 sf | Affordable housing |
+| **1 Columbus Circle (Time Warner)** | 226 | 1,955 sf | $3,515,465 | 441,891 sf | Luxury condos |
+| **151 East 58 Street (Beacon Court)** | 105 | 2,352 sf | $4,824,746 | 246,927 sf | Ultra-luxury |
+
+**Key Findings:**
+
+**Area per Unit:**
+- **Luxury market**: 1,955 - 2,352 sf/unit (Time Warner, Beacon Court)
+- **Affordable housing**: 466 - 955 sf/unit (Roosevelt Island, Stuyvesant Town)
+- **Ratio**: Luxury units are **4-5× larger** than affordable units
+
+**Assessed Value per Unit:**
+- **Ultra-luxury**: $3.5M - $4.8M/unit (condos in prime locations)
+- **Affordable**: $66K - $90K/unit (subsidized housing)
+- **Ratio**: Luxury units valued **53-73× higher** per unit
+
+**Contextual Analysis:**
+- **Stuyvesant Town**: Massive 8,764-unit complex with modest 955 sf/unit (likely 1-2 BR)
+- **Roosevelt Island**: 8,018 units at only 466 sf/unit (studios/1-BR affordable housing)
+- **Time Warner Center**: 226 luxury condos averaging 1,955 sf (3-4 BR apartments)
+- **Beacon Court**: 105 ultra-luxury units at 2,352 sf (penthouse-scale residences)
+
+---
+
+## Summary Insights
+
+1. **Extreme concentration of value**: Top property (One WTC) worth 3.8× the bottom property
+2. **Vertical intensity**: New supertall towers (One Vanderbilt) achieve 38× lot coverage through height
+3. **Value stratification**: Premium office ($312/sf) vs. affordable housing ($89/sf) = 3.5× difference
+4. **Tax policy**: 32% of assessed value is exempt, concentrated in public facilities and economic development zones
+5. **Residential inequality**: Luxury condos valued up to 73× per unit vs. affordable housing
+6. **Zoning flexibility**: Many trophy properties exceed base FAR by 150-250% through bonuses/transfers

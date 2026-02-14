@@ -1,0 +1,150 @@
+# JOLTS 2025 Labor Market Analysis
+
+## 1. Industries with Highest and Lowest Job Openings Rates
+
+**Top 3 (Highest Average JO Rates):**
+1. **Accommodation and food services: 5.83%**
+2. **Leisure and hospitality: 5.73%**
+3. **Health care and social assistance: 5.68%**
+
+**Bottom 3 (Lowest Average JO Rates):**
+1. **Construction: 2.90%**
+2. **Manufacturing: 3.19%**
+3. **Government: 3.41%**
+
+**Interpretation:** This suggests stark differences in labor demand across sectors. The service-oriented, customer-facing industries (hospitality, healthcare) face persistent worker shortages with openings rates nearly double those in goods-producing and public sectors. This reflects structural challenges in attracting workers to physically demanding, shift-based service roles versus more capital-intensive industries with established workforces.
+
+---
+
+## 2. Labor Market Churn Rankings
+
+**Formula: (Hires Level + Total Separations Level) / 2, averaged over 12 months**
+
+| Rank | Industry | Average Monthly Churn (thousands) |
+|------|----------|-----------------------------------|
+| 1 | Total nonfarm | 5,279.4 |
+| 2 | Total private | 4,945.7 |
+| 3 | Professional and business services | 1,025.8 |
+| 4 | Leisure and hospitality | 960.3 |
+| 5 | Accommodation and food services | 794.8 |
+| 6 | Health care and social assistance | 692.8 |
+| 7 | Retail trade | 591.8 |
+| 8 | Construction | 338.8 |
+| 9 | Government | 333.6 |
+| 10 | Manufacturing | 310.2 |
+| 11 | Financial activities | 205.9 |
+| 12 | Information | 85.9 |
+
+**Note:** Professional and business services, Leisure/hospitality, and Healthcare drive the most labor market turnover in absolute terms, indicating highly dynamic workforces.
+
+---
+
+## 3. Net Hiring Rate (Growth vs. Decline)
+
+**Formula: Average Hire Rate - Average Total Separation Rate**
+
+**GROWING INDUSTRIES (Positive Net Hiring):**
+- Health care and social assistance: **+0.30%**
+- Leisure and hospitality: **+0.18%**
+- Accommodation and food services: **+0.16%**
+- Construction: **+0.13%**
+- Financial activities: **+0.08%**
+- Government: **+0.06%**
+- Total nonfarm: **+0.06%**
+- Total private: **+0.06%**
+
+**SHRINKING INDUSTRIES (Negative Net Hiring):**
+- Information: **-0.06%**
+- Manufacturing: **-0.04%**
+- Retail trade: **-0.03%**
+- Professional and business services: **-0.03%**
+
+**Interpretation:** Healthcare shows strongest growth, adding 0.3 percentage points more workers than it loses monthly. Manufacturing, Information, and Retail face structural headwinds with separations exceeding hires. Professional services shows slight contraction despite high absolute employment levels.
+
+---
+
+## 4. Structural Comparison: Leisure & Hospitality vs. Professional & Business Services
+
+### 2025 Average Rates:
+
+| Metric | Leisure & Hospitality | Professional & Business |
+|--------|----------------------|-------------------------|
+| **Job Openings** | 5.73% | 5.39% |
+| **Hires** | 5.72% | 4.54% |
+| **Total Separations** | 5.53% | 4.57% |
+| **Quits** | 3.99% | 2.34% |
+| **Layoffs/Discharges** | 1.39% | 1.99% |
+| **Other Separations** | 0.12% | 0.23% |
+
+### **Key Structural Differences:**
+
+1. **Turnover Velocity:** Leisure/hospitality operates at ~25% higher hiring/separation rates, indicating a "revolving door" labor model vs. professional services' more stable workforce.
+
+2. **Voluntary vs. Involuntary Separations:** 
+   - L&H: 72% of separations are quits (workers leaving voluntarily)
+   - PBS: Only 51% are quits, with 44% layoffs
+   - **Implication:** Hospitality struggles with retention; workers quit at 1.7x the rate of professional services. PBS shows more employer-initiated separations, suggesting economic sensitivity and project-based employment.
+
+3. **Labor Market Tightness:** Both have similar job opening rates (~5.4-5.7%), but L&H converts openings to hires much faster, suggesting less selective hiring but poorer retention.
+
+4. **Stability:** Professional services workers stay longer (lower quit rates) despite higher layoff exposure. L&H faces chronic worker dissatisfaction driving high voluntary turnover.
+
+---
+
+## 5. Construction Seasonality
+
+**Highest Hires:** April 2025 with **364,000 hires**  
+**Lowest Hires:** March 2025 with **306,000 hires**  
+**Range:** **58,000 (18.9% variation)**
+
+**Note:** Construction shows moderate seasonality despite being seasonally adjusted data. The spring hiring surge (April-May) likely reflects project ramp-ups, while March represents late winter lull.
+
+---
+
+## 6. Separation Composition by Industry
+
+**Using total annual separation levels:**
+
+| Industry | Quits % | Layoffs % | Other % | **Notable Pattern** |
+|----------|---------|-----------|---------|---------------------|
+| Accommodation & food services | **79.1%** | 18.6% | 2.3% | 🏆 Highest quit share |
+| Leisure & hospitality | **72.1%** | 25.6% | 2.3% | |
+| Retail trade | 69.1% | 27.0% | 3.9% | |
+| Health care | 68.5% | 23.8% | 5.2% | |
+| Financial activities | 60.1% | 28.4% | 11.3% | |
+| Manufacturing | 56.6% | 37.2% | 6.2% | |
+| Government | 55.5% | 25.2% | **19.2%** | 🏆 Highest "other" (retirements) |
+| Professional & business | 51.5% | 43.5% | 5.1% | |
+| Construction | 44.1% | **51.2%** | 4.5% | 🏆 Highest layoff share |
+| Information | 44.3% | 47.6% | 8.3% | |
+
+### **Key Findings:**
+
+- **Highest Quit Share:** Accommodation and food services (79.1%) - workers flee these jobs
+- **Highest Layoff Share:** Construction (51.2%) - driven by project cycles and weather
+- **Highest "Other" Share:** Government (19.2%) - reflects retirements in aging public workforce
+
+**Quit-to-Layoff Ratio** is a critical labor market health indicator:
+- Service industries: High quits = worker dissatisfaction, wage/condition issues
+- Construction/Information: High layoffs = economic volatility, restructuring
+
+---
+
+## 7. Job Openings and Labor Market Tightness (Total Nonfarm)
+
+**Average Monthly Job Openings:** 7,243,000  
+**Average JO Rate:** 4.39%
+
+### Context for Interpretation:
+
+Without unemployment data in this dataset, we can still assess **relative tightness**:
+
+- **Historical Context:** Pre-pandemic (2019) JO rates averaged ~4.0%. The 2025 average of 4.39% suggests **continued labor market tightness** above pre-COVID norms.
+
+- **Beveridge Curve Implications:** With 7.24M openings and a separation rate near hires rate (3.35% vs 3.29%), the labor market shows **near-equilibrium** with slight growth momentum.
+
+- **Job Openings-to-Unemployment Ratio:** If we assume a 4.0% unemployment rate (approximately 6.5M unemployed based on ~165M labor force), the implied ratio would be **1.11 openings per unemployed person**, indicating a still-tight labor market favoring workers, though cooling from 2022-23 peaks.
+
+- **Trend:** The decline from 7,762K (January) to 6,542K (December) - a **15.7% drop** - suggests **labor market normalization** throughout 2025, reducing worker bargaining power.
+
+This tightness explains persistent wage pressure in service sectors and continued hiring difficulties in leisure/hospitality.

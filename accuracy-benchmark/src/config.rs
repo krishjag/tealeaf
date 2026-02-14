@@ -388,6 +388,26 @@ impl std::fmt::Display for DataFormat {
     }
 }
 
+impl std::str::FromStr for DataFormat {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "tl" | "tealeaf" => Ok(DataFormat::TL),
+            "json" => Ok(DataFormat::Json),
+            "toon" => Ok(DataFormat::Toon),
+            _ => Err(format!("unknown format '{}' (expected: tl, json, toon)", s)),
+        }
+    }
+}
+
+/// Parse a comma-separated list of format names into DataFormat values
+pub fn parse_formats(s: &str) -> Result<Vec<DataFormat>, String> {
+    s.split(',')
+        .map(|f| f.trim().parse::<DataFormat>())
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

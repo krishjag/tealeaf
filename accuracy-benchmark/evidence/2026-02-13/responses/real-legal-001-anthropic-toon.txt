@@ -1,0 +1,142 @@
+# Wisconsin Circuit Court Case Analysis
+## Case No. 2016CF000031 - State v. Luis A Ramirez
+
+---
+
+## 1. TIME FROM OFFENSE TO SENTENCING
+
+**Offense Date:** May 5, 2015  
+**Sentencing Date:** February 24, 2020
+
+**Total Elapsed Time:** **4 years, 9 months, and 19 days**
+
+---
+
+## 2. SENTENCE ANALYSIS
+
+### Charge 1: Battery by Prisoners (Felony H)
+- **State Prison:** 12 Years
+- **Extended Supervision:** 3 Years
+- **Total Combined:** **15 Years**
+- **Relationship:** Consecutive to any other sentence currently serving
+
+### Charge 2: Disorderly Conduct (Misdemeanor B)
+- **State Prison:** 1 Year
+- **Extended Supervision:** 6 Months
+- **Total Combined:** **1.5 Years**
+- **Relationship:** Concurrent with Count 1
+
+### Overall Sentence Structure:
+- **Effective Total Sentence:** 15 years (since Charge 2 runs concurrent with Charge 1)
+- **Total Initial Confinement:** 12 years (Charge 2's 1 year runs concurrently)
+- **Total Extended Supervision:** 3 years (Charge 2's 6 months runs concurrently)
+- All sentences are **consecutive to any other sentence defendant was serving**
+
+---
+
+## 3. DEFENSE ATTORNEYS ANALYSIS
+
+**Total Number of Attorneys:** 3
+
+| Attorney Name | Entered | Withdrawn | Duration (Months) |
+|--------------|---------|-----------|-------------------|
+| Leonie C. Dolch | 2016-03-15 | 2016-07-07 | **3.7 months** |
+| Ronald Gabriel Benavides | 2016-07-07 | 2020-03-12 | **44.2 months** |
+| Jennifer A. Lohr | 2020-05-20 | 2025-10-02 | **64.4 months** |
+
+**Total representation period:** 112.3 months (approximately 9.4 years)
+
+---
+
+## 4. DOCKET ENTRIES BY YEAR
+
+| Year | Number of Entries |
+|------|-------------------|
+| 2016 | 36 |
+| 2017 | 14 |
+| 2018 | 24 |
+| 2019 | 30 |
+| 2020 | 31 |
+| 2021 | 28 |
+| **2022** | **32** |
+| 2023 | 24 |
+| 2024 | 7 |
+| 2025 | 4 |
+| **TOTAL** | **230** |
+
+**Year with Most Activity:** **2022 (32 entries)**
+- This year involved heavy appellate activity including filing notice of appeal, transcript preparation, and transmittal of records to Court of Appeals
+
+---
+
+## 5. APPEAL-RELATED DOCKET ENTRIES
+
+### Count of Appeal-Related Entries:
+
+**Identified Appeal-Related Entries:** 51 entries
+
+Key categories include:
+- Court of Appeals orders and decisions
+- Supreme Court orders and decisions
+- Notice of appeal
+- Appellate briefs and motions
+- Transcript requests/filings for appeal
+- Transmittal of records to appellate courts
+- Acknowledgments from Court of Appeals
+- Appeals document indices
+- Remittitur
+
+**Percentage of Total Docket Entries:** 51/231 = **22.1% of all entries are appeal-related**
+
+### Timeline of Appellate Activity:
+- **Notice of Appeal filed:** June 2, 2022
+- **Court of Appeals Decision:** April 25, 2024 (Reversed conviction and ordered case dismissed)
+- **Supreme Court Review Granted:** October 7, 2024
+- **Supreme Court Decision:** June 27, 2025 (Final disposition)
+- **Remittitur:** September 5, 2025
+
+---
+
+## 6. FINANCIAL RECEIVABLES ANALYSIS
+
+From receivables data:
+
+| Financial Metric | Amount |
+|-----------------|--------|
+| **Total Amount Due (Original)** | $761.00 |
+| **Amount Paid** | $352.00 |
+| **Adjustments** | $0.00 |
+| **Remaining Balance** | $0.00 |
+
+### Collection Analysis:
+- **Percentage Paid:** 352/761 = **46.3%**
+- **Status:** Document Collected = TRUE, Balance Due = $0
+
+**Note:** Despite only $352 being paid on a $761 obligation, the balance shows $0. This discrepancy suggests the remaining $409 was likely:
+  - Written off after conviction reversal
+  - Satisfied through other means
+  - Adjusted after case dismissal on appeal
+
+The case-level balance also shows $0.00, confirming no outstanding financial obligations.
+
+---
+
+## 7. BOND ANALYSIS
+
+### Bond Amount: **$5,000.00**
+
+### Bond-Related Docket Entries:
+
+| Date | Entry Description | Amount |
+|------|-------------------|--------|
+| **2016-02-11** | Signature bond set (Initial appearance) | $5,000 |
+| **2016-02-11** | "with felony conds." - Bond conditions specified | $5,000 |
+| **2016-02-25** | Signature bond signed and filed | $5,000 |
+
+### Bond Details:
+- **Type:** Signature Bond (Recognizance)
+- **Conditions:** Felony conditions imposed
+- **Status:** Defendant appeared via video from Waupun Correctional during initial appearance (already in custody on other charges)
+- **Bond Continuation:** Bond was continued at arraignment on 10/26/2016
+
+**Note:** The defendant was incarcerated throughout these proceedings (initially at Waupun Correctional, later transferred to Green Bay Correctional, then Wisconsin Secure Program Facility), so the bond was effectively a formality for if/when he was released from his other sentence.

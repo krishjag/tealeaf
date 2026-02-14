@@ -1,0 +1,119 @@
+# Credit Analysis Summary: 4 Public Companies (FY 2025)
+
+## 1. APPLE INC
+
+**Balance Sheet Metrics:**
+- Total Debt: $98,657M (Commercial Paper: $7,979M + Current Term Debt: $12,350M + Long-term Term Debt: $78,328M)
+- Total Stockholders' Equity: $73,733M
+- **Debt-to-Equity Ratio: 1.34**
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $111,482M
+- Investing Cash Flow: $15,195M (positive - net proceeds from securities)
+- Financing Cash Flow: -$120,686M
+- Capital Expenditures: $12,715M
+- **Free Cash Flow: $98,767M**
+
+**Profitability:**
+- Operating Income: $133,050M
+- Interest Coverage: Cannot calculate (interest expense not separately disclosed in provided data)
+
+---
+
+## 2. VISA INC.
+
+**Balance Sheet Metrics:**
+- Total Debt: $25,171M (Current: $5,569M + Long-term: $19,602M)
+- Total Equity: $37,909M
+- **Debt-to-Equity Ratio: 0.66**
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $23,059M
+- Investing Cash Flow: $708M (positive)
+- Financing Cash Flow: -$18,963M
+- Capital Expenditures: $1,482M
+- **Free Cash Flow: $21,577M**
+
+**Profitability:**
+- Operating Income: $23,994M
+- Interest Expense: $589M
+- **Interest Coverage Ratio: 40.7x**
+
+---
+
+## 3. COSTCO WHOLESALE CORP
+
+**Balance Sheet Metrics:**
+- Total Debt: $5,713M (all long-term; no short-term debt)
+- Total Equity: $29,164M
+- **Debt-to-Equity Ratio: 0.20** ⭐
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $13,335M
+- Investing Cash Flow: -$5,311M
+- Financing Cash Flow: -$3,775M
+- Capital Expenditures: $5,498M
+- **Free Cash Flow: $7,837M**
+
+**Profitability:**
+- Operating Income: $10,383M
+- Interest Expense: $154M
+- **Interest Coverage Ratio: 67.4x** ⭐
+
+---
+
+## 4. QUALCOMM INC/DE
+
+**Balance Sheet Metrics:**
+- Total Debt: $14,811M (all long-term; no short-term debt)
+- Total Stockholders' Equity: $21,206M
+- **Debt-to-Equity Ratio: 0.70**
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $14,012M
+- Investing Cash Flow: -$800M
+- Financing Cash Flow: -$13,196M
+- Capital Expenditures: $1,192M
+- **Free Cash Flow: $12,820M**
+
+**Profitability:**
+- Operating Income: $12,355M
+- Interest Expense: $664M
+- **Interest Coverage Ratio: 18.6x**
+
+---
+
+## KEY FINDINGS
+
+### 6. Strongest Balance Sheet (Lowest Leverage):
+**🏆 COSTCO** - Debt-to-Equity: 0.20
+- Minimal debt load (only $5.7B vs $29.2B equity)
+- Exceptional interest coverage of 67.4x
+- Conservative capital structure appropriate for retail operations
+
+### 7. Most Free Cash Flow Generation:
+**🏆 APPLE** - FCF: $98,767M
+- Generates nearly $100B in annual free cash flow
+- Operating cash flow of $111B with modest capex ($12.7B)
+- Strongest absolute cash generation despite higher leverage
+
+**Runner-up: VISA** - FCF: $21,577M (highest FCF margin at 54% of revenue)
+
+### 8. Risk Assessment:
+
+**⚠️ CONCERNING - APPLE:**
+- **Debt-to-Equity of 1.34** (highest among the four)
+- Total debt of $98.7B exceeds equity
+- However, massive cash generation ($98.7B FCF) and strong cash position ($35.9B) mitigate concerns
+- Debt appears strategic (low interest rates) rather than financial distress
+
+**✅ ALL CLEAR:**
+- **No companies with negative free cash flow**
+- All four companies show strong interest coverage (Costco: 67x, Visa: 41x, Qualcomm: 19x)
+- All generate substantial positive operating cash flows
+- Visa, Costco, and Qualcomm maintain conservative leverage (all below 0.70)
+
+**Overall Credit Quality: STRONG across all four companies**
+- Technology and payment networks show asset-light, high-margin business models
+- Costco demonstrates retail can maintain minimal leverage with strong operations
+- All companies returned significant capital to shareholders while maintaining financial health

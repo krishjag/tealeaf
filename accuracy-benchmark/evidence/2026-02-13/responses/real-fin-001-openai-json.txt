@@ -1,0 +1,64 @@
+## Per-company metrics (FY 2025 from provided statements)
+
+_All $ amounts in USD._
+
+### APPLE INC (period end 2025-09-30)
+- **Total current assets:** 147,957,000,000  
+- **Total current liabilities:** 165,631,000,000  
+- **Current ratio:** 147,957 / 165,631 = **0.89x**
+- **Total revenue (net sales):** 416,161,000,000  
+- **Net income:** 112,010,000,000  
+- **Net profit margin:** 112,010 / 416,161 = **26.91%**
+- **Operating cash flow (CFO):** **111,482,000,000**
+
+---
+
+### VISA INC. (period end 2025-09-30)
+- **Total current assets:** 37,766,000,000  
+- **Total current liabilities:** 35,048,000,000  
+- **Current ratio:** 37,766 / 35,048 = **1.08x**
+- **Total revenue (net revenue):** 40,000,000,000  
+- **Net income:** 20,058,000,000  
+- **Net profit margin:** 20,058 / 40,000 = **50.15%**
+- **Operating cash flow (CFO):** **23,059,000,000**
+
+---
+
+### COSTCO WHOLESALE CORP (period end 2025-08-31)
+- **Total current assets:** 38,380,000,000  
+- **Total current liabilities:** 37,108,000,000  
+- **Current ratio:** 38,380 / 37,108 = **1.03x**
+- **Total revenue:** 275,235,000,000  
+- **Net income:** 8,099,000,000  
+- **Net profit margin:** 8,099 / 275,235 = **2.94%**
+- **Operating cash flow (CFO):** **13,335,000,000**
+
+---
+
+### QUALCOMM INC (period end 2025-09-30)
+- **Total current assets:** 25,754,000,000  
+- **Total current liabilities:** 9,144,000,000  
+- **Current ratio:** 25,754 / 9,144 = **2.82x**
+- **Total revenue:** 44,284,000,000  
+- **Net income:** 5,541,000,000  
+- **Net profit margin:** 5,541 / 44,284 = **12.51%**
+- **Operating cash flow (CFO):** **14,012,000,000**
+
+---
+
+## Cross-company comparisons
+
+### 6) Rank by current ratio (strongest liquidity first)
+1. **QUALCOMM** — **2.82x**
+2. **VISA** — **1.08x**
+3. **COSTCO** — **1.03x**
+4. **APPLE** — **0.89x**
+
+### 7) Rank by net profit margin
+1. **VISA** — **50.15%**
+2. **APPLE** — **26.91%**
+3. **QUALCOMM** — **12.51%**
+4. **COSTCO** — **2.94%**
+
+### 8) Highest operating cash flow
+- **APPLE** has the highest operating cash flow: **$111.482B**

@@ -1,0 +1,32 @@
+I can’t complete the requested calculations accurately from what you pasted because the `properties:@table` is truncated: it contains **~26 records**, not 30 (it ends at “250 WEST 34 STREET”), so totals/medians/rankings would be wrong.
+
+If you paste the remaining 4 Manhattan lots (or provide the full table as CSV/JSON), I’ll run all 7 items exactly.
+
+Meanwhile, here’s what I *can* do now:
+
+- Confirm the dataset-level total assessed value you already provided in `summary`:
+  - **Total assessed value (all 30)** = **18,262,649,478** (from `summary.totalAssessedValue`)
+- And I can compute any per-property metrics for the **26 visible records** if you want an interim result (but it won’t match “all 30”).
+
+## What I need to finish all 7 tasks
+Please send either:
+1) the missing 4 records in the same tuple format, **or**
+2) a CSV export of the 30 rows with at least these columns:
+`address, bbl, lotarea, bldgarea, assesstot, exempttot, builtfar, residfar, commfar, facilfar, landuse, numfloors, unitsres, resarea`
+
+Once I have the full 30, I will return:
+
+1) **Total/avg/median/min/max** of `assesstot` (across all 30)  
+2) **Building efficiency ratio** `bldgarea/lotarea` for each lot + highest/lowest  
+3) **Assessed $/sf** (`assesstot/bldgarea`) for each lot + top/bottom 5 rankings  
+4) Grouped by **land use code meaning**: count, avg `assesstot`, avg `bldgarea`, avg `numfloors`  
+5) **FAR utilization %** = `builtfar / max(commfar, residfar, facilfar) * 100` + most underbuilt and near/over limit  
+6) **Total exempt value**, exempt %, and lots with highest `exempttot`  
+7) For `unitsres>0`: `resarea/unitsres` and `assesstot/unitsres` comparisons
+
+## Quick data-quality notes (so the calculations are interpreted correctly)
+- Some records have `bldgfront/bldgdepth` = 0 (e.g., “527 WEST 34 STREET”), but `bldgarea` is present—fine for area-based metrics.
+- `commfar` is typed as **int** in your struct, while `residfar/facilfar` are floats; I’ll cast to float for the FAR utilization denominator.
+- Condo records (e.g., Time Warner Center condo lot) can have very different assessed-value behavior vs fee-simple tax lots; I’ll keep them in but can also segment if you want.
+
+Send the remaining 4 rows (or a file), and I’ll produce the full computed tables and rankings.

@@ -88,7 +88,7 @@ retry_delay_ms = 1000
 # Maximum retry delay in milliseconds
 max_retry_delay_ms = 60000
 # Request timeout in milliseconds
-timeout_ms = 120000
+timeout_ms = 300000
 
 # Format comparison settings
 [benchmark.format_comparison]

@@ -1,0 +1,148 @@
+## 1) Highest vs lowest average Job Openings rate (JO rate)
+
+Average JO rate over 2025 (simple average of monthly rates):
+
+**Highest (top 3)**
+1. **Accommodation & food services (720000): ~5.93%**
+2. **Leisure & hospitality (700000): ~5.82%**
+3. **Health care & social assistance (620000): ~5.68%**  
+*(Next: Professional & business services ~5.48%, Information ~4.89%)*
+
+**Lowest (bottom 3)**
+1. **Construction (230000): ~2.88%**
+2. **Government (900000): ~3.33%**
+3. **Manufacturing (300000): ~3.19%**  
+*(Next: Retail trade ~3.54%)*
+
+**Interpretation (labor demand):** High JO rates in leisure/hospitality and health care point to persistently high vacancy pressure—roles are harder to staff and/or turnover-driven replacement demand is large. Low JO rates in construction/manufacturing/government suggest comparatively less vacancy pressure (either weaker demand, better matching, slower growth, or more constrained hiring pipelines/budgets—especially in government).
+
+---
+
+## 2) Labor market churn (average of (hires level + total separations level)/2), ranked
+
+Definition (monthly):  
+\[
+\text{churn}_m=\frac{\text{HI level}_m+\text{TS level}_m}{2}
+\]
+Then average across months.
+
+**Average churn in 2025 (thousands), highest → lowest**
+1. **Total private (100000): ~4,919**
+2. **Total nonfarm (000000): ~5,272** *(note: includes government; levels are larger than private—if ranking “industries” including aggregates, Total nonfarm is actually the largest; see note below)*
+3. **Professional & business services (540099): ~1,019**
+4. **Leisure & hospitality (700000): ~964**
+5. **Health care & social assistance (620000): ~696**
+6. **Retail trade (440000): ~595**
+7. **Government (900000): ~329**
+8. **Manufacturing (300000): ~313**
+9. **Construction (230000): ~344**
+10. **Financial activities (510099): ~201**
+11. **Information (510000): ~86**
+12. **Accommodation & food services (720000): ~796**
+
+**Important note on comparability:** churn in *levels* is heavily driven by industry size. A large sector can have high churn levels even with modest rates. For “true” churn intensity, you’d usually compute churn using **rates** (or normalize by employment).
+
+---
+
+## 3) Net hiring rate = avg hire rate − avg total separation rate
+
+Using average rates over 2025:
+
+- **Total nonfarm (000000):** HI ~3.35% − TS ~3.28% = **+0.07 pp** (growing slightly)
+- **Total private (100000):** ~3.68% − ~3.62% = **+0.06 pp** (slightly growing)
+- **Construction (230000):** ~4.18% − ~4.03% = **+0.15 pp** (growing)
+- **Manufacturing (300000):** ~2.42% − ~2.46% = **−0.04 pp** (shrinking slightly)
+- **Retail trade (440000):** ~3.82% − ~3.81% = **+0.01 pp** (flat)
+- **Information (510000):** ~2.94% − ~3.07% = **−0.13 pp** (shrinking)
+- **Financial activities (510099):** ~2.30% − ~2.20% = **+0.10 pp** (growing)
+- **Professional & business services (540099):** ~4.58% − ~4.57% = **+0.01 pp** (flat)
+- **Health care & social assistance (620000):** ~3.11% − ~2.80% = **+0.31 pp** (growing)
+- **Leisure & hospitality (700000):** ~5.72% − ~5.58% = **+0.14 pp** (growing)
+- **Accommodation & food services (720000):** ~5.62% − ~5.46% = **+0.16 pp** (growing)
+- **Government (900000):** ~1.45% − ~1.38% = **+0.07 pp** (growing slightly)
+
+**Growing (positive):** most sectors here, especially **health care** and **leisure-related**.  
+**Shrinking (negative):** **Information** and **Manufacturing** (both mildly negative).
+
+---
+
+## 4) Leisure & hospitality vs Professional & business services (avg rates, all 6 metrics)
+
+Averages over 2025 (rates):
+
+| Metric (rate) | Leisure & hospitality (700000) | Prof & business services (540099) |
+|---|---:|---:|
+| **JO** | ~5.82 | ~5.48 |
+| **HI** | ~5.72 | ~4.58 |
+| **TS** | ~5.58 | ~4.57 |
+| **QU** | ~4.04 | ~2.38 |
+| **LD** | ~1.41 | ~2.02 |
+| **OS** | ~0.13 | ~0.23 |
+
+**Structural differences**
+- **Much higher quit intensity in Leisure & hospitality** (QU ~4.0% vs ~2.4%): classic high-churn, worker-driven separations, shorter job tenures, and frequent job-to-job moves.
+- **Higher layoff/discharge rate in Professional & business services** (LD ~2.0% vs ~1.4%): separations are more employer-driven relative to leisure, consistent with project/cycle sensitivity (e.g., staffing, contracting, business services adjustments).
+- **Other separations are higher in PBS** (OS ~0.23% vs ~0.13%), consistent with a somewhat older/more career-tenured workforce and more non-quit exits.
+- Both have **high JO rates**, but Leisure converts that into **even higher hires and separations rates**, indicating a “fast-flow” labor market.
+
+---
+
+## 5) Construction seasonality (hires level): highest, lowest, range
+
+Construction hires levels (thousands) by month:
+- **Highest:** **April = 364**
+- **Lowest:** **March = 306**
+- **Range:** 364 − 306 = **58 (thousand)**
+
+---
+
+## 6) Separation composition: quits vs layoffs vs other (levels), and highest quit/layoff shares
+
+For each industry, compute annual totals of QU, LD, OS (sum of monthly levels) and divide by annual total separations (sum of TS levels). Using the fact that **TS = QU + LD + OS** each month, annual shares are consistent.
+
+**Quit share (approx)**
+- Total nonfarm: QU 38,299 / TS 63,698 ≈ **60.1%**
+- Total private: 36,187 / 59,743 ≈ **60.6%**
+- Construction: 1,770 / 4,110 ≈ **43.1%**
+- Manufacturing: 2,161 / 3,762 ≈ **57.4%**
+- Retail trade: 4,925 / 7,227 ≈ **68.1%**
+- Information: 461 / 1,040 ≈ **44.3%**
+- Financial activities: 1,452 / 2,416 ≈ **60.1%**
+- Professional & business services: 6,460 / 12,260 ≈ **52.7%**
+- Health care & social assistance: 5,557 / 7,900 ≈ **70.3%**
+- Leisure & hospitality: 8,168 / 11,522 ≈ **70.9%**
+- Accommodation & food services: 7,437 / 9,900 ≈ **75.1%**
+- Government: 2,193 / 3,905 ≈ **56.2%**
+
+**Layoff/discharge share (approx)**
+- Construction: 2,053 / 4,110 ≈ **49.9%**
+- Information: 503 / 1,040 ≈ **48.4%**
+- Professional & business services: 5,369 / 12,260 ≈ **43.8%**
+- (Most others are far lower; e.g., health care ~22%, leisure ~24%, accommodation/food ~16%)
+
+**Highest quit share:** **Accommodation & food services (~75%)**  
+**Highest layoff share:** **Construction (~50%)** *(Information is close at ~48%)*
+
+---
+
+## 7) “Ratio of unemployed persons implied by job openings” for Total nonfarm
+
+To compute a **job openings–to–unemployed ratio** (or its inverse), you need **both**:
+- Total nonfarm job openings level (you have this), and
+- **Number of unemployed persons** (from CPS), or unemployment rate + labor force/employment to convert to unemployed level.
+
+From your dataset we only have JOLTS series (openings/hires/separations), not CPS unemployment counts. So I can’t compute the ratio numerically without an external unemployment level.
+
+What I *can* provide from your data:
+- **Average Total nonfarm job openings in 2025:**  
+  Sum JO levels = 87,418 (thousand-months) ⇒ average ≈ **7,285 thousand** openings.
+
+If you provide (or allow me to use) the **average 2025 unemployed level** (in thousands) or monthly unemployed counts, then:
+- **Openings-to-unemployed (tightness):** \( \text{JO}/U \)
+- **Unemployed-per-opening:** \( U/\text{JO} \)
+
+Example: if average unemployed were 6,000k, then JO/U ≈ 7,285/6,000 = 1.21 openings per unemployed (tight). If unemployed were 8,000k, JO/U ≈ 0.91 (looser).
+
+--- 
+
+If you want, I can also (a) redo churn ranking using **rates** (size-adjusted), and/or (b) compute the JO-to-unemployed ratio by pulling CPS unemployed levels if you confirm it’s okay to use external BLS CPS data.

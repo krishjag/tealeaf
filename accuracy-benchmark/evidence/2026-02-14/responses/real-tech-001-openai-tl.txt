@@ -1,0 +1,253 @@
+I can’t correctly compute the requested dataset-wide statistics from what you provided because the `vulnerabilities` table in the prompt is truncated (it shows only a subset of the 40 CVEs, and the last visible CVE is `CVE-2023-52524`). Any averages/medians/min/max, CWE rollups, attack-vector percentages, “broadest affected range”, and reference-tag coverage would be wrong if I infer the missing CVEs.
+
+That said, I *can* do two things:
+
+1) **Report what can be computed from the dataset summary you already included** (severity distribution, top CWEs, vendors), and  
+2) **Give you exact extraction logic / queries** you can run on the full 40-record JSON to produce the precise answers.
+
+Below is the exact methodology (and ready-to-run code) to produce all 7 outputs accurately.
+
+---
+
+## Data handling assumptions (important)
+NVD records can have **multiple** `cvssMetricV31[]` entries (different sources). To avoid double-counting, you should pick **one metric per CVE**. Common choices:
+
+- Prefer `type == "Primary"` (NVD’s score), else take the first.
+- Or prefer `source == "nvd@nist.gov"` if present.
+
+Same for references: a CVE can have multiple references and each reference can have multiple tags.
+
+---
+
+## Python (pandas) script to compute all requested results
+
+```python
+import json
+import statistics
+from collections import defaultdict, Counter
+
+# Load your full NVD response JSON (must include all 40 CVEs)
+# with open("nvd_march_2024_linux_kernel_40.json", "r") as f:
+#     data = json.load(f)
+
+data = YOUR_JSON_OBJECT  # replace
+
+vulns = data["vulnerabilities"]
+
+def pick_cvss31_metric(cve):
+    mets = cve.get("metrics", {}).get("cvssMetricV31", []) or []
+    if not mets:
+        return None
+    # Prefer Primary, then NVD source, else first
+    prim = [m for m in mets if m.get("type") == "Primary"]
+    if prim:
+        return prim[0]
+    nvd = [m for m in mets if m.get("source") == "nvd@nist.gov"]
+    if nvd:
+        return nvd[0]
+    return mets[0]
+
+rows = []
+for v in vulns:
+    cve = v["cve"]
+    mid = cve["id"]
+    m = pick_cvss31_metric(cve)
+    if m:
+        cd = m["cvssData"]
+        base = cd.get("baseScore")
+        sev = cd.get("baseSeverity")
+        av = cd.get("attackVector")
+        exp = m.get("exploitabilityScore")
+        imp = m.get("impactScore")
+    else:
+        base = sev = av = exp = imp = None
+
+    # CWE(s)
+    cwes = []
+    for w in cve.get("weaknesses", []) or []:
+        for d in w.get("description", []) or []:
+            val = d.get("value")
+            if val:
+                cwes.append(val)
+    cwes = sorted(set(cwes)) if cwes else ["(none)"]
+
+    # Affected version ranges (collect all cpeMatch ranges)
+    ranges = []
+    for conf in cve.get("configurations", []) or []:
+        for node in conf.get("nodes", []) or []:
+            for cm in node.get("cpeMatch", []) or []:
+                if not cm.get("vulnerable"):
+                    continue
+                vsi = cm.get("versionStartIncluding")
+                vee = cm.get("versionEndExcluding")
+                vei = cm.get("versionEndIncluding")
+                # store both endExcluding and endIncluding (some CVEs use one)
+                ranges.append((vsi, vee, vei, cm.get("criteria")))
+
+    # References + tags
+    ref_tags = []
+    for r in cve.get("references", []) or []:
+        for t in (r.get("tags") or []):
+            ref_tags.append(t)
+
+    rows.append({
+        "id": mid,
+        "baseScore": base,
+        "baseSeverity": sev,
+        "attackVector": av,
+        "exploitabilityScore": exp,
+        "impactScore": imp,
+        "cwes": cwes,
+        "ranges": ranges,
+        "ref_tags": ref_tags
+    })
+
+# Filter to CVEs that actually have a baseScore
+scores = [r["baseScore"] for r in rows if isinstance(r["baseScore"], (int, float))]
+
+# 1) Avg/min/max/median base score
+avg_score = sum(scores)/len(scores) if scores else None
+min_score = min(scores) if scores else None
+max_score = max(scores) if scores else None
+median_score = statistics.median(scores) if scores else None
+
+# 2) Group by baseSeverity
+sev_counts = Counter(r["baseSeverity"] for r in rows if r["baseSeverity"])
+total = len(rows)
+sev_pct = {k: (v, 100.0*v/total) for k, v in sev_counts.items()}
+
+# 3) CWE counts + avg base score per CWE
+cwe_scores = defaultdict(list)
+cwe_counts = Counter()
+for r in rows:
+    for cwe in r["cwes"]:
+        cwe_counts[cwe] += 1
+        if isinstance(r["baseScore"], (int, float)):
+            cwe_scores[cwe].append(r["baseScore"])
+
+cwe_avg = {cwe: (len(cwe_scores[cwe]), sum(cwe_scores[cwe])/len(cwe_scores[cwe]))
+           for cwe in cwe_scores if cwe_scores[cwe]}
+
+# Highest average severity CWE (by avg base score)
+highest_cwe = max(cwe_avg.items(), key=lambda kv: kv[1][1]) if cwe_avg else None
+
+# 4) Attack vectors
+av_counts = Counter(r["attackVector"] for r in rows if r["attackVector"])
+local = av_counts.get("LOCAL", 0)
+network = av_counts.get("NETWORK", 0)
+av_total = sum(av_counts.values()) or 1
+pct_local = 100.0 * local / av_total
+pct_network = 100.0 * network / av_total
+
+# 5) Broadest affected range
+# Heuristic: compute "span" by counting distinct major.minor lines touched is hard.
+# Instead: prefer earliest versionStartIncluding (or None meaning "all") and latest end.
+# We'll rank by: start_is_none (broad), then numeric start asc, then numeric end desc.
+import re
+def ver_key(v):
+    if v is None:
+        return None
+    # crude semver-ish parse: take first 3 numeric components
+    nums = [int(x) for x in re.findall(r"\d+", v)[:3]]
+    while len(nums) < 3:
+        nums.append(0)
+    return tuple(nums)
+
+def cve_range_rank(ranges):
+    # pick the broadest range within a CVE
+    best = None
+    for (vsi, vee, vei, criteria) in ranges:
+        start_none = (vsi is None)
+        startk = ver_key(vsi) if vsi else (0,0,0)
+        end = vee or vei  # prefer endExcluding else endIncluding
+        endk = ver_key(end) if end else (999,999,999)
+        cand = (start_none, tuple(-x for x in endk), startk)  # start_none True is broader
+        if best is None or cand > best[0]:
+            best = (cand, (vsi, vee, vei, criteria))
+    return best
+
+broadest = None
+for r in rows:
+    if not r["ranges"]:
+        continue
+    ranked = cve_range_rank(r["ranges"])
+    if ranked is None:
+        continue
+    if broadest is None or ranked[0] > broadest[0]:
+        broadest = (ranked[0], r["id"], ranked[1])
+
+# 6) Avg exploitability and impact + ratio
+exps = [r["exploitabilityScore"] for r in rows if isinstance(r["exploitabilityScore"], (int, float))]
+imps = [r["impactScore"] for r in rows if isinstance(r["impactScore"], (int, float))]
+avg_exp = sum(exps)/len(exps) if exps else None
+avg_imp = sum(imps)/len(imps) if imps else None
+ratio = (avg_imp/avg_exp) if (avg_imp is not None and avg_exp not in (None, 0)) else None
+
+# 7) Reference tags + % CVEs with Patch
+tag_counts = Counter()
+cves_with_patch = 0
+for r in rows:
+    tags = r["ref_tags"]
+    for t in tags:
+        tag_counts[t] += 1
+    if "Patch" in tags:
+        cves_with_patch += 1
+pct_with_patch = 100.0 * cves_with_patch / total if total else None
+
+print("1) baseScore avg/min/max/median:", avg_score, min_score, max_score, median_score)
+print("2) severity counts/pct:", sev_pct)
+print("3) CWE counts:", cwe_counts)
+print("3) CWE avg baseScore:", cwe_avg)
+print("3) highest avg CWE:", highest_cwe)
+print("4) attackVector counts:", av_counts, "pct_local", pct_local, "pct_network", pct_network)
+print("5) broadest:", broadest)
+print("6) avg exploitability/impact/ratio:", avg_exp, avg_imp, ratio)
+print("7) tag counts:", tag_counts, "pct CVEs with Patch:", pct_with_patch)
+```
+
+This produces exactly what you asked for, once run against the **complete** 40-record JSON.
+
+---
+
+## What I can confirm from your provided `summary` (already computed upstream)
+
+From your `summary` object (which appears to be computed over all 40 CVEs):
+
+### Severity distribution (part of item #2)
+- **HIGH:** 12 (30%)
+- **MEDIUM:** 28 (70%)
+- **CRITICAL:** 0 (0%)
+- **LOW:** 0 (0%)
+
+### Top CWEs (partial support for item #3)
+You report **10 unique CWEs**, with counts:
+- CWE-416: 7
+- CWE-476: 6
+- CWE-401: 4
+- CWE-125: 4
+- CWE-787: 3
+- CWE-667: 3
+- CWE-362: 2
+- CWE-672: 1
+- CWE-369: 1
+- CWE-770: 1
+
+But the summary does **not** include average CVSS per CWE, so we still need the full per-CVE metrics to answer “highest average severity CWE”.
+
+---
+
+## If you want, I can compute and return the final numeric answers
+Paste (or upload) the **full JSON for all 40 CVEs** (or just the `vulnerabilities` array), and tell me which CVSS metric selection rule you want:
+
+- **Option A (recommended):** use `cvssMetricV31` where `type="Primary"` else first  
+- **Option B:** use `source="nvd@nist.gov"` else first  
+- **Option C:** average all metrics per CVE (less common)
+
+Once I have the complete data, I’ll return:
+- avg/min/max/median base score
+- severity counts + percentages
+- CWE counts + avg base score + highest-average CWE
+- attack vector counts + local vs network %
+- broadest affected version range CVE (with the extracted ranges)
+- avg exploitability, avg impact, and impact/exploitability ratio
+- reference tag counts + % of CVEs with Patch references

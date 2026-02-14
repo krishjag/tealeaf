@@ -1,0 +1,98 @@
+# Analysis of 40 Linux Kernel CVEs from March 2024
+
+## 1. CVSS v3.1 Base Score Statistics
+
+**Scores:** 4.7, 5.3, 5.3, 5.3, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 6.1, 6.3, 7.0, 7.0, 7.0, 7.1, 7.1, 7.1, 7.1, 7.1, 7.8, 7.8, 7.8, 7.8, 7.8, 7.8
+
+- **Average:** 6.11
+- **Minimum:** 4.7 (CVE-2023-52505)
+- **Maximum:** 7.8 (6 CVEs)
+- **Median:** 5.5
+
+## 2. Severity Distribution
+
+| Severity | Count | Percentage |
+|----------|-------|------------|
+| **HIGH** | 12 | 30.0% |
+| **MEDIUM** | 28 | 70.0% |
+| **LOW** | 0 | 0% |
+| **CRITICAL** | 0 | 0% |
+
+The dataset matches the summary: 12 HIGH, 28 MEDIUM severity vulnerabilities.
+
+## 3. CWE Analysis with Average CVSS Scores
+
+| CWE | Count | CVEs | Avg CVSS | Description |
+|-----|-------|------|----------|-------------|
+| **CWE-125** | 4 | 52501, 52504, 52507, 52519 | **7.10** | Out-of-bounds Read |
+| **CWE-416** | 7 | 47078, 47081, 48628, 52503, 52509, 52510, 52515 | **7.00** | Use After Free |
+| **CWE-672** | 1 | 47069 | **7.00** | Operation on Resource after Expiration |
+| **CWE-362** | 2 | 52502, 52517 | **6.65** | Race Condition |
+| **CWE-667** | 3 | 52505, 52516, 52524 | **6.00** | Improper Locking |
+| **CWE-787** | 2 | 52497, 48627 | **5.80** | Out-of-bounds Write |
+| **NVD-CWE-noinfo** | 6 | 47072, 47073, 52499, 52506, 52511, 52522 | **5.50** | Insufficient Info |
+| **CWE-476** | 6 | 47077, 47079, 52506, 52513, 52523 | **5.50** | NULL Pointer Dereference |
+| **CWE-369** | 1 | 47080 | **5.50** | Divide By Zero |
+| **CWE-770** | 1 | 52518 | **5.50** | Allocation w/o Limits |
+| **NVD-CWE-Other** | 2 | 52500, 52520 | **5.50** | Other |
+| **CWE-401** | 4 | 47070, 47071, 47074, 47075 | **5.45** | Memory Leak |
+
+**Highest Average Severity:** **CWE-125 (Out-of-bounds Read)** with 7.10
+
+## 4. Attack Vector Analysis
+
+| Attack Vector | Count | Percentage |
+|--------------|-------|------------|
+| **LOCAL** | 39 | 97.5% |
+| **NETWORK** | 1 | 2.5% |
+| **ADJACENT_NETWORK** | 0 | 0% |
+| **PHYSICAL** | 0 | 0% |
+
+**Key Finding:** 97.5% require local access, only 2.5% are network-accessible. This indicates most vulnerabilities require an attacker to already have some level of system access.
+
+## 5. Broadest Kernel Version Range Affected
+
+**CVE-2023-52522** (net: neigh_periodic_work race condition)
+- **Range:** Linux kernel 2.6.37 → 6.5.7
+- **Span:** ~14 years of kernel versions
+- **Impact:** Affects virtually all modern Linux distributions
+
+Other notably broad ranges:
+- **CVE-2023-52507:** 3.2 → 6.5.8
+- **CVE-2021-47078:** 4.8 → 5.13 (multiple branches)
+- **CVE-2023-52504:** 4.17 → 6.5.8
+
+## 6. Exploitability vs Impact Scores
+
+**Average Scores:**
+- **Exploitability:** 1.62 (median: 1.8)
+- **Impact:** 4.31 (median: 3.6)
+- **Impact/Exploitability Ratio:** 2.66:1
+
+**Analysis:** On average, the impact potential is 2.66x higher than exploitability. This suggests these vulnerabilities, while requiring local access (reducing exploitability), can cause significant damage once exploited (high availability/integrity/confidentiality impact).
+
+**Score Breakdown:**
+- Exploitability 1.0 (HIGH complexity): 2 CVEs (5%)
+- Exploitability 1.8 (LOW complexity, LOCAL): 37 CVEs (92.5%)
+- Exploitability 3.9 (NETWORK): 1 CVE (2.5%)
+
+## 7. Reference Tag Analysis
+
+**Reference Statistics (across 40 CVEs):**
+
+| Tag Type | CVE Count | Percentage | Total References |
+|----------|-----------|------------|------------------|
+| **Patch** | 40 | **100%** | 351 |
+| **Mailing List** | 2 | 5% | 2 |
+| **Vendor Advisory** | 0 | 0% | 0 |
+| **Third Party Advisory** | 0 | 0% | 0 |
+
+**Key Findings:**
+- **100% of CVEs have Patch references** - excellent patch availability
+- Average of **8.8 patch references per CVE** (multiple kernel version patches)
+- Only 2 CVEs reference mailing lists (CVE-2022-48627, CVE-2021-47070 - Debian LTS)
+- All patches link to kernel.org stable repository
+- References are duplicated for both source identifiers (416baaa9... and af854a3a...)
+
+**Reference Pattern:**
+Each CVE typically has 4-8 git.kernel.org patch commits, representing fixes for different stable kernel branches (e.g., 5.4.x, 5.10.x, 5.15.x, 6.1.x, 6.5.x, 6.6-rc).

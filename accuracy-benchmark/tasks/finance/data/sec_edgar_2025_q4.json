@@ -1,5 +1,5 @@
 {
-  "source": "SEC EDGAR Financial Statement Data Sets (2025 Q4)",
+  "source": "SEC EDGAR Financial Statement Data Sets (2025Q4)",
   "license": "US Government Public Domain",
   "url": "https://www.sec.gov/dera/data/financial-statement-data-sets",
   "description": "XBRL financial statement data from annual 10-K filings, joined across SUB/NUM/TAG/PRE tables",
@@ -848,15 +848,6 @@
           "statement_type": "Balance Sheet",
           "items": [
             {
-              "tag": "PreferredStockParOrStatedValuePerShare",
-              "label": "Preferred stock, par value (in dollars per share)",
-              "value": 0.0001,
-              "period_end": "20250930",
-              "quarters": 0,
-              "normal_balance": "",
-              "definition": "Face amount or stated value per share of preferred stock nonredeemable or redeemable solely at the option of the issuer."
-            },
-            {
               "tag": "CashAndCashEquivalentsAtCarryingValue",
               "label": "Cash and cash equivalents",
               "value": 17164000000.0,
@@ -864,6 +855,15 @@
               "quarters": 0,
               "normal_balance": "debit",
               "definition": "Amount of cash and cash equivalent. Cash includes, but is not limited to, currency on hand, demand deposit with financial institution, and account with general characteristic of demand deposit. Cash e..."
+            },
+            {
+              "tag": "PreferredStockParOrStatedValuePerShare",
+              "label": "Preferred stock, par value (in dollars per share)",
+              "value": 0.0001,
+              "period_end": "20250930",
+              "quarters": 0,
+              "normal_balance": "",
+              "definition": "Face amount or stated value per share of preferred stock nonredeemable or redeemable solely at the option of the issuer."
             },
             {
               "tag": "RestrictedCashAndCashEquivalentsU.S.LitigationEscrow",

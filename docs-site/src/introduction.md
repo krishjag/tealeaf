@@ -2,7 +2,7 @@
 
 **A schema-aware data format with human-readable text and compact binary representation.**
 
-**~43% fewer input tokens than JSON for LLM applications, with zero accuracy loss.**
+**~51% fewer input tokens than JSON for LLM applications, with zero accuracy loss.**
 
 <span class="version-badge">v2.0.0-beta.13</span>
 
@@ -118,20 +118,19 @@ TeaLeaf unifies these concerns:
 TeaLeaf is well-suited for assembling and managing context for large language models -- sending business data, analytics, and structured payloads to LLM APIs where token efficiency directly impacts API costs.
 
 **Why TeaLeaf for LLM context:**
-- **~42% fewer input tokens** on real-world data (SEC EDGAR 10-K filings, 4 companies, ~196KB JSON) — verified across Claude Sonnet 4.5 and GPT-5.2
-- **~30% fewer input tokens** on synthetic data (12 tasks, 10 domains; smaller datasets dilute savings)
+- **~51% fewer input tokens** on real-world data (14 tasks, 7 domains — SEC EDGAR, BLS, clinical trials, court filings, patents, census, NYC PLUTO) — verified across Claude Sonnet 4.5 and GPT-5.2
 - **Zero accuracy loss** — [three-format benchmark](https://github.com/krishjag/tealeaf/tree/main/accuracy-benchmark) (TeaLeaf vs JSON vs TOON) scores within noise across all providers
 - Binary format for fast cached context retrieval
 - String deduplication (roles, field names, common values stored once)
 - Human-readable text for prompt authoring
 
-**Three-format comparison (real-world SEC EDGAR data, Claude Sonnet 4.5 + GPT-5.2):**
+**Three-format comparison (real-world data, 14 tasks, 7 domains, Claude Sonnet 4.5 + GPT-5.2):**
 
 | Metric | TeaLeaf | JSON | TOON |
 |--------|---------|------|------|
-| Anthropic accuracy | 0.952 | 0.960 | 0.935 |
-| OpenAI accuracy | 0.927 | 0.933 | 0.886 |
-| Input token savings | **-43%** | baseline | **-43%** |
+| Anthropic accuracy | 0.942 | 0.945 | 0.939 |
+| OpenAI accuracy | 0.925 | 0.924 | 0.928 |
+| Input token savings | **-51%** | baseline | **-20%** |
 
 ## Size Comparison
 

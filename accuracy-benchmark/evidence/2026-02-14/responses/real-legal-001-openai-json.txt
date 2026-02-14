@@ -1,0 +1,121 @@
+## 1) Time from offense date to sentencing date (years & months)
+
+- **Offense date:** 2015-05-05 (both charges)
+- **Sentencing date:** 2020-02-24
+
+Elapsed time:
+- **4 years, 9 months** (approximately; exact is 4 years, 9 months, 19 days).
+
+---
+
+## 2) Sentence components by charge (prison, ES, total; concurrent/consecutive)
+
+### Charge 1 — Battery by Prisoners (Felony H) (940.20(1))  
+Disposition: Found Guilty at Jury Trial; Sentence date 2020-02-24  
+- **Prison (Initial Confinement):** 12 years  
+- **Extended Supervision (ES):** 3 years  
+- **Total confinement + ES:** **15 years**  
+- **Concurrency/Consecutivity:** **Consecutive** to “any other sentence currently serving.”
+
+### Charge 2 — Disorderly Conduct (Misd. B) (947.01(1))  
+Disposition: Found Guilty at Jury Trial; Sentence date 2020-02-24  
+- **Prison (Initial Confinement):** 1 year  
+- **Extended Supervision (ES):** 6 months  
+- **Total confinement + ES:** **1 year, 6 months**  
+- **Concurrency/Consecutivity:** **Concurrent with Count 1** (both IC and ES noted concurrent with Ct. 1).
+
+---
+
+## 3) Defense attorneys and duration on the case (months)
+
+The defendant had **3** defense attorneys listed.
+
+Method: months between **entered** date and **withdrawn** date (calendar-month based; rounded to nearest whole month for readability).
+
+1) **Leonie C. Dolch**  
+- Entered: 2016-03-15  
+- Withdrawn: 2016-07-07  
+- Duration: **~4 months**
+
+2) **Ronald Gabriel Benavides**  
+- Entered: 2016-07-07  
+- Withdrawn: 2020-03-12  
+- Duration: **~44 months**
+
+3) **Jennifer A. Lohr**  
+- Entered: 2020-05-20  
+- Withdrawn: 2025-10-02  
+- Duration: **~64 months**
+
+---
+
+## 4) Total docket entries per year (2016–2025) + most active year
+
+Counted by the docket entry `date` year.
+
+- **2016:** 31  
+- **2017:** 10  
+- **2018:** 19  
+- **2019:** 23  
+- **2020:** 22  
+- **2021:** 23  
+- **2022:** 28  
+- **2023:** 19  
+- **2024:** 7  
+- **2025:** 3  
+
+**Most activity:** **2016 (31 entries)**
+
+---
+
+## 5) Appeal-related docket entries (Court of Appeals / Supreme Court) and percentage
+
+Appeal-related = docket entries whose description or text references **Court of Appeals**, **Supreme Court**, **appeal**, **notice of appeal**, **remand**, **remittitur**, **transmittal of record**, **acknowledgment from appellate courts**, etc.
+
+- **Appeal-related entries:** **33**
+- **Total docket entries (all years):** **185**
+- **Percentage appeal-related:** **33 / 185 ≈ 17.8%**
+
+---
+
+## 6) Receivables calculations (due, paid, balance, % collected)
+
+Receivables show one item:
+
+- **Amount due:** 761.00  
+- **Paid:** 352.00  
+- **Balance due (remaining):** 0.00 (WCCA field shows balanceDue = 0.0)  
+- **Amount due vs. paid gap:** 761.00 − 352.00 = **409.00** (this corresponds to the listed `probAmt: 409.0`, suggesting that portion may be handled/converted differently than a remaining “balance due”)
+
+Collection percentage (based on amountDue vs paid):
+- **352.00 / 761.00 ≈ 46.3% collected**
+
+So, numerically:
+- **Total assessed/due:** **$761.00**
+- **Total paid:** **$352.00**
+- **Remaining balance shown by WCCA:** **$0.00**
+- **% collected (paid ÷ assessed):** **~46.3%**
+
+---
+
+## 7) Bond amount + bond-related docket entries (dates)
+
+**Bond set amount:** **$5,000 signature/recognizance bond** (“recog. bond with felony conds.”)
+
+Bond-related docket entries identified:
+
+1) **2016-02-11 — “Signature bond set”**  
+- Amount: **$5,000.00**  
+- Addl text: “with felony conds.”
+
+2) **2016-02-11 — “Hearing” (initial appearance narrative includes bond)**  
+- Narrative states: “$5,000 recog. bond with felony conds.”
+
+3) **2016-02-25 — “Signature bond signed”**  
+- Amount: **$5,000.00**  
+- Addl text: “and filed.”
+
+4) **2016-10-26 — “Arraignment” (bond continued)**  
+- Narrative ends: “Bond continued.”
+
+If you want, I can also (a) compute attorney durations in exact days, or (b) provide the list of the 33 appeal-related entries with their dates for auditability.

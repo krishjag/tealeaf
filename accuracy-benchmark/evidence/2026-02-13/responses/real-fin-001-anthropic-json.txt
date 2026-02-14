@@ -1,0 +1,67 @@
+# Financial Analysis of Four Companies
+
+## Individual Company Metrics
+
+### 1. **APPLE INC**
+- **Total Current Assets:** $147,957 million
+- **Total Current Liabilities:** $165,631 million
+- **Current Ratio:** 0.89
+- **Total Revenue:** $416,161 million
+- **Net Income:** $112,010 million
+- **Net Profit Margin:** 26.91%
+- **Operating Cash Flow:** $111,482 million
+
+### 2. **VISA INC.**
+- **Total Current Assets:** $37,766 million
+- **Total Current Liabilities:** $35,048 million
+- **Current Ratio:** 1.08
+- **Total Revenue:** $40,000 million
+- **Net Income:** $20,058 million
+- **Net Profit Margin:** 50.15%
+- **Operating Cash Flow:** $23,059 million
+
+### 3. **COSTCO WHOLESALE CORP**
+- **Total Current Assets:** $38,380 million
+- **Total Current Liabilities:** $37,108 million
+- **Current Ratio:** 1.03
+- **Total Revenue:** $275,235 million
+- **Net Income:** $8,099 million
+- **Net Profit Margin:** 2.94%
+- **Operating Cash Flow:** $13,335 million
+
+### 4. **QUALCOMM INC**
+- **Total Current Assets:** $25,754 million
+- **Total Current Liabilities:** $9,144 million
+- **Current Ratio:** 2.82
+- **Total Revenue:** $44,284 million
+- **Net Income:** $5,541 million
+- **Net Profit Margin:** 12.51%
+- **Operating Cash Flow:** $14,012 million
+
+---
+
+## Comparative Rankings
+
+### 6. **Companies Ranked by Current Ratio (Strongest Liquidity First):**
+1. **QUALCOMM** - 2.82 (Strongest)
+2. **VISA** - 1.08
+3. **COSTCO** - 1.03
+4. **APPLE** - 0.89
+
+### 7. **Companies Ranked by Net Profit Margin:**
+1. **VISA** - 50.15% (Highest profitability)
+2. **APPLE** - 26.91%
+3. **QUALCOMM** - 12.51%
+4. **COSTCO** - 2.94%
+
+### 8. **Highest Operating Cash Flow:**
+**APPLE INC** - $111,482 million
+
+---
+
+## Key Insights
+
+- **QUALCOMM** has the strongest liquidity position with a current ratio of 2.82, indicating robust ability to cover short-term obligations
+- **VISA** is remarkably profitable with a 50% net profit margin, reflecting its asset-light, high-margin business model
+- **APPLE** generates by far the most operating cash flow ($111.5 billion), nearly 5x the next company, demonstrating massive operational scale
+- **COSTCO** operates on the thinnest margins (2.94%), typical of the wholesale retail model that relies on high volume and membership fees

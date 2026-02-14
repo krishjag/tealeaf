@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "description": "Real-world data benchmark task definitions (SEC EDGAR 10-K filings)",
+  "version": "1.6",
+  "description": "Real-world data benchmark task definitions (SEC EDGAR 10-K filings, CDC PLACES health indicators, BLS JOLTS labor turnover / HR, WCCA court cases, NVD CVE vulnerabilities, USDA branded food products, NYC PLUTO property data)",
   "tasks": [
     {
       "id": "FIN-001",
@@ -8,6 +8,7 @@
       "complexity": "complex",
       "output_type": "calculation",
       "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "prompt_template": "You are a financial analyst reviewing annual 10-K filings from SEC EDGAR.\nThe data contains balance sheet, income statement, cash flow, and other financial statement items for multiple public companies.\n\n{data}\n\nFor each company in the dataset:\n1. Calculate total current assets and total current liabilities from the Balance Sheet\n2. Compute the current ratio (current assets / current liabilities)\n3. Identify total revenue and net income from the Income Statement\n4. Calculate the net profit margin (net income / revenue)\n5. Extract operating cash flow from Cash Flows\n\nThen compare across all companies:\n6. Rank companies by current ratio (strongest liquidity first)\n7. Rank companies by net profit margin\n8. Which company has the highest operating cash flow?",
       "data_file": "finance/data/sec_edgar_2025_q4.json",
       "expected_elements": [
@@ -24,6 +25,7 @@
       "complexity": "complex",
       "output_type": "analysis",
       "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "prompt_template": "You are a credit analyst evaluating the financial health of public companies using their SEC EDGAR 10-K filing data.\n\n{data}\n\nFor each company:\n1. From the Balance Sheet, compute total debt (short-term + long-term borrowings) and total stockholders' equity\n2. Calculate the debt-to-equity ratio\n3. From Cash Flows, identify cash from operations, investing, and financing activities\n4. Determine free cash flow (operating cash flow minus capital expenditures)\n5. From the Income Statement, find interest expense and compute the interest coverage ratio (operating income / interest expense)\n\nSummarize:\n6. Which company has the strongest balance sheet (lowest leverage)?\n7. Which company generates the most free cash flow?\n8. Flag any companies with concerning debt levels or negative free cash flow",
       "data_file": "finance/data/sec_edgar_2025_q4.json",
       "expected_elements": [
@@ -31,6 +33,233 @@
         {"element_type": "metric", "description": "Free cash flow calculation", "required": true},
         {"element_type": "analysis", "description": "Balance sheet strength ranking", "required": true},
         {"element_type": "analysis", "description": "Risk flags for concerning debt levels", "required": false}
+      ]
+    },
+    {
+      "id": "HEALTH-001",
+      "category": "healthcare",
+      "complexity": "complex",
+      "output_type": "analysis",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are a public health analyst reviewing county-level health indicators from the CDC PLACES dataset (Behavioral Risk Factor Surveillance System).\nThe data contains crude prevalence estimates for 33 health measures across 10 Washington State counties.\n\n{data}\n\nAnalyze the data:\n1. For each county, identify the top 3 most prevalent health outcomes (category HLTHOUT) and their values with confidence intervals\n2. Which county has the highest obesity rate (OBESITY)? The lowest?\n3. Compare diabetes prevalence (DIABETES) across all 10 counties and rank from highest to lowest\n4. For King County (most urban) vs Ferry County (most rural), compare rates for: smoking (CSMOKING), obesity (OBESITY), depression (DEPRESSION), and health insurance access (ACCESS2)\n5. Which health risk behavior (category RISKBEH) shows the widest disparity between the highest and lowest county?\n6. Identify any counties where more than 3 health outcomes exceed the 10-county average by 5+ percentage points",
+      "data_file": "healthcare/data/places_wa_health_2023.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "Top 3 health outcomes per county with values", "required": true, "validation_pattern": "\\d+\\.\\d+%?"},
+        {"element_type": "metric", "description": "Obesity rate comparison (highest/lowest county)", "required": true},
+        {"element_type": "metric", "description": "Diabetes prevalence ranking across all counties", "required": true},
+        {"element_type": "analysis", "description": "Urban vs rural health comparison (King vs Ferry)", "required": true},
+        {"element_type": "analysis", "description": "Widest disparity health risk behavior", "required": true},
+        {"element_type": "analysis", "description": "Counties with outlier health outcomes", "required": false}
+      ]
+    },
+    {
+      "id": "HEALTH-002",
+      "category": "healthcare",
+      "complexity": "complex",
+      "output_type": "calculation",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are an epidemiologist analyzing population health data from the CDC PLACES dataset for Washington State counties.\n\n{data}\n\nPerform the following calculations and analysis:\n1. Using population and adult_population from each county, calculate the percentage of residents who are adults (18+)\n2. For each county, compute a composite \"chronic disease burden\" score: average the prevalence values for ARTHRITIS, BPHIGH, DIABETES, CHD, COPD, and STROKE\n3. Rank all 10 counties by their chronic disease burden score\n4. For disability measures (category DISABLT), calculate the average disability prevalence per county and identify which county has the highest disability burden\n5. Compare preventive service utilization (category PREVENT): which county has the highest dental visit rate (DENTAL)? The highest mammography rate (MAMMOUSE)? The highest cholesterol screening rate (CHOLSCREEN)?\n6. Calculate the population-weighted average for obesity (OBESITY) across all 10 counties (weight by adult_population)\n7. For each category, identify the single measure with the highest overall average prevalence across all counties",
+      "data_file": "healthcare/data/places_wa_health_2023.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "Adult percentage per county", "required": true, "validation_pattern": "\\d+\\.?\\d*%"},
+        {"element_type": "metric", "description": "Chronic disease burden score per county", "required": true, "validation_pattern": "\\d+\\.\\d+"},
+        {"element_type": "metric", "description": "Chronic disease burden ranking", "required": true},
+        {"element_type": "metric", "description": "Disability burden per county", "required": true},
+        {"element_type": "metric", "description": "Preventive service leaders (dental, mammography, cholesterol)", "required": true},
+        {"element_type": "metric", "description": "Population-weighted obesity average", "required": true, "validation_pattern": "\\d+\\.\\d+%?"},
+        {"element_type": "analysis", "description": "Highest-prevalence measure per category", "required": true}
+      ]
+    },
+    {
+      "id": "HR-001",
+      "category": "hr",
+      "complexity": "complex",
+      "output_type": "calculation",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are a labor economist analyzing the BLS Job Openings and Labor Turnover Survey (JOLTS) data.\nThe data contains monthly seasonally adjusted job openings, hires, and separations for 12 US industries in 2025.\nLevels are in thousands; rates are percent of employment.\n\n{data}\n\nPerform the following calculations and analysis:\n1. For each industry, calculate the average monthly job openings level and hires level for the full year\n2. Compute the job openings-to-hires ratio (average JO level / average HI level) for each industry. Which industry has the highest ratio (hardest to fill positions)?\n3. Calculate the quit rate minus the layoff rate (QU rate - LD rate) for each industry, averaged over the year. This measures voluntary vs involuntary turnover balance. Rank industries from highest to lowest\n4. For Total nonfarm, compute the month-over-month change in job openings level for each month. In which month was the largest increase? The largest decrease?\n5. Calculate total separations as the sum of quits + layoffs + other separations (using levels) for each industry. Verify this matches the reported TS level within rounding\n6. Which industry has the highest average quit rate? Which has the highest average layoff rate?\n7. Compare the private sector (Total private) to Government: which has higher hire rates, quit rates, and layoff rates on average?",
+      "data_file": "hr/data/jolts_2025.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "Average job openings and hires per industry", "required": true, "validation_pattern": "\\d+\\.?\\d*"},
+        {"element_type": "metric", "description": "Job openings-to-hires ratio per industry", "required": true, "validation_pattern": "\\d+\\.\\d+"},
+        {"element_type": "metric", "description": "Quit rate minus layoff rate per industry", "required": true},
+        {"element_type": "metric", "description": "Month-over-month job openings changes", "required": true},
+        {"element_type": "metric", "description": "Total separations verification (QU+LD+OS vs TS)", "required": true},
+        {"element_type": "analysis", "description": "Highest quit rate and layoff rate industries", "required": true},
+        {"element_type": "analysis", "description": "Private sector vs Government comparison", "required": true}
+      ]
+    },
+    {
+      "id": "HR-002",
+      "category": "hr",
+      "complexity": "complex",
+      "output_type": "analysis",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are a workforce analyst studying labor market dynamics using BLS JOLTS data.\nThe data contains monthly seasonally adjusted job openings, hires, and separations for 12 US industries in 2025.\nLevels are in thousands; rates are percent of employment.\n\n{data}\n\nAnalyze the following:\n1. Identify the 3 industries with the highest average job openings rate (JO rate) and the 3 with the lowest. What does this suggest about labor demand across sectors?\n2. For each industry, calculate labor market churn: (hires level + total separations level) / 2, averaged over the year. Rank industries by churn from highest to lowest\n3. Compute the net hiring rate for each industry: average hire rate minus average total separation rate. Which industries are growing (positive) and which are shrinking (negative)?\n4. For Leisure and hospitality vs Professional and business services, compare all 6 metrics (JO, HI, TS, QU, LD, OS rates) averaged over 2025. What structural differences in workforce dynamics do you observe?\n5. Examine seasonality: for Construction, which month has the highest hires level and which has the lowest? What is the range (max - min)?\n6. Calculate what percentage of total separations are quits vs layoffs vs other, for each industry (use levels). Which industry has the highest quit share? Which has the highest layoff share?\n7. For Total nonfarm, what is the ratio of unemployed persons implied by job openings? (This is related to the JO level — if there are X thousand openings and the unemployment rate suggests Y thousand unemployed, the ratio indicates labor market tightness)",
+      "data_file": "hr/data/jolts_2025.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "Top 3 and bottom 3 industries by job openings rate", "required": true},
+        {"element_type": "metric", "description": "Labor market churn ranking by industry", "required": true, "validation_pattern": "\\d+\\.?\\d*"},
+        {"element_type": "metric", "description": "Net hiring rate per industry (growth vs shrinkage)", "required": true},
+        {"element_type": "analysis", "description": "Leisure/hospitality vs Professional services structural comparison", "required": true},
+        {"element_type": "analysis", "description": "Construction hiring seasonality pattern", "required": true},
+        {"element_type": "metric", "description": "Separation composition (quit/layoff/other share) per industry", "required": true, "validation_pattern": "\\d+\\.?\\d*%"},
+        {"element_type": "analysis", "description": "Labor market tightness assessment", "required": false}
+      ]
+    },
+    {
+      "id": "LEGAL-001",
+      "category": "legal",
+      "complexity": "complex",
+      "output_type": "calculation",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are a legal analyst reviewing Wisconsin Circuit Court case data from the WCCA system.\nThe data contains a criminal case with charges, sentencing, docket entries, defendant information, and financial receivables.\n\n{data}\n\nPerform the following calculations and analysis:\n1. Calculate the total time from offense date to sentencing date. How many years and months elapsed?\n2. For each charge, extract the sentence components: prison time and extended supervision time. What is the total combined incarceration (prison + ES) for each charge? Are the sentences concurrent or consecutive?\n3. How many defense attorneys represented the defendant? Calculate the duration (in months) each attorney was on the case\n4. Count the total docket entries per year (2016-2025). Which year had the most activity?\n5. How many docket entries are related to appeals (Court of Appeals or Supreme Court references)? What percentage of total docket entries are appeal-related?\n6. From the receivables, calculate: total amount due, total paid, remaining balance, and what percentage has been collected\n7. The bond was set at what amount? Identify the bond-related docket entries and their dates",
+      "data_file": "legal/data/wcca_cases.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "Time from offense to sentencing", "required": true},
+        {"element_type": "metric", "description": "Sentence components per charge (prison + ES)", "required": true},
+        {"element_type": "metric", "description": "Attorney duration in months", "required": true},
+        {"element_type": "metric", "description": "Docket entries per year count", "required": true, "validation_pattern": "\\d+"},
+        {"element_type": "metric", "description": "Appeal-related docket entry count and percentage", "required": true},
+        {"element_type": "metric", "description": "Receivables financial summary", "required": true, "validation_pattern": "\\$?\\d+"},
+        {"element_type": "metric", "description": "Bond amount and dates", "required": true}
+      ]
+    },
+    {
+      "id": "LEGAL-002",
+      "category": "legal",
+      "complexity": "complex",
+      "output_type": "analysis",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are a criminal justice researcher analyzing Wisconsin Circuit Court case data.\nThe data contains a criminal felony case with detailed charge history, sentencing structures, docket entries spanning nearly a decade, and appellate proceedings.\n\n{data}\n\nAnalyze the following:\n1. Trace the charge progression: compare the original charges in chargeHistory with the final charges. Were any charges added, dropped, or modified? What charge modifiers (enhancers) were applied and what statutes do they reference?\n2. Analyze the case timeline: identify the major phases (filing, preliminary hearing, trial, sentencing, post-conviction motions, appeals). What were the key dates and how long did each phase take?\n3. The case went through multiple levels of appellate review. Identify all Court of Appeals and Supreme Court docket entries chronologically. What was the appellate trajectory and outcome?\n4. Examine the sentencing structure for both charges. How do the supervision conditions differ between Charge 1 and Charge 2? What specific conditions were imposed (costs, DNA, no-contact, etc.)?\n5. Analyze the habeas corpus activity: how many writs of habeas corpus were filed? What does this pattern suggest about post-conviction litigation?\n6. Review the pattern of motions filed throughout the case. What types of motions appear most frequently? During which phase of the case was motion activity highest?\n7. Based on all available data, provide a comprehensive timeline summary of this case from offense (2015) through final disposition, highlighting the most significant procedural events",
+      "data_file": "legal/data/wcca_cases.json",
+      "expected_elements": [
+        {"element_type": "analysis", "description": "Charge progression from original to final", "required": true},
+        {"element_type": "analysis", "description": "Case timeline with major phases and durations", "required": true},
+        {"element_type": "analysis", "description": "Appellate trajectory (Court of Appeals + Supreme Court)", "required": true},
+        {"element_type": "analysis", "description": "Sentencing structure comparison between charges", "required": true},
+        {"element_type": "metric", "description": "Habeas corpus filing count and pattern", "required": true, "validation_pattern": "\\d+"},
+        {"element_type": "analysis", "description": "Motion filing patterns by case phase", "required": true},
+        {"element_type": "analysis", "description": "Comprehensive case timeline summary", "required": true}
+      ]
+    },
+    {
+      "id": "TECH-001",
+      "category": "technology",
+      "complexity": "complex",
+      "output_type": "calculation",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are a cybersecurity analyst reviewing vulnerability data from the NIST National Vulnerability Database (NVD).\nThe data contains 40 CVE records for Linux kernel vulnerabilities published in March 2024.\nEach vulnerability has nested structure: cve.metrics.cvssMetricV31[].cvssData for CVSS v3.1 scores, cve.weaknesses[].description[] for CWE classifications, cve.configurations[].nodes[].cpeMatch[] for affected product version ranges (CPE), and cve.references[] for external links with tags.\n\n{data}\n\nPerform the following calculations and analysis:\n1. Calculate the average CVSS v3.1 base score across all CVEs. What are the min, max, and median scores?\n2. Group CVEs by baseSeverity (CRITICAL, HIGH, MEDIUM, LOW). How many in each category and what percentage of the total?\n3. For each unique CWE type, count the number of CVEs and calculate the average CVSS base score. Which CWE has the highest average severity?\n4. Analyze the CVSS attack vectors: count CVEs by attackVector (NETWORK, LOCAL, ADJACENT_NETWORK, PHYSICAL). What percentage require local access vs network access?\n5. For each CVE with affected products, extract the version ranges (versionStartIncluding, versionEndExcluding). Which CVE affects the broadest range of kernel versions?\n6. Calculate the average exploitabilityScore and impactScore separately. What is the ratio of impact to exploitability across the dataset?\n7. Count references by tag type (Patch, Vendor Advisory, Mailing List, etc.) across all CVEs. What percentage of CVEs have a Patch reference?",
+      "data_file": "technology/data/nvd_cves_linux_kernel_2024-03-01_to_2024-03-31.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "CVSS base score statistics (avg, min, max, median)", "required": true, "validation_pattern": "\\d+\\.\\d+"},
+        {"element_type": "metric", "description": "Severity distribution counts and percentages", "required": true, "validation_pattern": "\\d+"},
+        {"element_type": "metric", "description": "CWE occurrence counts with average CVSS per CWE", "required": true},
+        {"element_type": "metric", "description": "Attack vector distribution counts and percentages", "required": true},
+        {"element_type": "metric", "description": "Broadest affected version range identification", "required": true},
+        {"element_type": "metric", "description": "Exploitability vs impact score ratio", "required": true, "validation_pattern": "\\d+\\.\\d+"},
+        {"element_type": "metric", "description": "Reference tag type distribution and patch coverage", "required": true}
+      ]
+    },
+    {
+      "id": "TECH-002",
+      "category": "technology",
+      "complexity": "complex",
+      "output_type": "analysis",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are a security researcher analyzing Linux kernel vulnerability trends using NVD data.\nThe data contains 40 CVE records published in March 2024 in native NVD format.\nKey paths: cve.metrics.cvssMetricV31[].cvssData for CVSS scoring vectors, cve.weaknesses[] for CWE weakness classifications, cve.configurations[].nodes[].cpeMatch[] for affected version ranges (CPE URIs), and cve.references[] with categorized tags.\n\n{data}\n\nAnalyze the following:\n1. Examine the CWE (Common Weakness Enumeration) distribution. What are the top 3 most common vulnerability types? For each, explain what the weakness category means and its security implications for the Linux kernel\n2. Analyze the CVSS vector components across all CVEs: compare the distribution of privilegesRequired (NONE vs LOW vs HIGH), userInteraction (NONE vs REQUIRED), and scope (CHANGED vs UNCHANGED). What does this tell us about the typical exploitation requirements?\n3. Group CVEs by their publication week within March 2024. Was vulnerability disclosure evenly distributed or clustered? Identify any weeks with notably high or low disclosure counts\n4. For CVEs scored HIGH (7.0-8.9), compare their attack patterns to those scored MEDIUM (4.0-6.9). Do HIGH-severity CVEs tend to have different attack vectors, complexity levels, or impact profiles?\n5. Analyze the affected product version ranges. Are most vulnerabilities confined to recent kernel versions or do they affect long-standing code (wide version ranges)? Identify any CVEs that affect versions spanning multiple major kernel releases\n6. Cross-reference CWE types with CVSS impact metrics (confidentialityImpact, integrityImpact, availabilityImpact). Do certain weakness types consistently lead to specific impact patterns (e.g., do use-after-free bugs primarily cause availability impact)?\n7. Based on the reference tags, assess patch availability: what proportion of vulnerabilities have patches available? For those with patches, do they tend to be higher or lower severity than unpatched ones?",
+      "data_file": "technology/data/nvd_cves_linux_kernel_2024-03-01_to_2024-03-31.json",
+      "expected_elements": [
+        {"element_type": "analysis", "description": "Top 3 CWE types with security implications", "required": true},
+        {"element_type": "analysis", "description": "CVSS vector component distribution analysis", "required": true},
+        {"element_type": "metric", "description": "Weekly CVE disclosure counts within March 2024", "required": true, "validation_pattern": "\\d+"},
+        {"element_type": "analysis", "description": "HIGH vs MEDIUM severity attack pattern comparison", "required": true},
+        {"element_type": "analysis", "description": "Version range breadth analysis", "required": true},
+        {"element_type": "analysis", "description": "CWE-to-impact cross-reference patterns", "required": true},
+        {"element_type": "analysis", "description": "Patch availability assessment and severity correlation", "required": true}
+      ]
+    },
+    {
+      "id": "RETAIL-001",
+      "category": "retail",
+      "complexity": "complex",
+      "output_type": "calculation",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are a food scientist and nutrition analyst reviewing branded food product data from the USDA FoodData Central database.\nThe data contains 25 branded breakfast cereal products with detailed nutritional profiles.\nEach food has a foodNutrients array where each entry contains: nutrientId, nutrientName, nutrientNumber, unitName, value (per 100g), derivationCode, derivationDescription, derivationId, foodNutrientSourceId, foodNutrientSourceCode, foodNutrientSourceDescription, rank, indentLevel, foodNutrientId, and optionally percentDailyValue.\n\n{data}\n\nPerform the following calculations and analysis:\n1. For each product, extract calories (Energy, KCAL), protein (g), total fat (g), carbohydrates (g), total sugars (g), and fiber (g) per 100g. Create a nutrition summary table\n2. Calculate the sugar-to-fiber ratio for each product. Which product has the best (lowest) ratio? Which has the worst (highest)?\n3. Rank all 25 products by protein content per 100g from highest to lowest. What is the range (max - min)?\n4. For micronutrients, compare iron (Fe) and calcium (Ca) content across all products. Which product is the most iron-fortified? Which has the most calcium?\n5. Calculate the average sodium content across all products. Which products exceed 500mg sodium per 100g? Which are below 200mg?\n6. Compare products by brand owner: for General Mills products vs non-General Mills products, calculate the average calories, sugar, fiber, and protein per 100g\n7. How many products have a percentDailyValue for Vitamin D? For those that do, what is the range of values? Which product provides the highest Vitamin D percentage?",
+      "data_file": "retail/data/usda_branded_breakfast_cereal.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "Macronutrient summary per product (cal, protein, fat, carb, sugar, fiber)", "required": true, "validation_pattern": "\\d+\\.?\\d*"},
+        {"element_type": "metric", "description": "Sugar-to-fiber ratio per product with best/worst", "required": true, "validation_pattern": "\\d+\\.\\d+"},
+        {"element_type": "metric", "description": "Protein ranking across all products", "required": true},
+        {"element_type": "metric", "description": "Iron and calcium content comparison", "required": true},
+        {"element_type": "metric", "description": "Sodium content average and threshold analysis", "required": true, "validation_pattern": "\\d+"},
+        {"element_type": "analysis", "description": "General Mills vs non-General Mills nutritional comparison", "required": true},
+        {"element_type": "metric", "description": "Vitamin D percentDailyValue availability and range", "required": true}
+      ]
+    },
+    {
+      "id": "RETAIL-002",
+      "category": "retail",
+      "complexity": "complex",
+      "output_type": "analysis",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are a consumer products analyst evaluating branded breakfast cereals using USDA FoodData Central nutritional data.\nThe data contains 25 branded products with full nutrient profiles from the USDA database.\nKey structure: foods[].foodNutrients[] with nutrientName, value (per 100g), unitName, derivationCode (LCCS=calculated from serving, LCCD=calculated from daily value percentage, LCSA=label statement analytical), percentDailyValue, and indentLevel (nutrient hierarchy: 1=primary, 2=macro, 3=sub-component, 4=detail).\n\n{data}\n\nAnalyze the following:\n1. Examine the nutrient derivation methods: group nutrients by derivationCode (LCCS, LCCD, LCSA, etc.) and count how many nutrient entries use each method. What does this tell us about how manufacturers report nutritional data?\n2. Compare the nutrient profile completeness across products: how many distinct nutrients does each product report? Which products have the most complete profiles (most nutrients) and which are sparse? Is there a correlation between brand and profile completeness?\n3. Analyze the indentLevel hierarchy: which nutrients appear at each level (1, 2, 3, 4)? Map out the nutrient hierarchy tree that the indentLevel implies (e.g., Carbohydrate at level 2, Total Sugars at level 3, Added Sugars at level 4)\n4. For products with duplicate nutrient entries (same nutrientId appearing multiple times), identify which products have duplicates and explain why (different derivation methods produce different values for the same nutrient). How do the values differ?\n5. Assess the \"healthiness\" of each product using a composite score: (+1 point per g of protein, +2 points per g of fiber, -1 point per g of sugar, -0.5 points per 100mg of sodium, all per 100g). Rank all products from healthiest to least healthy\n6. Analyze the ingredient lists: which products list sugar (or sugar variants like corn syrup, fructose, dextrose) as one of the first 3 ingredients? Compare the actual sugar content (from foodNutrients) between products with early-listed sugar vs those without\n7. Cross-reference serving sizes (servingSize, servingSizeUnit, householdServingFullText) with nutrient values: since nutrients are per 100g, calculate the actual nutrient amounts per serving for calories, sugar, and sodium for each product. Which product has the most calories per household serving?",
+      "data_file": "retail/data/usda_branded_breakfast_cereal.json",
+      "expected_elements": [
+        {"element_type": "analysis", "description": "Nutrient derivation method distribution and interpretation", "required": true},
+        {"element_type": "metric", "description": "Nutrient profile completeness per product", "required": true, "validation_pattern": "\\d+"},
+        {"element_type": "analysis", "description": "IndentLevel nutrient hierarchy mapping", "required": true},
+        {"element_type": "analysis", "description": "Duplicate nutrient entry identification and explanation", "required": true},
+        {"element_type": "metric", "description": "Composite healthiness score and ranking", "required": true, "validation_pattern": "-?\\d+\\.?\\d*"},
+        {"element_type": "analysis", "description": "Ingredient list sugar position vs actual sugar content", "required": true},
+        {"element_type": "metric", "description": "Per-serving nutrient calculations (calories, sugar, sodium)", "required": true}
+      ]
+    },
+    {
+      "id": "RE-001",
+      "category": "real_estate",
+      "complexity": "complex",
+      "output_type": "calculation",
+      "max_tokens": 4096,
+      "include_format_hint": {"tl": true, "json": false, "toon": false},
+      "prompt_template": "You are a real estate analyst reviewing NYC property tax lot data from the PLUTO dataset.\nThe data contains 30 Manhattan tax lots — the highest assessed-value properties in the borough.\nEach record has ~76 fields: geographic identifiers (borough, block, lot, bbl, address, zipcode, latitude, longitude), zoning (zonedist1, bldgclass, landuse), building dimensions (bldgarea, lotarea, numfloors, bldgfront, bldgdepth), area breakdowns (comarea, resarea, officearea, retailarea, factryarea, garagearea, otherarea), unit counts (unitsres, unitstotal), assessed values (assessland, assesstot, exempttot), floor area ratios (builtfar, residfar, commfar, facilfar), and administrative districts (cd, council, schooldist, policeprct, firecomp).\nRefer to the landUseCodeReference for land use code meanings (e.g., 5=Commercial & Office).\n\n{data}\n\nPerform the following calculations and analysis:\n1. Calculate the total assessed value (assesstot) across all 30 properties. What is the average, median, min, and max assessed value?\n2. For each property, compute the building efficiency ratio: bldgarea / lotarea. Which property has the highest ratio (most intensely built)? Which has the lowest?\n3. Calculate the assessed value per square foot of building area (assesstot / bldgarea) for each property. Rank the top 5 most valuable per sqft and bottom 5 least valuable per sqft\n4. Group properties by land use code (use the landUseCodeReference). For each land use type, calculate: count, average assessed value, average building area, and average numfloors\n5. Compute the FAR utilization percentage for each property: builtfar / max(commfar, residfar, facilfar) * 100. Which properties are most underbuilt (lowest utilization)? Which are near or over their zoning limit?\n6. Calculate the total tax-exempt value (exempttot) across all properties. What percentage of the total assessed value is exempt? Which properties have the highest exemption amounts?\n7. For properties with residential units (unitsres > 0), calculate the residential area per unit (resarea / unitsres) and the assessed value per residential unit (assesstot / unitsres). Compare these metrics across the residential properties",
+      "data_file": "real_estate/data/pluto_manhattan.json",
+      "expected_elements": [
+        {"element_type": "metric", "description": "Total assessed value with statistics (avg, median, min, max)", "required": true, "validation_pattern": "\\$?\\d+"},
+        {"element_type": "metric", "description": "Building efficiency ratio (bldgarea/lotarea) per property", "required": true, "validation_pattern": "\\d+\\.\\d+"},
+        {"element_type": "metric", "description": "Assessed value per sqft ranking (top 5 and bottom 5)", "required": true},
+        {"element_type": "metric", "description": "Land use group statistics (count, avg value, avg area, avg floors)", "required": true},
+        {"element_type": "metric", "description": "FAR utilization percentage per property", "required": true, "validation_pattern": "\\d+\\.?\\d*%"},
+        {"element_type": "metric", "description": "Tax exemption analysis (total exempt, percentage of assessed)", "required": true},
+        {"element_type": "metric", "description": "Residential metrics (area per unit, value per unit)", "required": true}
+      ]
+    },
+    {
+      "id": "RE-002",
+      "category": "real_estate",
+      "complexity": "complex",
+      "output_type": "analysis",
+      "max_tokens": 8192,
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
+      "prompt_template": "You are an urban planning analyst studying Manhattan's highest-value properties using NYC PLUTO data.\nThe data contains 30 tax lots ordered by assessed value, with ~76 fields per record covering zoning, building characteristics, area breakdowns, ownership, assessment values, and geographic coordinates.\nKey fields: landuse (1-11, see landUseCodeReference), bldgclass (2-char building classification), zonedist1 (zoning district like C6-4, M1-6, R10), builtfar/residfar/commfar/facilfar (floor area ratios), yearbuilt, numfloors, and various area breakdowns (comarea, resarea, officearea, retailarea).\n\n{data}\n\nAnalyze the following:\n1. Examine the zoning district distribution (zonedist1): which zoning districts appear most frequently among these high-value properties? What does the zoning tell us about what types of development are permitted? Identify any properties in manufacturing (M) zones vs commercial (C) zones vs residential (R) zones\n2. Analyze the building age profile: group properties by decade built (1930s, 1940s, ..., 2010s). What is the relationship between year built and assessed value? Do newer buildings tend to have higher assessments? Calculate the average assessed value per decade\n3. Compare the area composition of each property: calculate what percentage of total building area is commercial (comarea), residential (resarea), office (officearea), retail (retailarea), and other uses. Which properties are most mixed-use (multiple area types > 0)? Which are single-purpose?\n4. Analyze the relationship between numfloors and building area. Calculate the average floor plate size (bldgarea / numfloors) for each property. Which buildings have the largest floor plates? Is there a pattern between floor plate size and building class?\n5. Identify the top 5 property owners (ownername) by total assessed value. How concentrated is ownership among these high-value Manhattan properties? Do any owners appear multiple times?\n6. Compare lot dimensions (lotfront, lotdepth, lotarea) with building dimensions (bldgfront, bldgdepth, bldgarea). Calculate the lot coverage ratio (building footprint implied by bldgfront*bldgdepth vs lotarea) for each property. Which properties have the most and least lot coverage?\n7. Using latitude and longitude, identify the geographic clustering of these properties. Which are in Midtown (lat ~40.75-40.76), Lower Manhattan (lat ~40.70-40.72), or other areas? Is there a relationship between location and property type or value?",
+      "data_file": "real_estate/data/pluto_manhattan.json",
+      "expected_elements": [
+        {"element_type": "analysis", "description": "Zoning district distribution and development implications", "required": true},
+        {"element_type": "analysis", "description": "Building age vs assessed value relationship by decade", "required": true},
+        {"element_type": "metric", "description": "Area composition percentages per property (commercial, residential, office, retail)", "required": true, "validation_pattern": "\\d+\\.?\\d*%"},
+        {"element_type": "metric", "description": "Average floor plate size per property with building class patterns", "required": true},
+        {"element_type": "analysis", "description": "Top 5 property owners by total assessed value and ownership concentration", "required": true},
+        {"element_type": "metric", "description": "Lot coverage ratio per property", "required": true, "validation_pattern": "\\d+\\.?\\d*"},
+        {"element_type": "analysis", "description": "Geographic clustering and location-value relationship", "required": true}
       ]
     }
   ]

@@ -1,0 +1,68 @@
+# Financial Analysis of 4 Public Companies (FY 2025)
+
+## Individual Company Metrics
+
+### 1. **APPLE INC**
+- **Current Assets:** $147,957M
+- **Current Liabilities:** $165,631M
+- **Current Ratio:** 0.89
+- **Total Revenue:** $416,161M
+- **Net Income:** $112,010M
+- **Net Profit Margin:** 26.91%
+- **Operating Cash Flow:** $111,482M
+
+### 2. **VISA INC**
+- **Current Assets:** $37,766M
+- **Current Liabilities:** $35,048M
+- **Current Ratio:** 1.08
+- **Total Revenue:** $40,000M
+- **Net Income:** $20,058M
+- **Net Profit Margin:** 50.15%
+- **Operating Cash Flow:** $23,059M
+
+### 3. **COSTCO WHOLESALE CORP**
+- **Current Assets:** $38,380M
+- **Current Liabilities:** $37,108M
+- **Current Ratio:** 1.03
+- **Total Revenue:** $275,235M
+- **Net Income:** $8,099M
+- **Net Profit Margin:** 2.94%
+- **Operating Cash Flow:** $13,335M
+
+### 4. **QUALCOMM INC**
+- **Current Assets:** $25,754M
+- **Current Liabilities:** $9,144M
+- **Current Ratio:** 2.82
+- **Total Revenue:** $44,284M
+- **Net Income:** $5,541M
+- **Net Profit Margin:** 12.51%
+- **Operating Cash Flow:** $14,012M
+
+---
+
+## Comparative Rankings
+
+### **6. Companies Ranked by Current Ratio (Liquidity Strength)**
+1. 🥇 **Qualcomm** - 2.82 (Strongest liquidity position)
+2. 🥈 **Visa** - 1.08
+3. 🥉 **Costco** - 1.03
+4. **Apple** - 0.89 (Below 1.0 indicates current liabilities exceed current assets)
+
+### **7. Companies Ranked by Net Profit Margin (Profitability)**
+1. 🥇 **Visa** - 50.15% (Exceptional profitability)
+2. 🥈 **Apple** - 26.91%
+3. 🥉 **Qualcomm** - 12.51%
+4. **Costco** - 2.94% (Typical for retail industry with high volume, low margins)
+
+### **8. Highest Operating Cash Flow**
+🏆 **APPLE INC** - $111.48 billion
+
+Apple generates nearly 5x more operating cash than the second-place company (Visa), reflecting its massive scale and operational efficiency.
+
+---
+
+## Key Insights
+- **Qualcomm** has the strongest balance sheet liquidity with nearly $3 in current assets for every $1 of current liabilities
+- **Visa** demonstrates remarkable profitability, converting 50 cents of every revenue dollar to net income
+- **Apple** dominates in absolute cash generation, though its current ratio below 1.0 reflects aggressive capital management through buybacks and dividends
+- **Costco's** low profit margin is characteristic of the warehouse retail model, compensated by high inventory turnover

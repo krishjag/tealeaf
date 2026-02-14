@@ -1,0 +1,64 @@
+## Per-company calculations (FY2025)
+
+_All $ amounts in USD._
+
+### 1) Apple Inc. (CIK 320193)
+- **Total current assets (Balance Sheet):** 147,957,000,000  
+- **Total current liabilities (Balance Sheet):** 165,631,000,000  
+- **Current ratio:** 147,957 / 165,631 = **0.89x**
+- **Total revenue (Income Statement):** 416,161,000,000  
+- **Net income (Income Statement):** 112,010,000,000  
+- **Net profit margin:** 112,010 / 416,161 = **26.9%**
+- **Operating cash flow (Cash Flows):** **111,482,000,000**
+
+---
+
+### 2) Visa Inc. (CIK 1403161)
+- **Total current assets:** 37,766,000,000  
+- **Total current liabilities:** 35,048,000,000  
+- **Current ratio:** 37,766 / 35,048 = **1.08x**
+- **Total revenue:** 40,000,000,000  
+- **Net income:** 20,058,000,000  
+- **Net profit margin:** 20,058 / 40,000 = **50.1%**
+- **Operating cash flow:** **23,059,000,000**
+
+---
+
+### 3) Costco Wholesale Corp. (CIK 909832)
+- **Total current assets:** 38,380,000,000  
+- **Total current liabilities:** 37,108,000,000  
+- **Current ratio:** 38,380 / 37,108 = **1.03x**
+- **Total revenue:** 275,235,000,000  
+- **Net income:** 8,099,000,000  
+- **Net profit margin:** 8,099 / 275,235 = **2.9%**
+- **Operating cash flow:** **13,335,000,000**
+
+---
+
+### 4) Qualcomm Inc. (CIK 804328)
+- **Total current assets:** 25,754,000,000  
+- **Total current liabilities:** 9,144,000,000  
+- **Current ratio:** 25,754 / 9,144 = **2.82x**
+- **Total revenue:** 44,284,000,000  
+- **Net income:** 5,541,000,000  
+- **Net profit margin:** 5,541 / 44,284 = **12.5%**
+- **Operating cash flow:** **14,012,000,000**
+
+---
+
+## Cross-company comparisons
+
+### 6) Rank by current ratio (strongest liquidity first)
+1. **Qualcomm — 2.82x**  
+2. **Visa — 1.08x**  
+3. **Costco — 1.03x**  
+4. **Apple — 0.89x**
+
+### 7) Rank by net profit margin
+1. **Visa — 50.1%**  
+2. **Apple — 26.9%**  
+3. **Qualcomm — 12.5%**  
+4. **Costco — 2.9%**
+
+### 8) Highest operating cash flow
+- **Apple** has the highest operating cash flow at **$111.482B**.

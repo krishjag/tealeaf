@@ -1,0 +1,67 @@
+# Financial Analysis of 4 Public Companies (FY 2025)
+
+## Individual Company Metrics
+
+### 1. **APPLE INC**
+- **Current Assets:** $147,957 million
+- **Current Liabilities:** $165,631 million
+- **Current Ratio:** 0.89
+- **Total Revenue:** $416,161 million
+- **Net Income:** $112,010 million
+- **Net Profit Margin:** 26.91%
+- **Operating Cash Flow:** $111,482 million
+
+### 2. **VISA INC.**
+- **Current Assets:** $37,766 million
+- **Current Liabilities:** $35,048 million
+- **Current Ratio:** 1.08
+- **Total Revenue:** $40,000 million
+- **Net Income:** $20,058 million
+- **Net Profit Margin:** 50.15%
+- **Operating Cash Flow:** $23,059 million
+
+### 3. **COSTCO WHOLESALE CORP**
+- **Current Assets:** $38,380 million
+- **Current Liabilities:** $37,108 million
+- **Current Ratio:** 1.03
+- **Total Revenue:** $275,235 million
+- **Net Income:** $8,099 million
+- **Net Profit Margin:** 2.94%
+- **Operating Cash Flow:** $13,335 million
+
+### 4. **QUALCOMM INC**
+- **Current Assets:** $25,754 million
+- **Current Liabilities:** $9,144 million
+- **Current Ratio:** 2.82
+- **Total Revenue:** $44,284 million
+- **Net Income:** $5,541 million
+- **Net Profit Margin:** 12.51%
+- **Operating Cash Flow:** $14,012 million
+
+---
+
+## Comparative Rankings
+
+### **Liquidity Ranking (Current Ratio - Strongest First):**
+1. 🥇 **QUALCOMM** - 2.82 (Excellent liquidity position)
+2. 🥈 **VISA** - 1.08 (Adequate liquidity)
+3. 🥉 **COSTCO** - 1.03 (Marginally adequate)
+4. **APPLE** - 0.89 (Below 1.0, potential concern)
+
+### **Profitability Ranking (Net Profit Margin):**
+1. 🥇 **VISA** - 50.15% (Exceptional profitability)
+2. 🥈 **APPLE** - 26.91% (Strong profitability)
+3. 🥉 **QUALCOMM** - 12.51% (Good profitability)
+4. **COSTCO** - 2.94% (Low margin, typical for retail)
+
+### **Highest Operating Cash Flow:**
+🏆 **APPLE INC** - $111.5 billion (nearly 5x larger than the next company)
+
+---
+
+## Key Insights
+
+- **VISA** demonstrates the highest profitability with an exceptional 50% net profit margin, reflecting its asset-light business model
+- **QUALCOMM** has the strongest liquidity position with nearly $3 in current assets for every $1 of current liabilities
+- **APPLE** generates massive operating cash flow despite having a current ratio below 1.0, suggesting efficient working capital management
+- **COSTCO** operates on razor-thin margins (typical for wholesale retail) but generates solid operating cash flow of $13.3 billion

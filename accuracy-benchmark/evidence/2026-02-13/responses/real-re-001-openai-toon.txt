@@ -1,0 +1,80 @@
+I can do all of these calculations, but I don’t yet have the full set of **30** property records in the message (the `properties[30]` list is truncated mid-way through block 783 lot 70). I can still:
+
+- compute items **(1)–(7)** accurately once you provide the remaining records, and  
+- in the meantime, compute **partial** results on the subset shown—but that would not match your request (“across all 30 properties”, rankings top/bottom 5, etc.).
+
+### What I need from you
+Please paste (or upload) the **remaining property records** so I have all 30, or provide the raw JSON/CSV export for the 30-row query.
+
+If you can’t paste everything, the minimum fields needed per record to complete your analysis are:
+
+- identifiers: `address` (or `bbl`)
+- size: `lotarea`, `bldgarea`, `numfloors`
+- values: `assesstot`, `exempttot`, `assessland` (optional)
+- zoning/FAR: `builtfar`, `commfar`, `residfar`, `facilfar`
+- use: `landuse`
+- residential: `unitsres`, `resarea`
+
+### Quick data-quality notes (based on the visible rows)
+A few PLUTO quirks that will affect interpretation (I’ll handle them consistently in the final output, but confirming your preference helps):
+
+1. **Division by zero / missing**: some lots can have `lotarea=0` or `bldgarea=0` in PLUTO (not in the visible sample, but possible).  
+   - Default handling: treat ratios as `null` and exclude from min/max rankings.
+2. **FAR utilization denominator**: you specified `max(commfar, residfar, facilfar)`.  
+   - If all three are 0 (possible for PARK or special cases), utilization is undefined; I’ll mark as `null`.
+3. **Condo lots (`lot=7501/7502`)**: these are condo “tax lots” that often represent an entire building’s assessment but can have quirks in `unitstotal`, etc. I’ll compute as given.
+
+---
+
+## Deliverable format (what you’ll get once all 30 rows are provided)
+
+### 1) Assessed value summary (all 30)
+- **Total assesstot**
+- **Average, median, min, max**
+- (Optionally) distribution by percentile / histogram bins
+
+### 2) Building efficiency ratio (bldgarea / lotarea)
+For each property:
+- `eff_ratio = bldgarea / lotarea`
+- Identify **highest** (most intensely built) and **lowest**
+
+### 3) Assessed value per building SF (assesstot / bldgarea)
+For each property:
+- `av_per_bldg_sf = assesstot / bldgarea`
+- Rank:
+  - **Top 5** most valuable per SF
+  - **Bottom 5** least valuable per SF  
+Including address, BBL, landuse, bldgclass, bldgarea, assesstot.
+
+### 4) Group by land use code
+Using your `landUseCodeReference`, for each land use type:
+- **count**
+- **avg assesstot**
+- **avg bldgarea**
+- **avg numfloors**
+
+### 5) FAR utilization %
+For each property:
+- `far_cap = max(commfar, residfar, facilfar)`
+- `util_pct = builtfar / far_cap * 100`
+- Identify:
+  - **Most underbuilt** (lowest utilization)
+  - **Near/over limit** (highest utilization; flag >100%)
+
+### 6) Exemptions
+- **Total exempttot**
+- **Exempt % of total assessed** = total_exempttot / total_assesstot
+- Properties with **highest exempttot** (top 5), plus whether fully exempt (exempttot == assesstot)
+
+### 7) Residential-only metrics (unitsres > 0)
+For each residential property:
+- `res_sf_per_unit = resarea / unitsres`
+- `assessed_per_res_unit = assesstot / unitsres`
+Compare across residential properties (table + min/max).
+
+---
+
+## If you want, I can start on the subset shown
+If you confirm you want **interim** results on just the visible records, tell me “run on the partial data shown” and I’ll compute everything possible on that subset (with clear labeling that it’s incomplete and rankings are only within the subset).
+
+Otherwise, paste the remaining ~ (30 - visible_count) records and I’ll return the full analysis in one consolidated set of tables.

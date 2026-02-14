@@ -1,9 +1,10 @@
 //! Task loading from TeaLeaf and JSON files
 
+use std::collections::HashMap;
 use std::path::Path;
 use serde::Deserialize;
 
-use super::{BenchmarkTask, DataSource, ExpectedElement, TaskMetadata};
+use super::{BenchmarkTask, DataSource, ExpectedElement, FormatHints, TaskMetadata};
 use super::categories::{Complexity, OutputType};
 
 /// Error type for task loading
@@ -91,6 +92,7 @@ fn parse_task_from_value(value: &tealeaf::Value, _index: usize) -> Result<Benchm
         data_context: Vec::new(),
         grading_rubric: obj.get("grading_rubric").and_then(|v| v.as_str()).map(String::from),
         data_source: DataSource::None,
+        include_format_hint: HashMap::new(),
     })
 }
 
@@ -134,6 +136,7 @@ fn parse_task_from_tuple(arr: &[tealeaf::Value]) -> Result<BenchmarkTask, String
         data_context: Vec::new(),
         grading_rubric: arr.get(4).and_then(|v| v.as_str()).map(String::from),
         data_source: DataSource::None,
+        include_format_hint: HashMap::new(),
     })
 }
 
@@ -315,6 +318,8 @@ struct TaskDefinition {
     expected_elements: Vec<ExpectedElement>,
     #[serde(default)]
     grading_rubric: Option<String>,
+    #[serde(default)]
+    include_format_hint: HashMap<String, bool>,
 }
 
 fn default_complexity() -> Complexity { Complexity::Moderate }
@@ -351,6 +356,7 @@ impl TaskDefinition {
             data_context: Vec::new(),
             grading_rubric: self.grading_rubric,
             data_source,
+            include_format_hint: self.include_format_hint,
         }
     }
 }
@@ -407,6 +413,21 @@ pub fn load_tasks_from_directory(dir: impl AsRef<Path>) -> Result<Vec<BenchmarkT
     }
 
     Ok(all_tasks)
+}
+
+/// Load format hints from a JSON file.
+///
+/// The file maps format keys (`"tl"`, `"json"`, `"toon"`) to hint text strings.
+/// Returns an empty map if the file doesn't exist.
+pub fn load_format_hints(path: impl AsRef<Path>) -> FormatHints {
+    let path = path.as_ref();
+    match std::fs::read_to_string(path) {
+        Ok(content) => serde_json::from_str(&content).unwrap_or_else(|e| {
+            tracing::warn!("Failed to parse format hints {:?}: {}", path, e);
+            HashMap::new()
+        }),
+        Err(_) => HashMap::new(),
+    }
 }
 
 #[cfg(test)]

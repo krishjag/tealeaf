@@ -1,0 +1,201 @@
+I can’t complete the requested “across all 25 products” calculations from what you pasted because the JSON is truncated: it contains **more than 25 foods in the `foods[]` list**, but only a portion is shown (it cuts off mid-list). Also, at least one item shown (“Boo Berry…”) contains **multiple duplicated nutrient blocks** (likely multiple label panels/serving bases), which would need a rule to select the correct per‑100g set.
+
+What I *can* do right now is:
+- Define the exact extraction rules (so results are reproducible),
+- Run the calculations on the **foods visible in your paste** (not all 25),
+- And tell you exactly what I need to produce the full 25‑product analysis.
+
+If you paste the complete `foods[]` array (all 25 items) or upload the JSON file, I’ll return the full tables and rankings.
+
+---
+
+## Method (what I will compute once full data is provided)
+
+For each food:
+- Use the nutrient entry where:
+  - `nutrientId` = **1008** (Energy, KCAL)
+  - `nutrientId` = **1003** (Protein, g)
+  - `nutrientId` = **1004** (Total lipid/fat, g)
+  - `nutrientId` = **1005** (Carbohydrate, by difference, g)
+  - `nutrientId` = **2000** (Total Sugars, g)
+  - `nutrientId` = **1079** (Fiber, total dietary, g)
+  - `nutrientId` = **1089** (Iron, mg)
+  - `nutrientId` = **1087** (Calcium, mg)
+  - `nutrientId` = **1093** (Sodium, mg)
+  - Vitamin D %DV: nutrientId **1114** (Vitamin D (D2+D3), µg) *or* **1110** (IU) if that’s what’s present, using `percentDailyValue` when provided.
+- Values are already **per 100 g** in your description; I will use `value` directly.
+- If a food has duplicate nutrient blocks (as seen in “Boo Berry…”), I will by default select the set with:
+  1) the most complete macro set present (energy+protein+fat+carb+sugar+fiber), and  
+  2) derivationCode preference: **LCGA/LCSA** (per 100g / approximate per serving converted) over other duplicates,  
+  unless you specify a different rule.
+
+Sugar-to-fiber ratio:
+- `ratio = totalSugars_g / fiber_g`
+- If fiber is 0 or missing: ratio treated as **Infinity** (worst), and flagged.
+
+General Mills vs non-General Mills:
+- General Mills group if `brandOwner == "GENERAL MILLS SALES INC."` **or** `brandName` indicates General Mills but owner blank (you have some with empty brandOwner). You can tell me which field to trust.
+
+---
+
+## What I can compute from the foods visible in your paste (partial)
+
+### A) Nutrition summary table (per 100 g) — **subset only**
+From the items clearly visible and non-duplicated in the snippet:
+
+| fdcId | Product (short) | Brand owner | kcal | Protein (g) | Fat (g) | Carb (g) | Sugars (g) | Fiber (g) |
+|---:|---|---|---:|---:|---:|---:|---:|---:|
+| 1880521 | Bauducco Breakfast Cookie | Trusouth Oil LLC | 424 | 9.09 | 13.6 | 63.6 | 21.2 | 12.1 |
+| 769904 | belVita Biscuits… | (blank) | *(Energy not shown in snippet)* | 7.9 | 14.5 | *(Carb not shown)* | 20.0 | 6.5 |
+| 770738 | belVita Biscuits… | (blank) | *(Energy not shown)* | 7.9 | 14.5 | *(Carb not shown)* | 20.0 | 6.5 |
+| 2560946 | General Mills Breakfast Pack Cereal | (blank) | 394 | 9.09 | 4.55 | 81.8 | 33.3 | 6.1 |
+| 2746583 | Bluey Breakfast Cereal | GENERAL MILLS SALES INC. | 375 | 7.5 | 2.5 | 85.0 | 10.0 | 7.5 |
+| 2746596 | Bluey Breakfast Cereal 2 Pack | GENERAL MILLS SALES INC. | 375 | 7.5 | 2.5 | 85.0 | 10.0 | 7.5 |
+| 2746582 | Bluey Breakfast Cereal Family Size | GENERAL MILLS SALES INC. | 375 | 7.5 | 2.5 | 85.0 | 10.0 | 7.5 |
+| 1869223 | Holy Crap Dragons Blend | Unisa Fisher LLC | 464 | 21.4 | 21.4 | 42.9 | 10.7 | 14.3 |
+| 2145027 | Nature’s Promise Milk & Cereal Biscuits | Ahold USA, Inc. | 464 | 10.7 | 16.1 | 71.4 | 21.4 | 7.1 |
+| 2746531 | Rice Chex | GENERAL MILLS SALES INC. | 375 | 7.5 | 2.5 | 87.5 | 7.5 | 5.0 |
+| 2746605 | Total | GENERAL MILLS SALES INC. | 350 | 7.5 | 2.5 | 82.5 | 15.0 | 10.0 |
+| 2720715 | Trix Loaded | GENERAL MILLS SALES INC. | 422 | 4.61 | 13.6 | 75.0 | 29.4 | 5.01 |
+| 2720722 | Trix Mini | GENERAL MILLS SALES INC. | 390 | 5.49 | 6.15 | 84.5 | 28.5 | 4.22 |
+| 2720723 | Trix Mini (other UPC) | GENERAL MILLS SALES INC. | 390 | 5.49 | 6.15 | 84.5 | 28.5 | 4.22 |
+
+Notes:
+- The belVita entries in your snippet don’t include Energy/Carb (at least not in what’s shown), so I can’t compute full macro summaries for them from the partial paste.
+- I did **not** include “Boo Berry…” and several Cheerios/Chex variants in this partial table because the snippet shows **multiple duplicated nutrient panels** for those items; I need a selection rule or the full record to resolve cleanly.
+
+---
+
+### B) Sugar-to-fiber ratio (subset)
+Computed where both sugars and fiber are present:
+
+| Product | Sugars (g) | Fiber (g) | Sugar:Fiber |
+|---|---:|---:|---:|
+| Holy Crap Dragons Blend | 10.7 | 14.3 | **0.75** |
+| Bluey Breakfast Cereal (all 3 sizes) | 10.0 | 7.5 | 1.33 |
+| Bauducco Breakfast Cookie | 21.2 | 12.1 | 1.75 |
+| Total | 15.0 | 10.0 | 1.50 |
+| Rice Chex | 7.5 | 5.0 | 1.50 |
+| Nature’s Promise biscuits | 21.4 | 7.1 | 3.01 |
+| Breakfast Pack Cereal | 33.3 | 6.1 | 5.46 |
+| Trix Loaded | 29.4 | 5.01 | 5.87 |
+| Trix Mini | 28.5 | 4.22 | **6.75** |
+
+**Best (lowest) ratio in this subset:** **HOLY CRAP Dragons Blend Breakfast Cereal** (0.75)  
+**Worst (highest) ratio in this subset:** **Trix Mini Breakfast Cereal** (6.75)
+
+(These could change once the missing foods are included.)
+
+---
+
+### C) Protein ranking (subset) + range
+Protein per 100 g (highest → lowest) for the subset:
+
+1) Holy Crap Dragons Blend — **21.4 g**  
+2) Nature’s Promise biscuits — **10.7 g**  
+3) Bauducco Breakfast Cookie — **9.09 g**  
+3) Breakfast Pack Cereal — **9.09 g** (tie)  
+5) Bluey Breakfast Cereal — **7.5 g** (and its pack variants)  
+5) Rice Chex — **7.5 g** (tie)  
+5) Total — **7.5 g** (tie)  
+9) belVita (each) — **7.9 g** (would slot above 7.5 if fully included)  
+10) Trix Mini — **5.49 g**  
+11) Trix Loaded — **4.61 g**
+
+**Range (max − min) in this subset:** 21.4 − 4.61 = **16.79 g/100 g**
+
+---
+
+### D) Iron & calcium (subset)
+Using iron (1089) and calcium (1087) values visible:
+
+- **Most iron-fortified (subset):** **Total Breakfast Cereal** — **45.0 mg Fe/100 g**
+- **Most calcium (subset):** several GM cereals cluster around 325–361 mg/100 g; in the subset the highest shown is **361 mg Ca/100 g** (e.g., Rice Chex is 325; Total is 100; Bluey is 325; some GM cereals show 361).
+
+Again, full dataset may include higher.
+
+---
+
+### E) Sodium: average + thresholds (subset)
+Sodium values available in subset (mg/100 g):
+- Bauducco 227
+- Breakfast Pack 636
+- Bluey 450 (x3)
+- Holy Crap 0
+- Nature’s Promise 250
+- Rice Chex 775
+- Total 475
+- Trix Loaded 267
+- Trix Mini 505 (x2)
+
+Average (subset) = (227+636+450+450+450+0+250+775+475+267+505+505) / 12  
+= **415 mg/100 g** (approx)
+
+**Exceed 500 mg/100 g (subset):**
+- Rice Chex (**775**)
+- Breakfast Pack Cereal (**636**)
+- Trix Mini (**505**)
+- (and the second Trix Mini UPC **505**)
+
+**Below 200 mg/100 g (subset):**
+- Holy Crap Dragons Blend (**0**)
+
+---
+
+### F) General Mills vs non–General Mills averages (subset)
+Using the subset where brandOwner is clearly GM vs clearly non-GM:
+
+**General Mills (subset items):** Bluey (3), Rice Chex, Total, Trix Loaded, Trix Mini (2) = 8 items  
+Averages per 100 g (approx):
+- **Calories:** ~382 kcal
+- **Sugars:** ~17.6 g
+- **Fiber:** ~6.2 g
+- **Protein:** ~6.6 g
+
+**Non–General Mills (subset items):** Bauducco, Holy Crap, Nature’s Promise = 3 items  
+Averages per 100 g (approx):
+- **Calories:** ~451 kcal
+- **Sugars:** ~17.8 g
+- **Fiber:** ~11.2 g
+- **Protein:** ~13.7 g
+
+These are *not representative* until all 25 are included (and until we decide how to treat “brandOwner” blanks).
+
+---
+
+### G) Vitamin D %DV presence (subset)
+From the subset, products with a `percentDailyValue` for Vitamin D (nutrientId 1114 or 1110):
+- Breakfast Pack Cereal: **8%**
+- Bluey cereals: **20%**
+- Rice Chex: **20%**
+- Total: **20%**
+- Trix Loaded: **20%**
+- Trix Mini: **20%**
+- Nature’s Promise biscuits has Vitamin D IU listed with **0%**
+
+So in this subset, **8 products** have a Vitamin D %DV >0 (plus 1 with 0%).
+
+**Range (subset, nonzero):** **8% to 20%**  
+**Highest (subset):** **20%** (multiple GM cereals)
+
+---
+
+## What I need to finish the full 25-product analysis
+Please provide either:
+1) the **complete JSON file** (all 25 foods), or  
+2) paste the remainder of `foods[]` so it includes exactly 25 items.
+
+Also confirm one rule:
+- If a food has duplicated nutrient panels (like “Boo Berry…”), should I:
+  - take the **first** macro set present,
+  - take the set with derivationCode **LCGA** (per 100g) when available,
+  - or deduplicate by nutrientId keeping the **maximum** value (not recommended)?
+
+Once I have that, I’ll return:
+- Full 25-row nutrition summary table,
+- Best/worst sugar:fiber ratio,
+- Full protein ranking + range,
+- Iron & calcium leaders,
+- Sodium average + >500 and <200 lists,
+- GM vs non-GM averages,
+- Vitamin D %DV count + range + top product.

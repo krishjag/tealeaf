@@ -1,0 +1,146 @@
+## 1) Time from offense date to sentencing date
+- **Offense date:** 2015-05-05  
+- **Sentencing date:** 2020-02-24  
+
+Elapsed time:
+- From **2015-05-05 → 2020-02-05** = **4 years 9 months**
+- From **2020-02-05 → 2020-02-24** = **19 days**
+
+**Total elapsed:** **4 years 9 months** (plus **19 days**).  
+(If expressed approximately in months: ~**57 months** plus 19 days.)
+
+---
+
+## 2) Sentence components by charge (IC + ES), totals, and concurrency
+Sentencing date for both charges: **2020-02-24**.
+
+### Charge 1 — Battery by Prisoners (Felony H) (with repeater + dangerous weapon)
+Sentence components (Judgment):
+- **Initial confinement / State Prison:** **12 years**  
+  - **Consecutive to:** “Any other sentence currently serving.”
+- **Extended Supervision:** **3 years**  
+  - **Consecutive to:** “Any other sentence currently serving.”
+
+**Total combined (IC + ES):** **15 years** (12 + 3)  
+**Relationship to other sentences:** **Consecutive** to any other sentence currently being served (external to this case).
+
+### Charge 2 — Disorderly Conduct (Misd. B) (repeater)
+Sentence components (Judgment):
+- **Initial confinement / State Prison:** **1 year**  
+  - **Concurrent with:** Ct. 1
+- **Extended Supervision:** **6 months**  
+  - **Concurrent with:** Ct. 1
+
+**Total combined (IC + ES):** **1 year 6 months**  
+**Relationship to Ct. 1:** **Concurrent** with Ct. 1.
+
+---
+
+## 3) Defense attorneys and duration on the case (months)
+The defendant shows **3 attorneys** with “entered” and “withdrawn” dates:
+
+1) **Leonie C. Dolch**
+- **Entered:** 2016-03-15  
+- **Withdrawn:** 2016-07-07  
+- Duration: **~3 months, 22 days** ≈ **4 months** (rounded to nearest month)
+
+2) **Ronald Gabriel Benavides**
+- **Entered:** 2016-07-07  
+- **Withdrawn:** 2020-03-12  
+- Duration: **~3 years, 8 months, 5 days** ≈ **44 months**
+
+3) **Jennifer A. Lohr**
+- **Entered:** 2020-05-20  
+- **Withdrawn:** 2025-10-02  
+- Duration: **~5 years, 4 months, 12 days** ≈ **64 months**
+
+**Total defense attorneys:** **3**
+
+Notes:
+- There is a gap between Benavides’ withdrawal (2020-03-12) and Lohr’s entry (2020-05-20) of about **2 months**.
+
+---
+
+## 4) Total docket entries per year (2016–2025) and most active year
+Important limitation: the dataset states **231 docket entries**, but the prompt provides only a **partial listing** (not all 231 are visible here). I can only count **the entries shown** in the provided text.
+
+### Counts from the entries visible in the prompt
+- **2016:** 29
+- **2017:** 15
+- **2018:** 22
+- **2019:** 29
+- **2020:** 18
+- **2021:** 22
+- **2022:** 24
+- **2023:** 18
+- **2024:** 6
+- **2025:** 3
+
+**Most activity (tie, based on visible entries):** **2016 and 2019** (each **29** entries shown).
+
+If you want the true per-year counts for all **231**, you’d need to provide the complete docketEntries list (or I can compute from the raw JSON/CSV export).
+
+---
+
+## 5) Appeal-related docket entries and percentage
+Again, based only on the **visible docket entries**.
+
+### Appeal-related entries (Court of Appeals / Supreme Court)
+I counted entries that explicitly reference:
+- “Court of Appeals” (orders, acknowledgments, transmittals, motions in COA, appeal index/record), or
+- “Supreme Court” (acknowledgment, orders, decision, review, remittitur).
+
+**Count (visible): 27 appeal-related entries**, spanning 2020–2025, including (examples):
+- 2020-06-15 Order of Court of Appeals  
+- 2022-06-07 Acknowledgment from Court of Appeals  
+- 2022-09-30 Order of Court of Appeals (remand for supplemental motion)  
+- 2024-04-25 Court of Appeals decision & order reversing  
+- 2024-05-28 Acknowledgment from Supreme Court  
+- 2025-06-27 Supreme Court decision filed  
+- 2025-09-05 Remittitur (Petition for Review Case)
+
+### Percentage
+- **Total docket entries shown (2016–2025):** 186 (sum of the per-year counts above)
+- **Appeal-related shown:** 27
+
+**Appeal-related percentage (of shown entries):**  
+27 / 186 ≈ **14.5%**
+
+If calculated against the full docket count stated in the case (**231**), then:  
+27 / 231 ≈ **11.7%** (but that assumes no additional appeal entries exist in the omitted portion).
+
+---
+
+## 6) Receivables calculations
+Receivables record (single line):
+- **amountDue:** 761  
+- **paid:** 352  
+- **balanceDue:** 0  
+- **adjust:** 0  
+- **docCollected:** true
+
+Calculations:
+- **Total amount due:** **$761**
+- **Total paid:** **$352**
+- **Remaining balance (computed):** $761 − $352 = **$409**
+- **Remaining balance (as reported “probAmt”):** **$409** (matches computed)
+- **Remaining balance (as reported “balanceDue”):** **$0** (this appears to be a different field meaning than “still owed”; the record also shows **probAmt 409**, which aligns with the unpaid portion)
+
+**% collected:** $352 / $761 ≈ **46.3%**
+
+So, financially, the record indicates **$761 assessed**, **$352 collected**, **~46.3% collected**, with **$409 not paid** (even though “balanceDue” field is 0).
+
+---
+
+## 7) Bond amount and bond-related docket entries
+### Bond amount
+- **Signature bond set:** **$5,000** (“with felony conds.”)
+
+### Bond-related docket entries (shown)
+1) **2016-02-11** — **Signature bond set** — **$5,000**  
+   - addlTxt: “with felony conds.”
+2) **2016-02-25** — **Signature bond signed** — **$5,000**  
+   - addlTxt: “and filed.”
+3) **2016-10-26** — **Arraignment** — “**Bond continued**.” (no amount stated here, but bond status referenced)
+
+If you want, I can also flag any other bond mentions (e.g., modifications, revocations) if you provide the full docket list.

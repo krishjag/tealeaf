@@ -1,0 +1,160 @@
+I can’t complete the requested calculations from the excerpt you provided because it only contains a subset of the 40 CVE records (it cuts off mid-list) and, for several CVEs shown, the CVSS v3.1 metrics are **Secondary-only** (no NVD “Primary”), while others have multiple metric entries. Any averages/medians, CWE rollups, attack-vector counts, and “broadest affected range” results would be incorrect without the full 40-record dataset and a consistent scoring-selection rule.
+
+If you paste/provide the full `vulnerabilities[40]` JSON (or allow me to assume “use NVD Primary if present else first metric”), I can compute everything exactly.
+
+That said, here is **exactly how to compute each item** against the full NVD nesting you described, including edge cases, plus what I can already infer from your provided **summary**.
+
+---
+
+## Assumptions / rules needed (to make results deterministic)
+
+For each CVE, define a single “chosen” CVSS v3.1 metric record:
+
+1) Prefer `cve.metrics.cvssMetricV31[]` entry where `type == "Primary"` **and** `source == "nvd@nist.gov"` if present.  
+2) Else, if any `type == "Primary"` exists, use that.  
+3) Else use the first `cvssMetricV31[0]` (Secondary-only cases exist in your excerpt).  
+
+Then use:
+- `baseScore` and `baseSeverity` from `cvssData`
+- `exploitabilityScore`, `impactScore`
+- `attackVector` from `cvssData`
+
+For CWEs:
+- Use `cve.weaknesses[].description[].value` values (e.g., `CWE-416`, `NVD-CWE-noinfo`, `NVD-CWE-Other`)
+- A CVE can contribute to **multiple** CWEs if multiple are listed (your excerpt shows at least one like that).
+
+For affected ranges:
+- Use all `cve.configurations[].nodes[].cpeMatch[]` where `vulnerable == true` and `criteria` is Linux kernel CPE (`cpe:2.3:o:linux:linux_kernel:...`)
+- Extract `(versionStartIncluding, versionStartExcluding, versionEndIncluding, versionEndExcluding)` if present.
+- “Broadest range” needs a comparison method because versions are not trivially numeric across major lines; a practical approach is:
+  - Count how many distinct vulnerable range entries exist for linux_kernel CPE (more ranges = broader coverage across maintained branches), **and/or**
+  - Compute span within each range using semantic version parsing (best-effort), then sum spans.
+
+References:
+- Count tags in `cve.references[].tags[]` (a reference can have multiple tags).
+- “% of CVEs with a Patch reference” = number of CVEs where **any** reference has tag `Patch` divided by total CVEs.
+
+---
+
+## 1) Average CVSS v3.1 base score (avg, min, max, median)
+
+**Computation**
+- Collect the chosen `baseScore` for each of the 40 CVEs.
+- Average = sum / 40
+- Min/Max = min()/max()
+- Median (40 values) = average of the 20th and 21st values after sorting ascending.
+
+**Note:** Your summary only gives severity distribution, not scores, so this cannot be derived without the full list of baseScores.
+
+---
+
+## 2) Group by baseSeverity (CRITICAL/HIGH/MEDIUM/LOW)
+
+From your dataset summary:
+
+- HIGH: **12**
+- MEDIUM: **28**
+- CRITICAL: **0**
+- LOW: **0**
+- Total: **40**
+
+**Percentages**
+- HIGH: 12 / 40 = **30%**
+- MEDIUM: 28 / 40 = **70%**
+- CRITICAL: 0%
+- LOW: 0%
+
+---
+
+## 3) CWE counts + average base score per CWE; highest average severity
+
+You already have counts (from summary):
+
+| CWE | Count |
+|---|---:|
+| CWE-416 | 7 |
+| CWE-476 | 6 |
+| CWE-401 | 4 |
+| CWE-125 | 4 |
+| CWE-787 | 3 |
+| CWE-667 | 3 |
+| CWE-362 | 2 |
+| CWE-672 | 1 |
+| CWE-369 | 1 |
+| CWE-770 | 1 |
+
+**What’s missing to finish:** the per-CWE **average baseScore** requires the baseScore for each CVE mapped to that CWE (and handling multi-CWE CVEs).
+
+**Computation**
+- For each CVE, for each CWE it lists, append the CVE’s chosen baseScore into that CWE bucket.
+- Average per CWE = mean(bucket).
+- “Highest average severity” = CWE with highest mean baseScore.
+
+---
+
+## 4) Attack vectors distribution; % local vs network
+
+**Computation**
+- For each CVE, read chosen `cvssData.attackVector`.
+- Count by: `NETWORK`, `LOCAL`, `ADJACENT_NETWORK`, `PHYSICAL`.
+- Local-required % = LOCAL / 40
+- Network-access % = NETWORK / 40  
+  (Optionally include ADJACENT_NETWORK with “network-based” depending on your reporting convention; you asked specifically local vs network, so I’d keep NETWORK only unless you say otherwise.)
+
+**Why I can’t compute now:** the excerpt shows many LOCAL and at least a couple NETWORK (e.g., CVE-2021-47075 secondary vector is AV:N; CVE-2023-52511 secondary vector is AV:N), but we don’t have all 40 and we need the “chosen metric” rule applied consistently.
+
+---
+
+## 5) Extract affected version ranges; which CVE affects broadest kernel range
+
+**Extraction**
+For each CVE:
+- Iterate all `cpeMatch` entries for linux kernel.
+- Record tuples like:
+  - `startIncl=5.3, endExcl=5.4.285`
+  - `startIncl=5.5, endExcl=5.10.211`
+  - etc.
+
+**Broadest range (recommended practical metric)**
+- Compute “breadth” as the **number of distinct maintained-branch ranges** listed for linux_kernel CPE (because NVD often expresses breadth as multiple parallel ranges across LTS lines).
+- Tie-breaker: earliest start version (lowest) and/or latest end version (highest), best-effort semver compare.
+
+**From the excerpt only (not authoritative for all 40):**
+- `CVE-2022-48627` appears very broad (starts at **3.7** and includes many branches up through **5.19-rc6** in the shown configuration), which is likely among the broadest.
+- But I can’t confirm it’s the broadest across all 40 without the remaining CVEs.
+
+---
+
+## 6) Average exploitabilityScore and impactScore; ratio impact/exploitability
+
+**Computation**
+- For each CVE, take chosen `exploitabilityScore` and `impactScore`.
+- Average exploitability = mean(exploitabilityScore)
+- Average impact = mean(impactScore)
+- Ratio = (average impact) / (average exploitability)
+
+**Note:** Must use the same chosen metric record as in (1). Cannot compute without full dataset.
+
+---
+
+## 7) Reference tag counts; % of CVEs with a Patch reference
+
+**Computation**
+- For each CVE:
+  - For each reference:
+    - For each tag in `tags[]`: increment global tag counter.
+- Patch coverage:
+  - `patchCveCount = count(CVE where any reference.tags contains "Patch")`
+  - `% with Patch = patchCveCount / 40 * 100`
+
+**From the excerpt only:** many CVEs clearly have Patch-tagged kernel.org links, but not enough to compute the dataset-wide percentage.
+
+---
+
+## If you want, I can compute everything immediately
+Send either:
+1) the full JSON for `vulnerabilities` (all 40), or  
+2) a CSV with columns: `cveId, baseScore, baseSeverity, attackVector, exploitabilityScore, impactScore, cwes(list), ranges(list), referenceTags(list)`.
+
+Also confirm one choice:
+- **Use NVD Primary when present; otherwise use first available cvssMetricV31** (recommended).

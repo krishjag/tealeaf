@@ -21,7 +21,7 @@ import json
 import tempfile
 import zipfile
 from pathlib import Path
-from urllib.request import urlopen, Request
+import requests
 
 import polars as pl
 
@@ -29,7 +29,7 @@ DATA_DIR = Path(__file__).parent
 SEC_BASE_URL = "https://www.sec.gov/files/dera/data/financial-statement-data-sets"
 
 # SEC requires a User-Agent header for programmatic access
-USER_AGENT = "TeaLeaf-Benchmark/1.0 (https://github.com/AltruisticKnowledge/tealeaf)"
+USER_AGENT = "TeaLeaf-Benchmark/1.0 benchmark@tealeaf-project.dev"
 
 
 def download_and_extract(quarter: str) -> Path:
@@ -37,9 +37,9 @@ def download_and_extract(quarter: str) -> Path:
     url = f"{SEC_BASE_URL}/{quarter}.zip"
     print(f"Downloading {url} ...")
 
-    req = Request(url, headers={"User-Agent": USER_AGENT})
-    with urlopen(req) as resp:
-        zip_bytes = resp.read()
+    resp = requests.get(url, headers={"User-Agent": USER_AGENT})
+    resp.raise_for_status()
+    zip_bytes = resp.content
 
     print(f"  Downloaded {len(zip_bytes):,} bytes")
 
@@ -345,7 +345,9 @@ def main():
         output = build_json(matched, enriched, quarter)
 
         # Step 6: Write output
-        out_path = DATA_DIR / f"sec_edgar_{quarter}.json"
+        # Insert underscore before q-suffix: "2025q4" -> "2025_q4"
+        file_quarter = quarter[:4] + "_" + quarter[4:]
+        out_path = DATA_DIR / f"sec_edgar_{file_quarter}.json"
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
 

@@ -134,7 +134,7 @@ For a typical LLM context with 50 messages, 10 tools, and a user profile:
 | TeaLeaf Binary | ~4 KB |
 | TeaLeaf Binary (compressed) | ~3 KB |
 
-Token savings are significant but less than byte savings. BPE tokenizers partially compress repeated JSON field names, so byte savings overstate token savings by 5-18 percentage points depending on data repetitiveness. On real-world data (SEC EDGAR 10-K filings), expect **~42% fewer data tokens**. On synthetic benchmarks (12 tasks, 10 domains), expect **~30% fewer data tokens** (smaller datasets dilute savings).
+Token savings are significant but less than byte savings. BPE tokenizers partially compress repeated JSON field names, so byte savings overstate token savings by 5-18 percentage points depending on data repetitiveness. On real-world data (14 tasks, 7 domains), expect **~51% fewer data tokens**. Savings range from 27% (small datasets) to 77% (tabular data with high schema repetition).
 
 ### Token Comparison (verified via OpenAI tokenizer)
 
@@ -183,15 +183,15 @@ if let Some(Value::Array(insights)) = response.get("analysis") {
 
 The [accuracy-benchmark](../internals/accuracy-benchmark.md) suite compares TeaLeaf vs JSON vs TOON on Claude Sonnet 4.5 and GPT-5.2:
 
-**Real-world results (SEC EDGAR 10-K data):**
+**Real-world results (14 tasks, 7 domains, Claude Sonnet 4.5 + GPT-5.2):**
 
 | Metric | TeaLeaf | JSON | TOON |
 |--------|---------|------|------|
-| Anthropic accuracy | 0.952 | 0.960 | 0.935 |
-| OpenAI accuracy | 0.927 | 0.933 | 0.886 |
-| Input token savings | **-43%** | baseline | **-43%** |
+| Anthropic accuracy | 0.942 | 0.945 | 0.939 |
+| OpenAI accuracy | 0.925 | 0.924 | 0.928 |
+| Input token savings | **-51%** | baseline | **-20%** |
 
 - **No accuracy loss** -- scores within noise across all three formats
-- **~30% savings** on synthetic benchmarks (smaller datasets dilute savings)
-- Results are captured in `analysis.tl` with `@struct` schema definitions and `@table` format comparison data
+- Savings range from 27% (small datasets) to 77% (tabular data)
+- Evidence package with prompts, responses, and analysis available in [`accuracy-benchmark/evidence/`](https://github.com/krishjag/tealeaf/tree/main/accuracy-benchmark/evidence)
 - See the [benchmark README](https://github.com/krishjag/tealeaf/tree/main/accuracy-benchmark) for full methodology and results.

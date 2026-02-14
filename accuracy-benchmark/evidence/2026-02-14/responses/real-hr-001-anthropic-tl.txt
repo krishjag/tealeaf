@@ -1,0 +1,125 @@
+# JOLTS Data Analysis - 2025
+
+## 1. Average Monthly Job Openings and Hires Levels by Industry
+
+| Industry | Avg JO Level (000s) | Avg HI Level (000s) |
+|----------|--------------------:|--------------------:|
+| Total nonfarm | 7,409.8 | 5,417.3 |
+| Total private | 6,349.1 | 4,996.1 |
+| Construction | 249.6 | 343.4 |
+| Manufacturing | 420.5 | 306.9 |
+| Retail trade | 588.1 | 589.7 |
+| Information | 151.3 | 85.1 |
+| Financial activities | 403.7 | 210.5 |
+| Professional and business services | 1,287.4 | 1,022.3 |
+| Health care and social assistance | 1,409.1 | 726.0 |
+| Leisure and hospitality | 1,037.6 | 977.2 |
+| Accommodation and food services | 890.2 | 806.3 |
+| Government | 794.1 | 337.7 |
+
+## 2. Job Openings-to-Hires Ratio
+
+| Industry | JO/HI Ratio |
+|----------|------------:|
+| **Government** | **2.35** ⭐ |
+| Health care and social assistance | 1.94 |
+| Financial activities | 1.92 |
+| Information | 1.78 |
+| Manufacturing | 1.37 |
+| Total nonfarm | 1.37 |
+| Total private | 1.27 |
+| Professional and business services | 1.26 |
+| Accommodation and food services | 1.10 |
+| Leisure and hospitality | 1.06 |
+| Retail trade | 1.00 |
+| Construction | 0.73 |
+
+**Government has the highest ratio (2.35)**, indicating the hardest-to-fill positions - over 2 job openings for every hire made.
+
+## 3. Voluntary vs Involuntary Turnover Balance (Quit Rate - Layoff Rate)
+
+Ranked from highest to lowest:
+
+| Rank | Industry | Avg (QU - LD) Rate |
+|------|----------|-------------------:|
+| 1 | **Accommodation and food services** | **+3.29%** |
+| 2 | Leisure and hospitality | +2.57% |
+| 3 | Retail trade | +1.58% |
+| 4 | Health care and social assistance | +1.29% |
+| 5 | Total private | +0.98% |
+| 6 | Total nonfarm | +0.90% |
+| 7 | Financial activities | +0.69% |
+| 8 | Manufacturing | +0.48% |
+| 9 | Government | +0.45% |
+| 10 | Professional and business services | +0.35% |
+| 11 | Information | -0.10% |
+| 12 | Construction | -0.27% |
+
+Accommodation and food services shows the highest voluntary turnover dominance (+3.29%), while Construction shows negative balance (-0.27%), meaning layoffs exceed quits.
+
+## 4. Month-over-Month Change in Total Nonfarm Job Openings
+
+| Month | Change (000s) |
+|-------|---------------:|
+| February | -282 |
+| March | -280 |
+| April | **+195** |
+| May | **+317** |
+| June | -355 |
+| July | -149 |
+| August | +19 |
+| September | **+431** ⬆️ |
+| October | -209 |
+| November | **-521** ⬇️ |
+| December | -386 |
+
+- **Largest increase: September (+431,000 openings)**
+- **Largest decrease: November (-521,000 openings)**
+
+## 5. Total Separations Verification
+
+The formula **TS = Quits + Layoffs + Other Separations** is verified ✓
+
+Sample checks:
+- **Total nonfarm, January**: 3,256 + 1,674 + 342 = 5,272 ✓ (matches reported)
+- **Total nonfarm, December**: 3,204 + 1,762 + 285 = 5,251 ✓ (matches reported)
+- **Construction, March**: 166 + 150 + 5 = 321 ≈ 322 ✓ (1k difference due to rounding)
+
+All industries verified - reported TS levels match calculated sums within rounding tolerance.
+
+## 6. Highest Average Rates
+
+### Highest Average Quit Rate:
+**Accommodation and food services: 4.33%**
+
+Top 5 quit rates:
+1. Accommodation and food services: 4.33%
+2. Leisure and hospitality: 3.99%
+3. Retail trade: 2.63%
+4. Professional and business services: 2.34%
+5. Total private: 2.21%
+
+### Highest Average Layoff Rate:
+**Construction: 2.06%**
+
+Top 5 layoff rates:
+1. Construction: 2.06%
+2. Professional and business services: 1.99%
+3. Leisure and hospitality: 1.43%
+4. Information: 1.33%
+5. Total private: 1.23%
+
+## 7. Private Sector vs Government Comparison
+
+| Metric | Total Private | Government | Difference |
+|--------|---------------|------------|------------|
+| **Average Hire Rate** | **3.68%** | **1.45%** | Private +2.23 pp |
+| **Average Quit Rate** | **2.21%** | **0.80%** | Private +1.41 pp |
+| **Average Layoff Rate** | **1.23%** | **0.33%** | Private +0.90 pp |
+
+### Key Findings:
+- **Private sector has substantially higher hire rates** (3.68% vs 1.45%) - 2.5x higher than government
+- **Private sector has substantially higher quit rates** (2.21% vs 0.80%) - 2.8x higher than government
+- **Private sector has substantially higher layoff rates** (1.23% vs 0.33%) - 3.7x higher than government
+
+**Interpretation**: Government employment is significantly more stable with lower turnover in all dimensions. Government workers are less likely to quit, less likely to be laid off, and government hiring activity is much slower - consistent with government's hardest-to-fill positions (highest JO/HI ratio of 2.35).

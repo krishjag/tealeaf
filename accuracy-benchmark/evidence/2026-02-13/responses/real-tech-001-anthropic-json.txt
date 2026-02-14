@@ -1,0 +1,99 @@
+# Analysis of Linux Kernel Vulnerabilities (March 2024)
+
+## 1. CVSS v3.1 Base Score Statistics
+
+Analyzing all 40 CVEs with Primary CVSS scores:
+
+**Scores identified:** 6.1, 7.0, 5.5 (×27), 7.8 (×5), 7.1 (×5), 4.7
+
+- **Average:** 5.98
+- **Median:** 5.5
+- **Minimum:** 4.7 (CVE-2023-52505)
+- **Maximum:** 7.8 (CVE-2021-47081, CVE-2023-52509, CVE-2023-52510, CVE-2023-52515, CVE-2023-52524)
+
+## 2. Severity Distribution
+
+From the dataset summary:
+- **HIGH:** 12 CVEs (30%)
+- **MEDIUM:** 28 CVEs (70%)
+- **CRITICAL:** 0 CVEs (0%)
+- **LOW:** 0 CVEs (0%)
+
+## 3. CWE Analysis
+
+| CWE | Count | Avg CVSS | Description |
+|-----|-------|----------|-------------|
+| **CWE-416** | 7 | **7.57** | Use After Free (Highest avg) |
+| CWE-476 | 6 | 5.58 | NULL Pointer Dereference |
+| CWE-401 | 4 | 5.50 | Missing Release of Memory |
+| CWE-125 | 4 | 6.55 | Out-of-bounds Read |
+| CWE-787 | 3 | 6.57 | Out-of-bounds Write |
+| CWE-667 | 3 | 5.90 | Improper Locking |
+| CWE-362 | 2 | 6.70 | Race Condition |
+| CWE-672 | 1 | 7.0 | Operation on Resource After Expiration |
+| CWE-369 | 1 | 5.5 | Divide By Zero |
+| CWE-770 | 1 | 5.5 | Allocation of Resources Without Limits |
+
+**CWE-416 (Use After Free) has the highest average severity at 7.57**
+
+## 4. Attack Vector Analysis
+
+Counting from CVSS metrics:
+
+- **LOCAL (AV:L):** 39 CVEs (97.5%)
+- **NETWORK (AV:N):** 1 CVE (2.5%) - CVE-2023-52511
+- **ADJACENT_NETWORK:** 0 CVEs (0%)
+- **PHYSICAL:** 0 CVEs (0%)
+
+**97.5% of vulnerabilities require local access**, making them less immediately exploitable remotely.
+
+## 5. Broadest Kernel Version Range Affected
+
+Analyzing version ranges across configurations:
+
+**CVE-2023-52507** affects the broadest range:
+- **3.6 to 6.6-rc5** (spanning ~7 years of kernel versions)
+- Range: 3.2 → 3.6 → 4.x → 5.x → 6.6-rc5
+
+Other notably broad CVEs:
+- **CVE-2023-52522:** 2.6.37 to 6.6-rc4
+- **CVE-2021-47078:** 4.8 to 6.6-rc5
+
+## 6. Exploitability vs Impact Scores
+
+Analyzing available scores:
+
+**Average Exploitability Score:** 1.82
+- Most scores are 1.8 (LOCAL access) or 3.9 (NETWORK access)
+
+**Average Impact Score:** 4.27
+- Range: 1.4 to 5.9
+
+**Impact to Exploitability Ratio:** 2.34:1
+- Impact scores are on average **2.34× higher** than exploitability scores
+- This indicates these vulnerabilities have significant impact but are harder to exploit (requiring local access)
+
+## 7. Reference Tag Analysis
+
+Counting tags across all references:
+
+- **Patch:** Present in **100% of CVEs** (40/40)
+  - Most CVEs have 3-8 patch references to different kernel versions
+- **Mailing List:** ~5% of CVEs (2 CVEs)
+  - Debian LTS announcements
+- **Vendor Advisory:** 0%
+- **Exploit:** 0%
+- **Technical Description:** 0%
+
+**Key Finding:** Every single CVE (100%) has at least one patch reference, indicating all vulnerabilities have been addressed with code fixes. The average number of patch references per CVE is approximately 4-5, corresponding to patches for different stable kernel branches.
+
+---
+
+## Summary Insights
+
+1. **Predominantly Medium Severity:** 70% of vulnerabilities are rated MEDIUM
+2. **Local Exploitation Required:** 97.5% require local access, limiting remote attack surface
+3. **Memory Safety Issues Dominate:** Use-after-free (CWE-416) is most severe class
+4. **Excellent Patch Coverage:** 100% of CVEs have available patches
+5. **Long Version Spans:** Some vulnerabilities affect 6+ years of kernel versions
+6. **High Impact, Lower Exploitability:** Ratio of 2.34:1 suggests serious consequences if exploited, but exploitation requires local access

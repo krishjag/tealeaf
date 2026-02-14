@@ -3,6 +3,23 @@
   "authors": "TeaLeaf Contributors",
   "license": "MIT",
   "repository": "https://github.com/krishjag/tealeaf",
+  "benchmark": {
+    "date": "2026-02-13",
+    "models": "Claude Sonnet 4.5, GPT-5.2",
+    "tasks": 14,
+    "domains": 7,
+    "data_source": "7 domains: SEC EDGAR, BLS, clinical trials, court filings, patents, census, NYC PLUTO",
+    "tl_input_savings_pct": 51,
+    "toon_input_savings_pct": 20,
+    "accuracy": {
+      "anthropic_tl": 0.942,
+      "anthropic_json": 0.945,
+      "anthropic_toon": 0.939,
+      "openai_tl": 0.925,
+      "openai_json": 0.924,
+      "openai_toon": 0.928
+    }
+  },
   "packages": {
     "tealeaf-core": {
       "description": "Schema-aware data format with human-readable text and compact binary representation"

@@ -1,0 +1,218 @@
+I can’t compute exact distributions/averages for *all 30* lots from what’s shown here because the prompt only includes a partial list of the 30 records (it cuts off after block 783 lot 70). I’ll do two things:
+
+1) **Give defensible findings from the records visible** (the ones in the excerpt), including concrete classifications and examples.  
+2) **Provide the exact formulas / steps** you can run on the full 30-lot table to produce the requested counts, averages, and rankings.
+
+---
+
+## 1) Zoning district distribution (zonedist1) + what it permits; M vs C vs R
+
+### What appears most often (in the excerpt)
+Among the visible high-value lots, **commercial districts dominate**:
+
+- **C6-4** appears repeatedly (e.g., 185 Greenwich; multiple Hudson Yards lots; 388 Greenwich; 250 W 34th has C6-4 as one of split zones but zonedist1 is C6-4).
+- **C5-2.5 / C5-3** appear repeatedly (Rockefeller Center area, 5th Ave, Park/Lex corridor, 42nd St / Vanderbilt area).
+- Several **C6-5.5 / C6-6 / C6-6.5 / C6-7** appear (Avenue of the Americas/Broadway corridor).
+
+**Interpretation:** These are high-density commercial zoning districts that permit large office towers and major mixed commercial uses, with high allowable FAR (and often special district controls like **MiD** for Midtown, **HY** for Hudson Yards, **LM** for Lower Manhattan).
+
+### M vs C vs R vs special
+From the excerpted records:
+
+**Manufacturing (M) zones**
+- **111 8 AVENUE** (zonedist1 **M1-5**) — still used as office (bldgclass O6), typical of Manhattan “loft/converted” or as-of-right commercial in certain M districts.
+- **360 WEST STREET** (zonedist1 **M2-3**) — convention center (P9), a large facility/assembly use consistent with heavier manufacturing zoning.
+
+**Commercial (C) zones**
+Examples (many):
+- **185 GREENWICH STREET** (C6-4 / C5-3) – O4 office complex (WTC site)
+- **761 5 AVENUE** (C5-3 / C5-2.5)
+- **1111 AVENUE OF THE AMER** (C6-6 etc.)
+- **500 W 33 ST / 427 10 AVE / 527 W 34 ST** (C6-4 in HY special district)
+- **Rockefeller Center / Avenue of the Americas cluster** (C5-2.5, C6-5.5, C6-6.5, etc.)
+- **51 EAST 42 STREET** (C5-3) – One Vanderbilt
+
+**Residential (R) zones**
+- **240 1 AVENUE** (R7-2 with C1-5 overlay) – large residential complex with some commercial overlay
+- **MAIN STREET (Roosevelt Island)** (R7-2) – large multifamily (D4)
+- **180 FT WASHINGTON AVENUE** (R8) – institutional (hospital) use in residence district (common via community facility rules)
+
+**Special / Park**
+- **200 CENTRAL PARK WEST** (zonedist1 = **PARK**) – museum (P7)
+
+**Bottom line:** High assessed value in this set is overwhelmingly associated with **high-density commercial zoning (C5/C6)**, with a smaller number of **large residential complexes** and **major institutions**.
+
+---
+
+## 2) Building age profile by decade + relationship to assessed value; average assesstot per decade
+
+### What the excerpt suggests (qualitative)
+You have two “value engines” in the visible records:
+
+1) **New supertalls / new office towers (2000s–2010s)** in Midtown and Hudson Yards (e.g., 2015–2019 HY towers; 2017 One Vanderbilt) — very high assessments.
+2) **Iconic older towers (1930s–1970s)** in prime Midtown (Empire State 1931; Rockefeller-era buildings 1930s; many 1960s–1970s Avenue of the Americas/Park towers) — also very high assessments due to location, scale, and income.
+
+So: **newer does not automatically mean higher assessed value**; *prime location + very large office area* can keep older buildings at the top.
+
+### How to compute the decade groups + averages (exact)
+For each record:
+
+- **decade = floor(yearbuilt/10)*10** (e.g., 1931 → 1930s)
+- **average assessed value per decade**:
+  - `avg_assesstot_decade = mean(assesstot)` within each decade group
+  - also compute `count` and `sum` to see whether a decade’s average is driven by 1–2 outliers
+
+If you want a quick SODA pull for the full 30 and do it in Python/R, you can compute:
+
+- `decade = (yearbuilt // 10) * 10`
+- groupby(decade).agg(count, mean(assesstot), sum(assesstot), median(assesstot))
+
+**Expected pattern to test:** 2010s average likely high (HY + One Vanderbilt), but 1960s/1970s may also be high because many prime Midtown office towers were built then.
+
+---
+
+## 3) Area composition (% of bldgarea) + most mixed-use vs single-purpose
+
+### Method (per property)
+Let `A = bldgarea`. Compute:
+
+- `%commercial = comarea / A`
+- `%residential = resarea / A`
+- `%office = officearea / A`
+- `%retail = retailarea / A`
+- `%other = (otherarea + garagearea + strgearea + factryarea) / A`  
+  (You can keep garage/storage separate if you prefer.)
+
+Note: In PLUTO, **comarea often includes office+retail+other commercial**, so office/retail are *subcomponents* of commercial for many records. That’s fine—just be explicit whether you’re reporting:
+- a) “commercial vs residential vs other”, or
+- b) “office vs retail vs residential vs other” (and treat comarea as a check, not an additional category).
+
+### Mixed-use examples in the excerpt (multiple area types > 0)
+- **1 COLUMBUS CIRCLE (Time Warner Center condo)**: comarea + resarea, and within commercial: office + retail + garage + other → strongly mixed.
+- **240 1 AVENUE**: huge resarea plus nonzero comarea/office/retail/garage → mixed (but residential-dominant).
+- **151 EAST 58 STREET (One Beacon Court condo)**: resarea + office + retail → mixed.
+- **Roosevelt Island MAIN STREET (D4)**: res + retail + garage + other → mixed.
+- Many office towers have **office + retail + storage/garage** (e.g., 761 5 Ave; 1631 Broadway; 345 Park; 666 5 Ave; 250 W 34).
+
+### Single-purpose (or near single-purpose) examples
+- **388 GREENWICH STREET**: essentially all office (officearea == bldgarea; retail 0; res 0).
+- **527 WEST 34 STREET**: officearea == bldgarea; retail 0; res 0.
+- **111 8 AVENUE**: officearea == bldgarea; retail 0; res 0.
+- **200 CENTRAL PARK WEST** (museum): “otherarea” dominates; no office/retail/res.
+
+---
+
+## 4) numfloors vs bldgarea; average floor plate (bldgarea/numfloors); largest floor plates; pattern by bldgclass
+
+### Method
+For each lot:
+
+- `avg_floor_plate = bldgarea / numfloors`
+
+Caveat: For campuses / multi-building lots (numbldgs > 1), this becomes an *average across buildings* and can be misleading.
+
+### Largest floor plates (visible, approximate)
+A few stand out immediately:
+
+- **240 1 AVENUE**: 8,942,176 / 13 ≈ **688k sf/floor** (but it’s a multi-building complex: numbldgs=39, so this is not a single tower plate).
+- **360 WEST STREET (Javits Center)**: 4,060,596 / 4 ≈ **1,015,149 sf/floor** (large convention halls; bldgclass P9).
+- **111 8 AVENUE**: 2,161,994 / 17 ≈ **127k sf/floor** (big-block building; bldgclass O6).
+- **388 GREENWICH**: 2,354,289 / 39 ≈ **60k sf/floor** (office tower).
+- Typical Midtown towers (O4) often land in the **30k–60k sf/floor** range in this excerpt.
+
+### Pattern by building class (what to test on full data)
+- **P-class (public facilities)** and **large complexes** tend to have **very large floor plates** (low-rise, huge footprint).
+- **O4 (office towers)**: moderate plates, many floors.
+- **RC/RM (condo-related classes)** can vary; mixed-use podiums can inflate plate sizes.
+
+---
+
+## 5) Top 5 owners by total assessed value; concentration; repeat owners
+
+### What’s visible
+Even in the excerpt, you can see **repeat ownership / branding** patterns:
+
+- **Rockefeller Center** appears multiple times (e.g., “ROCKEFELLER CENTER PROPERTIES (RCP)”, “ROCKEFELLER CTR NORTH INC”) — likely multiple lots in the 30.
+- Several “UNAVAILABLE OWNER” entries (condo/complex ownership structures) repeat.
+- Many are single-asset LLCs (e.g., ONE VANDERBILT OWNER LLC; 345 PARK AVENUE, L.P.; etc.).
+
+### How to compute top 5 (exact)
+Group by `ownername`:
+
+- `owner_total_assessed = sum(assesstot)` per owner
+- sort desc, take top 5
+- compute concentration metrics:
+  - **Top5 share** = sum(top5 owner totals) / sum(all assesstot)
+  - **HHI** (optional): sum((owner_share)^2)
+
+This will answer “how concentrated” quantitatively.
+
+---
+
+## 6) Lot vs building dimensions; lot coverage ratio; most/least coverage
+
+### Method
+Implied footprint (very rough) = `bldgfront * bldgdepth`  
+Lot coverage ratio = `(bldgfront * bldgdepth) / lotarea`
+
+Caveats:
+- PLUTO `bldgfront/bldgdepth` can be 0 or not representative for irregular lots or multi-building sites.
+- For towers with setbacks, podiums, multiple structures, this is only a proxy.
+
+### Examples from excerpt
+- **360 WEST STREET**: footprint ≈ 1227.5 * 389 ≈ 477,497 sf; lotarea 962,250 → coverage ≈ **0.50**
+- **338 5 AVENUE (Empire State Building)**: 198 * 425 = 84,150; lotarea 91,351 → **0.92** (very high coverage)
+- **250 WEST 34 STREET**: 647 * 197 = 127,459; lotarea 127,966 → **~1.00** (near full coverage; likely rounding/measurement artifact)
+- **761 5 AVENUE**: 200.67 * 314.67 ≈ 63,150; lotarea 84,350 → **0.75**
+- **Some HY towers** have bldgfront/bldgdepth present but may not reflect podium/tower geometry well.
+
+**Least coverage** in the excerpt will likely be:
+- large campus lots where the building occupies a small portion of the lot *or* where bldgfront/bldgdepth are recorded as 0 (cannot compute).  
+Example: Roosevelt Island and Ft Washington have bldgfront/bldgdepth = 0, so coverage is undefined from this proxy.
+
+---
+
+## 7) Geographic clustering (lat/long): Midtown vs Lower Manhattan vs other; relationship to type/value
+
+### Clusters visible
+Using your latitude guidance:
+
+**Lower Manhattan (~40.70–40.72)**
+- **185 Greenwich St** (40.7116) — WTC / Lower Manhattan office mega-site
+- **388 Greenwich St** (40.7209) — Tribeca/FiDi-adjacent office
+
+**Midtown core (~40.75–40.76)**
+A very large share of the excerpt sits here:
+- Bryant Park / 6th Ave towers (40.755–40.760)
+- Rockefeller Center / 5th Ave / Park Ave corridor (40.758–40.764)
+- One Vanderbilt (40.7530)
+- Broadway/Times Sq area (40.7621)
+
+**Hudson Yards / Far West Midtown (~40.753–40.756, lon ~ -74.001)**
+- 500 W 33 (40.7535)
+- 427 10 Ave (40.7545)
+- 527 W 34 (40.7552)
+These are new, very high-FAR, high-assessment office developments.
+
+**Other areas**
+- **Upper West Side**: 200 Central Park West (40.7813) — cultural institution
+- **Roosevelt Island**: (40.7662, lon -73.9459) — large residential complex
+- **Washington Heights**: 180 Ft Washington (40.8407) — hospital/institutional
+
+### Relationship between location and type/value (what the excerpt indicates)
+- **Midtown + HY**: overwhelmingly **commercial office (O4/RC)** with high FAR zoning (C5/C6) → high assessments driven by office concentration and land values.
+- **Lower Manhattan**: also high-value office, but fewer records in this top-30 slice (in the excerpt).
+- **Outside core (UWS, Roosevelt Island, Washington Heights)**: high assessed values come from **institutional or massive residential complexes**, not from typical office towers.
+
+---
+
+## If you want, I can produce the full numeric results for all 30
+If you paste (or upload) the complete 30-record JSON/CSV (or just the missing 30−N rows), I can return:
+
+- exact `zonedist1` frequency table + M/C/R counts  
+- decade table with **average/median assesstot** and a quick correlation (yearbuilt vs assesstot)  
+- per-property area composition percentages + “mixed-use score”  
+- floor plate ranking + by-building-class summary  
+- top-5 owners by summed assesstot + concentration metrics  
+- lot coverage ranking (with flags for invalid 0-dimension cases)  
+- clustering counts by neighborhood band (Midtown/Lower/Other) and cross-tabs with landuse/bldgclass.

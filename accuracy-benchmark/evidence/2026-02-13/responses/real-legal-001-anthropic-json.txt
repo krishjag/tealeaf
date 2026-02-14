@@ -1,0 +1,131 @@
+# Legal Analysis: Wisconsin v. Luis A Ramirez (Columbia County Case 2016CF000031)
+
+## 1. Time from Offense to Sentencing
+
+**Offense Date:** May 5, 2015  
+**Sentencing Date:** February 24, 2020  
+**Total Elapsed Time:** **4 years, 9 months, 19 days** (approximately 57.6 months)
+
+---
+
+## 2. Sentence Components Analysis
+
+### Charge 1: Battery by Prisoners (Felony H)
+- **State Prison:** 12 Years
+- **Extended Supervision:** 3 Years
+- **Total Incarceration:** **15 Years**
+- **Status:** **Consecutive** to any other sentence currently serving
+
+### Charge 2: Disorderly Conduct (Misdemeanor B)
+- **State Prison:** 1 Year
+- **Extended Supervision:** 6 Months (0.5 years)
+- **Total Incarceration:** **1.5 Years**
+- **Status:** **Concurrent** with Count 1
+
+### Combined Sentence Structure:
+- **Effective Total:** 15 years (since Count 2 runs concurrent with Count 1)
+- **Total Confinement Time:** 13 years initial confinement
+- **Total Extended Supervision:** 3 years
+
+---
+
+## 3. Defense Attorney Timeline
+
+| Attorney | Entry Date | Withdrawal Date | Duration |
+|----------|-----------|-----------------|----------|
+| **Leonie C. Dolch** | March 15, 2016 | July 7, 2016 | **3.7 months** |
+| **Ronald Gabriel Benavides** | July 7, 2016 | March 12, 2020 | **44.2 months** |
+| **Jennifer A. Lohr** | May 20, 2020 | October 2, 2025 | **64.4 months** |
+
+**Total Attorneys:** 3  
+**Longest Representation:** Jennifer A. Lohr (64.4 months - appellate work)
+
+---
+
+## 4. Docket Entry Activity by Year
+
+| Year | Number of Entries |
+|------|------------------|
+| 2016 | 40 |
+| 2017 | 11 |
+| 2018 | 17 |
+| 2019 | 22 |
+| 2020 | 27 |
+| 2021 | 19 |
+| 2022 | 20 |
+| 2023 | 18 |
+| 2024 | 8 |
+| 2025 | 4 |
+| **TOTAL** | **186** |
+
+**Most Active Year:** **2016** (40 entries) - initial proceedings through arraignment  
+**Second Most Active:** **2020** (27 entries) - sentencing and initial post-conviction activity
+
+---
+
+## 5. Appeals Activity Analysis
+
+### Appeal-Related Docket Entries:
+- Notice of Intent to Pursue Post-Conviction Relief (March 12, 2020)
+- Multiple Court of Appeals Orders (15+ entries)
+- Supreme Court Orders (5 entries)
+- Court of Appeals Decision (April 25, 2024) - **REVERSED & REMANDED**
+- Supreme Court Review Granted (2024)
+- Supreme Court Decision Filed (June 27, 2025)
+
+**Total Appeal-Related Entries:** **Approximately 35-40 entries**  
+**Percentage of Total Docket:** **19-21%** of all docket entries
+
+### Key Appeal Milestones:
+- Notice of Appeal filed: June 2, 2022
+- Court of Appeals reversed conviction: April 25, 2024
+- Supreme Court accepted review: May 28, 2024
+- Supreme Court decision: June 27, 2025
+- Remittitur: September 5, 2025
+
+---
+
+## 6. Financial Receivables Analysis
+
+| Category | Amount |
+|----------|--------|
+| **Total Amount Due** | $761.00 |
+| **Amount Paid Directly** | $352.00 |
+| **Probation/DOC Amount** | $409.00 |
+| **Adjustments** | $0.00 |
+| **Balance Due** | $0.00 |
+
+### Collection Analysis:
+- **Total Collected:** $761.00
+- **Collection Rate:** **100%**
+- **Method:** Direct payment ($352) + DOC Collection ($409)
+- **Status:** At Collections = FALSE (completed)
+- **DOC Collected:** TRUE
+
+---
+
+## 7. Bond Information
+
+### Initial Bond Order:
+**Date:** February 11, 2016  
+**Amount:** **$5,000.00**  
+**Type:** Signature Bond (Recognizance Bond)  
+**Conditions:** "with felony conditions"
+
+### Bond-Related Docket Entries:
+
+1. **February 11, 2016** - Signature bond set at $5,000 with felony conditions
+2. **February 15, 2016** - Letter to defendant with bond documents
+3. **February 25, 2016** - Signature bond signed and filed
+4. **October 26, 2016** (Arraignment) - "Bond continued" (maintained same bond conditions)
+
+**Note:** Bond remained in effect throughout pretrial proceedings as defendant was already incarcerated at various correctional facilities (Waupun, Green Bay Correctional, Wisconsin Secure Program Facility).
+
+---
+
+## Additional Notable Observations:
+
+- **Venue:** Multiple video appearances from correctional facilities
+- **Jury Trial:** December 3-4, 2019 (2-day trial, guilty on both counts)
+- **Current Status:** Case closed following Supreme Court proceedings and remittitur
+- **Defendant Location:** Wisconsin Secure Program Facility, Boscobel (as of final address update)

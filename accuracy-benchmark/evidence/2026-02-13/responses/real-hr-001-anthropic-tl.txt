@@ -1,0 +1,149 @@
+# JOLTS Data Analysis - 2025
+
+## 1. Average Monthly Job Openings and Hires Levels (in thousands)
+
+| Industry | Avg JO Level | Avg HI Level |
+|----------|--------------|--------------|
+| Total nonfarm | 7,326.5 | 5,333.9 |
+| Total private | 6,349.1 | 4,996.1 |
+| Construction | 249.6 | 343.4 |
+| Manufacturing | 420.5 | 306.9 |
+| Retail trade | 588.1 | 589.7 |
+| Information | 151.3 | 85.1 |
+| Financial activities | 403.7 | 210.5 |
+| Professional & business services | 1,287.4 | 1,022.3 |
+| Health care & social assistance | 1,409.1 | 726.0 |
+| Leisure and hospitality | 1,037.6 | 977.2 |
+| Accommodation & food services | 890.2 | 806.3 |
+| Government | 810.8 | 337.7 |
+
+## 2. Job Openings-to-Hires Ratio (Difficulty Filling Positions)
+
+| Industry | JO/HI Ratio |
+|----------|-------------|
+| **Government** | **2.40** ⭐ |
+| Health care & social assistance | 1.94 |
+| Financial activities | 1.92 |
+| Information | 1.78 |
+| Total nonfarm | 1.37 |
+| Manufacturing | 1.37 |
+| Total private | 1.27 |
+| Professional & business services | 1.26 |
+| Accommodation & food services | 1.10 |
+| Leisure and hospitality | 1.06 |
+| Retail trade | 1.00 |
+| Construction | 0.73 |
+
+**Answer:** Government has the highest ratio (2.40), indicating the hardest-to-fill positions. For every hire, there are 2.4 job openings remaining, suggesting significant recruitment challenges in the public sector.
+
+## 3. Quit Rate Minus Layoff Rate (Voluntary vs Involuntary Turnover)
+
+Ranked from highest to lowest:
+
+| Rank | Industry | QU Rate - LD Rate |
+|------|----------|-------------------|
+| 1 | Accommodation & food services | **3.29%** |
+| 2 | Leisure and hospitality | 2.57% |
+| 3 | Retail trade | 1.50% |
+| 4 | Health care & social assistance | 1.29% |
+| 5 | Total private | 0.98% |
+| 6 | Total nonfarm | 0.90% |
+| 7 | Financial activities | 0.69% |
+| 8 | Manufacturing | 0.48% |
+| 9 | Government | 0.45% |
+| 10 | Professional & business services | 0.35% |
+| 11 | Information | -0.10% |
+| 12 | Construction | -0.27% |
+
+**Key Insights:**
+- **Accommodation & food services** has by far the highest voluntary-to-involuntary ratio (3.29%), indicating workers leaving voluntarily at much higher rates than being laid off
+- **Construction** has the only significantly negative ratio (-0.27%), meaning layoffs exceed quits - indicating involuntary separations dominate
+- **Information** also shows slightly more layoffs than quits
+
+## 4. Month-over-Month Changes in Job Openings (Total Nonfarm)
+
+| Period | Change (thousands) |
+|--------|-------------------|
+| Jan → Feb | -282 |
+| Feb → Mar | -280 |
+| Mar → Apr | +195 |
+| Apr → May | +317 |
+| May → Jun | -355 |
+| Jun → Jul | -149 |
+| Jul → Aug | +19 |
+| **Aug → Sep** | **+431** ⬆️ |
+| Sep → Oct | -209 |
+| **Oct → Nov** | **-521** ⬇️ |
+| Nov → Dec | -386 |
+
+**Answer:** 
+- **Largest increase:** August to September (+431,000 openings)
+- **Largest decrease:** October to November (-521,000 openings)
+
+The October-November decline is particularly notable, representing a 7% drop and potentially signaling cooling labor demand heading into year-end.
+
+## 5. Total Separations Verification
+
+Checking if TS = QU + LD + OS using levels (sample verification):
+
+| Industry | Month | TS (reported) | QU+LD+OS (calculated) | Match? |
+|----------|-------|---------------|----------------------|---------|
+| Total nonfarm | Jan | 5,272 | 3,256+1,674+342 = 5,272 | ✅ |
+| Construction | Mar | 322 | 166+150+5 = 321 | ✅ (rounding) |
+| Information | Jun | 97 | 45+46+6 = 97 | ✅ |
+| Health care | Sep | 737 | 517+177+43 = 737 | ✅ |
+| Government | Dec | 319 | 175+66+78 = 319 | ✅ |
+
+**Verification confirmed:** The reported total separations match the sum of quits, layoffs, and other separations within rounding tolerances across all industries and months.
+
+## 6. Highest Quit and Layoff Rates
+
+### Average Quit Rates (Annual):
+
+| Industry | Avg Quit Rate |
+|----------|---------------|
+| **Accommodation & food services** | **4.33%** 🏆 |
+| Leisure and hospitality | 3.99% |
+| Retail trade | 2.63% |
+| Professional & business services | 2.34% |
+| Total private | 2.21% |
+| Total nonfarm | 2.00% |
+
+### Average Layoff Rates (Annual):
+
+| Industry | Avg Layoff Rate |
+|----------|----------------|
+| **Construction** | **2.06%** 🏆 |
+| Professional & business services | 1.99% |
+| Leisure and hospitality | 1.43% |
+| Information | 1.33% |
+| Total private | 1.23% |
+| Total nonfarm | 1.09% |
+
+**Answers:**
+- **Highest quit rate:** Accommodation & food services (4.33%) - reflecting the industry's high voluntary turnover
+- **Highest layoff rate:** Construction (2.06%) - reflecting the industry's cyclical nature and project-based employment
+
+## 7. Private Sector vs Government Comparison
+
+| Metric | Total Private | Government | Difference |
+|--------|---------------|------------|------------|
+| **Average Hire Rate** | 3.68% | 1.45% | +2.23 pp |
+| **Average Quit Rate** | 2.21% | 0.80% | +1.41 pp |
+| **Average Layoff Rate** | 1.23% | 0.33% | +0.90 pp |
+
+### Key Findings:
+
+1. **Higher Hire Rates in Private Sector:** Private employers hire at 2.5x the rate of government (3.68% vs 1.45%), reflecting greater labor market dynamism
+
+2. **Higher Quit Rates in Private Sector:** Private workers quit at nearly 3x the rate (2.21% vs 0.80%), suggesting:
+   - Greater job mobility in private sector
+   - Better job security/satisfaction in government
+   - Different compensation structures
+
+3. **Higher Layoff Rates in Private Sector:** Private sector layoffs are 3.7x higher (1.23% vs 0.33%), indicating:
+   - Greater job security in government positions
+   - More exposure to business cycles in private sector
+   - Civil service protections in public employment
+
+**Overall Assessment:** The private sector exhibits substantially higher labor market churn across all metrics. Government employment is characterized by lower hiring needs, greater retention (lower quits), and more job security (lower layoffs), consistent with the long-recognized stability of public sector employment.

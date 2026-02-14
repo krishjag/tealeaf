@@ -1,0 +1,153 @@
+# Workforce Analysis: 2025 JOLTS Data
+
+## 1. Industries by Average Job Openings Rate
+
+### Highest Average JO Rates:
+1. **Accommodation and food services: 5.83%**
+2. **Leisure and hospitality: 5.73%**
+3. **Health care and social assistance: 5.68%**
+
+### Lowest Average JO Rates:
+1. **Construction: 2.90%**
+2. **Manufacturing: 3.19%**
+3. **Government: 3.41%**
+
+**Interpretation:** Labor demand is strongest in service sectors requiring high-volume staffing (hospitality, food service, healthcare) where turnover is traditionally high. Construction and manufacturing show weaker demand, potentially reflecting economic headwinds in goods-producing sectors. The low government rate reflects typical public sector stability with less volatility in hiring needs.
+
+---
+
+## 2. Labor Market Churn Rankings
+
+**Churn = (Annual Hires + Annual Separations) / 24**
+
+| Rank | Industry | Monthly Churn (000s) |
+|------|----------|---------------------|
+| 1 | Professional and business services | 1,015.88 |
+| 2 | Leisure and hospitality | 964.83 |
+| 3 | Accommodation and food services | 797.50 |
+| 4 | Health care and social assistance | 697.79 |
+| 5 | Retail trade | 609.25 |
+| 6 | Construction | 338.79 |
+| 7 | Government | 337.79 |
+| 8 | Manufacturing | 307.79 |
+| 9 | Financial activities | 206.88 |
+| 10 | Information | 88.54 |
+
+**Note:** Total nonfarm (5,307.96) and Total private (4,977.00) excluded as aggregates.
+
+---
+
+## 3. Net Hiring Rate Analysis
+
+**Net Hiring Rate = Average Hire Rate - Average Separation Rate**
+
+### Growing Industries (Positive):
+- **Health care and social assistance: +0.30%** 🔥 (strongest growth)
+- **Leisure and hospitality: +0.19%**
+- **Accommodation and food services: +0.16%**
+- **Construction: +0.12%**
+- **Financial activities: +0.09%**
+- **Total nonfarm: +0.07%**
+- **Total private: +0.06%**
+- **Government: +0.06%**
+
+### Shrinking Industries (Negative):
+- **Information: -0.06%** (tech sector contraction)
+- **Manufacturing: -0.04%**
+- **Professional and business services: -0.03%**
+- **Retail trade: -0.01%**
+
+---
+
+## 4. Structural Comparison: Leisure & Hospitality vs Professional & Business Services
+
+| Metric | Leisure & Hospitality | Prof & Business Svcs | Difference |
+|--------|----------------------|---------------------|------------|
+| **JO Rate** | 5.73% | 5.39% | +0.34% |
+| **Hire Rate** | 5.72% | 4.54% | +1.18% |
+| **Total Sep Rate** | 5.53% | 4.57% | +0.96% |
+| **Quit Rate** | 3.99% | 2.34% | +1.65% |
+| **Layoff/Discharge Rate** | 1.39% | 1.99% | -0.60% |
+| **Other Sep Rate** | 0.13% | 0.23% | -0.10% |
+
+### Key Structural Differences:
+
+**Leisure & Hospitality:**
+- **High-churn, voluntary separation model** - Quits represent 72% of all separations
+- Nearly identical hire and separation rates (5.72% vs 5.53%) = "revolving door" labor market
+- Lower layoff rate indicates stability in available hours/positions
+- Workers have high mobility and frequently change jobs voluntarily
+- Typical of entry-level, part-time, seasonal workforce
+
+**Professional & Business Services:**
+- **Lower turnover, higher layoff component** - Layoffs represent 43% of separations (vs 26% for L&H)
+- Lower quit rate (2.34%) suggests jobs are more "sticky" with better retention
+- Higher layoff share indicates business cycle sensitivity and restructuring activity
+- Slightly negative net hiring (-0.03%) suggests sector contraction/consolidation
+- Reflects professional workforce with career investment and employment contracts
+
+---
+
+## 5. Construction Seasonality
+
+| Metric | Value |
+|--------|-------|
+| **Highest hires month** | April (364,000) |
+| **Lowest hires month** | March (306,000) |
+| **Range (max - min)** | **58,000** |
+| **Coefficient of variation** | 5.6% |
+
+**Pattern:** Spring surge in April hiring (post-winter weather, construction season start), with trough in March. The 58,000 range represents 17% of average monthly hires, showing **moderate seasonality** despite weather-related industry characteristics.
+
+---
+
+## 6. Separation Composition by Industry
+
+| Industry | Quit % | Layoff % | Other % | Total Sep (000s) |
+|----------|--------|----------|---------|------------------|
+| **Accommodation & food services** | **78.7%** 🥇 | 18.7% | 2.7% | 9,460 |
+| Leisure and hospitality | 71.9% | 26.3% | 1.7% | 11,402 |
+| Health care & social assist | 70.9% | 24.6% | 4.5% | 8,014 |
+| Retail trade | 68.8% | 27.8% | 3.4% | 7,278 |
+| Total nonfarm | 60.8% | 33.1% | 6.1% | 62,984 |
+| Financial activities | 59.6% | 30.1% | 10.2% | 2,423 |
+| Manufacturing | 56.6% | 36.7% | 6.7% | 3,737 |
+| Government | 54.4% | 26.6% | **19.0%** 🥇 | 4,055 |
+| Prof & business services | 50.5% | 43.5% | 6.0% | 12,193 |
+| Information | 43.7% | 47.0% | 9.3% | 1,085 |
+| **Construction** | 43.7% | **51.2%** 🥇 | 5.1% | 4,010 |
+
+### Key Findings:
+- **Highest Quit Share:** Accommodation and food services (78.7%) - workers freely exit for better opportunities
+- **Highest Layoff Share:** Construction (51.2%) - project-based work drives involuntary separations
+- **Highest Other Separations:** Government (19.0%) - retirements/transfers reflect career public servants
+
+---
+
+## 7. Labor Market Tightness Indicators (Total Nonfarm)
+
+### Job Openings Trend:
+- **Annual average:** 7,243,000 openings
+- **January:** 7,762,000 (peak)
+- **December:** 6,542,000 (trough)
+- **Decline:** -1,220,000 (-15.7% year-over-year)
+
+### Vacancy-to-Unemployment Context:
+**Note:** JOLTS data alone doesn't provide unemployment levels. However, we can assess tightness directionally:
+
+- **Average JO rate:** 4.39% of employment
+- **Downward trajectory** throughout 2025 suggests cooling labor market
+- For context, a "balanced" labor market historically shows ~3.5% JO rate
+- **2025 pattern:** Market started tight (4.7% in Jan) and loosened considerably (3.9% in Dec)
+
+**Implied tightness ratio trend:** If assuming unemployment remained relatively stable, the 16% decline in openings suggests meaningful reduction in jobs-per-unemployed worker, shifting bargaining power from workers to employers as the year progressed. The ratio likely moved from above 1.0 (more openings than unemployed) toward parity or below.
+
+---
+
+## Strategic Summary
+
+2025 showed a **bifurcated labor market:**
+- **Service sectors** (healthcare, leisure, food service) remained hot with expansion and voluntary turnover
+- **White-collar/goods sectors** (info, manufacturing, professional services) contracted with layoff-driven separations
+- Overall market **cooled significantly** through year-end, with December showing weakest openings rate
+- **Structural churn** remains highest where automation resistance is strongest (healthcare, hospitality)

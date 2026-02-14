@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "description": "Synthetic benchmark task definitions (12 tasks across 10 domains)",
+  "description": "Synthetic benchmark task definitions (9 tasks across 7 domains)",
   "tasks": [
     {
       "id": "FIN-001",
@@ -9,6 +9,7 @@
       "output_type": "calculation",
       "prompt_template": "You are a financial analyst. Analyze the following quarterly financial data (provided in {format_name} format) and extract key metrics:\n\n{data}\n\nProvide:\n1. Total revenue (sum all revenue sources)\n2. Gross profit and margin\n3. Operating income\n4. Net income\n5. Profit margin percentage\n6. Total assets and liabilities\n7. Shareholders' equity",
       "data_file": "finance/synthetic-data/financial_statement_simple.json",
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "expected_elements": [
         {"element_type": "metric", "description": "Total revenue calculation", "required": true, "validation_pattern": "\\$[\\d,]+"},
         {"element_type": "metric", "description": "Gross profit calculation", "required": true},
@@ -22,6 +23,7 @@
       "output_type": "calculation",
       "prompt_template": "You are an investment analyst. Analyze the following portfolio data (provided in {format_name} format) and calculate key metrics:\n\n{data}\n\nCalculate:\n1. Total portfolio value (including cash)\n2. Total cost basis\n3. Total unrealized gain/loss\n4. Portfolio return percentage\n5. Allocation percentages for each holding\n6. Weighted average dividend yield",
       "data_file": "finance/synthetic-data/portfolio_simple.json",
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "expected_elements": [
         {"element_type": "metric", "description": "Portfolio value", "required": true, "validation_pattern": "\\$[\\d,]+"},
         {"element_type": "metric", "description": "Unrealized gain", "required": true},
@@ -35,6 +37,7 @@
       "output_type": "summary",
       "prompt_template": "You are a retail analyst. Analyze the following weekly sales data (provided in {format_name} format) and provide key metrics:\n\n{data}\n\nProvide:\n1. Total weekly revenue\n2. Total orders\n3. Average order value\n4. Best and worst performing days\n5. Day-over-day trends and patterns",
       "data_file": "retail/synthetic-data/weekly_sales.json",
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "expected_elements": [
         {"element_type": "metric", "description": "Total revenue", "required": true, "validation_pattern": "\\$[\\d,]+"},
         {"element_type": "insight", "description": "Best performing day", "required": true},
@@ -48,6 +51,7 @@
       "output_type": "recommendation",
       "prompt_template": "You are a customer analytics expert. Analyze the following customer data (provided in {format_name} format) and perform customer segmentation:\n\n{data}\n\nPerform RFM (Recency, Frequency, Monetary) analysis and:\n1. Calculate RFM scores for each customer\n2. Segment each customer (Champions, Loyal, At-Risk, Lost, etc.)\n3. Identify high-value customers\n4. Recommend retention strategies for each segment",
       "data_file": "retail/synthetic-data/customers.json",
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "expected_elements": [
         {"element_type": "analysis", "description": "Customer segmentation", "required": true},
         {"element_type": "insight", "description": "High-value identification", "required": true},
@@ -61,6 +65,7 @@
       "output_type": "summary",
       "prompt_template": "You are a clinical data analyst. Extract and summarize key information from the following patient record (provided in {format_name} format):\n\n{data}\n\nProvide:\n1. Patient demographics summary\n2. Active conditions count and list\n3. Current medications with potential interactions\n4. Allergy alerts with severity levels\n5. Recent vitals assessment",
       "data_file": "healthcare/synthetic-data/patient_record.json",
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "expected_elements": [
         {"element_type": "summary", "description": "Demographics", "required": true},
         {"element_type": "summary", "description": "Conditions", "required": true},
@@ -74,36 +79,11 @@
       "output_type": "analysis",
       "prompt_template": "You are a DevOps engineer. Analyze the following server metrics (provided in {format_name} format) and identify issues:\n\n{data}\n\nProvide:\n1. Critical issues requiring immediate action\n2. Warning-level concerns\n3. Resource utilization summary\n4. Performance assessment vs targets\n5. Prioritized recommended actions",
       "data_file": "technology/synthetic-data/server_metrics_simple.json",
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "expected_elements": [
         {"element_type": "analysis", "description": "Critical issues", "required": true},
         {"element_type": "analysis", "description": "Resource assessment", "required": true},
         {"element_type": "recommendation", "description": "Action items", "required": true}
-      ]
-    },
-    {
-      "id": "MKT-001",
-      "category": "marketing",
-      "complexity": "moderate",
-      "output_type": "calculation",
-      "prompt_template": "You are a marketing analyst. Analyze the following campaign data (provided in {format_name} format) and calculate ROI metrics:\n\n{data}\n\nCalculate for each campaign:\n1. CTR (Click-through rate)\n2. Conversion rate\n3. CPA (Cost per acquisition)\n4. ROAS (Return on ad spend)\n5. ROI percentage\n\nThen compare the campaigns and recommend budget allocation.",
-      "data_file": "marketing/synthetic-data/campaigns_simple.json",
-      "expected_elements": [
-        {"element_type": "metric", "description": "CTR calculation", "required": true, "validation_pattern": "\\d+\\.?\\d*%"},
-        {"element_type": "metric", "description": "ROAS calculation", "required": true},
-        {"element_type": "metric", "description": "ROI calculation", "required": true}
-      ]
-    },
-    {
-      "id": "LOG-001",
-      "category": "logistics",
-      "complexity": "moderate",
-      "output_type": "analysis",
-      "prompt_template": "You are a logistics analyst. Analyze the following shipment data (provided in {format_name} format) and calculate delivery metrics:\n\n{data}\n\nProvide:\n1. Total shipments and delivery status breakdown\n2. On-time delivery rate percentage\n3. Average shipment cost and cost per kg\n4. Carrier performance comparison\n5. Warehouse utilization summary\n6. Recommendations for improving delivery performance",
-      "data_file": "logistics/synthetic-data/shipments.json",
-      "expected_elements": [
-        {"element_type": "metric", "description": "On-time delivery rate", "required": true, "validation_pattern": "\\d+\\.?\\d*%"},
-        {"element_type": "analysis", "description": "Carrier comparison", "required": true},
-        {"element_type": "recommendation", "description": "Performance improvement", "required": false}
       ]
     },
     {
@@ -113,23 +93,11 @@
       "output_type": "analysis",
       "prompt_template": "You are an HR analyst. Analyze the following employee data (provided in {format_name} format) and provide workforce insights:\n\n{data}\n\nProvide:\n1. Headcount by department\n2. Average salary by department and role level\n3. Performance score distribution\n4. Tenure analysis (average years at company)\n5. Attrition analysis and trends\n6. Cost of benefits per employee",
       "data_file": "hr/synthetic-data/employees.json",
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "expected_elements": [
         {"element_type": "metric", "description": "Headcount breakdown", "required": true},
         {"element_type": "metric", "description": "Average salary", "required": true},
         {"element_type": "insight", "description": "Attrition analysis", "required": true}
-      ]
-    },
-    {
-      "id": "MFG-001",
-      "category": "manufacturing",
-      "complexity": "moderate",
-      "output_type": "calculation",
-      "prompt_template": "You are a manufacturing analyst. Analyze the following production data (provided in {format_name} format) and calculate OEE metrics:\n\n{data}\n\nProvide:\n1. Total production volume (planned vs actual)\n2. Production efficiency percentage\n3. Defect rate by product\n4. Equipment utilization analysis\n5. Downtime analysis and causes\n6. Material stock levels vs reorder points",
-      "data_file": "manufacturing/synthetic-data/production.json",
-      "expected_elements": [
-        {"element_type": "metric", "description": "Production efficiency", "required": true, "validation_pattern": "\\d+\\.?\\d*%"},
-        {"element_type": "metric", "description": "Defect rate", "required": true},
-        {"element_type": "analysis", "description": "Equipment utilization", "required": true}
       ]
     },
     {
@@ -139,6 +107,7 @@
       "output_type": "recommendation",
       "prompt_template": "You are a real estate analyst. Analyze the following property and market data (provided in {format_name} format) and provide market insights:\n\n{data}\n\nProvide:\n1. Active listings summary by property type\n2. Average price per square foot by type\n3. Days on market analysis\n4. Transaction volume and average sale price\n5. Market conditions assessment (buyer's vs seller's market)\n6. Investment recommendations based on the data",
       "data_file": "real_estate/synthetic-data/properties.json",
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "expected_elements": [
         {"element_type": "metric", "description": "Price per sqft", "required": true},
         {"element_type": "analysis", "description": "Market conditions", "required": true},
@@ -152,6 +121,7 @@
       "output_type": "analysis",
       "prompt_template": "You are a legal analyst. Analyze the following contract portfolio (provided in {format_name} format) and assess compliance and risk:\n\n{data}\n\nProvide:\n1. Contract portfolio summary by type\n2. Total contract value by category\n3. Risk level distribution\n4. Compliance status overview\n5. Upcoming renewals and expirations\n6. Active disputes and financial exposure\n7. Recommendations for risk mitigation",
       "data_file": "legal/synthetic-data/contracts.json",
+      "include_format_hint": {"tl": false, "json": false, "toon": false},
       "expected_elements": [
         {"element_type": "summary", "description": "Contract portfolio", "required": true},
         {"element_type": "analysis", "description": "Risk assessment", "required": true},

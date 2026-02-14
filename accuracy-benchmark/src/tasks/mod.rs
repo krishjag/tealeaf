@@ -4,13 +4,17 @@ pub mod categories;
 pub mod loader;
 
 pub use categories::{Complexity, Domain, OutputType};
-pub use loader::{load_tasks_from_directory, load_tasks_from_file, load_tasks_from_json_file, load_tasks_from_string, LoadError};
+pub use loader::{load_format_hints, load_tasks_from_directory, load_tasks_from_file, load_tasks_from_json_file, load_tasks_from_string, LoadError};
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use crate::config::DataFormat;
 use crate::providers::CompletionResponse;
+
+/// Per-format hint text loaded from `format_hints.json`
+pub type FormatHints = HashMap<String, String>;
 
 /// Metadata for a benchmark task
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -76,6 +80,9 @@ pub struct BenchmarkTask {
     /// Data source (JSON to be converted to TeaLeaf)
     #[serde(default)]
     pub data_source: DataSource,
+    /// Per-format hint flags, e.g. `{"tl": true}` to prepend a hint for TL prompts
+    #[serde(default)]
+    pub include_format_hint: HashMap<String, bool>,
 }
 
 impl BenchmarkTask {
@@ -99,6 +106,7 @@ impl BenchmarkTask {
             data_context: Vec::new(),
             grading_rubric: None,
             data_source: DataSource::None,
+            include_format_hint: HashMap::new(),
         }
     }
 
@@ -116,11 +124,13 @@ impl BenchmarkTask {
 
     /// Prepare the prompt by converting JSON data to TeaLeaf and inserting it
     pub fn prepare_prompt(&mut self) -> Result<(), String> {
-        self.prepare_prompt_with_format(DataFormat::TL)
+        self.prepare_prompt_with_format(DataFormat::TL, &HashMap::new())
     }
 
-    /// Prepare the prompt with a specific data format (TeaLeaf, JSON, or TOON)
-    pub fn prepare_prompt_with_format(&mut self, format: DataFormat) -> Result<(), String> {
+    /// Prepare the prompt with a specific data format (TeaLeaf, JSON, or TOON).
+    /// If `format_hints` contains a non-empty string for this format and the task
+    /// opts in via `include_format_hint`, the hint is prepended to the prompt.
+    pub fn prepare_prompt_with_format(&mut self, format: DataFormat, format_hints: &FormatHints) -> Result<(), String> {
         let data = match format {
             DataFormat::TL => self.get_data_as_tl()?,
             DataFormat::Json => self.get_data_as_json()?,
@@ -132,6 +142,17 @@ impl BenchmarkTask {
             .replace("{tl_data}", &data)
             .replace("{data}", &data)
             .replace("{format_name}", format.display_name());
+
+        // Prepend format hint when the task opts in for this format
+        let format_key = format.as_str();
+        if self.include_format_hint.get(format_key).copied().unwrap_or(false) {
+            if let Some(hint) = format_hints.get(format_key) {
+                if !hint.is_empty() {
+                    self.prompt = format!("{}\n\n{}", hint, self.prompt);
+                }
+            }
+        }
+
         Ok(())
     }
 

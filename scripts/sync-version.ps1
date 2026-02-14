@@ -51,11 +51,26 @@ $Authors = $Release.authors
 $License = $Release.license
 $Repository = $Release.repository
 
+# Benchmark metrics
+$Benchmark = $Release.benchmark
+$BenchDate = $Benchmark.date
+$BenchTasks = $Benchmark.tasks
+$BenchDomains = $Benchmark.domains
+$TlSavings = $Benchmark.tl_input_savings_pct
+$ToonSavings = $Benchmark.toon_input_savings_pct
+$AccAnthropicTl = $Benchmark.accuracy.anthropic_tl
+$AccAnthropicJson = $Benchmark.accuracy.anthropic_json
+$AccAnthropicToon = $Benchmark.accuracy.anthropic_toon
+$AccOpenaiTl = $Benchmark.accuracy.openai_tl
+$AccOpenaiJson = $Benchmark.accuracy.openai_json
+$AccOpenaiToon = $Benchmark.accuracy.openai_toon
+
 Write-Host "Release Metadata:" -ForegroundColor Cyan
 Write-Host "  Version:    $Version"
 Write-Host "  Authors:    $Authors"
 Write-Host "  License:    $License"
 Write-Host "  Repository: $Repository"
+Write-Host "  Benchmark:  $BenchDate ($BenchTasks tasks, $BenchDomains domains, TL saves ~${TlSavings}%)"
 Write-Host ""
 
 # Track if any updates were needed
@@ -260,6 +275,76 @@ $FfiRefPath = Join-Path $RepoRoot "docs-site/src/ffi/api-reference.md"
 Update-File -Path $FfiRefPath -Description "ffi/api-reference.md (version example)" -Transform {
     param($content)
     $content = $content -replace '(e\.g\., `")[^"]*(")', "`${1}$Version`${2}"
+    return $content
+}
+
+# ── Benchmark metric propagation ─────────────────────────────────────────────
+
+# README.md -- headline savings
+Update-File -Path $ReadmePath -Description "README.md (benchmark headline)" -Transform {
+    param($content)
+    $content = $content -replace '~\d+% fewer input tokens than JSON', "~${TlSavings}% fewer input tokens than JSON"
+    return $content
+}
+
+# README.md -- context engineering section
+Update-File -Path $ReadmePath -Description "README.md (benchmark stats)" -Transform {
+    param($content)
+    # Savings bullet (just the percentage)
+    $content = $content -replace '(\*\*~)\d+(% fewer input tokens\*\* on real-world data)', "`${1}${TlSavings}`${2}"
+    # Accuracy table rows
+    $content = $content -replace '(\| Anthropic accuracy \| )[\d.]+( \| )[\d.]+( \| )[\d.]+( \|)', "`${1}${AccAnthropicTl}`${2}${AccAnthropicJson}`${3}${AccAnthropicToon}`${4}"
+    $content = $content -replace '(\| OpenAI accuracy \| )[\d.]+( \| )[\d.]+( \| )[\d.]+( \|)', "`${1}${AccOpenaiTl}`${2}${AccOpenaiJson}`${3}${AccOpenaiToon}`${4}"
+    # Input savings row
+    $content = $content -replace '(\| Input token savings \| \*\*-)\d+(%\*\* \| baseline \| \*\*-)\d+(%\*\* \|)', "`${1}${TlSavings}`${2}${ToonSavings}`${3}"
+    return $content
+}
+
+# CLAUDE.md -- token efficiency section
+Update-File -Path $ClaudeMdPath -Description "CLAUDE.md (benchmark stats)" -Transform {
+    param($content)
+    # Savings percentage
+    $content = $content -replace '(\*\*~)\d+(% fewer input tokens\*\* on real-world data)', "`${1}${TlSavings}`${2}"
+    # Accuracy example
+    $content = $content -replace '(e\.g\., TL )[\d.]+( vs JSON )[\d.]+( on Anthropic)', "`${1}${AccAnthropicTl}`${2}${AccAnthropicJson}`${3}"
+    return $content
+}
+
+# tealeaf-core/README.md -- headline
+Update-File -Path $CoreReadmePath -Description "tealeaf-core/README.md (benchmark headline)" -Transform {
+    param($content)
+    $content = $content -replace '~\d+% fewer input tokens than JSON', "~${TlSavings}% fewer input tokens than JSON"
+    return $content
+}
+
+# docs-site/src/introduction.md -- headline + LLM section + table
+Update-File -Path $IntroPath -Description "introduction.md (benchmark stats)" -Transform {
+    param($content)
+    $content = $content -replace '~\d+% fewer input tokens than JSON', "~${TlSavings}% fewer input tokens than JSON"
+    $content = $content -replace '(\*\*~)\d+(% fewer input tokens\*\* on real-world data)', "`${1}${TlSavings}`${2}"
+    $content = $content -replace '(\| Anthropic accuracy \| )[\d.]+( \| )[\d.]+( \| )[\d.]+( \|)', "`${1}${AccAnthropicTl}`${2}${AccAnthropicJson}`${3}${AccAnthropicToon}`${4}"
+    $content = $content -replace '(\| OpenAI accuracy \| )[\d.]+( \| )[\d.]+( \| )[\d.]+( \|)', "`${1}${AccOpenaiTl}`${2}${AccOpenaiJson}`${3}${AccOpenaiToon}`${4}"
+    $content = $content -replace '(\| Input token savings \| \*\*-)\d+(%\*\* \| baseline \| \*\*-)\d+(%\*\* \|)', "`${1}${TlSavings}`${2}${ToonSavings}`${3}"
+    return $content
+}
+
+# docs-site/src/guides/llm-context.md -- savings stats + table
+$LlmContextPath = Join-Path $RepoRoot "docs-site/src/guides/llm-context.md"
+Update-File -Path $LlmContextPath -Description "llm-context.md (benchmark stats)" -Transform {
+    param($content)
+    $content = $content -replace '(\*\*~)\d+(% fewer data tokens\*\*\. On synthetic)', "`${1}${TlSavings}`${2}"
+    $content = $content -replace '(expect \*\*~)\d+(% fewer data tokens\*\*)', "`${1}${TlSavings}`${2}"
+    $content = $content -replace '(\| Anthropic accuracy \| )[\d.]+( \| )[\d.]+( \| )[\d.]+( \|)', "`${1}${AccAnthropicTl}`${2}${AccAnthropicJson}`${3}${AccAnthropicToon}`${4}"
+    $content = $content -replace '(\| OpenAI accuracy \| )[\d.]+( \| )[\d.]+( \| )[\d.]+( \|)', "`${1}${AccOpenaiTl}`${2}${AccOpenaiJson}`${3}${AccOpenaiToon}`${4}"
+    $content = $content -replace '(\| Input token savings \| \*\*-)\d+(%\*\* \| baseline \| \*\*-)\d+(%\*\* \|)', "`${1}${TlSavings}`${2}${ToonSavings}`${3}"
+    return $content
+}
+
+# docs-site/src/internals/accuracy-benchmark.md -- results tables
+$BenchDocPath = Join-Path $RepoRoot "docs-site/src/internals/accuracy-benchmark.md"
+Update-File -Path $BenchDocPath -Description "accuracy-benchmark.md (benchmark stats)" -Transform {
+    param($content)
+    $content = $content -replace '(\*\*~)\d+(% input token savings\*\* on real-world data)', "`${1}${TlSavings}`${2}"
     return $content
 }
 

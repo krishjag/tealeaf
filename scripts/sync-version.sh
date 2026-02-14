@@ -36,11 +36,25 @@ LICENSE=$(jq -r '.license' "$RELEASE_FILE")
 REPOSITORY=$(jq -r '.repository' "$RELEASE_FILE")
 DOTNET_DESCRIPTION=$(jq -r '.packages.dotnet.description' "$RELEASE_FILE")
 
+# Benchmark metrics
+BENCH_DATE=$(jq -r '.benchmark.date' "$RELEASE_FILE")
+BENCH_TASKS=$(jq -r '.benchmark.tasks' "$RELEASE_FILE")
+BENCH_DOMAINS=$(jq -r '.benchmark.domains' "$RELEASE_FILE")
+TL_SAVINGS=$(jq -r '.benchmark.tl_input_savings_pct' "$RELEASE_FILE")
+TOON_SAVINGS=$(jq -r '.benchmark.toon_input_savings_pct' "$RELEASE_FILE")
+ACC_ANTHROPIC_TL=$(jq -r '.benchmark.accuracy.anthropic_tl' "$RELEASE_FILE")
+ACC_ANTHROPIC_JSON=$(jq -r '.benchmark.accuracy.anthropic_json' "$RELEASE_FILE")
+ACC_ANTHROPIC_TOON=$(jq -r '.benchmark.accuracy.anthropic_toon' "$RELEASE_FILE")
+ACC_OPENAI_TL=$(jq -r '.benchmark.accuracy.openai_tl' "$RELEASE_FILE")
+ACC_OPENAI_JSON=$(jq -r '.benchmark.accuracy.openai_json' "$RELEASE_FILE")
+ACC_OPENAI_TOON=$(jq -r '.benchmark.accuracy.openai_toon' "$RELEASE_FILE")
+
 echo "Release Metadata:"
 echo "  Version:    $VERSION"
 echo "  Authors:    $AUTHORS"
 echo "  License:    $LICENSE"
 echo "  Repository: $REPOSITORY"
+echo "  Benchmark:  $BENCH_DATE ($BENCH_TASKS tasks, $BENCH_DOMAINS domains, TL saves ~${TL_SAVINGS}%)"
 echo ""
 
 # Track if any updates are needed
@@ -179,6 +193,73 @@ update_file "$REPO_ROOT/docs-site/src/rust/derive-macros.md" \
 update_file "$REPO_ROOT/docs-site/src/ffi/api-reference.md" \
     "ffi/api-reference.md (version example)" \
     "(e\.g\., \`\")[^\"]*(\")" "\1$VERSION\2"
+
+# ── Benchmark metric propagation ─────────────────────────────────────────────
+
+# README.md -- headline savings
+update_file "$REPO_ROOT/README.md" "README.md (benchmark headline)" \
+    "~[0-9]+% fewer input tokens than JSON" "~${TL_SAVINGS}% fewer input tokens than JSON"
+
+# README.md -- savings bullet
+update_file "$REPO_ROOT/README.md" "README.md (benchmark savings bullet)" \
+    "(\*\*~)[0-9]+(% fewer input tokens\*\* on real-world data)" "\1${TL_SAVINGS}\2"
+
+# README.md -- accuracy table (Anthropic row)
+update_file "$REPO_ROOT/README.md" "README.md (Anthropic accuracy)" \
+    "(\| Anthropic accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3${ACC_ANTHROPIC_TOON}\4"
+
+# README.md -- accuracy table (OpenAI row)
+update_file "$REPO_ROOT/README.md" "README.md (OpenAI accuracy)" \
+    "(\| OpenAI accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_OPENAI_TL}\2${ACC_OPENAI_JSON}\3${ACC_OPENAI_TOON}\4"
+
+# README.md -- input savings row
+update_file "$REPO_ROOT/README.md" "README.md (input savings row)" \
+    "(\| Input token savings \| \*\*-)[0-9]+(%\*\* \| baseline \| \*\*-)[0-9]+(%\*\* \|)" "\1${TL_SAVINGS}\2${TOON_SAVINGS}\3"
+
+# CLAUDE.md -- savings bullet
+update_file "$REPO_ROOT/CLAUDE.md" "CLAUDE.md (benchmark savings)" \
+    "(\*\*~)[0-9]+(% fewer input tokens\*\* on real-world data)" "\1${TL_SAVINGS}\2"
+
+# CLAUDE.md -- accuracy example
+update_file "$REPO_ROOT/CLAUDE.md" "CLAUDE.md (accuracy example)" \
+    "(e\.g\., TL )[0-9.]+( vs JSON )[0-9.]+( on Anthropic)" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3"
+
+# tealeaf-core/README.md -- headline
+update_file "$REPO_ROOT/tealeaf-core/README.md" "tealeaf-core/README.md (benchmark headline)" \
+    "~[0-9]+% fewer input tokens than JSON" "~${TL_SAVINGS}% fewer input tokens than JSON"
+
+# docs-site/src/introduction.md -- headline + LLM section
+update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (benchmark headline)" \
+    "~[0-9]+% fewer input tokens than JSON" "~${TL_SAVINGS}% fewer input tokens than JSON"
+
+update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (savings bullet)" \
+    "(\*\*~)[0-9]+(% fewer input tokens\*\* on real-world data)" "\1${TL_SAVINGS}\2"
+
+update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (Anthropic accuracy)" \
+    "(\| Anthropic accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3${ACC_ANTHROPIC_TOON}\4"
+
+update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (OpenAI accuracy)" \
+    "(\| OpenAI accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_OPENAI_TL}\2${ACC_OPENAI_JSON}\3${ACC_OPENAI_TOON}\4"
+
+update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (input savings)" \
+    "(\| Input token savings \| \*\*-)[0-9]+(%\*\* \| baseline \| \*\*-)[0-9]+(%\*\* \|)" "\1${TL_SAVINGS}\2${TOON_SAVINGS}\3"
+
+# docs-site/src/guides/llm-context.md
+update_file "$REPO_ROOT/docs-site/src/guides/llm-context.md" "llm-context.md (savings stat)" \
+    "(expect \*\*~)[0-9]+(% fewer data tokens\*\*)" "\1${TL_SAVINGS}\2"
+
+update_file "$REPO_ROOT/docs-site/src/guides/llm-context.md" "llm-context.md (Anthropic accuracy)" \
+    "(\| Anthropic accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3${ACC_ANTHROPIC_TOON}\4"
+
+update_file "$REPO_ROOT/docs-site/src/guides/llm-context.md" "llm-context.md (OpenAI accuracy)" \
+    "(\| OpenAI accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_OPENAI_TL}\2${ACC_OPENAI_JSON}\3${ACC_OPENAI_TOON}\4"
+
+update_file "$REPO_ROOT/docs-site/src/guides/llm-context.md" "llm-context.md (input savings)" \
+    "(\| Input token savings \| \*\*-)[0-9]+(%\*\* \| baseline \| \*\*-)[0-9]+(%\*\* \|)" "\1${TL_SAVINGS}\2${TOON_SAVINGS}\3"
+
+# docs-site/src/internals/accuracy-benchmark.md
+update_file "$REPO_ROOT/docs-site/src/internals/accuracy-benchmark.md" "accuracy-benchmark.md (savings headline)" \
+    "(\*\*~)[0-9]+(% input token savings\*\* on real-world data)" "\1${TL_SAVINGS}\2"
 
 # Regenerate workflow diagram (picks up version from release.json)
 DIAGRAM_SCRIPT="$REPO_ROOT/assets/generate_workflow_diagram.py"

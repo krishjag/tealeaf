@@ -1,0 +1,209 @@
+I can’t complete the requested calculations exactly from what you pasted because the JSON payload is truncated: it includes **fewer than 30** property records (the `properties` array cuts off at block 783 lot 70), so totals/medians/rankings would be wrong if I “fill in” the missing lots.
+
+If you paste the remaining records (or provide the full file / confirm you want results for only the records shown), I’ll compute everything precisely for all 30.
+
+Meanwhile, here’s what I *can* do now:
+
+- Provide the **formulas**, edge-case handling, and a **ready-to-run script** (Python/pandas) that will produce all outputs (1–7) as soon as the full 30 records are available.
+- Call out **data-quality flags** I already see in the snippet (e.g., some `bldgfront/bldgdepth` are 0; condos; exemptions equal to assessed total for some public/authority-owned lots).
+
+---
+
+## Definitions / formulas (what will be computed)
+
+### 1) Assessed value summary (assesstot)
+Across all properties:
+- **Total** = sum(assesstot)
+- **Average** = mean(assesstot)
+- **Median** = median(assesstot)
+- **Min/Max** = min/max(assesstot)
+
+### 2) Building efficiency ratio (intensity)
+For each lot:
+- **Efficiency ratio** = `bldgarea / lotarea`
+  - If `lotarea == 0` or missing → ratio = null (exclude from ranking)
+- Highest ratio = “most intensely built”
+- Lowest ratio = “least intensely built”
+
+### 3) Assessed value per building square foot
+For each lot:
+- **$/BSF** = `assesstot / bldgarea`
+  - If `bldgarea == 0` or missing → null
+Rank:
+- **Top 5** highest $/BSF
+- **Bottom 5** lowest $/BSF
+
+### 4) Group by land use (landuse)
+Using your reference (e.g., 5 = Commercial & Office):
+For each land use type:
+- count
+- avg assesstot
+- avg bldgarea
+- avg numfloors
+
+### 5) FAR utilization %
+For each lot:
+- `far_cap = max(commfar, residfar, facilfar)` (treat missing as 0)
+- **Utilization %** = `builtfar / far_cap * 100`
+  - If `far_cap == 0` → utilization null (cannot compute; e.g., special districts, PARK zoning, etc.)
+Identify:
+- **Most underbuilt** = lowest utilization %
+- **Near/over limit** = highest utilization % (flag >100%)
+
+### 6) Exemptions
+- **Total exempt** = sum(exempttot)
+- **Exempt % of assessed** = total_exempt / total_assessed * 100
+- Highest exemption amounts: rank by `exempttot` desc
+  - Also useful: exemption share per lot = `exempttot/assesstot`
+
+### 7) Residential-unit metrics (unitsres > 0)
+For each residential-bearing lot:
+- **Res area per unit** = `resarea / unitsres`
+- **Assessed value per res unit** = `assesstot / unitsres`
+Compare across those lots (rank high/low; also check for outliers like very low resarea/unit suggesting data coding issues or large common areas not in resarea).
+
+---
+
+## Ready-to-run Python (pandas) to produce all requested outputs
+
+Paste your full JSON into a file like `mn_top30.json` (same structure you showed), then run:
+
+```python
+import json
+import pandas as pd
+import numpy as np
+
+with open("mn_top30.json", "r") as f:
+    data = json.load(f)
+
+df = pd.DataFrame(data["properties"])
+
+# Ensure numeric columns are numeric
+num_cols = [
+    "assesstot","assessland","exempttot",
+    "bldgarea","lotarea","numfloors",
+    "builtfar","residfar","commfar","facilfar",
+    "unitsres","unitstotal","resarea"
+]
+for c in num_cols:
+    if c in df.columns:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+
+# 1) Assessed value stats
+assessed_total = df["assesstot"].sum()
+assessed_avg = df["assesstot"].mean()
+assessed_median = df["assesstot"].median()
+assessed_min = df["assesstot"].min()
+assessed_max = df["assesstot"].max()
+
+assessed_summary = {
+    "count": int(df["assesstot"].notna().sum()),
+    "total": float(assessed_total),
+    "average": float(assessed_avg),
+    "median": float(assessed_median),
+    "min": float(assessed_min),
+    "max": float(assessed_max),
+}
+
+# 2) Building efficiency ratio
+df["bldg_eff_ratio"] = df["bldgarea"] / df["lotarea"]
+eff_valid = df.dropna(subset=["bldg_eff_ratio"])
+highest_eff = eff_valid.loc[eff_valid["bldg_eff_ratio"].idxmax()]
+lowest_eff  = eff_valid.loc[eff_valid["bldg_eff_ratio"].idxmin()]
+
+# 3) $/BSF
+df["assessed_per_bsf"] = df["assesstot"] / df["bldgarea"]
+val_valid = df.dropna(subset=["assessed_per_bsf"])
+top5_bsf = val_valid.sort_values("assessed_per_bsf", ascending=False).head(5)
+bot5_bsf = val_valid.sort_values("assessed_per_bsf", ascending=True).head(5)
+
+# 4) Group by landuse
+landuse_group = (df.groupby("landuse", dropna=False)
+                   .agg(count=("bbl","count"),
+                        avg_assesstot=("assesstot","mean"),
+                        avg_bldgarea=("bldgarea","mean"),
+                        avg_numfloors=("numfloors","mean"))
+                   .reset_index())
+
+# 5) FAR utilization
+df["far_cap"] = df[["commfar","residfar","facilfar"]].max(axis=1, skipna=True)
+df["far_util_pct"] = np.where(df["far_cap"] > 0, df["builtfar"] / df["far_cap"] * 100, np.nan)
+
+far_valid = df.dropna(subset=["far_util_pct"])
+most_underbuilt = far_valid.sort_values("far_util_pct", ascending=True).head(5)
+near_or_over = far_valid.sort_values("far_util_pct", ascending=False).head(5)
+
+# 6) Exemptions
+exempt_total = df["exempttot"].sum()
+exempt_pct_total = exempt_total / assessed_total * 100 if assessed_total else np.nan
+top_exempt = df.sort_values("exempttot", ascending=False).head(10)
+
+# 7) Residential metrics
+res_df = df[df["unitsres"].fillna(0) > 0].copy()
+res_df["res_area_per_unit"] = res_df["resarea"] / res_df["unitsres"]
+res_df["assessed_per_res_unit"] = res_df["assesstot"] / res_df["unitsres"]
+res_compare = res_df.sort_values("assessed_per_res_unit", ascending=False)
+
+# Display key outputs
+print("ASSESSED SUMMARY:", assessed_summary)
+
+print("\nHIGHEST EFFICIENCY (bldgarea/lotarea):")
+print(highest_eff[["address","bbl","lotarea","bldgarea","bldg_eff_ratio"]])
+
+print("\nLOWEST EFFICIENCY (bldgarea/lotarea):")
+print(lowest_eff[["address","bbl","lotarea","bldgarea","bldg_eff_ratio"]])
+
+print("\nTOP 5 $/BSF:")
+print(top5_bsf[["address","bbl","assesstot","bldgarea","assessed_per_bsf"]])
+
+print("\nBOTTOM 5 $/BSF:")
+print(bot5_bsf[["address","bbl","assesstot","bldgarea","assessed_per_bsf"]])
+
+print("\nLANDUSE GROUP:")
+print(landuse_group.sort_values("avg_assesstot", ascending=False))
+
+print("\nMOST UNDERBUILT (lowest FAR utilization %):")
+print(most_underbuilt[["address","bbl","builtfar","far_cap","far_util_pct"]])
+
+print("\nNEAR/OVER LIMIT (highest FAR utilization %):")
+print(near_or_over[["address","bbl","builtfar","far_cap","far_util_pct"]])
+
+print("\nEXEMPT TOTAL:", exempt_total, "EXEMPT %:", exempt_pct_total)
+print("\nTOP EXEMPT LOTS:")
+print(top_exempt[["address","bbl","assesstot","exempttot"]])
+
+print("\nRESIDENTIAL COMPARISON:")
+print(res_compare[["address","bbl","unitsres","resarea","res_area_per_unit","assesstot","assessed_per_res_unit"]])
+```
+
+---
+
+## Quick observations from the visible subset (not the full 30)
+
+These are **not** the final answers—just notable patterns in what’s shown:
+
+- Several lots have **exempttot = assesstot** (fully exempt), including:
+  - **185 Greenwich St** (LMDC) — fully exempt
+  - **360 West St** (NY Convention Center) — fully exempt
+  - **One Bryant Park** — fully exempt in your extract
+  - Multiple Hudson Yards-area towers show large exemptions as well  
+  This will materially drive item (6): exempt share could be very high even among “top assessed” lots.
+
+- FAR utilization will likely show:
+  - **Very low utilization** for campus-style or special-purpose lots with huge lotarea (e.g., large residential complexes / institutions).
+  - **Very high utilization** for modern supertalls / HY towers (builtfar in the 30s vs caps around 10–15 in the fields shown), though note: PLUTO’s `commfar/residfar/facilfar` can be simplified and may not fully capture special district bonuses; still, your requested metric will flag “over 100%” cases.
+
+---
+
+## What I need from you to produce the exact NYC-analyst outputs
+Please provide **the remaining records** so the `properties` array contains all 30 lots (or upload the full JSON/CSV). Once I have that, I’ll return:
+
+- Exact totals/avg/median/min/max for assesstot
+- Highest/lowest bldgarea/lotarea with addresses + BBLs
+- Top/bottom 5 $/BSF tables
+- Land use group summary with labels (Commercial & Office, etc.)
+- Underbuilt vs near/overbuilt FAR utilization ranking
+- Total exempt $, exempt %, and top exemption lots
+- Residential-unit comparison table (res area/unit and assessed/unit)
+
+If you want, tell me whether to format currency as **$ with commas** and whether to round ratios to e.g. **2 decimals** and $/sf to **nearest dollar**.

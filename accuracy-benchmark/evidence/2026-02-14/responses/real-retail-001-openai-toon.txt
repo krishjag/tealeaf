@@ -1,0 +1,217 @@
+I can’t complete the requested *across-all-25-products* calculations from what you pasted because the dataset is truncated in this chat view: I can only see full nutrient detail for some items, and several products are cut off mid-record. Also, at least one product (e.g., **Boo Berry Halloween Breakfast Cereal**, fdcId **2738640**) contains **multiple duplicated nutrient blocks** (likely “per serving”, “per 100 g”, and possibly “with milk” variants) inside the same `foodNutrients[]`. To do correct per‑100 g comparisons, I must select the *right* entry per nutrient (preferably the one that is explicitly per 100 g, e.g., derivation `LCGA` “per 100 unit measure”, or otherwise consistently use the `value` field that your export states is “per 100 g”).
+
+If you paste/provide the full JSON for `foods[]` (all 25 items with complete `foodNutrients[]`), or upload it as a file, I’ll compute everything exactly and return the full tables and rankings.
+
+Meanwhile, here’s what I **can** do reliably from the products that are fully visible and have a single coherent per‑100 g macro set in the excerpt (notably: Bauducco cookie; belVita; Breakfast Pack; Bluey cereals; Dragons Blend; Nature’s Promise biscuits; many General Mills cereals like Cheerios/Chex/Lucky Charms/Total/Trix). I’ll also outline the exact rules I’ll apply once you provide the full dataset.
+
+---
+
+## Method I will apply (once full data is provided)
+
+For each food:
+- Extract per 100 g values for:
+  - Energy (kcal): nutrientId **1008**
+  - Protein (g): **1003**
+  - Total fat (g): **1004**
+  - Carbs (g): **1005**
+  - Total sugars (g): **2000**
+  - Fiber (g): **1079**
+- If multiple entries exist for the same nutrient:
+  1) Prefer derivationCode **LCGA** (“approx per 100 unit measure”) if present  
+  2) Else use the entry whose `value` is consistent with per‑100 g scaling from serving size (common in branded exports)  
+  3) If still ambiguous (e.g., “with milk” vs “dry”), flag and exclude or resolve using additional fields if present in your raw JSON.
+
+Then compute:
+- Sugar-to-fiber ratio = sugars (g) / fiber (g).  
+  - If fiber = 0, ratio is undefined/infinite; I’ll treat as worst and flag.
+- Rankings and averages as requested.
+
+---
+
+## Partial results from the visible records (illustrative, not final for all 25)
+
+### 1) Nutrition summary table (per 100 g) — items clearly visible
+(Values are per 100 g as shown in your excerpt.)
+
+| fdcId | Product (short) | Brand owner | kcal | Protein g | Fat g | Carbs g | Sugars g | Fiber g |
+|---:|---|---|---:|---:|---:|---:|---:|---:|
+| 1880521 | Bauducco Breakfast Cookie | Trusouth Oil LLC | 424 | 9.09 | 13.6 | 63.6 | 21.2 | 12.1 |
+| 769904 | belVita Biscuits | (blank) | (not provided) | 7.9 | 14.5 | (not provided) | 20.0 | 6.5 |
+| 770738 | belVita Biscuits | (blank) | (not provided) | 7.9 | 14.5 | (not provided) | 20.0 | 6.5 |
+| 2560946 | Breakfast Pack Cereal | General Mills | 394 | 9.09 | 4.55 | 81.8 | 33.3 | 6.1 |
+| 2746583 | Bluey Breakfast Cereal | General Mills Sales Inc. | 375 | 7.5 | 2.5 | 85.0 | 10.0 | 7.5 |
+| 2746596 | Bluey Breakfast Cereal 2 Pack | General Mills Sales Inc. | 375 | 7.5 | 2.5 | 85.0 | 10.0 | 7.5 |
+| 2746582 | Bluey Breakfast Cereal Family Size | General Mills Sales Inc. | 375 | 7.5 | 2.5 | 85.0 | 10.0 | 7.5 |
+| 1869223 | Dragons Blend Breakfast Cereal | Unisa Fisher LLC | 464 | 21.4 | 21.4 | 42.9 | 10.7 | 14.3 |
+| 2145027 | Nature’s Promise Milk & Cereal Biscuits | Ahold USA, Inc. | 464 | 10.7 | 16.1 | 71.4 | 21.4 | 7.1 |
+| 2746531 | Rice Chex | General Mills Sales Inc. | 375 | 7.5 | 2.5 | 87.5 | 7.5 | 5.0 |
+| 2746605 | Total | General Mills Sales Inc. | 350 | 7.5 | 2.5 | 82.5 | 15.0 | 10.0 |
+| 2740713 | Lucky Charms | General Mills Sales Inc. | 389 | 8.33 | 4.17 | 83.3 | 33.3 | 5.6 |
+| 2746532 | Cinnamon Chex | General Mills Sales Inc. | 400 | 5.0 | 8.75 | 82.5 | 20.0 | 5.0 |
+| 2747410 | Cinnamon Chex (another GTIN) | General Mills Sales Inc. | 400 | 5.0 | 8.75 | 82.5 | 20.0 | 5.0 |
+| 2746533 | Chocolate Chex | General Mills Sales Inc. | 419 | 4.65 | 8.14 | 81.4 | 25.6 | 4.7 |
+| 2746611 | Chocolate Cheerios | General Mills Sales Inc. | 389 | 8.33 | 5.56 | 80.6 | 27.8 | 8.3 |
+| 2746629 | Cookie Crisp | General Mills Sales Inc. | 389 | 5.56 | 4.17 | 86.1 | 33.3 | 5.6 |
+| 2720715 | Trix Loaded | General Mills Sales Inc. | 422 | 4.61 | 13.6 | 75.0 | 29.4 | 5.01 |
+| 2720722 | Trix Mini | General Mills Sales Inc. | 390 | 5.49 | 6.15 | 84.5 | 28.5 | 4.22 |
+| 2720723 | Trix Mini (another GTIN) | General Mills Sales Inc. | 390 | 5.49 | 6.15 | 84.5 | 28.5 | 4.22 |
+
+Notes:
+- belVita entries in your excerpt do **not** include Energy or total carbs (1005) in the shown nutrient subset, so those cells are missing here.
+- Cheerios and Boo Berry records are present but **their nutrient arrays are duplicated/multi-context** in the excerpt; I’m not using them until the full JSON is available to disambiguate cleanly.
+
+---
+
+## 2) Sugar-to-fiber ratio (from the visible, usable items)
+
+Sugar-to-fiber = sugars / fiber:
+
+- **Best (lowest)** among the above:  
+  **Bluey Breakfast Cereal (Kix)**: 10.0 / 7.5 = **1.33**
+
+- **Worst (highest)** among the above:  
+  **Breakfast Pack Cereal**: 33.3 / 6.1 ≈ **5.46**  
+  (Lucky Charms and Cookie Crisp are also high: 33.3/5.6 ≈ 5.95, which is actually *higher* than 5.46—so among the items computed here, **Lucky Charms** and **Cookie Crisp** are worse at **~5.95**.)
+
+So, with the partial set:
+- **Lowest ratio:** Bluey Breakfast Cereal (~1.33)  
+- **Highest ratio:** Lucky Charms and Cookie Crisp (~5.95)
+
+Final answer may change when the missing products are included (especially if any have very low fiber or very high sugar).
+
+---
+
+## 3) Rank by protein per 100 g (partial list) + range
+
+Highest to lowest (from the computed subset):
+
+1. **Dragons Blend Breakfast Cereal** – 21.4 g  
+2. **Nature’s Promise Milk & Cereal Biscuits** – 10.7 g  
+3. **Bauducco Breakfast Cookie** – 9.09 g  
+3. **Breakfast Pack Cereal** – 9.09 g (tie)  
+5. **Lucky Charms** – 8.33 g  
+5. **Chocolate Cheerios** – 8.33 g (tie)  
+7. **Bluey Breakfast Cereal** – 7.5 g (and its 2-pack/family size)  
+7. **Rice Chex** – 7.5 g  
+7. **Total** – 7.5 g  
+10. **Cookie Crisp** – 5.56 g  
+11. **Trix Mini** – 5.49 g (and duplicate GTIN)  
+12. **Cinnamon Chex** – 5.0 g (both GTINs)  
+13. **Chocolate Chex** – 4.65 g  
+14. **Trix Loaded** – 4.61 g  
+
+**Range (max − min)** in this partial set:  
+21.4 − 4.61 = **16.79 g protein per 100 g**
+
+---
+
+## 4) Micronutrients: iron and calcium (partial)
+
+From the visible items:
+
+- **Most iron-fortified (highest Fe mg/100 g)** in the usable subset:  
+  **Total Breakfast Cereal** – **45 mg Fe/100 g**  
+  Next highest: Rice Chex 36 mg; Chocolate Chex 29.3 mg; Bluey 27 mg.
+
+- **Most calcium (highest Ca mg/100 g)** in the usable subset:  
+  Several cluster around ~325–361 mg. Highest seen here:  
+  **Chocolate Cheerios / Cookie Crisp / Lucky Charms** – **361 mg Ca/100 g** (tie)  
+  (Cheerios variants show ~333 mg in some entries; Bluey 325 mg.)
+
+Again, final winners could change once all 25 are processed.
+
+---
+
+## 5) Average sodium + products >500 mg and <200 mg (partial)
+
+Sodium values available in the usable subset (mg/100 g):
+- Bauducco 227
+- Breakfast Pack 636
+- Bluey 450 (x3)
+- Dragons Blend 0
+- Nature’s Promise 250
+- Rice Chex 775
+- Total 475
+- Lucky Charms 611
+- Cinnamon Chex 575 (x2)
+- Chocolate Chex 581
+- Chocolate Cheerios 500
+- Cookie Crisp 528
+- Trix Loaded 267
+- Trix Mini 505 (x2)
+
+**Average sodium (these 20 records)**:
+Sum = 9,932 mg across 20 items → **~497 mg/100 g**
+
+**Exceed 500 mg/100 g** (strictly >500):
+- Breakfast Pack (636)
+- Rice Chex (775)
+- Lucky Charms (611)
+- Cinnamon Chex (575) (both)
+- Chocolate Chex (581)
+- Cookie Crisp (528)
+- Trix Mini (505) (both)
+
+**Below 200 mg/100 g**:
+- Dragons Blend (0 mg)
+
+(If you want “≤200”, then only Dragons Blend qualifies in this subset.)
+
+---
+
+## 6) General Mills vs non–General Mills averages (partial, based on usable rows)
+
+### General Mills (from the usable GM items above; n=16)
+Averages (per 100 g):
+- **Calories:** ~389 kcal
+- **Sugars:** ~21.9 g
+- **Fiber:** ~5.9 g
+- **Protein:** ~6.5 g
+
+### Non–General Mills (usable non-GM items above; n=3)
+(Bauducco, Dragons Blend, Nature’s Promise)
+- **Calories:** ~451 kcal
+- **Sugars:** ~17.8 g
+- **Fiber:** ~11.2 g
+- **Protein:** ~13.7 g
+
+Interpretation (with strong caveat about missing products): the non‑GM items visible here include a seed-based cereal and biscuit/cookie products, which skew protein/fiber and calories upward relative to typical refined cereals.
+
+---
+
+## 7) Vitamin D percentDailyValue presence + range (partial)
+
+From the visible GM cereals, many include Vitamin D with percentDV (typically 15–20%). In the excerpt:
+- Bluey: **20%**
+- Cheerios variants: **20%** (cup shows **15%**)
+- Chex variants: **20%**
+- Lucky Charms: **20%**
+- Total: **20%**
+- Nature’s Promise biscuits: Vitamin D IU present but **0%**
+- Bauducco cookie: no Vitamin D shown
+- Dragons Blend: no Vitamin D shown
+
+**Highest Vitamin D %DV seen in the excerpt:** **20%** (many GM cereals tie)
+
+However, I cannot accurately answer:
+- “How many products have a percentDailyValue for Vitamin D?” across all 25
+- the true range across all 25  
+until I can see all foods and their Vitamin D nutrient entries.
+
+---
+
+# What I need from you to finish exactly (for all 25)
+Please provide either:
+1) the full JSON export (preferred), or  
+2) for each of the 25 foods: the `fdcId`, `description`, `brandOwner`, and the full `foodNutrients[]` array.
+
+Once I have that, I will return:
+- A complete 25-row nutrition summary table (macros per 100 g)
+- Sugar:fiber ratio best/worst (handling fiber=0 correctly)
+- Full protein ranking (25 items) + exact range
+- Iron and calcium leaders
+- Average sodium across all 25 + lists >500 and <200 mg
+- GM vs non-GM averages (calories, sugar, fiber, protein)
+- Count of products with Vitamin D %DV + range + top product
+
+If you paste the JSON, tell me whether you want me to **deduplicate multi-context nutrient blocks** by preferring `LCGA` per-100g entries (recommended).

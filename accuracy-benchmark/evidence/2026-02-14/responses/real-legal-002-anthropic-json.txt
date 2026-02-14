@@ -1,0 +1,973 @@
+# Criminal Justice Case Analysis: Wisconsin v. Luis A. Ramirez (2016CF000031)
+
+## 1. CHARGE PROGRESSION ANALYSIS
+
+### Original vs. Final Charges
+
+**Both charges remained substantively identical from filing to conviction:**
+
+| Charge | Description | Statute | Severity | Modifiers Added |
+|--------|-------------|---------|----------|-----------------|
+| **Count 1** | Battery by Prisoners | 940.20(1) | Felony H | • Repeater [939.62(1)(b)]<br>• Use of Dangerous Weapon [939.63(1)(b)] |
+| **Count 2** | Disorderly Conduct | 947.01(1) | Misd. B | • Repeater [939.62(1)(a)] |
+
+### Key Observations:
+- **No charges were added or dropped** - both original charges proceeded to conviction
+- **Penalty enhancers added:** Both charges included "Repeater" modifiers, indicating prior felony/misdemeanor convictions
+- **Dangerous weapon enhancer:** Applied to Count 1 (battery); the weapon was identified as a **pencil** (Exhibit #1)
+- **Partial dismissal:** For Count 2, the "use of a dangerous weapon enhancer was dismissed" per the disposition description
+
+**Statutory References for Modifiers:**
+- **939.62(1)(b)**: Increases maximum sentence for felonies (repeater)
+- **939.62(1)(a)**: Increases maximum sentence for misdemeanors (repeater)
+- **939.63(1)(b)**: Dangerous weapon penalty enhancer
+
+---
+
+## 2. CASE TIMELINE: MAJOR PHASES
+
+### Phase 1: Filing and Initial Proceedings
+- **Offense Date:** May 5, 2015
+- **Filing Date:** February 1, 2016 (**9-month delay** from offense)
+- **Initial Appearance:** February 11, 2016
+- **Bond:** $5,000 signature bond with felony conditions
+
+### Phase 2: Preliminary Hearing
+- **Duration:** February 18, 2016 - August 4, 2016 (**5.5 months**)
+- **Multiple continuances:** Defendant changed attorneys; SPD appointed March 15, 2016
+- **Final Preliminary Hearing:** August 4, 2016 - Probable cause found, bound over
+
+### Phase 3: Information and Arraignment
+- **Information Filed:** August 10, 2016
+- **Arraignment:** October 26, 2016
+- Defendant stood mute; court entered not guilty plea
+
+### Phase 4: Pre-Trial Period
+- **Duration:** October 2016 - December 2019 (**3+ years**)
+- **Trial dates set and reset:**
+  - April 13, 2017 → reset
+  - September 26, 2017 → reset
+  - April 4, 2018 → reset
+  - April 3, 2019 → reset
+  - **Final trial date:** December 3, 2019
+
+- **Key motion activity:**
+  - Demand for Speedy Trial filed September 26, 2018
+  - Motions in Limine filed March 26, 2019
+  - Motion to Dismiss (speedy trial violation) filed April 15, 2019 → **denied** June 17, 2019
+
+### Phase 5: Jury Trial
+- **Dates:** December 3-4, 2019 (**2-day trial**)
+- **Jury Selection:** 33 summoned, 30 appeared, 23 for voir dire, 13 sworn
+- **Verdict:** December 4, 2019 - **Guilty on both counts**
+  - Count 1: Guilty with dangerous weapon
+  - Count 2: Guilty without dangerous weapon
+
+### Phase 6: Sentencing
+- **Date:** February 24, 2020 (**2.5 months** post-verdict)
+- **Sentence Imposed:**
+  - **Count 1:** 15 years total (12 years confinement + 3 years extended supervision)
+  - **Count 2:** 1.5 years (1 year confinement + 6 months supervision) - concurrent
+- **Effective sentence:** 15 years, consecutive to any other sentence currently serving
+
+### Phase 7: Post-Conviction Proceedings
+- **Notice of Intent:** March 12, 2020
+- **Appellate counsel appointed:** May 20, 2020
+- **Transcripts ordered:** May-August 2020
+- **Multiple extensions:** October 2020 - April 2021 (4 motions for extension)
+- **Post-Conviction Motion Filed:** June 21, 2021 (speedy trial violation)
+- **Evidentiary Hearing:** November 29, 2021
+- **Briefing:** February-March 2022
+- **Oral Ruling:** May 13, 2022 - **Motion DENIED**
+
+### Phase 8: Appellate Review (Court of Appeals)
+- **Notice of Appeal:** June 2, 2022
+- **Remand Order:** September 30, 2022 (for supplemental post-conviction motion)
+- **Supplemental Motion Filed:** October 28, 2022
+- **Oral Ruling on Remand:** May 16, 2023 - **Motion to Reconsider DENIED**
+- **Court of Appeals Decision:** April 25, 2024
+  - **REVERSED judgment of conviction**
+  - **REMANDED** for circuit court to dismiss the complaint
+
+### Phase 9: Supreme Court Review
+- **Petition for Review:** Acknowledged May 28, 2024
+- **Supreme Court Decision:** June 27, 2025
+- **Remittitur:** September 5, 2025
+- **Notice of Completion:** October 2, 2025 (Attorney Lohr withdrawn)
+
+**TOTAL CASE DURATION:** May 5, 2015 (offense) to October 2, 2025 (completion) = **10+ years**
+
+---
+
+## 3. APPELLATE TRAJECTORY AND OUTCOME
+
+### Chronological Appellate Activity
+
+#### **Court of Appeals - Appeal No. 2022AP000959**
+
+| Date | Event | Outcome/Action |
+|------|-------|----------------|
+| **June 2, 2022** | Notice of Appeal filed by Attorney Lohr | Appeal initiated |
+| **June 7, 2022** | Acknowledgment from Court of Appeals | Record receipt confirmed |
+| **July 1, 2022** | Appeals Document Index saved | Record compilation begins |
+| **July 11, 2022** | Transmittal of record to Court of Appeals | Initial record transmitted |
+| **July 12, 2022** | Court directs transcript filing | Transcript ordered forthwith |
+| **July 15-26, 2022** | Transcripts filed | Trial and hearing transcripts submitted |
+| **September 7, 2022** | Order of Court of Appeals | Jurisdiction retained |
+| **September 30, 2022** | **ORDER: REMAND** | • Court retains jurisdiction<br>• Remand for supplemental post-conviction motion<br>• Motion due by October 31, 2022<br>• Circuit court must decide within 90 days |
+| **October 28, 2022** | Supplemental post-conviction motion filed | Compliance with remand order |
+| **January 10, 2023** | Extension order | Deadline extended to May 22, 2023 |
+| **January 26, 2023** | Supplemental record transmitted | Updated record to Court of Appeals |
+| **May 16, 2023** | Circuit court oral ruling | Supplemental motion **DENIED** |
+| **June 23, 2023** | Supplemental record transmitted | Final record supplement |
+| **June 26, 2023** | Order re: transmittal of record | Final record requirements |
+| **April 25, 2024** | **COURT OF APPEALS DECISION** | **REVERSED AND REMANDED**<br>Circuit court ordered to **dismiss complaint** |
+
+#### **Supreme Court Review - Petition No. 2023AP959-CR**
+
+| Date | Event | Outcome/Action |
+|------|-------|----------------|
+| **May 28, 2024** | Acknowledgment from Supreme Court | State's petition for review filed |
+| **June 6, 2024** | Status conference held | Circuit court monitoring appeal |
+| **October 7, 2024** | Order of the Supreme Court | (Content not specified in record) |
+| **November 11, 2024** | Supreme Court order | • Motion granted<br>• Plaintiff-respondent-petitioner's brief due December 6, 2024 |
+| **January 3, 2025** | Supreme Court order | Defendant-appellant-respondent's brief accepted |
+| **June 27, 2025** | **SUPREME COURT DECISION** | "Review of Decision of Court of Appeals" |
+| **September 5, 2025** | Remittitur | Case formally returned to circuit court |
+| **October 2, 2025** | Notice of Completion | Attorney Lohr's representation concluded |
+
+### Appellate Outcome Analysis
+
+**The appellate trajectory shows:**
+
+1. **Initial Appeal (2022):** Defendant challenged post-conviction denial of speedy trial violation claim
+
+2. **Court of Appeals Remand (Sept 2022):** Rather than deciding immediately, the Court of Appeals remanded for supplemental proceedings - suggesting potential merit to the claim
+
+3. **Circuit Court (2023):** Again denied motion to reconsider on remand
+
+4. **Court of Appeals Victory (April 2024):** 
+   - **Reversed the conviction**
+   - **Ordered dismissal of the complaint**
+   - This represents a complete victory for the defendant
+
+5. **State's Supreme Court Petition (2024-2025):**
+   - State appealed the Court of Appeals reversal
+   - Petition accepted for review
+   - **Supreme Court decision issued June 27, 2025**
+   
+6. **Final Status:** 
+   - Case formally concluded October 2, 2025
+   - The Supreme Court decision content is not detailed in the record, but the "Notice of Completion" suggests finality
+   - **Given the case status is "Closed" and balance due is $0.00, the ultimate outcome appears to favor the defendant**
+
+**Critical Implication:** The Court of Appeals found a **speedy trial violation**, warranting dismissal. This suggests the 3+ year pre-trial delay (2016-2019) violated the defendant's constitutional rights.
+
+---
+
+## 4. SENTENCING STRUCTURE ANALYSIS
+
+### Count 1: Battery by Prisoners (Felony H with Enhancers)
+
+#### Initial Confinement
+- **Duration:** 12 Years
+- **Type:** State Prison
+- **Condition:** **Consecutive to any other sentence currently serving**
+
+#### Extended Supervision
+- **Duration:** 3 Years
+- **Type:** Post-release supervision
+- **Condition:** **Consecutive to any other sentence currently serving**
+
+#### Specific Conditions:
+1. **Costs:**
+   - If probation revoked or discharged with outstanding obligations, civil judgment shall be entered for balance due
+   
+2. **DNA Sample:**
+   - Mandatory submission (standard for felony convictions)
+   
+3. **No Contact Order:**
+   - No contact with the victim of this case (likely the correctional officer assaulted)
+
+### Count 2: Disorderly Conduct (Misdemeanor B with Repeater)
+
+#### Initial Confinement
+- **Duration:** 1 Year
+- **Type:** State Prison
+- **Condition:** **Concurrent with Count 1**
+
+#### Extended Supervision
+- **Duration:** 6 Months
+- **Type:** Post-release supervision
+- **Condition:** **Concurrent with Count 1**
+
+#### Specific Conditions:
+- **Costs:** "Same conditions as Ct. 1"
+- All other conditions from Count 1 apply
+
+### Comparative Analysis: Count 1 vs. Count 2
+
+| Element | Count 1 (Felony) | Count 2 (Misdemeanor) |
+|---------|------------------|----------------------|
+| **Total Prison Time** | 12 years | 1 year |
+| **Extended Supervision** | 3 years | 6 months |
+| **Run Type** | **CONSECUTIVE** to other sentences | **CONCURRENT** with Count 1 |
+| **DNA Requirement** | Yes (explicit) | Yes (by incorporation) |
+| **No Contact Order** | Yes (explicit) | Yes (by incorporation) |
+| **Costs** | Detailed civil judgment provision | Same as Count 1 |
+| **Jail Credit** | None awarded | None awarded |
+
+### Effective Total Sentence
+
+**Actual Time Served:** 
+- **15 years total** (12 years confinement + 3 years supervision)
+- Count 2 runs concurrent, so does not add additional time
+- **However:** Both counts run **consecutive to "any other sentence currently serving"**
+
+**Critical Context:** Defendant was already serving a sentence (evidenced by the offense occurring at a correctional institution and the #244212 inmate number). This 15-year sentence was **stacked on top** of his existing sentence.
+
+### Sentencing Hearing Details (February 24, 2020)
+
+**Evidence Presented:**
+- Copy of Judgment of Conviction from Milwaukee County case 97CF974862 (prior conviction)
+- Victim (likely correctional officer) made a statement
+
+**Additional Sentencing Notes:**
+- **No jail credit awarded** (because defendant was already incarcerated on another sentence)
+- **Costs assessed:** $518.00 (Count 1) + $243.00 (Count 2) = **$761.00 total**
+- **DNA:** Already on file but submission confirmed
+- **Not eligible for:** Challenge Incarceration Program or Substance Abuse Program
+
+### Supervision Condition Differences
+
+**Key Distinction:** Count 1 has **explicit, detailed conditions**, while Count 2 simply incorporates them by reference ("same conditions as Ct. 1"). This is standard practice when sentences run concurrent - the more serious charge (felony) governs the conditions.
+
+**Practical Effect:** 
+- Single set of supervision conditions applies to both
+- No contact order and DNA requirement stem from the violent felony nature of Count 1
+- Financial obligations enforceable through civil judgment mechanism
+
+---
+
+## 5. HABEAS CORPUS ACTIVITY ANALYSIS
+
+### Comprehensive Count of Writs
+
+I identified **approximately 20 separate habeas corpus petitions/writs** filed throughout this case:
+
+#### Pre-Trial Phase (2016)
+1. **February 16, 2016** - Writ for 2/18/16 hearing
+2. **February 16, 2016** - Writ for 2/25/16 hearing
+3. **February 24, 2016** - Writ for March 3, 2016
+4. **March 14, 2016** - Writ for 5/10/16
+5. **June 8, 2016** - Writ for July 20, 2016
+6. **July 22, 2016** - Writ for August 4, 2016
+7. **August 10, 2016** - Writ for Oct. 24, 2016
+8. **August 17, 2016** - Writ for 10/26/16
+
+#### Pre-Trial Phase (2018-2019)
+9. **February 22, 2018** - Two petitions filed
+10. **February 23, 2018** - Two writs issued
+11. **December 2, 2019** - Writ and petition for trial
+
+#### Sentencing Phase (2019-2020)
+12. **December 17, 2019** - Petition for 2/24/20 sentencing
+13. **December 18, 2019** - Writ issued for 2/24/20
+14. **February 17, 2020** - Petition for 2/24/20
+15. **February 20, 2020** - Order/Writ issued
+
+#### Post-Conviction Phase (2021)
+16. **August 16, 2021** - Two petitions filed (Green Bay CI and WSPF)
+17. **August 17, 2021** - Two writs issued
+18. **October 27, 2021** - Petition for 11/29/21
+19. **November 2, 2021** - Writ issued for 11/29/21
+
+### Pattern Analysis and Implications
+
+#### What This Pattern Suggests:
+
+1. **Continuous Incarceration:**
+   - Defendant remained in DOC custody throughout entire proceedings (2016-2025)
+   - Never released on bond despite $5,000 signature bond being set
+   - Suggests bond was never posted or defendant was held on other charges
+
+2. **Institutional Transfers:**
+   - **Multiple facilities referenced:**
+     - Waupun Correctional Institution (initial)
+     - Green Bay Correctional Institution (2016-2022)
+     - Wisconsin Secure Program Facility (2022-2025)
+   - WSPF is Wisconsin's supermax prison, suggesting security classification issues
+
+3. **Logistical Complexity:**
+   - Every court appearance required formal writ to transport prisoner
+   - Standard procedure for incarcerated defendants
+   - Shows burden on corrections system for multi-year litigation
+
+4. **Remote Appearance Evolution:**
+   - Early hearings: Physical transport to courthouse
+   - Later hearings (2019+): Video conferencing from institution
+   - Technology reduced need for some writs but not eliminated them
+
+5. **Frequency Correlation:**
+   - Highest habeas activity during:
+     - Pre-trial hearing scheduling (2016)
+     - Trial preparation (2018-2019)
+     - Post-conviction evidentiary hearings (2021)
+   - Demonstrates how incarcerated defendants face additional procedural hurdles
+
+### Comparison to Typical Cases
+
+**This level of habeas corpus activity is:**
+- **Above average** for misdemeanor cases (typically 2-4 writs)
+- **Normal** for complex felony cases with extensive pre-trial and appellate proceedings
+- **Indicative** of the case's 10-year duration and multiple stages of review
+
+**The pattern does NOT suggest frivolous litigation** - rather, it reflects:
+- Legitimate multi-stage proceedings (trial, post-conviction, appeals)
+- Defendant's continuous custody status
+- Proper procedure for prisoner court access
+
+---
+
+## 6. MOTION PATTERN ANALYSIS
+
+### Motion Categories and Frequency
+
+#### Discovery Motions (Early Phase: 2016)
+- **March 15, 2016:** Demand for discovery filed by defense
+- **March 15, 2016:** Petition for leave to file additional motions
+- **March 28, 2016:** State's motion and demand for discovery
+- **Multiple discovery letters exchanged** (2016-2018)
+
+**Frequency:** Standard for case initiation
+
+---
+
+#### Continuance/Extension Motions (Throughout Case)
+
+**Pre-Trial Continuances:**
+- **February 17, 2017:** State requests jury trial reset (witness unavailable)
+- **March 3, 2017:** State requests 3-day trial instead of 1-day
+- **March 6, 2018:** Defense motion for continuance (granted)
+- **August 4, 2017:** State requests reset (scheduling conflict)
+
+**Post-Conviction Extensions (Highest Activity):**
+1. **October 21, 2020:** Motion to extend time for post-conviction motion/notice of appeal
+2. **December 18, 2020:** Second motion to extend
+3. **February 18, 2021:** Third motion to extend
+4. **April 20, 2021:** Fourth motion to extend
+5. **March 11, 2022:** Fourth motion to extend circuit court decision time
+6. **December 14, 2021:** Multiple motions to extend circuit court order deadline
+7. **January 9, 2023:** Motion to extend time for supplemental post-conviction motion
+
+**Frequency:** **17+ extension motions** (majority post-conviction phase)
+
+---
+
+#### Substantive Pre-Trial Motions (2018-2019)
+
+- **September 26, 2018:** **Demand for Speedy Trial** filed by defendant
+- **March 26, 2019:** **Notice of Motion in Limine**
+- **March 26, 2019:** **Additional Motions in Limine to Exclude Statements**
+- **April 15, 2019:** **Motion to Dismiss** (speedy trial violation)
+
+**Frequency:** 4 major substantive motions
+
+**Outcome:** 
+- Motion to dismiss **denied** June 17, 2019
+- This issue later succeeded on appeal
+
+---
+
+#### Post-Conviction Motions (2020-2023)
+
+**Primary Motions:**
+1. **June 21, 2021:** Post-Conviction Motion to Vacate Conviction and Dismiss Case for Speedy Trial Violation
+2. **October 28, 2022:** Supplemental Post-Conviction Motion/Motion to Reconsider (after Court of Appeals remand)
+
+**Supporting Documents:**
+- **February 14, 2022:** Defendant's Further Brief in Support
+- **March 15, 2022:** State's Brief in Opposition
+- **February 24, 2023:** State's Response to Motion to Reconsider
+- **March 7, 2023:** Defendant's Reply in Support
+
+**Frequency:** 2 major post-conviction motions + extensive briefing
+
+---
+
+### Motion Activity by Phase
+
+| Phase | Time Period | Motion Types | Approximate Count | Activity Level |
+|-------|-------------|--------------|-------------------|----------------|
+| **Discovery** | 2016-2017 | Discovery demands, witness lists | 5-7 | Moderate |
+| **Pre-Trial Continuances** | 2017-2019 | Reset requests, scheduling | 6-8 | Moderate-High |
+| **Substantive Pre-Trial** | 2018-2019 | Speedy trial, motions in limine, dismiss | 4 | Moderate |
+| **Post-Conviction Extensions** | 2020-2023 | Extension motions for deadlines | **15+** | **HIGHEST** |
+| **Post-Conviction Substantive** | 2021-2023 | Motions to vacate, reconsider | 2 + briefing | High |
+| **Appellate Motions** | 2022-2025 | Filed in Court of Appeals/Supreme Court | 5+ | Moderate |
+
+### Peak Motion Activity Analysis
+
+**HIGHEST MOTION ACTIVITY PHASE: Post-Conviction Extension Motions (2020-2023)**
+
+**Reasons for High Activity:**
+1. **COVID-19 Pandemic Impact:**
+   - Courts granted liberal extensions during 2020-2021
+   - Public Defender offices faced backlogs
+   - Transcript preparation delays
+
+2. **Complexity of Record:**
+   - 10+ transcripts needed to be prepared
+   - Multiple court reporters involved
+   - Record spanned 2016-2022
+
+3. **Appellate Counsel Workload:**
+   - State Public Defender Appellate Division handles high caseload
+   - Attorney Lohr appointed May 2020
+   - 4 extension requests before filing initial motion (June 2021)
+
+4. **Remand Proceedings:**
+   - Court of Appeals remanded September 2022
+   - Required additional circuit court proceedings
+   - Generated new deadlines and extension requests
+
+### Motion Success Rate
+
+**Defense Motions:**
+- **Pre-trial motions to dismiss:** Initially **DENIED** (2019)
+- **Post-conviction motion:** **DENIED** at circuit court (2022)
+- **Supplemental post-conviction motion:** **DENIED** at circuit court (2023)
+- **Appeal to Court of Appeals:** **GRANTED** - Conviction REVERSED (2024)
+
+**State Motions:**
+- **Continuance requests:** Generally **GRANTED**
+- **Discovery motions:** Standard practice, **GRANTED**
+
+**Extension Motions (Both Parties):**
+- **Nearly 100% grant rate** (routine in criminal appeals)
+
+### Most Significant Motions
+
+1. **Demand for Speedy Trial (Sept 2018):** Established record of defendant's objection to delay
+
+2. **Motion to Dismiss for Speedy Trial Violation (April 2019):** Core issue that eventually succeeded on appeal
+
+3. **Post-Conviction Motion (June 2021):** Initiated appellate process that led to reversal
+
+4. **Supplemental Post-Conviction Motion (Oct 2022):** Result of Court of Appeals remand; provided additional briefing opportunity
+
+### Pattern Observations
+
+**The motion pattern reveals:**
+- **Procedural delays:** Case reset 4+ times over 3 years
+- **Thorough appellate work:** Extensive briefing and record development
+- **Defendant's persistence:** Consistently raised speedy trial issue from 2018 onward
+- **Court accommodation:** Numerous extensions granted, suggesting recognition of case complexity
+- **Ultimate vindication:** Despite repeated circuit court denials, appellate courts found merit in speedy trial claim
+
+---
+
+## 7. COMPREHENSIVE TIMELINE SUMMARY (2015-2025)
+
+### **PHASE 1: THE OFFENSE (2015)**
+**May 5, 2015** - Incident at correctional institution
+- Luis A. Ramirez, already incarcerated (Inmate #244212), allegedly battered correctional staff with a pencil
+- Resulted in disorderly conduct and battery charges
+
+**May-December 2015** - Investigation period
+- 9-month gap before charges filed
+- DA case number assigned: 2015CO001313
+
+---
+
+### **PHASE 2: INITIAL PROCEEDINGS (2016)**
+
+**February 1, 2016** - Case filed in Columbia County Circuit Court
+- Complaint filed by DA Kohlwey
+- Case No. 2016CF000031 assigned
+- Judge W. Andrew Voigt presiding (Branch 2)
+
+**February 11, 2016** - Initial appearance
+- Defendant appeared via video from Waupun Correctional
+- $5,000 signature bond set with felony conditions
+- Preliminary hearing scheduled
+
+**February-March 2016** - Continuances and attorney changes
+- Multiple resets due to attorney access issues
+- **March 15, 2016:** Leonie Dolch (SPD) appointed
+- Time limits waived
+
+**July 7, 2016** - Attorney substitution
+- **Ronald Gabriel Benavides** appointed as new defense counsel
+- Dolch withdrawn
+
+**August 4, 2016** - **PRELIMINARY HEARING**
+- **9:58 AM:** Detective Roger Brandner testified
+- **10:10 AM:** Probable cause found
+- **Defendant bound over for trial**
+- Information to be filed
+
+**August 10, 2016** - Information formally filed
+- Count 1: Battery by Prisoners (Felony H)
+- Count 2: Disorderly Conduct (Misd. B)
+
+**October 26, 2016** - **ARRAIGNMENT**
+- Defendant stood mute
+- Court entered **not guilty plea**
+- Jury trial ordered
+
+---
+
+### **PHASE 3: PRE-TRIAL DELAYS (2017-2019)**
+
+**December 21, 2016** - First trial date set
+- Trial scheduled for April 13, 2017
+
+**February 17, 2017** - State requests reset #1
+- Witness unavailable
+- Defense does not object
+
+**March 27, 2017** - Rescheduling conference
+- Trial reset to **September 26, 2017**
+
+**August 4, 2017** - State requests reset #2
+- Scheduling conflict cited
+
+**August 16, 2017** - Second trial reschedule
+- Trial reset to **April 4, 2018** (3-day trial)
+
+**March 6, 2018** - Defense motion for continuance #3
+- Attorney Benavides requests reset
+- **Trial removed from April 2018 calendar**
+
+**August 6, 2018** - Scheduling conference
+- No new trial date immediately set
+
+**September 26, 2018** - **DEFENDANT FILES DEMAND FOR SPEEDY TRIAL**
+- Critical assertion of constitutional right
+- Clock now formally running
+
+**October 3, 2018** - Telephone conference
+- Case management discussion
+
+**December 5, 2018** - New trial date set
+- Trial scheduled for **April 3, 2019** (#2 two-day trial)
+
+**March 26, 2019** - Pre-trial motions filed
+- Motions in limine filed by defense
+- State requests reset #4 (witness unavailable)
+
+**April 3, 2019** - Trial reset to December 2019
+- Telephone scheduling conference
+- Trial rescheduled to **December 3-4, 2019**
+
+**April 15, 2019** - **MOTION TO DISMISS FOR SPEEDY TRIAL VIOLATION**
+- Defense formally moves to dismiss
+- Argues constitutional violation
+
+**June 17, 2019** - Motion hearing on dismissal
+- 10:31 AM: Arguments heard via video
+- Court **DENIES motion to dismiss**
+- Trial to proceed
+
+---
+
+### **PHASE 4: JURY TRIAL (December 2019)**
+
+**December 3, 2019 - DAY 1**
+
+**09:01 AM** - Court convenes
+- Defendant present in custody with Attorney Benavides
+- DA Brenda Yaskal for State
+- Motions in limine discussed
+
+**10:23 AM** - Jury selection begins
+- 33 jurors summoned, 30 appeared
+- 23 seated for voir dire
+- 13 jurors selected and sworn (including 1 alternate)
+
+**1:24 PM** - Trial begins
+- Opening statements
+
+**State's Witnesses (Day 1):**
+1. **T. Judd** (1:24 PM) - Sworn, direct and cross examination
+2. **M. Biedermann** (2:25 PM) - ER Doctor at DHS
+3. **E. Starck** (2:36 PM) - Nurse
+4. **T. Anderson** (2:48 PM) - Nurse
+5. **M. Babcock** (3:20 PM) - CCI Officer
+6. **S. Darling-Jezyt** (3:43 PM) - CCI Officer
+
+**4:13 PM** - Day 1 concludes
+- Jury excused until 8:45 AM next day
+
+**December 4, 2019 - DAY 2**
+
+**09:00 AM** - Court resumes
+
+**State's Final Witnesses:**
+7. **B. Slaney** (9:04 AM) - Former CCI Officer
+8. **Z. Graff** (9:32 AM) - CCI Officer
+9. **P. Hooper** (9:38 AM) - Former CCI Officer
+
+**9:38 AM** - **State rests**
+
+**9:44 AM** - Defense motion for directed verdict
+- Motion **DENIED**
+- Court reviews defendant's right to testify
+
+**10:14 AM** - Defense case begins
+- **Defendant Luis A. Ramirez testifies** (sworn)
+- Direct examination
+- Exhibits #2 and #3 offered and received
+- Cross-examination by State
+
+**10:53 AM** - **Defense rests**
+
+**11:27 AM** - Jury instructions conference
+
+**12:55 PM** - Court reconvenes
+- Jury returns
+- Alternate juror drawn
+- Final instructions read
+
+**1:42 PM** - **Closing arguments begin**
+
+**2:21 PM** - Jury instructed on verdict forms
+
+**2:25 PM** - **Jury begins deliberations**
+
+**3:12 PM** - **VERDICT REACHED**
+
+**Jury Returns Guilty Verdicts:**
+- **Count 1: GUILTY** - Battery by Prisoner **with use of dangerous weapon**
+- **Count 2: GUILTY** - Disorderly Conduct **without use of dangerous weapon**
+
+**3:12 PM** - Jury polled (all confirm verdicts)
+
+**3:30 PM** - State moves for judgment on verdicts
+- Motion **GRANTED**
+- **Judgment entered**
+- Sentencing to be scheduled separately
+
+---
+
+### **PHASE 5: SENTENCING (February 2020)**
+
+**December 16, 2019** - Sentencing hearing scheduled
+- Set for February 24, 2020 at 11:00 AM
+
+**January 8, 2020** - Subpoena issued
+- Pre-sentence investigation preparation
+
+**February 24, 2020** - **SENTENCING HEARING**
+
+**11:11 AM** - Hearing begins
+- Attorney Benavides appears with defendant (in custody)
+- ADA Kevin Calkins for State
+- Victim makes statement to court
+- State files prior conviction (Milwaukee County 97CF974862)
+
+**Sentencing recommendations argued:**
+- State recommends substantial prison time
+- Defense argues for mitigation
+
+**Defendant's statement to court**
+- Ramirez addresses the court
+
+**COURT IMPOSES SENTENCE:**
+
+**Count 1 (Battery by Prisoners):**
+- 12 years initial confinement
+- 3 years extended supervision
+- **CONSECUTIVE to any other sentence currently serving**
+- $518.00 costs
+- Submit DNA sample
+- No contact with victim
+
+**Count 2 (Disorderly Conduct):**
+- 1 year initial confinement
+- 6 months extended supervision
+- **CONCURRENT with Count 1**
+- $243.00 costs
+- Same conditions as Count 1
+
+**Total effective sentence: 15 years**
+- No jail credit awarded (already serving another sentence)
+- Not eligible for Challenge Incarceration or Substance Abuse programs
+
+**11:55 AM** - Sentencing concludes
+
+**February 25, 2020** - Judgment of Conviction entered
+- Formal JOC filed by Judge Bescup
+
+---
+
+### **PHASE 6: POST-CONVICTION PROCEEDINGS (2020-2022)**
+
+**March 12, 2020** - Defense files Notice of Intent to Pursue Post-Conviction Relief
+- Atty Benavides indicates appeal forthcoming
+- Stops sentencing finality clock
+
+**March 13, 2020** - Appellate process initiated
+- Record request sent to State Public Defender Appellate Division
+
+**May 20, 2020** - New appellate counsel appointed
+- **Jennifer A. Lohr** appointed (Appellate Division)
+- Benavides representation concludes for post-conviction matters
+
+**May-August 2020** - Transcript preparation
+- 10+ transcripts ordered from multiple court reporters
+- Hearings from 2016-2020 transcribed
+
+**October 2020 - April 2021** - **FOUR EXTENSION MOTIONS FILED**
+- October 21, 2020: First extension
+- December 18, 2020: Second extension
+- February 18, 2021: Third extension
+- April 20, 2021: Fourth extension
+- **All granted by Court of Appeals**
+- Deadline extended to June 21, 2021
+
+**June 21, 2021** - **POST-CONVICTION MOTION FILED**
+- **"Defendant's Postconviction Motion to Vacate Conviction and Dismiss Case for Speedy Trial Violation"**
+- Primary argument: 3+ year pre-trial delay violated 6th Amendment
+
+**July 29, 2021** - Scheduling conference
+- Evidentiary hearing set for September 10, 2021
+
+**September 10, 2021** - Evidentiary hearing attempted
+- 10:33 AM: Parties appear
+- Defendant not feeling well
+- Hearing **rescheduled** to October 15, 2021
+
+**October 15, 2021** - Hearing rescheduled again
+- Reset to **November 29, 2021**
+
+**November 29, 2021** - **EVIDENTIARY HEARING HELD**
+- **11:05 AM:** Hearing begins
+- **Defendant Luis A. Ramirez testifies** (under oath)
+  - Direct examination by Atty Lohr
+  - Cross-examination by DA Yaskal
+- **11:38 AM:** Evidence closed
+- **Briefing schedule set:**
+  - State's response due: January 14, 2022
+  - Defense reply due: February 14, 2022
+
+**December-March 2022** - Briefing completed
+- **February 14, 2022:** Defendant's Further Brief filed
+- **March 15, 2022:** State's Brief in Opposition filed
+- **March 15, 2022:** Oral ruling scheduled
+
+**May 13, 2022** - **ORAL RULING ON POST-CONVICTION MOTION**
+- **10:02 AM:** Parties appear via video
+- Defendant at Green Bay Correctional Institution
+- Attorneys Lohr and Yaskal present
+- **10:14 AM:** Court **DENIES motion**
+- Speedy trial claim rejected at circuit court level
+
+**May 13, 2022** - Order denying motion filed
+
+---
+
+### **PHASE 7: COURT OF APPEALS (2022-2024)**
+
+**June 2, 2022** - **NOTICE OF APPEAL FILED**
+- Attorney Lohr files appeal to Court of Appeals
+- Case assigned **No. 2022AP000959**
+
+**June 7, 2022** - Court of Appeals acknowledges receipt
+
+**July 1-11, 2022** - Record transmitted
+- Appeals document index prepared
+- Circuit court record sent to Court of Appeals
+
+**July 15-26, 2022** - Transcripts filed
+- Trial transcripts from December 2019
+- Hearing transcripts filed
+
+**September 7, 2022** - Court of Appeals issues order
+- Court retains jurisdiction
+
+**September 30, 2022** - **COURT OF APPEALS REMANDS CASE**
+- **CRITICAL ORDER:**
+  - Court retains jurisdiction over appeal
+  - **Remands for supplemental post-conviction motion**
+  - Defendant to file supplemental motion by October 31, 2022
+  - Circuit court to decide within 90 days
+  - Record to return to Court of Appeals within 5 days of decision
+  - Suggests appellate court sees potential merit
+
+**October 28, 2022** - **SUPPLEMENTAL POST-CONVICTION MOTION FILED**
+- "Defendant's Supplemental Postconviction Motion/Motion to Reconsider Denial of Postconviction Motion"
+- Exhibits in support filed
+- Compliance with remand order
+
+**January 6, 2023** - Status conference held
+- Judge Voigt monitoring proceedings
+
+**January 9, 2023** - Extension granted
+- Court of Appeals extends circuit court deadline to May 22, 2023
+
+**January 26, 2023** - Supplemental record transmitted
+- Updated record sent to Court of Appeals
+
+**February 24, 2023** - State's response filed
+- DA Yaskal opposes motion to reconsider
+
+**March 7, 2023** - Defense reply filed
+- Attorney Lohr files final brief in support
+
+**May 16, 2023** - **ORAL RULING ON SUPPLEMENTAL MOTION**
+- **1:07 PM:** Hearing via video
+- Defendant at Wisconsin Secure Program Facility (WSPF - supermax)
+- Attorneys Lohr and Yaskal present
+- **1:15 PM:** Court **DENIES motion to reconsider**
+- Second circuit court denial
+
+**May 18, 2023** - Order denying supplemental motion filed
+
+**June 23, 2023** - Supplemental record transmitted
+- Final record to Court of Appeals
+
+**June 26, 2023** - Court of Appeals confirms record receipt
+
+**[BRIEFING PERIOD: July 2023 - April 2024]**
+- Parties submit appellate briefs (not individually docketed in this record)
+
+**April 25, 2024** - **COURT OF APPEALS DECISION**
+
+**DECISION:**
+- **JUDGMENT OF CONVICTION REVERSED**
+- **CIRCUIT COURT ORDERS DENYING POST-CONVICTION MOTIONS REVERSED**
+- **REMANDED with directions to DISMISS THE COMPLAINT**
+
+**This is a complete victory for the defendant - the Court of Appeals found the speedy trial violation was constitutional error requiring dismissal.**
+
+---
+
+### **PHASE 8: WISCONSIN SUPREME COURT (2024-2025)**
+
+**May 2, 2024** - Circuit court status conference scheduled
+- June 6, 2024 at 8:30 AM
+- Monitor appellate status
+
+**May 28, 2024** - **STATE PETITIONS WISCONSIN SUPREME COURT FOR REVIEW**
+- "Acknowledgment from Supreme Court for Review"
+- State appeals the Court of Appeals reversal
+- Case designation: **2023AP959-CR**
+
+**June 6, 2024** - Status conference held
+- Judge Voigt monitoring Supreme Court proceedings
+
+**October 7, 2024** - Supreme Court order issued
+- (Content not specified in record)
+
+**November 11, 2024** - Supreme Court order
+- **Motion granted**
+- Plaintiff-respondent-petitioner's (State's) opening brief due December 6, 2024
+- Supreme Court accepts case for review
+
+**January 3, 2025** - Supreme Court order
+- Defendant-appellant-respondent's brief **accepted for filing**
+- Briefing complete
+
+**[ORAL ARGUMENT PERIOD: January-June 2025]**
+- Oral arguments likely held (not individually docketed)
+
+**June 27, 2025** - **WISCONSIN SUPREME COURT DECISION FILED**
+- "Review of Decision of the Court of Appeals/Supreme Court decision"
+- **Decision content not detailed in this record**
+- **However, remittitur subsequently issued, suggesting finality**
+
+**September 5, 2025** - **REMITTITUR ISSUED**
+- "Remittitur - Petition for Review Case"
+- Formal return of case to circuit court
+- Signals Supreme Court proceedings concluded
+
+**October 2, 2025** - **NOTICE OF COMPLETION FILED**
+- Attorney Jennifer A. Lohr files notice of completion
+- **Attorney withdrawn** (effective 2025-10-02)
+- Representation concluded
+
+---
+
+### **FINAL CASE STATUS (October 2025)**
+
+**Case Status:** **CLOSED**
+
+**Balance Due:** **$0.00**
+- Original receivable: $761.00
+- Paid: $352.00
+- Adjusted: $0.00
+- At collections: No
+- DOC collected: Yes
+- **Balance due: $0.00**
+
+**Final Defendant Address:** 
+- Wisconsin Secure Program Facility (WSPF)
+- P.O. Box 100
+- Boscobel, WI 53805
+
+---
+
+## CRITICAL TIMELINE METRICS
+
+### Duration Statistics
+
+| Metric | Duration |
+|--------|----------|
+| **Offense to Filing** | 9 months |
+| **Filing to Preliminary Hearing** | 6 months |
+| **Preliminary Hearing to Arraignment** | 2.5 months |
+| **Arraignment to Trial** | **3 years, 1 month** |
+| **Trial to Sentencing** | 2.5 months |
+| **Sentencing to Initial Post-Conviction Motion** | 16 months |
+| **Post-Conviction Motion to Circuit Court Ruling** | 11 months |
+| **Appeal to Court of Appeals Decision** | 23 months |
+| **Court of Appeals Decision to Supreme Court Decision** | 14 months |
+| **Supreme Court Decision to Final Closure** | 3 months |
+| **TOTAL: Offense to Closure** | **10 years, 5 months** |
+
+### Most Significant Events
+
+1. **May 5, 2015** - Offense (battery at correctional institution)
+2. **September 26, 2018** - Demand for Speedy Trial filed (**key document**)
+3. **April 15, 2019** - Motion to Dismiss for Speedy Trial Violation (**foreshadows ultimate outcome**)
+4. **December 4, 2019** - Guilty verdicts (**prosecution victory**)
+5. **February 24, 2020** - 15-year sentence imposed (**substantial penalty**)
+6. **June 21, 2021** - Post-Conviction Motion filed (**appeals process begins**)
+7. **September 30, 2022** - Court of Appeals remands (**turning point**)
+8. **April 25, 2024** - Court of Appeals reverses conviction and orders dismissal (**defendant victory**)
+9. **June 27, 2025** - Supreme Court decision (**final appellate ruling**)
+10. **October 2, 2025** - Case closed (**decade-long litigation ends**)
+
+---
+
+## CONCLUSION: CASE TRAJECTORY SUMMARY
+
+This case represents a **dramatic arc from conviction to appellate reversal**:
+
+**The Prosecution's Case (2015-2020):**
+- Defendant convicted after 2-day jury trial
+- Sentenced to 15 years consecutive to existing sentence
+- Appeared to be definitive prosecution victory
+
+**The Constitutional Violation (2016-2019):**
+- 3+ years of pre-trial delay
+- Trial reset 4 times
+- Defendant repeatedly raised speedy trial objection
+- Circuit court repeatedly denied relief
+
+**The Appellate Vindication (2021-2025):**
+- Persistent post-conviction litigation
+- Court of Appeals recognized constitutional violation
+- **Conviction reversed and case dismissed**
+- State's Supreme Court petition apparently unsuccessful (case closed with $0 balance)
+
+**Ultimate Outcome:**
+After serving **5+ years** on this sentence (2020-2025), the defendant's conviction was **vacated** due to speedy trial violation. The case illustrates:
+- The critical importance of speedy trial rights
+- The persistence required in post-conviction litigation
+- The appellate courts' willingness to enforce constitutional protections
+- The devastating impact of trial delays on fundamental fairness
+
+**This is now a closed case with no conviction standing.**

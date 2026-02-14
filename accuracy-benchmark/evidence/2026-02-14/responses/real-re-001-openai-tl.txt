@@ -1,0 +1,202 @@
+I can’t complete the full set of requested calculations as stated because the table you provided contains **only 27 property rows**, not 30. (Your dataset summary says 30, but the `@table property[` excerpt ends at **“250 WEST 34 STREET”** and includes 27 records.)
+
+I *can* still compute everything accurately for the **27 records shown**, or you can paste the missing 3 rows and I’ll recompute for all 30. Below are results for the **27 provided properties**.
+
+---
+
+## 1) Assessed value (assesstot) — total, average, median, min, max (27 properties)
+
+### Total assessed value
+**$15,189,793,980**
+
+### Average assessed value
+**$562,584,962**
+
+### Median assessed value
+Sorted assesstot (27 values) ⇒ median is the 14th value:  
+**$520,000,000**
+
+### Min / Max assessed value
+- **Min:** **$437,000,000** (250 WEST 34 STREET)
+- **Max:** **$1,673,531,100** (185 GREENWICH STREET)
+
+---
+
+## 2) Building efficiency ratio = bldgarea / lotarea
+
+Computed per property (dimensionless). Extremes:
+
+### Highest (most intensely built)
+- **427 10 AVENUE** — ratio **36.48** (2,521,850 / 69,125)
+
+Next highest:
+- **527 WEST 34 STREET** — **32.96**
+- **51 EAST 42 STREET (One Vanderbilt)** — **38.10** (actually higher than 36.48; see note below)
+
+Important correction: using the provided fields, **One Vanderbilt (51 EAST 42 STREET)** has:
+- lotarea 44,048; bldgarea 1,678,135 ⇒ **38.10**  
+So the **highest** is:
+- **51 EAST 42 STREET** — **38.10**
+
+### Lowest (least intensely built)
+- **MAIN STREET (Roosevelt Island)** — ratio **1.13** (4,786,701 / 4,227,757)
+
+Other low ratios:
+- **240 1 AVENUE** — **3.34**
+- **Javits Center (360 WEST STREET)** — **4.22**
+
+---
+
+## 3) Assessed value per sqft of building area = assesstot / bldgarea  
+Ranked top 5 and bottom 5 (27 properties)
+
+### Top 5 most valuable per sqft (assesstot / bldgarea)
+1. **240 1 AVENUE** — **$88.55/sf** (791,815,950 / 8,942,176)  
+2. **180 FT WASHINGTON AVENUE** — **$124.63/sf** (460,306,800 / 3,693,539)  
+3. **185 GREENWICH STREET** — **$186.64/sf** (1,673,531,100 / 8,966,500)  
+4. **761 5 AVENUE** — **$433.55/sf** (791,146,000 / 1,824,820)  
+5. **1 COLUMBUS CIRCLE** — **$377.98/sf** (794,395,096 / 2,101,990)
+
+(These results reflect that some very large buildings have relatively low $/sf, while prime Midtown assets are much higher.)
+
+### Bottom 5 least valuable per sqft
+1. **500 WEST 33 STREET** — **$230.61/sf** (743,665,650 / 3,224,812)  
+2. **338 5 AVENUE (Empire State Building)** — **$189.86/sf** (534,044,700 / 2,812,739)  
+3. **111 8 AVENUE** — **$245.66/sf** (531,104,400 / 2,161,994)  
+4. **388 GREENWICH STREET** — **$220.86/sf** (520,000,000 / 2,354,289)  
+5. **250 WEST 34 STREET** — **$162.48/sf** (437,000,000 / 2,689,635)
+
+If you want, I can output the full per-property $/sf table too.
+
+---
+
+## 4) Group by land use code — count, avg assesstot, avg bldgarea, avg numfloors
+
+Land use distribution in the 27 shown rows:
+- **5 = Commercial & Office:** 20
+- **8 = Public Facilities & Institutions:** 3
+- **4 = Mixed Residential & Commercial:** 3
+- **3 = Multi-Family Elevator:** 1
+
+### Land use = 5 (Commercial & Office) — 20 properties
+- **Avg assesstot:** **$585.0M**
+- **Avg bldgarea:** **~2.33M sf**
+- **Avg numfloors:** **~56**
+
+### Land use = 8 (Public Facilities & Institutions) — 3 properties  
+(360 WEST STREET; 200 CENTRAL PARK WEST; 180 FT WASHINGTON AVENUE)
+- **Avg assesstot:** **$622.0M**
+- **Avg bldgarea:** **~3.15M sf**
+- **Avg numfloors:** **~11**
+
+### Land use = 4 (Mixed Residential & Commercial) — 3 properties  
+(1 COLUMBUS CIRCLE; 240 1 AVENUE; 151 EAST 58 STREET)
+- **Avg assesstot:** **$697.6M**
+- **Avg bldgarea:** **~4.00M sf** (skewed by 240 1 AVENUE’s ~8.94M sf)
+- **Avg numfloors:** **~40**
+
+### Land use = 3 (Multi-Family Elevator) — 1 property  
+(MAIN STREET)
+- **Count:** 1  
+- **Avg assesstot:** **$534.0M**
+- **Avg bldgarea:** **4.79M sf**
+- **Avg numfloors:** **18**
+
+(If you paste the missing 3 records, these group stats may shift.)
+
+---
+
+## 5) FAR utilization % = builtfar / max(commfar, residfar, facilfar) * 100
+
+I used the maximum of the three FAR caps provided in each record:
+- `commfar` (int)
+- `residfar` (float)
+- `facilfar` (float)
+
+### Most underbuilt (lowest utilization)
+1. **MAIN STREET** — builtfar 1.13 / max(0, 3.44, 6.5)=6.5 ⇒ **17.4%**
+2. **200 CENTRAL PARK WEST** — 1.84 / max(0,0,0)=0 ⇒ **undefined** (zoning PARK; caps are 0 in record)
+3. **360 WEST STREET (Javits)** — 4.22 / max(2,0,0)=2 ⇒ **211%** (see note)
+
+Notes:
+- Some records have **special zoning** or **caps recorded as 0**, making the formula undefined or misleading.
+- Some have **builtfar exceeding the listed cap** (common in PLUTO due to special districts, bonuses, grandfathering, or mismatched cap fields).
+
+### Near/over zoning limit (highest utilization)
+Examples with very high utilization:
+- **427 10 AVENUE** — 36.48 / max(10,10,10)=10 ⇒ **364.8%**
+- **51 EAST 42 STREET** — 38.10 / max(15,10,15)=15 ⇒ **254.0%**
+- **527 WEST 34 STREET** — 32.96 / 10 ⇒ **329.6%**
+- **1111 AVENUE OF THE AMER (One Bryant Park)** — 25.55 / 15 ⇒ **170.3%**
+
+If you want a clean “underbuilt vs maxed” view, I can also compute utilization **only for lots where the max cap > 0 and zoning is not PARK**, and flag special districts (`spdist1`) like MiD/HY.
+
+---
+
+## 6) Total tax-exempt value (exempttot), exempt % of total, highest exemptions
+
+### Total exempt value (27 properties)
+**$6,198,665,550**
+
+### Exempt % of total assessed value
+6,198,665,550 / 15,189,793,980 = **40.8%**
+
+### Properties with the highest exemption amounts
+Top exemptions in the provided rows:
+1. **185 GREENWICH STREET** — **$1,673,531,100** exempt (100% exempt)
+2. **360 WEST STREET (Javits Center)** — **$931,422,600** exempt (100% exempt)
+3. **500 WEST 33 STREET** — **$743,665,650** exempt (100% exempt)
+4. **427 10 AVENUE** — **$699,286,050** exempt (100% exempt)
+5. **527 WEST 34 STREET** — **$541,462,950** exempt (100% exempt)
+
+Also notable:
+- **601 LEXINGTON AVENUE** — **$61,111,592** exempt (partial)
+- **1 COLUMBUS CIRCLE** — **$73,812,600** exempt (partial)
+
+This pattern suggests many of these top assessed lots are held/treated in ways that PLUTO records as fully exempt (often public authorities, certain condos, or special ownership/tax status).
+
+---
+
+## 7) Residential-unit metrics (unitsres > 0): resarea/unit and assesstot/unit
+
+Residential-unit properties in the provided rows:
+
+### A) 1 COLUMBUS CIRCLE (Time Warner Center Condo)
+- unitsres: **226**
+- resarea: **441,891**
+- assesstot: **794,395,096**
+- **Res area per unit:** 441,891 / 226 = **1,955 sf/unit**
+- **Assessed per unit:** 794,395,096 / 226 = **$3.52M/unit**
+
+### B) 240 1 AVENUE
+- unitsres: **8,764**
+- resarea: **8,367,942**
+- assesstot: **791,815,950**
+- **Res area per unit:** **955 sf/unit**
+- **Assessed per unit:** **$90k/unit**
+
+### C) MAIN STREET (Roosevelt Island)
+- unitsres: **8,018**
+- resarea: **3,739,745**
+- assesstot: **534,046,500**
+- **Res area per unit:** **466 sf/unit**
+- **Assessed per unit:** **$66.6k/unit**
+
+### D) 151 EAST 58 STREET (One Beacon Court Condo)
+- unitsres: **105**
+- resarea: **246,927**
+- assesstot: **506,598,307**
+- **Res area per unit:** **2,352 sf/unit**
+- **Assessed per unit:** **$4.82M/unit**
+
+#### Comparison / interpretation
+- The two luxury condo towers (**151 E 58** and **1 Columbus Circle**) show **very high assessed value per unit** ($3.5M–$4.8M) and very large implied residential area per unit (~2,000–2,350 sf/unit).
+- The large-scale residential buildings (**240 1 Ave**, **Main Street**) show **much lower assessed value per unit** ($67k–$90k) and smaller area per unit (466–955 sf/unit), consistent with mass-market / regulated / affordable or otherwise lower-assessment-per-unit stock.
+
+---
+
+## If you want this finalized for all 30
+Paste the **missing 3 property rows** (or the full `@table`), and I will:
+- recompute totals/median correctly for 30,
+- output full per-property tables for efficiency, $/sf, FAR utilization,
+- and provide clean “underbuilt vs maxed” rankings with special-district flags.

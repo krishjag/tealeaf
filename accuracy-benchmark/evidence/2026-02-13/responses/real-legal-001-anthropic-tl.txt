@@ -1,0 +1,128 @@
+# Legal Analysis of Wisconsin Circuit Court Case 2016CF000031
+
+## 1. Time from Offense to Sentencing
+
+**Offense Date:** May 5, 2015  
+**Sentencing Date:** February 24, 2020  
+**Total Elapsed Time:** **4 years and 9 months** (1,756 days)
+
+---
+
+## 2. Sentence Components Analysis
+
+### Charge 1: Battery by Prisoners (Felony H)
+- **State Prison:** 12 years (consecutive to any other sentence)
+- **Extended Supervision:** 3 years (consecutive to any other sentence)
+- **Total Combined Incarceration:** **15 years**
+- **Disposition:** Consecutive
+
+### Charge 2: Disorderly Conduct (Misdemeanor B)
+- **State Prison:** 1 year (concurrent with Ct. 1)
+- **Extended Supervision:** 6 months (concurrent with Ct. 1)
+- **Total Combined Incarceration:** **1.5 years**
+- **Disposition:** Concurrent with Count 1
+
+**Effective Total Sentence:** 15 years (since Count 2 runs concurrent)
+
+---
+
+## 3. Defense Attorneys Timeline
+
+**Total Attorneys:** 3
+
+| Attorney | Entered | Withdrawn | Duration |
+|----------|---------|-----------|----------|
+| **Leonie C. Dolch** | March 15, 2016 | July 7, 2016 | **3.8 months** |
+| **Ronald Gabriel Benavides** | July 7, 2016 | March 12, 2020 | **44.2 months** (3 yrs 8 mo) |
+| **Jennifer A. Lohr** | May 20, 2020 | October 2, 2025 | **64.4 months** (5 yrs 4 mo) |
+
+---
+
+## 4. Docket Entry Activity by Year
+
+| Year | Docket Entries | Notable Events |
+|------|----------------|----------------|
+| **2016** | **37** | Case filed, preliminary hearings, arraignment |
+| 2017 | 14 | Trial continuances |
+| 2018 | 24 | Multiple trial resets |
+| 2019 | 28 | Jury trial conducted (Dec 3-4) |
+| 2020 | 31 | Sentencing, post-conviction motions begin |
+| 2021 | 28 | Post-conviction evidentiary hearings |
+| 2022 | 32 | Appeal filed and briefing |
+| 2023 | 24 | Supplemental motions, second oral ruling |
+| 2024 | 7 | Court of Appeals reversal, Supreme Court review |
+| 2025 | 4 | Supreme Court decision, case closure |
+
+**Total Docket Entries:** 229  
+**Most Active Year:** **2016** (37 entries)
+
+---
+
+## 5. Appeal-Related Activity
+
+**Appeal-Related Docket Entries:** 47
+
+Key appeal entries include:
+- Notice of appeal (6/2/2022)
+- 15 Court of Appeals orders
+- 8 transcript filings
+- 6 transmittal of records
+- 5 Supreme Court orders/acknowledgments
+- Multiple motions for extensions and supplemental briefing
+
+**Percentage of Total Docket Entries:** **20.5%**
+
+**Appeal Timeline:**
+- Notice of Appeal: June 2, 2022
+- Court of Appeals Decision (Reversal): April 25, 2024
+- Supreme Court Review Granted: May 28, 2024
+- Supreme Court Decision: June 27, 2025
+- Remittitur: September 5, 2025
+
+---
+
+## 6. Financial Receivables Analysis
+
+| Category | Amount |
+|----------|--------|
+| **Total Amount Due** | $761.00 |
+| **Amount Paid** | $352.00 |
+| **Adjustments** | $0.00 |
+| **Balance Due** | $0.00 |
+| **Probation Amount** | $409.00 |
+
+**Collection Status:**
+- At Collections: No
+- At SDC: No
+- DOC Collected: **Yes**
+
+**Collection Rate:** 46.3% paid directly ($352/$761)  
+**Status:** Balance satisfied (likely through DOC collection program given `docCollected:true` flag)
+
+---
+
+## 7. Bond Information
+
+**Bond Amount:** **$5,000** (signature/recognizance bond with felony conditions)
+
+**Bond-Related Docket Entries:**
+
+| Date | Entry | Amount |
+|------|-------|--------|
+| **February 11, 2016** | Signature bond set | $5,000 |
+| February 15, 2016 | Letter to defendant with copy of bond for signature | — |
+| **February 25, 2016** | Signature bond signed and filed | $5,000 |
+
+**Bond Type:** Recognizance bond with felony conditions (defendant was already in custody at Waupun Correctional Institution at time of initial appearance via video conferencing)
+
+---
+
+## Key Case Observations
+
+1. **Lengthy Pre-Trial Period:** Nearly 5 years from offense to sentencing, with multiple trial continuances (scheduled for April 2017, September 2017, April 2018, April 2019 before finally proceeding December 2019)
+
+2. **Successful Appeal:** Case was ultimately reversed by the Court of Appeals on speedy trial grounds after extensive post-conviction litigation
+
+3. **Defendant Status:** Defendant was incarcerated throughout proceedings on other charges (moved between Waupun Correctional, Green Bay Correctional, and Wisconsin Secure Program Facility)
+
+4. **Financial Obligations:** Despite sentencing, financial obligations appear satisfied through DOC collection program

@@ -1,0 +1,129 @@
+I can compute items (1)–(7) **only for the counties included in the JSON you provided**. Your prompt says “10 counties,” but the excerpt contains **9 counties** (King, Pierce, Spokane, Clark, Yakima, Whatcom, Benton, Island, Ferry, Garfield). Below are results for these **9**.
+
+---
+
+## 1) Percent of residents who are adults (18+)
+
+Adult % = adult_population / population × 100
+
+| County | Population | Adult pop | Adult % |
+|---|---:|---:|---:|
+| King | 2,271,380 | 1,836,529 | 80.9% |
+| Pierce | 928,696 | 716,813 | 77.2% |
+| Spokane | 551,455 | 433,863 | 78.7% |
+| Clark | 521,150 | 405,348 | 77.8% |
+| Yakima | 256,643 | 183,160 | 71.4% |
+| Whatcom | 231,919 | 189,784 | 81.8% |
+| Benton | 215,219 | 159,518 | 74.1% |
+| Island | 86,267 | 71,614 | 83.0% |
+| Ferry | 7,497 | 6,217 | 82.9% |
+| Garfield | 2,363 | 1,865 | 78.9% |
+
+---
+
+## 2) Composite “chronic disease burden” score (mean of 6 measures)
+Average of: **ARTHRITIS, BPHIGH, DIABETES, CHD, COPD, STROKE** (all crude %).
+
+| County | Chronic disease burden score |
+|---|---:|
+| King | 10.5 |
+| Pierce | 13.7 |
+| Spokane | 13.8 |
+| Clark | 13.4 |
+| Yakima | 14.9 |
+| Whatcom | 12.6 |
+| Benton | 13.1 |
+| Island | 15.7 |
+| Ferry | 19.9 |
+| Garfield | 16.7 |
+
+(Example: King = (19.4+26.7+7.3+4.0+3.4+2.3)/6 = **10.5**)
+
+---
+
+## 3) Rank counties by chronic disease burden (lowest → highest)
+
+1. **King** — 10.5  
+2. **Whatcom** — 12.6  
+3. **Benton** — 13.1  
+4. **Clark** — 13.4  
+5. **Pierce** — 13.7  
+6. **Spokane** — 13.8  
+7. **Yakima** — 14.9  
+8. **Island** — 15.7  
+9. **Garfield** — 16.7  
+10. **Ferry** — 19.9  
+
+Highest burden in this set: **Ferry County**.
+
+---
+
+## 4) Disability (DISABLT): average disability prevalence per county + highest burden
+
+DISABLT measures averaged: **COGNITION, DISABILITY, HEARING, INDEPLIVE, MOBILITY, SELFCARE, VISION**.
+
+| County | Avg disability prevalence (DISABLT composite) |
+|---|---:|
+| King | 7.8 |
+| Pierce | 11.4 |
+| Spokane | 11.2 |
+| Clark | 10.6 |
+| Yakima | 13.8 |
+| Whatcom | 11.0 |
+| Benton | 11.1 |
+| Island | 10.8 |
+| Ferry | 15.4 |
+| Garfield | 11.8 |
+
+**Highest disability burden:** **Ferry County** (avg ≈ **15.4%** across disability indicators).
+
+---
+
+## 5) Preventive service utilization (PREVENT): highest rates
+
+From the PREVENT measures shown:
+
+- **Highest dental visit (DENTAL):** **King** — **71.8%**
+- **Highest mammography (MAMMOUSE):** **Spokane** — **76.9%**
+- **Highest cholesterol screening (CHOLSCREEN):** **Garfield** — **86.4%**
+
+---
+
+## 6) Population-weighted average obesity (OBESITY), weighted by adult_population
+
+Weighted mean obesity = Σ(adult_pop × obesity%) / Σ(adult_pop)
+
+Using the counties provided:
+
+- Total adult population (sum): **4,002,848**
+- Weighted average adult obesity prevalence: **~29.3%**
+
+So, across these counties (weighted by adult population), **adult obesity ≈ 29.3%**.
+
+---
+
+## 7) For each category: measure with the highest overall average prevalence across counties
+
+I computed simple (unweighted) averages across counties for each measure within a category (using measures present in your JSON).
+
+### HLTHOUT (Health Outcomes)
+Highest average prevalence: **BPHIGH (High blood pressure)** — avg **~32.9%**
+
+### HLTHSTAT (Health Status)
+Highest average prevalence: **GHLTH (Fair/poor self-rated health)** — avg **~18.1%**
+
+### PREVENT (Prevention)
+Highest average prevalence: **CHOLSCREEN (Cholesterol screening)** — avg **~83.6%**
+
+### RISKBEH (Risk Behaviors)
+Highest average prevalence: **SLEEP (Short sleep duration)** — avg **~31.5%**
+
+### DISABLT (Disability)
+Highest average prevalence: **DISABILITY (Any disability)** — avg **~29.9%**
+
+### HRSN (Health-Related Social Needs)
+Not computable from the excerpt: **no HRSN measures are included** in the provided county health_data.
+
+---
+
+If you paste the missing 10th county (or confirm the intended list), I can recompute everything for the full set of 10 and also compute category (HRSN) item #7.

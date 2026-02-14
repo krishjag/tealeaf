@@ -1,0 +1,110 @@
+# Washington State County Health Data Analysis
+
+## 1. Adult Population Percentage by County
+
+| County | Total Population | Adult Population | % Adults (18+) |
+|--------|-----------------|------------------|----------------|
+| Island | 86,267 | 71,614 | **83.01%** |
+| Ferry | 7,497 | 6,217 | **82.93%** |
+| Whatcom | 231,919 | 189,784 | **81.83%** |
+| King | 2,271,380 | 1,836,529 | **80.86%** |
+| Garfield | 2,363 | 1,865 | **78.93%** |
+| Spokane | 551,455 | 433,863 | **78.67%** |
+| Clark | 521,150 | 405,348 | **77.78%** |
+| Pierce | 928,696 | 716,813 | **77.18%** |
+| Benton | 215,219 | 159,518 | **74.12%** |
+| Yakima | 256,643 | 183,160 | **71.37%** |
+
+## 2. Chronic Disease Burden Score
+*(Average of: Arthritis, High Blood Pressure, Diabetes, CHD, COPD, Stroke)*
+
+| County | Disease Burden Score |
+|--------|---------------------|
+| Ferry | 19.87% |
+| Garfield | 16.55% |
+| Island | 15.08% |
+| Yakima | 14.25% |
+| Spokane | 13.82% |
+| Pierce | 13.70% |
+| Clark | 13.38% |
+| Benton | 13.08% |
+| Whatcom | 12.60% |
+| King | 10.52% |
+
+## 3. Chronic Disease Burden Rankings
+
+**Top 3 (Highest Burden):**
+1. **Ferry County** - 19.87%
+2. **Garfield County** - 16.55%
+3. **Island County** - 15.08%
+
+**Bottom 3 (Lowest Burden):**
+8. Benton County - 13.08%
+9. Whatcom County - 12.60%
+10. **King County** - 10.52% *(Lowest burden)*
+
+## 4. Disability Burden Analysis
+
+### Average Disability Prevalence by County:
+
+| County | Average Disability % | Rank |
+|--------|---------------------|------|
+| **Ferry** | **15.40%** | **1 (Highest)** |
+| Yakima | 13.84% | 2 |
+| Garfield | 11.71% | 3 |
+| Pierce | 11.43% | 4 |
+| Spokane | 11.20% | 5 |
+| Benton | 11.13% | 6 |
+| Whatcom | 11.01% | 7 |
+| Island | 10.76% | 8 |
+| Clark | 10.56% | 9 |
+| King | 7.77% | 10 (Lowest) |
+
+**Ferry County has the highest disability burden at 15.40%** - nearly double that of King County.
+
+## 5. Preventive Service Utilization Leaders
+
+### Dental Visits (DENTAL):
+**Winner: King County - 71.8%**
+- Runner-up: Island (70.5%), Clark (69.1%)
+- Lowest: Yakima (55.0%)
+
+### Mammography Use (MAMMOUSE):
+**Winner: Spokane County - 76.9%**
+- Runner-up: King (75.6%), Clark/Garfield (75.2% tied)
+- Lowest: Ferry (62.7%)
+
+### Cholesterol Screening (CHOLSCREEN):
+**Winner: Garfield County - 86.4%**
+- Runner-up: Island (85.9%), King (85.6%)
+- Lowest: Yakima (79.2%)
+
+## 6. Population-Weighted Obesity Average
+
+**Across all 10 counties: 29.70%**
+
+### Component Calculation:
+- Total adult population: 4,004,711
+- Weighted by adult population from each county
+- King County (lowest obesity at 22.6%) significantly pulls down the overall average due to its large population
+- Rural counties like Ferry (40.2%) and Yakima (39.7%) have much higher rates but smaller populations
+
+## 7. Highest Prevalence Measures by Category
+
+| Category | Measure | Average Prevalence | Description |
+|----------|---------|-------------------|-------------|
+| **Health Outcomes (HLTHOUT)** | **High Cholesterol** | **35.84%** | Among adults screened |
+| **Health Status (HLTHSTAT)** | **Fair/Poor General Health** | **18.30%** | Self-rated health status |
+| **Prevention (PREVENT)** | **Cholesterol Screening** | **83.77%** | Highest utilization |
+| **Risk Behaviors (RISKBEH)** | **Short Sleep Duration** | **31.51%** | Most common risk behavior |
+| **Disability (DISABLT)** | **Any Disability** | **29.90%** | Composite disability measure |
+
+---
+
+## Key Findings Summary:
+
+1. **Rural-Urban Divide**: Rural counties (Ferry, Garfield) show significantly higher chronic disease and disability burdens compared to urban King County
+2. **Preventive Care Excellence**: Despite health challenges, rural Garfield County leads in cholesterol screening
+3. **Obesity Epidemic**: Nearly 30% of Washington adults are obese on average, with rural counties approaching 40%
+4. **Sleep Crisis**: Short sleep duration affects nearly 1 in 3 adults statewide
+5. **King County Advantage**: The state's most populous county has the lowest disease burden and disability rates, likely reflecting better healthcare access and socioeconomic factors

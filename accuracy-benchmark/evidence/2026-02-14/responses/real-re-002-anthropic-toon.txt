@@ -1,0 +1,364 @@
+# Analysis of Manhattan's Highest-Value Properties
+
+## 1. Zoning District Distribution
+
+**Frequency of Primary Zoning Districts (zonedist1):**
+
+| Zoning Type | Count | Properties |
+|-------------|-------|------------|
+| **C5-2.5** | 6 | Blocks 1265, 1267, 1273, 1268, 1306, 1268 |
+| **C6-4** | 6 | Blocks 58, 702, 706, 706, 783, 216 |
+| **C6-6** | 3 | Blocks 1049, 995, 1308 |
+| **C6-5.5** | 3 | Blocks 1001, 1002, 1000 |
+| **C5-3** | 3 | Blocks 1294, 835, 1277 |
+| **M1-5, M2-3** | 2 | Blocks 739, 680 (manufacturing) |
+| **R7-2, R8** | 2 | Blocks 972, 1373, 2138 (residential) |
+| **C6-7, C6-6.5, C5-2, PARK** | 1 each | Remaining properties |
+
+**Key Findings:**
+- **87% (26/30) are in Commercial (C) zones** - predominantly high-density commercial districts
+- **C5 and C6 zones dominate**: These allow the highest commercial FAR (Floor Area Ratio) ranging from 10-15
+- Only **2 properties in Manufacturing (M) zones**: 
+  - Block 680: NY Convention Center (M2-3)
+  - Block 739: 111 8th Avenue/Google Building (M1-5)
+- Only **3 properties in Residential (R) zones**:
+  - Block 972: Stuyvesant Town (R7-2, overlay C1-5)
+  - Block 1373: Roosevelt Island (R7-2)
+  - Block 2138: NY Presbyterian Hospital (R8)
+- **1 property in PARK zone**: American Museum of Natural History
+
+The C6 zones (especially C6-4, C6-5.5, C6-6) permit the most intensive commercial development with FARs of 10-15, explaining why they house Manhattan's most valuable properties.
+
+---
+
+## 2. Building Age Profile Analysis
+
+**Properties Grouped by Decade:**
+
+| Decade | Count | Properties | Avg Assessed Value | Total Value |
+|--------|-------|------------|-------------------|-------------|
+| **1930s** | 5 | 1930-1937 | $495,254,620 | $2,476,273,100 |
+| **1940s** | 1 | 1945 | $791,815,950 | $791,815,950 |
+| **1950s** | 1 | 1958 | $449,806,045 | $449,806,045 |
+| **1960s** | 4 | 1963-1969 | $621,603,563 | $2,486,414,250 |
+| **1970s** | 8 | 1970-1978 | $494,046,963 | $3,952,375,701 |
+| **1980s** | 1 | 1989 | $520,000,000 | $520,000,000 |
+| **1990s** | 1 | 1998 | $474,390,000 | $474,390,000 |
+| **2000s** | 4 | 2001-2009 | $922,437,541 | $3,689,750,163 |
+| **2010s** | 5 | 2015-2019 | $660,640,270 | $3,303,201,350 |
+
+**Key Findings:**
+- **Highest average value: 2000s buildings ($922M)** - includes One World Trade Center ($1.67B) and Time Warner Center ($794M)
+- **2010s buildings average $661M** - recent construction commands premium values
+- **Oldest buildings (1930s) still highly valuable** - average $495M, includes Empire State Building ($534M), Rockefeller Center properties
+- **No clear linear relationship**: 1940s has highest single property (Stuyvesant Town, $792M) but only one building
+- **Modern era dominance**: Buildings from 2000-2019 (9 properties) represent 38% of total value despite being only 30% of properties
+
+**Notable outliers:**
+- **Stuyvesant Town (1945)**: $792M - massive residential complex with 8,764 units
+- **Empire State Building (1931)**: $534M - iconic Art Deco landmark
+- **One World Trade Center (2009)**: $1.67B - highest individual assessment
+
+---
+
+## 3. Area Composition Analysis
+
+**Properties by Use Mix:**
+
+### Single-Purpose Properties (>95% one use):
+1. **Block 216** (388 Greenwich): 100% Office (2.35M sf)
+2. **Block 739** (111 8th Ave): 100% Office (2.16M sf)
+3. **Block 706** (527 W 34th): 100% Office (2.22M sf)
+4. **Block 705** (427 10th Ave): 99.3% Office (2.50M sf)
+5. **Block 2138** (NY Presbyterian): 100% Other/Medical (3.69M sf)
+6. **Block 1373** (Roosevelt Island): 78% Residential, 22% Commercial
+
+### Most Mixed-Use Properties:
+
+**Block 1049 (Time Warner Center)**
+- Commercial: 68.8% (1.45M sf)
+- Residential: 21.0% (442K sf)
+- Office: 37.1%
+- Retail: 19.9%
+- Garage: 5.4%
+- **Most diverse mixed-use**: 226 residential units + office + retail + parking
+
+**Block 972 (Stuyvesant Town)**
+- Residential: 93.6% (8.37M sf)
+- Commercial: 6.4% (574K sf)
+- **Largest residential**: 8,764 units
+
+**Block 1313 (One Beacon Court)**
+- Commercial: 77.6% (856K sf)
+- Residential: 22.4% (247K sf)
+- Office: 66.4% + 105 residential units
+
+**Block 58 (One World Trade Center)**
+- 100% Commercial (8.97M sf)
+- Office: 79.9% (7.17M sf)
+- Retail: 9.2% (823K sf)
+- Other: 10.9%
+
+### Area Composition Summary:
+
+| Property Type | Count | Characteristics |
+|--------------|-------|-----------------|
+| **Pure Office** | 8 | 100% commercial/office space |
+| **Office-dominant with retail** | 15 | 90%+ office, <10% retail |
+| **Mixed-Use** | 5 | Significant residential + commercial |
+| **Residential-dominant** | 2 | Stuyvesant Town, Roosevelt Island |
+| **Institutional** | 2 | Convention Center, Hospital |
+| **Museum** | 1 | Natural History Museum |
+
+**Average breakdown across all 30 properties:**
+- Commercial/Office: 84.2%
+- Residential: 9.8%
+- Retail: 3.1%
+- Other/Storage/Garage: 2.9%
+
+---
+
+## 4. Floor Plate Size Analysis
+
+**Top 10 Largest Average Floor Plates:**
+
+| Rank | Block | Address | Floors | Bldg Area | Avg Floor Plate | Building Class |
+|------|-------|---------|--------|-----------|----------------|----------------|
+| 1 | **2138** | NY Presbyterian | 22 | 3,693,539 | **167,888 sf** | I1 (Hospital) |
+| 2 | **1130** | Museum Natural History | 7 | 1,360,264 | **194,323 sf** | P7 (Museum) |
+| 3 | **1373** | Roosevelt Island | 18 | 4,786,701 | **265,928 sf** | D4 (Multiple Dwellings) |
+| 4 | **680** | Convention Center | 4 | 4,060,596 | **1,015,149 sf** | P9 (Public) |
+| 5 | **972** | Stuyvesant Town | 13 | 8,942,176 | **687,859 sf** | D7 (Multiple Buildings) |
+| 6 | **739** | 111 8th Avenue | 17 | 2,161,994 | **127,176 sf** | O6 (Office) |
+| 7 | **58** | One WTC | 104 | 8,966,500 | **86,216 sf** | O4 (Office) |
+| 8 | **216** | 388 Greenwich | 39 | 2,354,289 | **60,366 sf** | O4 (Office) |
+| 9 | **1266** | 1260 6th Ave | 31 | 2,734,038 | **88,195 sf** | O4 (Office) |
+| 10 | **835** | Empire State Bldg | 102 | 2,812,739 | **27,576 sf** | O4 (Office) |
+
+**Smallest Floor Plates (Super-Slender Towers):**
+
+| Block | Address | Floors | Floor Plate | Building Class |
+|-------|---------|--------|-------------|----------------|
+| **1313** | One Beacon Court | 54 | 20,429 sf | RM (Mixed) |
+| **1277** | One Vanderbilt | 60 | 27,969 sf | O4 (Office) |
+| **835** | Empire State | 102 | 27,576 sf | O4 (Office) |
+| **1268** | 666 5th Ave | 40 | 33,526 sf | RC (Condo Office) |
+
+**Key Patterns:**
+
+1. **Building Class vs Floor Plate:**
+   - **Public/Institutional (P9, I1, P7)**: Largest floor plates (100K-1M sf) - horizontal campus-style
+   - **Multiple Dwellings (D4, D7)**: Very large (265K-688K sf) - multiple buildings counted as one tax lot
+   - **Office Buildings (O4, O6)**: 20K-88K sf typical range
+   - **Super-slender luxury (RM, RC)**: 20K-35K sf - premium Midtown towers
+
+2. **Height vs Floor Plate (Inverse Relationship):**
+   - Convention Center: 4 floors = 1M sf plates
+   - Empire State: 102 floors = 27.5K sf plates
+   - One Vanderbilt: 60 floors = 28K sf plates
+
+3. **Modern super-tall trend**: Recent buildings (2015-2019) tend toward smaller, more efficient floor plates on more floors
+
+---
+
+## 5. Top Property Owners by Total Assessed Value
+
+| Rank | Owner | Properties | Total Assessed Value | Blocks |
+|------|-------|------------|---------------------|---------|
+| 1 | **Rockefeller-related entities** | 3 | **$1,592,634,212** | 1265, 1266, 1003 |
+| | - RCPI HOLDCO LCC | 1 | $498,581,100 | 1266 (1260 6th Ave) |
+| | - Rockefeller Center Properties | 1 | $619,023,162 | 1265 (1250 6th Ave) |
+| | - Rockefeller Ctr North Inc | 1 | $470,029,950 | 1003 (1271 6th Ave) |
+| 2 | **UNAVAILABLE OWNER** | 3 | **$1,704,691,567** | 702, 1002, 1268 |
+| | - 500 W 33rd St | 1 | $743,665,650 | 702 |
+| | - 1251 6th Ave | 1 | $511,220,267 | 1002 |
+| | - 666 5th Ave | 1 | $449,806,045 | 1268 |
+| 3 | **NYC/Public entities** | 5 | **$3,939,552,100** | 58, 680, 995, 1130, 2138 |
+| | - Lower Manhattan Dev Corp | 1 | $1,673,531,100 | 58 (One WTC) |
+| | - NY Convention Center | 1 | $931,422,600 | 680 |
+| | - One Bryant Park | 1 | $787,042,350 | 995 |
+| | - NYC Cultural Affairs | 1 | $474,390,000 | 1130 (Museum) |
+| | - Presbyterian Hospital | 1 | $460,306,800 | 2138 |
+| 4 | **50 HYMC OWNER LLC** | 1 | $699,286,050 | 705 (427 10th Ave) |
+| 5 | **767 Fifth Partners LLC** | 1 | $791,146,000 | 1294 (761 5th Ave) |
+| 6 | **BPP ST OWNER LLC** | 1 | $791,815,950 | 972 (Stuyvesant Town) |
+| 7 | **1633 Broadway Owner II** | 1 | $492,269,400 | 1022 |
+| 8 | **Citigroup Technology** | 1 | $520,000,000 | 216 |
+
+**Ownership Concentration Findings:**
+
+- **Highly concentrated**: Top 3 ownership groups control **$7.24B (39.6%)** of total value
+- **Rockefeller Group**: Largest private ownership cluster - 3 contiguous Avenue of the Americas properties
+- **Public/Exempt ownership**: 5 properties worth $3.94B are fully tax-exempt (ownertype: X or C)
+- **"UNAVAILABLE OWNER"** likely indicates condominiums with multiple unit owners
+- **Single-purpose LLCs**: Most private properties held in individual entities (standard practice for liability)
+- **No major REIT dominance**: Ownership is fragmented compared to other cities
+
+**Tax-Exempt Properties (ownertype X or C):**
+- 13 of 30 properties (43%) are fully tax-exempt
+- Total exempt value: **$6.43B** (35% of total assessed value)
+- Includes government buildings, convention center, museum, hospital, public plazas
+
+---
+
+## 6. Lot Coverage Ratio Analysis
+
+**Methodology:** Coverage = (bldgfront × bldgdepth) ÷ lotarea × 100%
+
+**Highest Lot Coverage (Most Intensive Use):**
+
+| Rank | Block | Address | Coverage | Lot Area | Bldg Footprint | FAR |
+|------|-------|---------|----------|----------|----------------|-----|
+| 1 | **1266** | 1260 6th Ave | 34.4% | 184,764 | 63,240 | 14.80 |
+| 2 | **1267** | 1290 6th Ave | 100.3%* | 89,775 | 90,048 | 21.16 |
+| 3 | **835** | Empire State | 84.3% | 91,351 | 84,150 | 30.79 |
+| 4 | **1273** | 9 W 57th St | 83.5% | 62,058 | 50,292 | 27.37 |
+| 5 | **995** | One Bryant Park | 90.1% | 87,863 | 87,837 | 25.55 |
+| 6 | **1294** | 761 5th Ave | 75.1% | 84,350 | 63,143 | 21.63 |
+
+*Over 100% indicates building cantilevers or measurement discrepancy
+
+**Lowest Lot Coverage (Campus/Horizontal Development):**
+
+| Rank | Block | Address | Coverage | Lot Area | Use Type |
+|------|-------|---------|----------|----------|----------|
+| 1 | **1373** | Roosevelt Island | 0.0%* | 4.2M sf | Residential Campus |
+| 2 | **972** | Stuyvesant Town | 1.0% | 2.7M sf | Residential Complex |
+| 3 | **1130** | Natural History Museum | 16.3% | 738K sf | Museum Campus |
+| 4 | **2138** | NY Presbyterian | Unknown | 364K sf | Hospital Campus |
+| 5 | **680** | Convention Center | 49.5% | 962K sf | Exhibition Hall |
+
+*Building dimensions listed as 0 for campus-style developments
+
+**Key Findings:**
+
+1. **Coverage correlates with building type:**
+   - **Office towers (O4)**: 75-100% coverage - maximize lot usage
+   - **Residential campuses**: <5% coverage - multiple low-rise buildings with green space
+   - **Institutional**: 15-50% coverage - plaza and circulation space
+
+2. **FAR vs Coverage:**
+   - High FAR + High Coverage = Super-tall narrow towers (Empire State: 30.79 FAR, 84% coverage, 102 floors)
+   - High FAR + Low Coverage = Campus development (Stuyvesant: 3.34 FAR, 1% coverage, 39 buildings)
+
+3. **Midtown pattern**: Premium Midtown parcels show 80-100% coverage to maximize value of expensive land
+
+4. **Data quality note**: Properties with bldgfront/bldgdepth = 0 are multi-building campuses where individual building footprints aren't measured
+
+---
+
+## 7. Geographic Clustering Analysis
+
+**Properties by Manhattan Submarket:**
+
+### **Lower Manhattan (Latitude 40.70-40.72) - 2 properties:**
+
+| Block | Address | Lat | Value | Use |
+|-------|---------|-----|-------|-----|
+| **58** | One World Trade Center | 40.7116 | $1,673M | Office (exempt) |
+| **216** | 388 Greenwich St | 40.7209 | $520M | Office (Citigroup) |
+
+- **Total value**: $2.19B (12% of dataset)
+- **Characteristics**: Post-9/11 redevelopment, newer construction, large floor plates
+- **Average**: $1.1B per property (highest average)
+
+### **Midtown South/Chelsea (Lat 40.74-40.755) - 11 properties:**
+
+| Subarea | Properties | Total Value |
+|---------|------------|-------------|
+| Penn Station/Hudson Yards | 8 | $4.17B |
+| 5th Ave (30s) | 2 | $1.07B |
+| Gramercy | 1 | $792M |
+
+**Notable properties:**
+- Convention Center (40.758): $931M
+- Hudson Yards towers: $2.04B combined (427 10th Ave, 500 W 33rd, 527 W 34th)
+- Empire State Building (40.748): $534M
+- Stuyvesant Town (40.732): $792M
+
+### **Midtown Core (Lat 40.755-40.765) - 15 properties:**
+
+**Rockefeller Center cluster (6th Ave, lat 40.759-40.761):**
+- 7 properties worth $3.37B
+- Includes entire Rockefeller complex
+
+**5th Avenue Corridor (lat 40.758-40.764):**
+- 5 properties worth $2.93B
+- Premium retail/office addresses
+
+**Park Avenue/Lexington (lat 40.758-40.762):**
+- 3 properties worth $1.47B
+
+- **Total Midtown Core value**: $8.72B (47.7% of total)
+- **Highest concentration**: 50% of properties, nearly half of all value
+- **Characteristics**: Class A office, luxury mixed-use, highest FARs
+
+### **Central Park South/Columbus Circle (Lat 40.765-40.770) - 2 properties:**
+
+| Block | Address | Lat | Value |
+|-------|---------|-----|-------|
+| **1049** | Time Warner Center | 40.7685 | $794M |
+| **1130** | Natural History Museum | 40.7814 | $474M |
+
+### **Upper Manhattan (Lat 40.84+) - 1 property:**
+
+| Block | Address | Lat | Value |
+|-------|---------|-----|-------|
+| **2138** | NY Presbyterian Hospital | 40.8407 | $460M |
+
+### **Roosevelt Island (Lat 40.766) - 1 property:**
+
+| Block | Address | Lat | Value |
+|-------|---------|-----|-------|
+| **1373** | Roosevelt Island | 40.7662 | $534M |
+
+---
+
+## **Geographic Insights:**
+
+1. **Midtown dominance**: 56% of properties (17/30) between 40.755-40.765 latitude
+   - Represents $8.72B (47.7%) of total value
+   - Dense cluster around Rockefeller Center/6th Avenue
+
+2. **Value by location:**
+   - **Lower Manhattan**: $1.1B average (highest) - limited supply, trophy assets
+   - **Midtown Core**: $582M average - dense concentration
+   - **Midtown South**: $446M average - emerging market
+   - **Upper Manhattan**: $460M (single property)
+
+3. **Latitude vs Value correlation:**
+   - **No strong linear relationship**: Highest single value (One WTC) is at southern extreme
+   - **Midtown premium**: Highest density and aggregate value 40.755-40.765
+   - **Quality over location**: Individual property characteristics matter more than latitude
+
+4. **Longitude patterns (East-West):**
+   - **West Side (long <-74.00)**: 10 properties, mix of newer development and convention/institutional
+   - **Core Manhattan (-74.00 to -73.97)**: 15 properties, highest concentration
+   - **East Side (long >-73.97)**: 5 properties, includes luxury residential mixed-use
+
+5. **Clustering by property type:**
+   - **Office towers**: Concentrated 40.755-40.765 (Midtown)
+   - **Mega-projects**: Dispersed (WTC downtown, Hudson Yards west, Roosevelt Island east)
+   - **Institutional**: Geographic outliers (Hospital at 40.84, Museum at 40.78)
+
+6. **Transit correlation** (external knowledge):
+   - Highest values cluster near Penn Station, Grand Central, Columbus Circle
+   - All properties within 1/4 mile of major subway stations
+
+---
+
+## Summary of Key Findings:
+
+1. **Zoning**: 87% in commercial zones (C5/C6), enabling high-density development with FARs of 10-15
+
+2. **Age**: 2000s buildings average highest value ($922M), but 1930s landmarks remain valuable; no simple age-value relationship
+
+3. **Use**: 73% single-purpose office buildings; most mixed-use properties are luxury condo/office/retail combinations
+
+4. **Floor plates**: Inverse relationship with height - institutional buildings have largest plates (100K-1M sf), super-tall offices have smallest (20K-30K sf)
+
+5. **Ownership**: Concentrated - Rockefeller Group ($1.6B), public entities ($3.9B), 43% tax-exempt; mostly single-purpose LLCs
+
+6. **Lot coverage**: Office towers use 75-100% of lot; residential campuses use <5%; correlates with building typology more than value
+
+7. **Geography**: Midtown Core (40.755-40.765) dominates with 56% of properties and 48% of value; Lower Manhattan has highest per-property average ($1.1B)

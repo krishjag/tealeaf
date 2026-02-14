@@ -1,0 +1,156 @@
+# Credit Analysis Summary - FY 2025 Financial Health Assessment
+
+## Detailed Company Analysis
+
+### 1. **APPLE INC**
+
+**Balance Sheet Metrics:**
+- Total Debt: $90.68B (Current: $12.35B + Long-term: $78.33B)
+- Stockholders' Equity: $73.73B
+- **Debt-to-Equity Ratio: 1.23**
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $111.48B
+- Investing Cash Flow: $15.20B (inflow)
+- Financing Cash Flow: ($120.69B)
+- Capital Expenditures: $12.72B
+- **Free Cash Flow: $98.77B**
+
+**Interest Coverage:**
+- Operating Income: $133.05B
+- Interest expense not separately disclosed in income statement
+- Strong coverage implied by massive operating income
+
+---
+
+### 2. **VISA INC**
+
+**Balance Sheet Metrics:**
+- Total Debt: $25.17B (Current: $5.57B + Long-term: $19.60B)
+- Stockholders' Equity: $37.91B
+- **Debt-to-Equity Ratio: 0.66**
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $23.06B
+- Investing Cash Flow: $0.71B (inflow)
+- Financing Cash Flow: ($18.96B)
+- Capital Expenditures: $1.48B
+- **Free Cash Flow: $21.58B**
+
+**Interest Coverage:**
+- Operating Income: $23.99B
+- Interest Expense: $0.59B
+- **Interest Coverage Ratio: 40.7x** (Excellent)
+
+---
+
+### 3. **COSTCO WHOLESALE CORP**
+
+**Balance Sheet Metrics:**
+- Total Debt: $5.71B (Current: $0 + Long-term: $5.71B)
+- Stockholders' Equity: $29.16B
+- **Debt-to-Equity Ratio: 0.20** ⭐
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $13.34B
+- Investing Cash Flow: ($5.31B)
+- Financing Cash Flow: ($3.78B)
+- Capital Expenditures: $5.50B
+- **Free Cash Flow: $7.84B**
+
+**Interest Coverage:**
+- Operating Income: $10.38B
+- Interest Expense: $0.15B
+- **Interest Coverage Ratio: 67.4x** (Outstanding) ⭐
+
+---
+
+### 4. **QUALCOMM INC**
+
+**Balance Sheet Metrics:**
+- Total Debt: $14.81B (Current: $0 + Long-term: $14.81B)
+- Stockholders' Equity: $21.21B
+- **Debt-to-Equity Ratio: 0.70**
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $14.01B
+- Investing Cash Flow: ($0.80B)
+- Financing Cash Flow: ($13.20B)
+- Capital Expenditures: $1.19B
+- **Free Cash Flow: $12.82B**
+
+**Interest Coverage:**
+- Operating Income: $12.36B
+- Interest Expense: $0.66B
+- **Interest Coverage Ratio: 18.6x** (Strong)
+
+---
+
+## Key Findings
+
+### 6. **STRONGEST BALANCE SHEET (Lowest Leverage):**
+🏆 **COSTCO WHOLESALE CORP**
+- Debt-to-Equity: **0.20** (significantly lowest)
+- Minimal leverage with only $5.7B in long-term debt
+- No short-term debt obligations
+- Interest coverage of 67.4x demonstrates excellent debt service capacity
+
+**Rankings by Leverage (Best to Worst):**
+1. Costco: 0.20
+2. Visa: 0.66
+3. Qualcomm: 0.70
+4. Apple: 1.23
+
+---
+
+### 7. **MOST FREE CASH FLOW:**
+🏆 **APPLE INC**
+- Free Cash Flow: **$98.77B** (nearly 5x higher than nearest competitor)
+- Exceptional cash generation despite high capex ($12.7B)
+- Operating cash flow of $111.5B is industry-leading
+
+**Rankings by Free Cash Flow:**
+1. Apple: $98.77B
+2. Visa: $21.58B
+3. Qualcomm: $12.82B
+4. Costco: $7.84B
+
+---
+
+### 8. **RISK ASSESSMENT:**
+
+#### ⚠️ **CONCERNS IDENTIFIED:**
+
+**APPLE INC - Elevated Leverage:**
+- Debt-to-Equity of 1.23 is highest among peers
+- Total debt of $90.7B exceeds equity ($73.7B)
+- However, **MITIGATED** by:
+  - Massive free cash flow generation ($98.8B)
+  - Strong cash position ($35.9B)
+  - Additional marketable securities ($96.5B current + noncurrent)
+  - Debt used strategically for shareholder returns ($90.7B stock buybacks)
+
+**Assessment:** While leverage is elevated, Apple's exceptional cash generation and liquid assets eliminate material credit risk.
+
+#### ✅ **NO SIGNIFICANT CONCERNS:**
+
+**VISA, COSTCO, QUALCOMM:**
+- All maintain healthy debt-to-equity ratios below 1.0
+- All generate substantial positive free cash flow
+- All have strong interest coverage (18x - 67x)
+- No liquidity or solvency concerns identified
+
+---
+
+## Credit Rating Implications
+
+| Company | Leverage Profile | FCF Strength | Interest Coverage | Overall Assessment |
+|---------|-----------------|--------------|-------------------|-------------------|
+| **Costco** | Excellent (0.20) | Strong | Outstanding (67x) | **Strongest Credit** |
+| **Visa** | Strong (0.66) | Excellent | Outstanding (41x) | **Excellent Credit** |
+| **Qualcomm** | Strong (0.70) | Excellent | Strong (19x) | **Strong Credit** |
+| **Apple** | Moderate (1.23) | Exceptional | Strong* | **Strong Credit** (despite leverage) |
+
+*Interest expense not separately disclosed but covered by $133B operating income
+
+**Conclusion:** All four companies demonstrate strong financial health suitable for investment-grade credit ratings. No companies exhibit concerning debt levels or negative free cash flow.

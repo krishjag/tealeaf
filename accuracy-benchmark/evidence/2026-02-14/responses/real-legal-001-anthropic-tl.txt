@@ -1,0 +1,126 @@
+# Legal Analysis of Wisconsin Circuit Court Case 2016CF000031
+
+## 1. TIME FROM OFFENSE TO SENTENCING
+
+**Offense Date:** May 5, 2015  
+**Sentencing Date:** February 24, 2020
+
+**Total Elapsed Time:** **4 years, 9 months, and 19 days**
+
+---
+
+## 2. SENTENCE COMPONENTS ANALYSIS
+
+### Charge 1: Battery by Prisoners (Felony H)
+- **State Prison:** 12 years (**consecutive** to any other sentence currently serving)
+- **Extended Supervision:** 3 years (**consecutive** to any other sentence currently serving)
+- **Total for Charge 1:** 15 years
+
+### Charge 2: Disorderly Conduct (Misd. B)
+- **State Prison:** 1 year (**concurrent** with Ct. 1)
+- **Extended Supervision:** 6 months (**concurrent** with Ct. 1)
+- **Total for Charge 2:** 1.5 years
+
+### Combined Sentence Structure
+Since Charge 2 runs **concurrent** with Charge 1, the **effective total sentence is 15 years** (12 years initial confinement + 3 years extended supervision). However, both charges run **consecutive** to any other sentence the defendant was already serving at the time.
+
+---
+
+## 3. DEFENSE ATTORNEY REPRESENTATION
+
+**Total Attorneys:** 3
+
+| Attorney | Entered | Withdrawn | Duration |
+|----------|---------|-----------|----------|
+| **Leonie C. Dolch** | March 15, 2016 | July 7, 2016 | **~4 months** |
+| **Ronald Gabriel Benavides** | July 7, 2016 | March 12, 2020 | **~44 months (3 years, 8 months)** |
+| **Jennifer A. Lohr** | May 20, 2020 | October 2, 2025 | **~64 months (5 years, 4 months)** |
+
+**Note:** Attorney Benavides represented the defendant through trial and initial sentencing. Attorney Lohr handled all post-conviction and appellate matters.
+
+---
+
+## 4. DOCKET ENTRIES BY YEAR
+
+| Year | Number of Entries |
+|------|-------------------|
+| **2016** | **36** ⭐ **(Highest)** |
+| 2017 | 14 |
+| 2018 | 24 |
+| 2019 | 28 |
+| 2020 | 31 |
+| 2021 | 28 |
+| 2022 | 32 |
+| 2023 | 24 |
+| 2024 | 7 |
+| 2025 | 4 |
+
+**Total Docket Entries:** 228
+
+**Year with Most Activity:** **2016** (initial proceedings, attorney changes, discovery, preliminary hearings)
+
+---
+
+## 5. APPEAL-RELATED DOCKET ENTRIES
+
+### Appeal-Related Entries Include:
+- Notice of intent to pursue post-conviction relief
+- Appellate attorney appointments
+- Transcript requests and filings (multiple)
+- Orders from Court of Appeals (16+ orders)
+- Motions to extend time filed with Court of Appeals (8+ motions)
+- Notice of Appeal (June 2, 2022)
+- Transmittal of records to Court of Appeals (5 instances)
+- Court of Appeals decision reversing (April 25, 2024)
+- Supreme Court proceedings (2024-2025)
+- Supreme Court decision (June 27, 2025)
+- Remittitur (September 5, 2025)
+
+**Total Appeal-Related Entries:** Approximately **42 entries**
+
+**Percentage of Total Docket:** **18.4%** (42/228)
+
+**Timeline:** Appeals activity primarily spans from March 2020 through October 2025 (5+ years of appellate litigation)
+
+---
+
+## 6. FINANCIAL RECEIVABLES ANALYSIS
+
+| Category | Amount |
+|----------|--------|
+| **Total Amount Due (Original)** | $761.00 |
+| **Total Paid** | $352.00 |
+| **Adjustments** | $0.00 |
+| **Current Balance Due** | $0.00 |
+| **Probable Amount** | $409.00 |
+
+### Collection Analysis:
+- **Amount Collected:** $352.00
+- **Collection Rate:** **46.3%** (352/761)
+- **Status:** Account shows $0 balance despite only partial payment
+- **At Collections:** No
+- **At SDC (State Dept of Corrections):** No
+- **Doc Collected:** Yes (marked as true)
+
+**Note:** The balance due shows $0 despite only $352 being paid on $761 due. This likely indicates the remaining balance was satisfied through other means, written off, or adjusted administratively. The case costs were itemized in sentencing as $518 (Ct. 1) + $243 (Ct. 2) = $761 total.
+
+---
+
+## 7. BOND INFORMATION
+
+### Bond Amount: **$5,000.00**
+
+### Bond Type: **Signature Bond (Recognizance)** with felony conditions
+
+### Bond-Related Docket Entries:
+
+| Date | Entry | Amount | Details |
+|------|-------|--------|---------|
+| **February 11, 2016** | Signature bond set | $5,000 | "with felony conds." - Set at initial appearance |
+| **February 15, 2016** | Letters/correspondence | — | Letter to defendant with copy of bond for signature and notice of hearing |
+| **February 25, 2016** | Signature bond signed | $5,000 | "and filed." - Defendant signed bond |
+
+### Bond Conditions:
+The docket entry from February 11, 2016 notes: "Defendant, Luis A Ramirez #244212, appeared via video conferencing from Waupun Correctional. Troy D Cross appeared for the State of Wisconsin. Right to attorney recited. Reading waived. **$5,000 recog. bond with felony conds.** Time limits not waived."
+
+**Note:** The defendant was already in custody at a correctional facility (Waupun Correctional) when this new case was filed, explaining why the bond was set but he remained in custody throughout proceedings.

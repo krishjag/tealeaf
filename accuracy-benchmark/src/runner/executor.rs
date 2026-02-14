@@ -8,7 +8,7 @@ use tokio::time::sleep;
 
 use crate::config::DataFormat;
 use crate::providers::{CompletionRequest, CompletionResponse, LLMProvider, Message, ProviderError};
-use crate::tasks::{BenchmarkTask, TaskResult, TaskResultKey};
+use crate::tasks::{BenchmarkTask, FormatHints, TaskResult, TaskResultKey};
 
 /// Configuration for the executor
 #[derive(Debug, Clone)]
@@ -25,6 +25,8 @@ pub struct ExecutorConfig {
     pub timeout_ms: u64,
     /// Enable format comparison (run tasks in both TeaLeaf and JSON formats)
     pub compare_formats: bool,
+    /// Explicit list of formats to run (overrides compare_formats logic)
+    pub formats: Option<Vec<DataFormat>>,
 }
 
 impl Default for ExecutorConfig {
@@ -36,6 +38,7 @@ impl Default for ExecutorConfig {
             max_retry_delay_ms: 60_000,
             timeout_ms: 120_000,
             compare_formats: false,
+            formats: None,
         }
     }
 }
@@ -47,6 +50,8 @@ pub struct Executor {
     /// Per-provider semaphores keyed by provider name, ensuring
     /// `parallel_requests` is enforced independently for each provider.
     provider_semaphores: Arc<HashMap<String, Arc<Semaphore>>>,
+    /// Per-format hint text (loaded from format_hints.json)
+    format_hints: FormatHints,
 }
 
 impl Executor {
@@ -54,6 +59,15 @@ impl Executor {
     pub fn new(
         providers: Vec<Arc<dyn LLMProvider + Send + Sync>>,
         config: ExecutorConfig,
+    ) -> Self {
+        Self::with_format_hints(providers, config, HashMap::new())
+    }
+
+    /// Create a new executor with format hints
+    pub fn with_format_hints(
+        providers: Vec<Arc<dyn LLMProvider + Send + Sync>>,
+        config: ExecutorConfig,
+        format_hints: FormatHints,
     ) -> Self {
         let provider_semaphores: HashMap<String, Arc<Semaphore>> = providers
             .iter()
@@ -63,6 +77,7 @@ impl Executor {
             config,
             providers,
             provider_semaphores: Arc::new(provider_semaphores),
+            format_hints,
         }
     }
 
@@ -92,7 +107,9 @@ impl Executor {
         let mut results = HashMap::new();
 
         // Determine which formats to test
-        let formats = if self.config.compare_formats && task.has_data() {
+        let formats = if let Some(ref fmts) = self.config.formats {
+            fmts.clone()
+        } else if self.config.compare_formats && task.has_data() {
             DataFormat::all()
         } else {
             vec![DataFormat::TL]
@@ -101,7 +118,7 @@ impl Executor {
         for format in formats {
             // Prepare the task with the specific format
             let mut prepared_task = task.clone();
-            if let Err(e) = prepared_task.prepare_prompt_with_format(format) {
+            if let Err(e) = prepared_task.prepare_prompt_with_format(format, &self.format_hints) {
                 // If preparation fails, return error for all providers
                 for provider in &self.providers {
                     let key = TaskResultKey::new(&task.metadata.id, provider.name(), format);
@@ -320,6 +337,7 @@ impl Executor {
             config: self.config.clone(),
             providers: self.providers.clone(),
             provider_semaphores: self.provider_semaphores.clone(),
+            format_hints: self.format_hints.clone(),
         }
     }
 }

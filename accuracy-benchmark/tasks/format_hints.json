@@ -1,0 +1,5 @@
+{
+  "tl": "Note: The data below uses TeaLeaf format. `@struct Name(field1:type, field2:type, ...)` defines a schema, and `@table Name[...]` contains rows where values are positional — each value corresponds to the field at the same position in the @struct definition.",
+  "json": "",
+  "toon": ""
+}

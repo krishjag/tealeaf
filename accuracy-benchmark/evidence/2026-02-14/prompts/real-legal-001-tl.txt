@@ -1,0 +1,320 @@
+=== API Request: LEGAL-001 (TL format) ===
+Task ID:     LEGAL-001
+Category:    legal
+Complexity:  Complex
+Output Type: Calculation
+Format:      TL
+Max Tokens:  4096
+Temperature: 0.3
+==================================================
+=== PROMPT ===
+
+You are a legal analyst reviewing Wisconsin Circuit Court case data from the WCCA system.
+The data contains a criminal case with charges, sentencing, docket entries, defendant information, and financial receivables.
+
+@struct attorney(name:string,withdrawn:string,isGal:bool,entered:string)
+@struct aliase(name:string,descr:string,dob:string)
+@struct defendant(name:string,dob:string,effDate:string,sex:string,race:string,status:string?,address:string,type:string,attorneys:[]attorney,aliases:[]aliase)
+@struct condition(descr:string,notes:string)
+@struct supervision(descr:string,notes:string,time:string,conditions:[]any)
+@struct judgment(supervisions:[]supervision,orderDate:string,isModified:bool,dispoCtofc:string,dispoDesc:string?,sentDate:string,action:string)
+@struct modifier(modSeqNo:int,statuteCite:string,descr:string)
+@struct charge(judgments:[]judgment,pleaDate:string,descr:string,offenseDate:string,pleaDescr:string,dispoDesc:string,statuteCite:string,severity:string,chargeNo:int,modifiers:[]modifier)
+@struct chargehistory(replacedBy:string,descr:string,seqNo:int,dispoDesc:string?,statuteCite:string,severity:string,chargeNo:int)
+@struct party(sealed:bool,name:string)
+@struct docketentry(addlTxt:string?,parties:[]party?,descr:string,amount:float?,ctofc:string?,date:string,courtRptr:string?)
+@struct receivable(amountDue:float,pmtsAllowed:bool,atCollections:bool,adjust:float,rcvblNo:int,countyNo:int,probAmt:float,paid:float,dueDate:string?,type:string,atSdc:bool,balanceDue:float,docCollected:bool)
+@struct case(county:string,countyNo:int,caseNo:string,daCaseNo:string,caseType:string,classType:string,caption:string,status:string,filingDate:string,isCriminal:bool,wcisClsCode:string,branchId:string,respCtofc:string,prosAtty:string,prosAgency:string,balanceDue:float,execSummary:string,defendant:defendant,charges:[]charge,chargeHistory:[]chargehistory,docketEntries:[]docketentry,receivables:[]receivable)
+source:"Wisconsin Circuit Court Access (WCCA)"
+url:"https://wcca.wicourts.gov"
+license:"Public Record — Wisconsin Supreme Court Rule 72"
+description:"Circuit court case data from 1 Wisconsin criminal case(s). Includes charges with nested sentencing structures, docket entries, defendant information, and financial receivables."
+note:"Data manually captured from WCCA (requires hCaptcha). See README.md for reproduction steps."
+case_count:1
+cases:@table case[
+(Columbia,11,"2016CF000031","2015CO001313",CF,Criminal,"State of Wisconsin vs. Luis A Ramirez  #244212",Closed,"2016-02-01",true,Battery,"2","Voigt, W. Andrew","Yaskal, Brenda L.","District Attorney",0,"The defendant Luis A Ramirez #244212 was found guilty of the following charge(s) in this case. Battery by Prisoners [Modifiers: Repeater, Use of a Dangerous Weapon], a class H felony, Wisconsin Statutes 940.20(1). Disorderly Conduct [Modifiers: Repeater], a class B misdemeanor, Wisconsin Statutes 947.01(1). Notice to employers: It may be a violation of state law to discriminate against a job applicant because of an arrest or conviction record. Generally speaking, an employer may refuse to hire an applicant on the basis of a conviction only if the circumstances of the conviction substantially relate to the particular job. For more information, see Wisconsin Statute 111.335 and the Department of Workforce Development's publication, Arrest and Conviction Records under the Law .",("Ramirez  #244212, Luis A","1975-06-12","2022-11-29",Male,Caucasian,~,"P.O. Box 100, Wisconsin Secure Program Facility, Boscobel, WI 53805",Defendant,[
+("Dolch, Leonie C","2016-07-07",false,"2016-03-15"),
+("Benavides, Ronald Gabriel","2020-03-12",false,"2016-07-07"),
+("Lohr, Jennifer A","2025-10-02",false,"2020-05-20")
+],[
+("Ramirez  #244212, Luis A","Changed case name","1975-06-12"),
+("Ramirez, Luis A","Changed case name","1975-06-12")
+]),[
+([
+([
+("State Prison","Consecutive to: Any other sentence currently serving.","12 Years",[]),
+("Extended Supervision","Consecutive to: Any other sentence currently serving","3 Years",[{descr:Costs,notes:"If probation is revoked or will discharge with outstanding financial obligations due, a civil judgment shall be entered for the balance due."},{descr:Other,notes:"Submit DNA sample. No contact with the victim of this case."}])
+],"2019-12-04",false,"Voigt, W. Andrew",~,"2020-02-24","Found Guilty at Jury Trial")
+],"2019-12-04","Battery by Prisoners","2015-05-05","Not Guilty","Found Guilty at Jury Trial","940.20(1)","Felony H",1,[
+(1,"939.62(1)(b)",Repeater),
+(2,"939.63(1)(b)","Use of a Dangerous Weapon")
+]),
+([
+([
+("State Prison","Concurrent with: Ct. 1","1 Years",[]),
+("Extended Supervision","Concurrent with: Ct. 1","6 Months",[{descr:Costs,notes:"Same conditions as Ct. 1."}])
+],"2019-12-04",false,"Voigt, W. Andrew","With use of a dangerous weapon enhancer dismissed.","2020-02-24","Found Guilty at Jury Trial")
+],"2019-12-04","Disorderly Conduct","2015-05-05","Not Guilty","Found Guilty at Jury Trial","947.01(1)","Misd. B",2,[
+(1,"939.62(1)(a)",Repeater)
+])
+],[
+("Information Filed","Battery by Prisoners",1,~,"940.20(1)","Felony H",1),
+("Information Filed","Disorderly Conduct",2,~,"947.01(1)","Misd. B",2)
+],[
+(~,~,"Complaint filed",~,"Voigt, W. Andrew","2016-02-01",~),
+(~,~,"Initial appearance",~,"Voigt, W. Andrew","2016-02-11","Kurtz, Marjorie"),
+("with felony conds.",[
+(false,"Ramirez  #244212, Luis A")
+],"Signature bond set",5000,"Voigt, W. Andrew","2016-02-11","Kurtz, Marjorie"),
+("Defendant, Luis A Ramirez  #244212, appeared via video conferencing from Waupun Correctional. Troy D Cross appeared for the State of Wisconsin. Right to attorney recited. Reading waived. $5,000 recog. bond with felony conds. Time limits not waived.  Preliminary hearing scheduled for February 25, 2016 at 09:00 am.",~,Hearing,~,"Voigt, W. Andrew","2016-02-11","Kurtz, Marjorie"),
+("Letter to defendant with attachments - copy of bond for signature and notice of hearing.",~,"Letters/correspondence",~,~,"2016-02-15",~),
+("Preliminary hearing at 02-18-2016 09:00 am",~,"Notice of hearing",~,~,"2016-02-15",~),
+("with Petition for Writ of Habeas Corpus for 2/25/16",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2016-02-16",~),
+("with Petition for Writ of Habeas Corpus for 2/18/16",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2016-02-16",~),
+("Defendant Luis A Ramirez  #244212 in court, in custody.  Jane Kohlwey appeared for the State of Wisconsin.  Defendant stated he did not have enough time to get attorney.  Preliminary hearing scheduled for March 3, 2016 at 09:00 am.",~,Hearing,~,"Voigt, W. Andrew","2016-02-18","Sisco, Cheryl"),
+("with Petition for Writ of Habeas Corpus for March 3, 2016",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2016-02-24",~),
+("and filed.",~,"Signature bond signed",5000,~,"2016-02-25",~),
+("Defendant Luis A Ramirez  #244212 in court, in custody.  Jane Kohley appeared for the State of Wisconsin.  Defendant has applied for attorney with SPD office.  Reset requested.  Time limits waived.  Pre-trial conference scheduled for April 8, 2016 at 11:30 am.  Return date scheduled for May 10, 2016 at 02:45 pm.",~,Hearing,~,"White, Alan J","2016-03-03","Champeau, Chris"),
+("with Petition for Writ of Habeas Corpus for Waupun Correctional Institution on 5/10/16 at 2:45 P.M.",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2016-03-14",~),
+("attorney Leonie Dolch",~,"Public defender order appointing counsel",~,~,"2016-03-15",~),
+("and Petition For Leave to File Additional Motions filed by Atty. Dolch",~,"Demand for discovery",~,~,"2016-03-15",~),
+("and Notice of DNA and Witness List, with Petition for Leave to file Additional Motions filed by DA Kohlwey",~,"Motion and demand for discovery",~,~,"2016-03-28",~),
+("DA Kohlwey discovery letter to Atty. Dolch",~,"Letters/correspondence",~,~,"2016-03-28",~),
+("Atty. Dolch requests May 10 return be reset - still needs discovery - fax",~,"Letters/correspondence",~,~,"2016-05-05",~),
+("Return date on July 20, 2016 at 02:45 pm.",~,"Notice of hearing",~,~,"2016-05-06",~),
+("with Petition for Writ of Habeas Corpus for July 20, 2016 at 2:45",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2016-06-08",~),
+("attorney Ronald Benavides",~,"Public defender order appointing counsel",~,~,"2016-07-07",~),
+("Defendant Luis A Ramirez in court, in custody from Green Bay Correcitonal, with attorney Ronald Gabriel Benavides.  Jane E. Kohlwey appeared for the State of Wisconsin.   Reset requested. Just appointed.  Preliminary hearing scheduled for August 4, 2016 at 09:00 am.",~,"Return date",~,"Hepler, Todd J.","2016-07-20","Braunschweig, Cathy"),
+("ADDRESS INFO for Luis A Ramirez\nCurrent: PO Box 19033, Green Bay Correctional Institution, Green Bay, WI 54307 United States  (Effective: 07-21-2016)\nPrior: 200 S Madison Street PO Box 351, Waupun Correctional, Waupun, WI 53963 United States\n",[
+(false,"Ramirez  #244212, Luis A")
+],"Change of address notification",~,~,"2016-07-21",~),
+("with Petition for Writ of Habeas Corpus",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2016-07-22",~),
+(~,~,"Notice mailed",~,~,"2016-08-03",~),
+(~,~,"Case Converted to Electronic Filing",~,~,"2016-08-03",~),
+("9:58 A.M., Defendant Luis A Ramirez  #244212 in court, in custody with attorney Ronald Gabriel Benavides.  Jane E. Kohlwey appeared for the State of Wisconsin. State calls Witness Detective Lieutenant Roger Brandner, Columbia County Sheriff's Office, sworn, 9:59 A.M., testimony taken, 10:10 A.M. Witness excused, Court finds probable cause, bound over, Information filed, matter to be set for Arraignment,  Arraignment scheduled for October 26, 2016 at 02:45 pm.",~,"Preliminary hearing",~,"Voigt, W. Andrew","2016-08-04","Kurtz, Marjorie"),
+("Writ for Oct. 24, 2016",~,Order,~,"Voigt, W. Andrew","2016-08-10",~),
+("filed by Atty Kohlwey",~,Information,~,~,"2016-08-10",~),
+(~,~,"Petition for writ of habeas corpus",~,~,"2016-08-10",~),
+("Writ for Oct. 24, 2016",~,"Proposed Order",~,~,"2016-08-10",~),
+("writ for 10/26/16 at 2:45",~,Order,~,"Voigt, W. Andrew","2016-08-17",~),
+("filed by DA's office",~,"Petition for writ of habeas corpus",~,~,"2016-08-17",~),
+("writ for 10/26/16 at 2:45",~,"Proposed Order",~,~,"2016-08-17",~),
+("Defendant Luis A Ramirez  #244212 in court, in custody with attorney Ronald Gabriel Benavides.  Troy D Cross appeared for the State of Wisconsin.  Information filed, reading waived. Defendant stood mute. Court entered not guilty plea, jury trial to be set. Bond continued.",~,Arraignment,~,"Hepler, Todd J.","2016-10-26","Braunschweig, Cathy"),
+("Scheduling Order",~,Order,~,"Voigt, W. Andrew","2016-12-21",~),
+("Jury trial on April 13, 2017 at 08:30 am.",~,"Notice of hearing",~,~,"2016-12-21",~),
+("Filed by District Attorney Jane Kohlwey",~,"Witness list - plaintiff",~,~,"2017-02-17",~),
+("Filed by District Attorney Jane Kohlwey, requesting the jury trial on 4-13-17 be reset.  Witness is unavailable.  Atty Benavides does not object.",~,"Letters/correspondence",~,~,"2017-02-17",~),
+("Filed by District Attorney Jane Kohlwey, requesting 3 day jury trial not 1 day, and a reset of teh 4-13-17 jury trial.",~,"Letters/correspondence",~,~,"2017-03-03",~),
+("Scheduling conference on March 27, 2017 at 08:45 am.",~,"Notice of hearing",~,~,"2017-03-06",~),
+(~,~,"Status conference",~,"Voigt, W. Andrew","2017-03-27","Kurtz, Marjorie"),
+("Jury trial on September 26, 2017 at 08:30 am.",~,"Notice of hearing",~,~,"2017-03-30",~),
+("Filed by District Attorney Jane Kohlwey, Letter regarding jury trial scheduling conflict.",~,"Letters/correspondence",~,~,"2017-08-04",~),
+("Filed by District Attorney Jane Kohlwey",~,"Witness list - plaintiff",~,~,"2017-08-08",~),
+("Filed by DA Office",~,"Affidavit/Declaration of mailing",~,~,"2017-08-10",~),
+("Scheduling conference on August 16, 2017 at 11:30 am.",~,"Notice of hearing",~,~,"2017-08-11",~),
+("Jury trial on April 4, 2018 at 08:30 am.",~,"Notice of hearing",~,~,"2017-08-16",~),
+("Filed by District Attorney Jane Kohlwey",~,"Witness list - plaintiff",~,~,"2017-09-07",~),
+("Filed by DA Office",~,"Affidavit/Declaration of mailing",~,~,"2017-09-12",~),
+(~,~,"Records of prosec. are converted data. See file.",~,~,"2017-11-15",~),
+("Filed by DA Office",~,"Petition for writ of habeas corpus",~,~,"2018-02-22",~),
+(~,~,"Proposed Order",~,"Voigt, W. Andrew","2018-02-22",~),
+("Filed by DA Office",~,"Petition for writ of habeas corpus",~,~,"2018-02-22",~),
+(~,~,"Proposed Order",~,"Voigt, W. Andrew","2018-02-22",~),
+(~,~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2018-02-23",~),
+(~,~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2018-02-23",~),
+("Motion for Continuance filed by atty Benavides",~,Motion,~,"Voigt, W. Andrew","2018-03-06",~),
+("Motion hearing on March 12, 2018 at 11:30 am.",~,"Notice of hearing",~,~,"2018-03-07",~),
+("Status conference on May 21, 2018 at 11:30 am.",~,"Notice of hearing",~,~,"2018-03-12",~),
+("Attorney Ronald Gabriel Benavides in courtroom. Mary Ellen Karst appeared for the State of Wisconsin. Clerk had difficulties connecting by video with defendant. Court felt it was acceptable to proceed without the defendant with this hearing. State had no objection to the motion for continuance. Court removed the trial for April 4,5, & 6 from calendar. Status conf. to be held with counsel only. 11:56/12:04  Status conference scheduled for May 21, 2018 at 11:30 am.",~,"Motion hearing",~,"Voigt, W. Andrew","2018-03-12","Kurtz, Marjorie"),
+(~,~,"Status conference",~,"Voigt, W. Andrew","2018-05-21","Kurtz, Marjorie"),
+("from Atty Karst to Atty Riek re: discovery material",~,"Letters/correspondence",~,~,"2018-06-05",~),
+("Scheduling conference on August 6, 2018 at 08:45 am.",~,"Notice of hearing",~,~,"2018-06-14",~),
+(~,~,"Scheduling conference",~,"Voigt, W. Andrew","2018-08-06","Kurtz, Marjorie"),
+("Copy of Letter from ADA Mary Ellen Karst to Atty Ronald Benavides    re:  Discovery.",~,"Letters/correspondence",~,~,"2018-08-07",~),
+("Scheduling conference on December 5, 2018 at 01:00 pm.",~,"Notice of hearing",~,~,"2018-08-10",~),
+("filed by defendant",~,"Demand for speedy trial",~,~,"2018-09-26",~),
+("Telephone conference on October 3, 2018 at 11:30 am. (duplicate, document removed)",~,"Notice of hearing",~,~,"2018-10-01",~),
+("Telephone conference on October 3, 2018 at 11:30 am.",~,"Notice of hearing",~,~,"2018-10-01",~),
+(~,~,"Telephone conference",~,"Voigt, W. Andrew","2018-10-03","Kurtz, Marjorie"),
+("Filed by Atty Ron Benavides. Update to Court, earliest telephone conf. is on 10/11/18 at 8:30 am, he will update the court after.",~,"Letters/correspondence",~,~,"2018-10-08",~),
+("Scheduling conference on December 5, 2018 at 01:00 pm.",~,"Notice of hearing",~,~,"2018-11-01",~),
+("Jury trial on April 3, 2019 at 09:00 am.",~,"Notice of hearing",~,~,"2018-12-05",~),
+("Scheduled as a #2 two day jury trial for April 3-4, 2019.",~,"Scheduling conference",~,"Voigt, W. Andrew","2018-12-05",~),
+("from Atty Smith requesting adjournment for the 4/3/19, 4/4/19 Jury Trial\n\nReset request filed on 3/26/19 by Attorney Smith is granted. The 2-day jury trial will be reset at a telephone scheduling conference to be scheduled by Br. 2 JA.  bbr",~,"Letters/correspondence",~,~,"2019-03-26",~),
+("in Limine and Motions in Limine filed by Atty Benavides",~,"Notice of motion",~,~,"2019-03-26",~),
+("Notice of Additional Motions in Limine and Additional Motions in Limine to Exclude Statements filed by Atty Benavides",~,Motion,~,~,"2019-03-26",~),
+("Telephone scheduling conference on April 3, 2019 at 09:00 am.",~,"Notice of hearing",~,~,"2019-03-28",~),
+("Jury trial on December 3, 2019 at 09:00 am.",~,"Notice of hearing",~,~,"2019-04-03",~),
+("2-day jury trial rescheduled to December 3-4, 2019.",~,"Telephone scheduling conference",~,"Voigt, W. Andrew","2019-04-03",~),
+("to Dismiss filed by defendant",~,Motion,~,~,"2019-04-15",~),
+("Motion hearing on June 17, 2019 at 10:30 am.",~,"Notice of hearing",~,~,"2019-05-01",~),
+("Green Bay Correctional",~,"Video conferencing",~,"Voigt, W. Andrew","2019-06-17","Kurtz, Marjorie"),
+("10:31 AM Defendant Luis A Ramirez  #244212 in court by video means with attorney Ronald Gabriel Benavides in the courtroom. Sheila Smith appeared for the State of Wisconsin. Atty. Benavides made statement. State objected to a dismissal. Atty. Benavides questioned video whereabouts. Court noted ADA Karst stated there was none. Defendant stated there are four cameras. He reviewed them at disciplinary hearing. Motion to Dismiss denied. Crt. adj. 11:00 a.m.",~,"Motion hearing",~,"Voigt, W. Andrew","2019-06-17","Kurtz, Marjorie"),
+(~,~,"Telephone conference",~,"Voigt, W. Andrew","2019-12-02",~),
+(~,~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2019-12-02",~),
+(~,~,"Proposed Order",~,~,"2019-12-02",~),
+(~,~,"Petition for writ of habeas corpus",~,~,"2019-12-02",~),
+("#1 Pencil in brown bag (stored in evidence box).",~,Exhibit,~,~,"2019-12-03",~),
+("Exhibit #2 - Offender Telephone Call Tracking Log from the 12/03/2019 Jury Trial - Retained Electronically",~,Exhibit,~,~,"2019-12-03",~),
+("33 jurors summoned; 30 appeared; 23 seated for voir dire; no jurors excused for cause; 13 jurors seated and sworn.",~,"Jury selection",~,~,"2019-12-03",~),
+("1st day of trial - 09:01AM  Defendant Luis A Ramirez in court, in custody, with Attorney Ronald Gabriel Benavides.   DA Brenda L. Yaskal appeared for the State of Wisconsin. Jury not present. Motions in limine discussed. Court in recess 9:55/10:23  Court resumed; appearances the same; potential jurors present and sworn. 23 jurors seated for voir dire; Court questioned jurors. 10:45  Counsel questioned jurors; peremptory strikes-5 each; 13 jurors selected and sworn; prospective jurors released.  Jurors removed. Sidebar discussed. Court in recess. 11:28/11:55  Court resumed; appearances the same; Court gave add'l jury instructions. Court in recess 12:05/1:11 Court resumed. Appearances the same. DA Yaskal stated the information charges as repeater and use of dangerous weapon, questioned the jury instructions. Agreement reached on how to proceed. 1:17 Jurors returned.  Opening arguments by counsel.  1:24 State called witness T. Judd, sworn.  Direct examination. 2:04 Cross examination. Exhibit #2 marked, witness unable to identify Exhibit #2, State objected to the use of the document, Court granted objection.  Cross continued. Redirect. Exhibit #1 marked. Witness excused.  Exhibit #1 offered & receivded.  2:25 State called witness M. Biedermann, ER Dr. at DHS; sworn.  Direct. Cross. Redirect. Recross. Witness excused. 2:36 State called witness E. Starck, nurse; sworn. Direct. Cross.  Witness excused. 2:48 State called witness, T. Anderson, nurse, sworn. Direct. Cross.  Witness excused. 3:00 Jurors removed; Court in recess 3:00/3:15 Court resumed. Appearances the same. Jurors returned.  3:20 State called witness M. Babcock, CCI officer; sworn. Direct. Cross.  Witness excused. 3:43 State called witness S. Darling-Jezyt, CCI officer; sworn.  Direct. Cross. Redirect. 4:09 Witness excused. Court excused jurors until 8:45 am tomorrow.  Court will resume tomorrow at 9:00 am.  Court in recess 4:13 pm.",~,"Jury trial",~,"Voigt, W. Andrew","2019-12-03","Kurtz, Marjorie"),
+("Telephone conference on December 2, 2019 at 11:45 am.",~,"Notice of hearing",~,~,"2019-12-03",~),
+(~,~,"Jury instructions",~,~,"2019-12-04",~),
+("Verdict forms :  2 signed - Guilty; 2 unsigned - Not Guilty.",~,Verdict,~,~,"2019-12-04",~),
+("Exhibit #3 Calendar for Year 2015 from the 12/04/2019 Jury Trial - Retained Electronically",~,Exhibit,~,~,"2019-12-04",~),
+("Exhibits 1 - 3 from the 12/04/2025 Jury Trial - Retained Electronically",~,"Exhibit list",~,~,"2019-12-04",~),
+("2nd day of trial - 09:00 AM Defendant Luis A Ramirez  #244212 in court, in custody with attorney Ronald Gabriel Benavides.  Brenda L. Yaskal appeared for the State of Wisconsin. Discussion on procedure.  9:04 Jurors returned to courtroom. State called witness B. Slaney, former CCI officer; sworn. Direct examination. Cross examination. Redirect. Recross. Witness excused. 9:32 State called witness Z. Graff, CCI officer; sworn.  Direct examination. Cross examination.  Witness excused. 9:38 State called witness P. Hooper, former CCI officer; sworn.  Direct. Cross.  Witness excused. State rested. 9:44 Jurors removed.  Atty Benavides motioned for dismissal based on evidence. State had no position. Court found no basis for the motion. Motion denied. Court reviewed rights to testify with defendant.  Court in recess 9:53/10:14 Court resumed, appearances the same. Jurors returned.  Defense called witness, defendant Ramirez; sworn. Direct examination. Exhibit # 3 marked, offered & received.  Exhibit #2 offered and received. Direct continued. Cross examination.  Witness excused. 10:53 Jurors removed.  Proposed jury instructions and verdict forms discussed.  Court to be present by 12:45; Court in recess 11:27/12:55 Court resumed, appearances the same. Court and counsel reviewed jury instructions. 1:21 Jurors returned; alternate Juror drawn. Court read jury instructions. 1:42 Closing statements by counsel 2:21 Court read final jury instructions and review verdict forms with jury.  Bailiffs sworn.  2:25 Jurors removed to deliberate. Court in recess 2:28/3:12 Court resumed; appearances the same.  Jurors returned.  Guilty verdict on count 1 - Battery by Prisoner with the use of a dangerous weapon & Guilty on count 2, Disorderly Conduct without the use of a dangerous weapon.  Jury polled and released.  DA Yaskal motioned for judgment on verdicts, motion granted, Judgment entered. Sentencing to be set for a separate hearing.\nCourt adjourned 3:30",~,"Jury trial",~,"Voigt, W. Andrew","2019-12-04","Kurtz, Marjorie"),
+("Sentencing hearing on February 24, 2020 at 11:00 am.",~,"Notice of hearing",~,~,"2019-12-16",~),
+(~,~,"Proposed Order",~,~,"2019-12-17",~),
+("Filed by DA Office re: 2-24-20 at 11:00 am",~,"Petition for writ of habeas corpus",~,~,"2019-12-17",~),
+("Filed by DA Brenda Yaskal, regarding jury issue.",~,"Letters/correspondence",~,~,"2019-12-17",~),
+("2-24-20 at 11:00 am",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2019-12-18",~),
+("Copy of DA Yaskal's discovery letter to Atty. Benavides",~,"Letters/correspondence",~,~,"2019-12-27",~),
+(~,~,Subpoena,~,~,"2020-01-08",~),
+("To: Green Bay Correctional",~,"Proposed Order",~,~,"2020-02-17",~),
+("Filed by DA Office re: 2/24/20 at 11:00 am",~,"Petition for writ of habeas corpus",~,~,"2020-02-17",~),
+(~,~,Order,~,"Voigt, W. Andrew","2020-02-20",~),
+("Filed by Atty Ron Benavides.",~,"Appeal rights/info on postconviction relief",~,~,"2020-02-24",~),
+("Ct. 1 12 years initial confinement, consecutive to any other sentence, 3 years extended supervision. Ct. 2 1 year initial confinement, concurrent with Ct. 1, 6 months extended supervision.",~,"Written explanation of determinate sentence",~,~,"2020-02-24",~),
+("Exhibit #1 - Copy of JOC from Milwaukee County case no:  97CF974862 from the 02/24/2020 Sentencing Hearing - Retained Electronically",~,Exhibit,~,~,"2020-02-24",~),
+(~,~,"Dispositional order/judgment",~,"Voigt, W. Andrew","2020-02-24",~),
+("11:11 AM Defendant Luis A Ramirez  #244212 in court, in custody with attorney Ronald Gabriel Benavides.  Kevin R. Calkins appeared for the State of Wisconsin. State filed a copy of the JOC from defendants conviction in the Milwaukee County case. Victim made a statement. Sentencing recommendations argued. Defendant made a statement to the Court. Court sentenced the defendant on Ct. 1 to serve 15 years in prison, consecutive to any other sentence. 12 years initial confinement and 3 years extended supervision, consecutive to any other sentence currently serving. $518.00 costs. Submit DNA sample. Ct. 2 Court sentenced the defendant to serve 1.5 years in prison, concurrent to Ct. 1; 1 year initial confinement and 6 months extended supervison, concurrent to Ct. 1. $243.00 costs. No contact with the victim of this case. No jail credit. Defendant requested his glasses be returned to him. Atty Benavides will follow up on the glasses. Defendant is not eligible for the challenge incarceration program or substance abuse program. 11:55 AM",~,"Sentencing hearing",~,"Voigt, W. Andrew","2020-02-24","Kurtz, Marjorie"),
+(~,~,"Assessment Report",~,~,"2020-02-25",~),
+(~,~,"Judgment of conviction",~,"Bescup, Melissa R","2020-02-25",~),
+("Filed by Atty Ron Benavides.",~,"Notice of intent to pursue post-conviction relief",~,~,"2020-03-12",~),
+("Copy of CCAP court record, Notice of Intent to Pursue Post-Conviction Relief, and Judgment mailed to State Public Defender, Appellate Division today.",~,"Letters/correspondence",~,~,"2020-03-13",~),
+("Attorney Jennifer Lohr appointed",~,"Public defender order appointing counsel",~,~,"2020-05-20",~),
+("submitted by Appellate Division, State Public Defender",~,"Request for court record",~,~,"2020-05-20",~),
+("3-3-2016 Preliminary Hearing Time Limit Waiver filed by Court Reporter Chris Champeau",~,Transcript,~,~,"2020-05-26",~),
+("2/18/2016 Hearing filed by Court Reporter Cheryl Sisco",~,Transcript,~,~,"2020-05-26",~),
+("for the 10/26/16 Arraignment filed by Court Reporter Catherine Thimm -Braunschweig",~,Transcript,~,~,"2020-05-27",~),
+("for the 07/20/16 Return Date filed by Court Reporter Catherine Thimm -Braunschweig",~,Transcript,~,~,"2020-05-27",~),
+("filed by Appellate Attorney Joseph Ehmann - Motion to Extend the Time for Appointing Postconviction Counsel and Ordering Transcripts",~,Motion,~,~,"2020-06-11",~),
+("The deadline for the state public defender to appoint postconviction counsel and to order transcripts is extended through May 20, 2020",~,"Order of Court of Appeals",~,~,"2020-06-15",~),
+("of Sentencing Hearing on 2/24/20 filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2020-06-22",~),
+("for the 12/4/19 Jury Trial, Day Two filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2020-08-18",~),
+("for the 12/3/19 Jury Trial filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2020-08-18",~),
+("for the 6/17/19 Motion Hearing filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2020-08-18",~),
+("for the 8/4/16 Preliminary Hearing filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2020-08-18",~),
+("for the 2/11/16 Initial Appearance filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2020-08-18",~),
+("Copy of Motion to Extend the Time for Filing a Postconviction Motion or Notice of Appeal filed with Court of Appeals filed by Jennifer Lohr",~,Motion,~,~,"2020-10-21",~),
+("The time to file a postconviction motion or notice of appeal is extended to December 21, 2020",~,"Order of Court of Appeals",~,~,"2020-10-27",~),
+("Copy of Second Motion to Extend the Time for Filing a Postconviction Motion or Notice of Appeal filed with the Court of Appeals by Attorney Lohr",~,Motion,~,~,"2020-12-18",~),
+("The time to file a notice of appeal or postconviction motion is extended to February 19, 2021",~,"Order of Court of Appeals",~,~,"2020-12-23",~),
+("Copy of Third Motion to Extend the Time for Filing a Postconviction Motion or Notice of Appeal filed with Court of Appeals by Jennifer Lohr",~,Motion,~,~,"2021-02-18",~),
+("The time to file a postconviction motion or notice of appeal is extended to April 20, 2021",~,"Order of Court of Appeals",~,~,"2021-02-22",~),
+("To the Court of Appeals - Fourth Motion to Extend the Time for Filing A Postconviction Motion or Notice of Appeal filed by Atty Lohr",~,Motion,~,~,"2021-04-20",~),
+("The time to file a postconviction motion or notice of appeal is extended to June 21, 2021",~,"Order of Court of Appeals",~,~,"2021-04-21",~),
+("Defendant's Postconviction Motion to Vacate Conviction and Dismiss Case for Speedy Trial Violation filed by Atty Lohr",~,Motion,~,~,"2021-06-21",~),
+("Scheduling conference on July 29, 2021 at 01:15 pm.",~,"Notice of hearing",~,~,"2021-07-01",~),
+("Evidentiary hearing on September 10, 2021 at 10:00 am.",~,"Notice of hearing",~,~,"2021-07-29",~),
+("In person evidentiary hearing set 9/10/21 from 10 - 11 AM.",~,"Scheduling conference",~,"Voigt, W. Andrew","2021-07-29",~),
+(~,~,"Proposed Order",~,~,"2021-08-16",~),
+("for Green Bay Correctional Institution on 09/10/21 at 10:00 a.m. filed by DA's office",~,"Petition for writ of habeas corpus",~,~,"2021-08-16",~),
+(~,~,"Proposed Order",~,~,"2021-08-16",~),
+("for Wisconsin Secure Program Facility for 09/10/21 at 10:00 a.m.",~,"Petition for writ of habeas corpus",~,~,"2021-08-16",~),
+("for Wisconsin Secure Program Facility on 09/10/21 at 10:00 a.m.",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2021-08-17",~),
+("for Green Bay Correctional Institution on 09/10/21 at 10:00 a.m.",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2021-08-17",~),
+("10:33 AM Prosecuting attorney Brenda L. Yaskal appeared in court for the State of Wisconsin, Defendant Luis A Ramirez  #244212 appeared in court, in custody, Attorney Jennifer A Lohr appeared in court for Luis A Ramirez  #244212. Court/Counsel discussion regarding proceeding today, defendant is not feeling well. This will be rescheduled. 10:39 AM\nEvidentiary hearing scheduled for October 15, 2021 at 11:00 am.",~,"Evidentiary hearing",~,"Voigt, W. Andrew","2021-09-10","Kurtz, Marjorie"),
+("Letter from Attorney Lohr requesting a document be added to the court record",~,Request,~,~,"2021-10-12",~),
+("Responsive letter from Clerk of Court to Attorney Lohr re: request to add a document to the official court record",~,"Response/reply",~,~,"2021-10-14",~),
+("The time for the circuit court to decide the defendant's postconviction motion is extended to December 20, 2021",~,"Order of Court of Appeals",~,~,"2021-10-19",~),
+("Evidentiary hearing on November 29, 2021 at 11:00 am.",~,"Notice of hearing",~,~,"2021-10-20",~),
+(~,~,"Proposed Order",~,~,"2021-10-27",~),
+("Green Bay Correctional Institution on 11/29/21 at 11:00 a.m.",~,"Petition for writ of habeas corpus",~,~,"2021-10-27",~),
+("Notice of 11-29-21 evidentiary hearing mailed to defendant @ Green Bay Correctional Institution, P O Box 19033, Green Bay WI 54307 returned \"60 day forwarding period expired\"",~,"Return of unclaimed/undelivered mail service",~,~,"2021-10-29",~),
+("for Green Bay Correctional Institution on 11/29/21 at 11:00 A.M.",~,"Writ of Habeas Corpus",~,"Voigt, W. Andrew","2021-11-02",~),
+("11:05 AM Prosecuting attorney Brenda L. Yaskal appeared in court for the State of Wisconsin, Defendant Luis A Ramirez appeared in court, in custody, Attorney Jennifer A Lohr appeared in court for Luis A Ramirez.  Attorney Lohr called defendant to the stand, sworn. Direct exam. Cross exam. Witness excused.  Evidence closed for today. State's response to motion is to be filed by 1/14/22; Attorney Lohr to reply by 2/14/22. Court in recess. 11:38 AM",~,"Evidentiary hearing",~,"Voigt, W. Andrew","2021-11-29","Kurtz, Marjorie"),
+("The time to decide the postconviction motion is extended to March 14, 2022",~,"Order of Court of Appeals",~,~,"2021-12-14",~),
+("Copy of Third Motion to Extend the Time for Circuit Court to Issue Order Determining Postconviction Motion filed with the Court of Appeals by Attorney Jennifer Lohr",~,Motion,~,~,"2021-12-14",~),
+("Copy of Motion to Extend the Time for Circuit Court to Issue Order Determining Postconviction Motion filed with the Court of Appeals by Attorney Jennifer Lohr",~,Motion,~,~,"2021-12-14",~),
+("for the 11/29/21 Motion Hearing filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2021-12-15",~),
+("Defendant's Further Brief in Support of Postconviction Motion to Vacate Conviction & Dismiss Case for Speedy Trial Violation filed by Atty Lohr",~,Brief,~,~,"2022-02-14",~),
+("Copy of Fourth Motion to Extend the Time for Circuit Court to Issue Order Determining Postconviction Motion filed in the Wi Court of Appeals by Attorney Jennifer Lohr",~,Motion,~,~,"2022-03-11",~),
+("The time to decide the postconviction motion is extended to May 31, 2022",~,"Order of Court of Appeals",~,~,"2022-03-14",~),
+("State' Brief in Opposition to Defendant's Post- Conviction Motion filed by DA Yaskal",~,Brief,~,~,"2022-03-15",~),
+("Filed by DA Brenda Yaskal re: filing of brief",~,"Letters/correspondence",~,~,"2022-03-15",~),
+("Oral ruling on May 13, 2022 at 10:00 am.",~,"Notice of hearing",~,~,"2022-03-15",~),
+("denying defendant's postconviction motion",~,Order,~,"Voigt, W. Andrew","2022-05-13",~),
+(~,~,"Proposed Order",~,~,"2022-05-13",~),
+(~,~,"Video conferencing",~,~,"2022-05-13",~),
+("10:02 AM Prosecuting attorney Brenda L. Yaskal in court for the State of Wisconsin. Defendant Luis A Ramirez  #244212 appeared by video in custody from the Green Bay Correctional Institution. Attorney Jennifer A Lohr appeared by video for Luis A Ramirez. Hearing is in re: defense motion right to speedy trial. Statements by Court, motion denied. 10:14 AM",~,"Oral ruling",~,"Voigt, W. Andrew","2022-05-13","Kurtz, Marjorie"),
+("filed by Attorney Jennifer Lohr",~,"Notice of appeal",~,~,"2022-06-02",~),
+("Notice of Appeal and Circuit Court Docket Entries received by the Wisconsin Court of Appeals",~,"Acknowledgment from Court of Appeals",~,~,"2022-06-07",~),
+(~,~,"Other papers",~,~,"2022-06-07",~),
+("filed by Atty Lohr",~,"Statement on transcript",~,~,"2022-06-16",~),
+("Appeals Document Index saved for: 2022AP000959 by: Nicole Saley",~,Index,~,~,"2022-07-01",~),
+(~,~,"Other papers",~,~,"2022-07-01",~),
+("from Attorney Jennifer Lohr re: appellate index",~,"Letters/correspondence",~,~,"2022-07-06",~),
+("from Lohr Law Office requesting specific documents to be added to the index",~,"Letters/correspondence",~,~,"2022-07-07",~),
+("Appeals Document Index: 2022AP000959 sent to Court of Appeals by: Nicole Saley",~,"Transmittal of record to court of appeals",~,~,"2022-07-11",~),
+("Copy of letter from Wisconsin Court of Appeals to court reporter M. Kurtz directing the filing of the transcript forthwith",~,"Letters/correspondence",~,~,"2022-07-12",~),
+(~,~,"Acknowledgment from Court of Appeals",~,~,"2022-07-15",~),
+("Appeals Document Index: 2022AP000959 sent to Court of Appeals by: Nicole Saley",~,"Transmittal of record to court of appeals",~,~,"2022-07-15",~),
+("for the 5/13/22 Oral Ruling filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2022-07-15",~),
+("for the 12/4/19 Jury Trial filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2022-07-26",~),
+("Transcript for the 12/3/19 Jury Trial filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2022-07-26",~),
+(~,~,"Order of Court of Appeals",~,~,"2022-09-07",~),
+("It is ordered thst this Corrt retains jurisdiction over this appeal and remands for the appellant to file a supplemental postconviction motion.  The motion shall be filed by October 31, 2022.  It is ordered that the circuit court shall hold any necessary proceedings and enter an order deciding the supplemental postconviction motion within ninety days of the filing of the motion.  It is ordered that a transcript of any hearing on the supplemental postconviction motion, if necessary for this appeal, shall be requested within eleven days of the entry of the order disposing of the motion.  The transcript shall be filed within thirty days of the date requested, and the party requesting the transcript shall advise the court reporter of this deadline.  It is ordered that the record shall be transmitted back to this court within five days of entry of the order disposing of the supplemental postconviction motion or the filing of the transcript if requested.  The record shall include the proceedings on remand.  It is ordered that the time to file the appellant's brief is extended to forty days after the return of the record to this court.",~,"Order of Court of Appeals",~,~,"2022-09-30",~),
+("Exhibits in Support of Supplemental Postconviction Motion filed by Atty Lohr",~,"Other papers",~,~,"2022-10-28",~),
+("Defendant's Supplemental Postconviction Motion/Motion to Reconsider Denial of Postconviction Motion filed by Atty Lohr",~,Motion,~,~,"2022-10-28",~),
+("Status conference on January 6, 2023 at 08:30 am.",~,"Notice of hearing",~,~,"2022-11-29",~),
+("ADDRESS INFO for Luis A Ramirez  #244212\nCurrent: P.O. Box 100, Wisconsin Secure Program Facility, Boscobel, WI 53805 United States  (Effective: 11-29-2022)\nPrior: PO Box 19033, Green Bay Correctional Institution, Green Bay, WI 54307 United States\n",[
+(false,"Ramirez  #244212, Luis A")
+],"Change of address notification",~,~,"2022-11-29",~),
+("Change of Address Notification filed by Atty Lohr",[
+(false,"Ramirez  #244212, Luis A")
+],"Change of address notification",~,~,"2022-11-29",~),
+(~,[
+(false,"Ramirez  #244212, Luis A")
+],"Status conference",~,"Voigt, W. Andrew","2023-01-06",~),
+("MOTION TO EXTEND THE TIME FOR CIRCUIT COURT TO ISSUE ORDER DETERMINING SUPPLEMENTAL POSTCONVICTION MOTION",~,"Motion in court of appeals",~,~,"2023-01-09",~),
+("Order of Court of Appeals - Circuit Court to decided pending postconviction motion is extended to May 22, 2023",~,"Order of Court of Appeals",~,~,"2023-01-10",~),
+("Appeals Document Index saved for: 2022AP000959 by: Nicole Saley",~,Index,~,~,"2023-01-17",~),
+("Notification of Filing of Circuit Court Record",~,"Acknowledgment from Court of Appeals",~,~,"2023-01-26",~),
+("Appeals Document Index: 2022AP000959 sent to Court of Appeals by: Nicole Saley",~,"Transmittal of record to court of appeals",~,~,"2023-01-26",~),
+(~,[
+(false,"Ramirez  #244212, Luis A")
+],"Other papers",~,~,"2023-01-26",~),
+("Atty Yaskal re: extension to file Brief",~,"Letters/correspondence",~,~,"2023-01-30",~),
+("filed by Sheila Reiff, Clerk of Court of Appeals",~,"Order of Court of Appeals",~,~,"2023-02-07",~),
+("Atty Yaskal re: response to defendant's motion to reconsider",~,"Letters/correspondence",~,~,"2023-02-24",~),
+("State's Response to Defendant's Motion to Reconsider filed by Atty Yaskal",~,"Response/reply",~,~,"2023-02-24",~),
+("Defendant's Reply in Support of Supplemental Postconviction Motion/Motion to Reconsider Denial of Postconviction Motion filed by Atty Lohr",~,"Response/reply",~,~,"2023-03-07",~),
+("Oral ruling on May 16, 2023 at 01:00 pm.",~,"Notice of hearing",~,~,"2023-03-28",~),
+(~,~,"Video conferencing",~,~,"2023-05-16",~),
+("1:07 PM Defendant Luis A Ramirez  #244212 appeared by video Zoom in custody from the Wisconsin Secure Program Facility.  Attorney Jennifer A Lohr in court for Luis A Ramirez  #244212.  Attorney Brenda L. Yaskal in court for State of Wisconsin. Court makes ruling on defendant's motion to reconsider, Court denies motion to reconsider, Atty Lohr to submit Order to the Court, 1:15 P.M.",~,"Oral ruling",~,"Voigt, W. Andrew","2023-05-16","Kurtz, Marjorie"),
+("Filed by Atty Lohr - Postconviction motion to reconsider is denied",~,"Proposed Order",~,~,"2023-05-17",~),
+("Supplemental postconviction motion/motion to reconsider is denied",~,Order,~,"Voigt, W. Andrew","2023-05-18",~),
+("Order of Court of Appeals - order to file the appellant's brief is extended",~,"Order of Court of Appeals",~,~,"2023-06-01",~),
+("Oral Ruling 5-16-23 filed by Court Reporter Marjorie Kurtz",~,Transcript,~,~,"2023-06-05",~),
+("Appeals Document Index saved for: 2022AP000959 by: Nicole Saley",~,"Supplemental Index",~,~,"2023-06-23",~),
+("Appeals Document Index: 2022AP000959 sent to Court of Appeals by: Nicole Saley",~,"Transmittal of record to court of appeals",~,~,"2023-06-23",~),
+("For the supplement to the appeal record",~,"Other papers",~,~,"2023-06-23",~),
+("Order of Court of Appeals - transmittal of record - due within eleven (11) days of order",~,"Order of Court of Appeals",~,~,"2023-06-26",~),
+("Supplemental Circuit Court Case Record filed.",~,"Acknowledgment from Court of Appeals",~,~,"2023-06-26",~),
+("Reverse the Judgment of Conviction and Circuit Court Orders Denying Postconviction Motions and remand for the Circuit Court to Dismiss the Complaint",~,"Court of Appeals decision & order reversing",~,~,"2024-04-25",~),
+(~,~,"Instructions for How to Appear Remotely",~,~,"2024-05-02",~),
+("Status conference on June 6, 2024 at 08:30 am.",~,"Notice of hearing",~,~,"2024-05-02",~),
+("for Review - Supreme Court",~,"Acknowledgment from Supreme Court",~,~,"2024-05-28",~),
+(Held.,~,"Status conference",~,"Voigt, W. Andrew","2024-06-06",~),
+(~,~,"Order of the Supreme Court",~,~,"2024-10-07",~),
+("If is ordered that the motion is granted.  Plaintiff-respondent-petition's opening brief shall be served and filed on or before December 6, 2024",~,"Order of the Supreme Court",~,~,"2024-11-11",~),
+("It is ordered that the motion is granted and that the defendant/appellant/respondent's brief is accepted for filing",~,"Order of the Supreme Court",~,~,"2025-01-03",~),
+("Review of Decision of the Court of Appeals/Supreme Court decision",~,"Supreme Court decision filed",~,~,"2025-06-27",~),
+("Remittitur - Petition for Review Case",~,Remittitur,~,~,"2025-09-05",~),
+("Atty Lohr",~,"Notice of Completion",~,~,"2025-10-02",~)
+],[
+(761,true,false,0,278739,11,409,352,~,R,false,0,true)
+])
+]
+
+
+Perform the following calculations and analysis:
+1. Calculate the total time from offense date to sentencing date. How many years and months elapsed?
+2. For each charge, extract the sentence components: prison time and extended supervision time. What is the total combined incarceration (prison + ES) for each charge? Are the sentences concurrent or consecutive?
+3. How many defense attorneys represented the defendant? Calculate the duration (in months) each attorney was on the case
+4. Count the total docket entries per year (2016-2025). Which year had the most activity?
+5. How many docket entries are related to appeals (Court of Appeals or Supreme Court references)? What percentage of total docket entries are appeal-related?
+6. From the receivables, calculate: total amount due, total paid, remaining balance, and what percentage has been collected
+7. The bond was set at what amount? Identify the bond-related docket entries and their dates

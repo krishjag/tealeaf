@@ -10,11 +10,11 @@ use tracing_subscriber::EnvFilter;
 
 use accuracy_benchmark::{
     analysis::{ComparisonEngine, ComparisonResult, AnalysisResult},
-    config::{Config, DataFormat},
+    config::{Config, DataFormat, parse_formats},
     providers::{create_all_providers_with_config, create_providers_with_config, LLMProvider},
     reporting::{print_console_report, JsonSummary, TLWriter},
     runner::{Executor, ExecutorConfig},
-    tasks::{load_tasks_from_directory, load_tasks_from_file, load_tasks_from_json_file, BenchmarkTask, TaskResult},
+    tasks::{load_format_hints, load_tasks_from_directory, load_tasks_from_file, load_tasks_from_json_file, BenchmarkTask, TaskResult},
 };
 
 /// Data source selection for benchmark tasks
@@ -55,6 +55,10 @@ enum Commands {
         #[arg(long)]
         categories: Option<String>,
 
+        /// Comma-separated task IDs to run (e.g., RE-001,RE-002)
+        #[arg(long)]
+        task_ids: Option<String>,
+
         /// Path to task definitions (file or directory)
         #[arg(short, long)]
         tasks: Option<PathBuf>,
@@ -70,6 +74,10 @@ enum Commands {
         /// Compare TeaLeaf vs JSON format performance
         #[arg(long)]
         compare_formats: bool,
+
+        /// Comma-separated formats to run (e.g., tl,json). Implies --compare-formats
+        #[arg(long)]
+        formats: Option<String>,
 
         /// Use synthetic or real-world data files
         #[arg(long, value_enum, default_value = "synthetic")]
@@ -108,6 +116,14 @@ enum Commands {
         #[arg(short, long)]
         tasks: Option<PathBuf>,
 
+        /// Comma-separated task categories to list (default: all)
+        #[arg(long)]
+        categories: Option<String>,
+
+        /// Comma-separated task IDs to list (e.g., RE-001,RE-002)
+        #[arg(long)]
+        task_ids: Option<String>,
+
         /// Use synthetic or real-world data files
         #[arg(long, value_enum, default_value = "synthetic")]
         data_source: DataSource,
@@ -123,12 +139,20 @@ enum Commands {
     /// Dump all task prompts (both TL and JSON formats) to text files for review
     DumpPrompts {
         /// Output directory for prompt files
-        #[arg(short, long, default_value = "results/prompts")]
+        #[arg(short, long, default_value = "accuracy-benchmark/results/prompts")]
         output: PathBuf,
 
         /// Path to task definitions (file or directory)
         #[arg(short, long)]
         tasks: Option<PathBuf>,
+
+        /// Comma-separated task IDs to dump (e.g., RE-001,RE-002)
+        #[arg(long)]
+        task_ids: Option<String>,
+
+        /// Comma-separated formats to dump (e.g., tl,json). Default: all
+        #[arg(long)]
+        formats: Option<String>,
 
         /// Use synthetic or real-world data files
         #[arg(long, value_enum, default_value = "synthetic")]
@@ -155,14 +179,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Run {
             providers,
             categories,
+            task_ids,
             tasks,
             parallel,
             output,
             compare_formats,
+            formats,
             data_source,
             save_responses,
         } => {
-            run_benchmark(providers, categories, tasks, parallel, output, compare_formats, data_source, save_responses).await?;
+            run_benchmark(providers, categories, task_ids, tasks, parallel, output, compare_formats, formats, data_source, save_responses).await?;
         }
 
         Commands::Analyze { input } => {
@@ -177,16 +203,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             generate_report(input, &format, output)?;
         }
 
-        Commands::ListTasks { tasks, data_source } => {
-            list_tasks(tasks, data_source)?;
+        Commands::ListTasks { tasks, data_source, task_ids, categories } => {
+            list_tasks(tasks, categories, task_ids, data_source)?;
         }
 
         Commands::InitConfig { output } => {
             init_config(output)?;
         }
 
-        Commands::DumpPrompts { output, tasks, data_source } => {
-            dump_prompts(output, tasks, data_source)?;
+        Commands::DumpPrompts { output, tasks, task_ids, formats, data_source } => {
+            dump_prompts(output, tasks, task_ids, formats, data_source)?;
         }
     }
 
@@ -196,21 +222,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn run_benchmark(
     providers_arg: Option<String>,
     categories_arg: Option<String>,
+    task_ids_arg: Option<String>,
     tasks_path: Option<PathBuf>,
     parallel: usize,
     output_dir: Option<PathBuf>,
     compare_formats: bool,
+    formats_arg: Option<String>,
     data_source: DataSource,
     save_responses: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let started_at = Utc::now();
     let run_id = started_at.format("%Y%m%d-%H%M%S").to_string();
 
+    // Parse --formats; implies --compare-formats when specified
+    let explicit_formats: Option<Vec<DataFormat>> = if let Some(ref fmts) = formats_arg {
+        Some(parse_formats(fmts).map_err(|e| -> Box<dyn std::error::Error> { e.into() })?)
+    } else {
+        None
+    };
+    let compare_formats = compare_formats || explicit_formats.is_some();
+
     println!("=== Accuracy Benchmark Suite ===");
     println!("Run ID: {}", run_id);
     println!("Data:   {:?}", data_source);
     if compare_formats {
-        println!("Mode: Format Comparison (TeaLeaf vs JSON vs TOON)");
+        if let Some(ref fmts) = explicit_formats {
+            let names: Vec<&str> = fmts.iter().map(|f| f.as_str()).collect();
+            println!("Mode: Format Comparison ({})", names.join(", ").to_uppercase());
+        } else {
+            println!("Mode: Format Comparison (TeaLeaf vs JSON vs TOON)");
+        }
     }
     println!();
 
@@ -236,7 +277,7 @@ async fn run_benchmark(
     println!("Providers: {}", provider_names.join(", "));
 
     // Load tasks
-    let tasks = load_tasks(tasks_path, categories_arg, data_source)?;
+    let tasks = load_tasks(tasks_path, categories_arg, task_ids_arg, data_source)?;
 
     if tasks.is_empty() {
         eprintln!("Error: No tasks to run");
@@ -246,13 +287,19 @@ async fn run_benchmark(
     println!("Tasks: {}", tasks.len());
     println!();
 
-    // Create executor
+    // Create executor (merge CLI overrides with loaded config)
     let config = ExecutorConfig {
         parallel_requests: parallel,
+        retry_count: model_config.benchmark.retry_count,
+        retry_delay_ms: model_config.benchmark.retry_delay_ms,
+        max_retry_delay_ms: model_config.benchmark.max_retry_delay_ms,
+        timeout_ms: model_config.benchmark.timeout_ms,
         compare_formats,
-        ..Default::default()
+        formats: explicit_formats.clone(),
     };
-    let executor = Executor::new(providers.clone(), config);
+    // Load per-format hint text
+    let format_hints = load_format_hints("accuracy-benchmark/tasks/format_hints.json");
+    let executor = Executor::with_format_hints(providers.clone(), config, format_hints.clone());
 
     // Execute tasks
     println!("Running benchmark...");
@@ -311,7 +358,7 @@ async fn run_benchmark(
     let aggregated = engine.aggregate_with_tasks(&comparisons, &tasks);
 
     // If format comparison enabled, analyze results for each format
-    let all_formats = DataFormat::all();
+    let all_formats = explicit_formats.clone().unwrap_or_else(DataFormat::all);
     let (format_aggregated, format_analysis_map, format_comparisons_map): (
         HashMap<DataFormat, _>,
         HashMap<DataFormat, Vec<HashMap<String, AnalysisResult>>>,
@@ -444,17 +491,24 @@ async fn run_benchmark(
             }
             println!("{:-<80}", "");
 
-            // === Token Comparison (vs JSON baseline) ===
-            println!("\n=== Format Comparison: Tokens (vs JSON baseline) ===");
+            // === Token Comparison ===
+            let has_json = all_formats.contains(&DataFormat::Json);
+            if has_json {
+                println!("\n=== Format Comparison: Tokens (vs JSON baseline) ===");
+            } else {
+                println!("\n=== Format Comparison: Tokens ===");
+            }
             println!("(Only tasks where all formats succeeded)");
             println!("{:-<96}", "");
             print!("{:<12}", "Provider");
             for fmt in &all_formats {
                 print!(" {:>13}", format!("{} Tokens", fmt.as_str().to_uppercase()));
             }
-            for fmt in &all_formats {
-                if *fmt != DataFormat::Json {
-                    print!(" {:>11}", format!("{} vs JSON", fmt.as_str().to_uppercase()));
+            if has_json {
+                for fmt in &all_formats {
+                    if *fmt != DataFormat::Json {
+                        print!(" {:>11}", format!("{} vs JSON", fmt.as_str().to_uppercase()));
+                    }
                 }
             }
             println!();
@@ -462,24 +516,26 @@ async fn run_benchmark(
 
             for provider in &provider_names {
                 print!("{:<12}", provider);
-                let json_total = {
-                    let (i, o) = token_usage.get(&(provider.clone(), DataFormat::Json)).copied().unwrap_or((0, 0));
-                    i + o
-                };
                 for &fmt in &all_formats {
                     let (i, o) = token_usage.get(&(provider.clone(), fmt)).copied().unwrap_or((0, 0));
                     print!(" {:>13}", i + o);
                 }
-                for &fmt in &all_formats {
-                    if fmt != DataFormat::Json {
-                        let (i, o) = token_usage.get(&(provider.clone(), fmt)).copied().unwrap_or((0, 0));
-                        let total = i + o;
-                        let pct = if json_total > 0 {
-                            ((total as f64 - json_total as f64) / json_total as f64) * 100.0
-                        } else {
-                            0.0
-                        };
-                        print!(" {:>+10.1}%", pct);
+                if has_json {
+                    let json_total = {
+                        let (i, o) = token_usage.get(&(provider.clone(), DataFormat::Json)).copied().unwrap_or((0, 0));
+                        i + o
+                    };
+                    for &fmt in &all_formats {
+                        if fmt != DataFormat::Json {
+                            let (i, o) = token_usage.get(&(provider.clone(), fmt)).copied().unwrap_or((0, 0));
+                            let total = i + o;
+                            let pct = if json_total > 0 {
+                                ((total as f64 - json_total as f64) / json_total as f64) * 100.0
+                            } else {
+                                0.0
+                            };
+                            print!(" {:>+10.1}%", pct);
+                        }
                     }
                 }
                 println!();
@@ -487,15 +543,21 @@ async fn run_benchmark(
             println!("{:-<96}", "");
 
             // === Input Token Breakdown ===
-            println!("\n=== Input Token Breakdown (vs JSON baseline) ===");
+            if has_json {
+                println!("\n=== Input Token Breakdown (vs JSON baseline) ===");
+            } else {
+                println!("\n=== Input Token Breakdown ===");
+            }
             println!("{:-<96}", "");
             print!("{:<12}", "Provider");
             for fmt in &all_formats {
                 print!(" {:>11}", format!("{} In", fmt.as_str().to_uppercase()));
             }
-            for fmt in &all_formats {
-                if *fmt != DataFormat::Json {
-                    print!(" {:>11}", format!("{} vs JSON", fmt.as_str().to_uppercase()));
+            if has_json {
+                for fmt in &all_formats {
+                    if *fmt != DataFormat::Json {
+                        print!(" {:>11}", format!("{} vs JSON", fmt.as_str().to_uppercase()));
+                    }
                 }
             }
             println!();
@@ -503,20 +565,22 @@ async fn run_benchmark(
 
             for provider in &provider_names {
                 print!("{:<12}", provider);
-                let json_in = token_usage.get(&(provider.clone(), DataFormat::Json)).copied().unwrap_or((0, 0)).0;
                 for &fmt in &all_formats {
                     let (i, _) = token_usage.get(&(provider.clone(), fmt)).copied().unwrap_or((0, 0));
                     print!(" {:>11}", i);
                 }
-                for &fmt in &all_formats {
-                    if fmt != DataFormat::Json {
-                        let (i, _) = token_usage.get(&(provider.clone(), fmt)).copied().unwrap_or((0, 0));
-                        let pct = if json_in > 0 {
-                            ((i as f64 - json_in as f64) / json_in as f64) * 100.0
-                        } else {
-                            0.0
-                        };
-                        print!(" {:>+10.1}%", pct);
+                if has_json {
+                    let json_in = token_usage.get(&(provider.clone(), DataFormat::Json)).copied().unwrap_or((0, 0)).0;
+                    for &fmt in &all_formats {
+                        if fmt != DataFormat::Json {
+                            let (i, _) = token_usage.get(&(provider.clone(), fmt)).copied().unwrap_or((0, 0));
+                            let pct = if json_in > 0 {
+                                ((i as f64 - json_in as f64) / json_in as f64) * 100.0
+                            } else {
+                                0.0
+                            };
+                            print!(" {:>+10.1}%", pct);
+                        }
                     }
                 }
                 println!();
@@ -525,58 +589,73 @@ async fn run_benchmark(
 
             // === Key Findings ===
             println!("\nKey Findings:");
-            for provider in &provider_names {
-                let json_score = format_aggregated.get(&DataFormat::Json)
-                    .and_then(|a| a.avg_scores_by_provider.get(provider).copied())
-                    .unwrap_or(0.0);
-                let json_in = token_usage.get(&(provider.clone(), DataFormat::Json)).copied().unwrap_or((0, 0)).0;
-                let json_total = {
-                    let (i, o) = token_usage.get(&(provider.clone(), DataFormat::Json)).copied().unwrap_or((0, 0));
-                    (i + o) as f64
-                };
-
-                // Find best format by accuracy and by token savings
-                let mut best_accuracy_fmt = DataFormat::Json;
-                let mut best_accuracy = json_score;
-                let mut best_savings_fmt = DataFormat::Json;
-                let mut best_savings_pct: f64 = 0.0;
-
-                for &fmt in &all_formats {
-                    let score = format_aggregated.get(&fmt)
+            if has_json {
+                for provider in &provider_names {
+                    let json_score = format_aggregated.get(&DataFormat::Json)
                         .and_then(|a| a.avg_scores_by_provider.get(provider).copied())
                         .unwrap_or(0.0);
-                    if score > best_accuracy {
-                        best_accuracy = score;
-                        best_accuracy_fmt = fmt;
+                    let json_in = token_usage.get(&(provider.clone(), DataFormat::Json)).copied().unwrap_or((0, 0)).0;
+                    let json_total = {
+                        let (i, o) = token_usage.get(&(provider.clone(), DataFormat::Json)).copied().unwrap_or((0, 0));
+                        (i + o) as f64
+                    };
+
+                    // Find best format by accuracy and by token savings
+                    let mut best_accuracy_fmt = DataFormat::Json;
+                    let mut best_accuracy = json_score;
+                    let mut best_savings_fmt = DataFormat::Json;
+                    let mut best_savings_pct: f64 = 0.0;
+
+                    for &fmt in &all_formats {
+                        let score = format_aggregated.get(&fmt)
+                            .and_then(|a| a.avg_scores_by_provider.get(provider).copied())
+                            .unwrap_or(0.0);
+                        if score > best_accuracy {
+                            best_accuracy = score;
+                            best_accuracy_fmt = fmt;
+                        }
+                        let (i, o) = token_usage.get(&(provider.clone(), fmt)).copied().unwrap_or((0, 0));
+                        let total = (i + o) as f64;
+                        let savings = if json_total > 0.0 { (1.0 - total / json_total) * 100.0 } else { 0.0 };
+                        if savings > best_savings_pct {
+                            best_savings_pct = savings;
+                            best_savings_fmt = fmt;
+                        }
                     }
-                    let (i, o) = token_usage.get(&(provider.clone(), fmt)).copied().unwrap_or((0, 0));
-                    let total = (i + o) as f64;
-                    let savings = if json_total > 0.0 { (1.0 - total / json_total) * 100.0 } else { 0.0 };
-                    if savings > best_savings_pct {
-                        best_savings_pct = savings;
-                        best_savings_fmt = fmt;
-                    }
+
+                    // Accuracy verdict
+                    let accuracy_diff = best_accuracy - json_score;
+                    let accuracy_verdict = if accuracy_diff > 0.02 {
+                        format!("{} +{:.1}% accuracy vs JSON", best_accuracy_fmt.as_str().to_uppercase(), accuracy_diff * 100.0)
+                    } else {
+                        "all formats comparable accuracy".to_string()
+                    };
+
+                    // Token verdict
+                    let (best_in, _) = token_usage.get(&(provider.clone(), best_savings_fmt)).copied().unwrap_or((0, 0));
+                    let input_savings = if json_in > 0 { (1.0 - best_in as f64 / json_in as f64) * 100.0 } else { 0.0 };
+                    let token_verdict = if best_savings_pct > 3.0 {
+                        format!("{} saves {:.0}% total tokens ({:.0}% on input) vs JSON",
+                            best_savings_fmt.as_str().to_uppercase(), best_savings_pct, input_savings)
+                    } else {
+                        "similar token usage across formats".to_string()
+                    };
+
+                    println!("  {}: {}, {}", provider, accuracy_verdict, token_verdict);
                 }
-
-                // Accuracy verdict
-                let accuracy_diff = best_accuracy - json_score;
-                let accuracy_verdict = if accuracy_diff > 0.02 {
-                    format!("{} +{:.1}% accuracy vs JSON", best_accuracy_fmt.as_str().to_uppercase(), accuracy_diff * 100.0)
-                } else {
-                    "all formats comparable accuracy".to_string()
-                };
-
-                // Token verdict
-                let (best_in, _) = token_usage.get(&(provider.clone(), best_savings_fmt)).copied().unwrap_or((0, 0));
-                let input_savings = if json_in > 0 { (1.0 - best_in as f64 / json_in as f64) * 100.0 } else { 0.0 };
-                let token_verdict = if best_savings_pct > 3.0 {
-                    format!("{} saves {:.0}% total tokens ({:.0}% on input) vs JSON",
-                        best_savings_fmt.as_str().to_uppercase(), best_savings_pct, input_savings)
-                } else {
-                    "similar token usage across formats".to_string()
-                };
-
-                println!("  {}: {}, {}", provider, accuracy_verdict, token_verdict);
+            } else {
+                // No JSON baseline — report absolute scores and token counts per format
+                for provider in &provider_names {
+                    let mut parts: Vec<String> = Vec::new();
+                    for &fmt in &all_formats {
+                        let score = format_aggregated.get(&fmt)
+                            .and_then(|a| a.avg_scores_by_provider.get(provider).copied())
+                            .unwrap_or(0.0);
+                        let (i, o) = token_usage.get(&(provider.clone(), fmt)).copied().unwrap_or((0, 0));
+                        parts.push(format!("{} score {:.3} ({} tokens)", fmt.as_str().to_uppercase(), score, i + o));
+                    }
+                    println!("  {}: {}", provider, parts.join(", "));
+                }
             }
             println!();
         }
@@ -625,12 +704,18 @@ async fn run_benchmark(
         std::fs::create_dir_all(&responses_dir)?;
         let mut count = 0;
 
+        let source_prefix = match data_source {
+            DataSource::Real => "real",
+            DataSource::Synthetic => "synthetic",
+        };
+
         if let Some(ref format_results) = format_comparison_results {
             // Format comparison mode: save per task/provider/format
             for (key, result) in format_results {
                 if let Some(ref response) = result.response {
                     let filename = format!(
-                        "{}-{}-{}.txt",
+                        "{}-{}-{}-{}.txt",
+                        source_prefix,
                         key.task_id.to_lowercase(),
                         key.provider,
                         key.format.as_str()
@@ -645,9 +730,11 @@ async fn run_benchmark(
                 for (provider, result) in task_map {
                     if let Some(ref response) = result.response {
                         let filename = format!(
-                            "{}-{}.txt",
+                            "{}-{}-{}-{}.txt",
+                            source_prefix,
                             result.task_id.to_lowercase(),
-                            provider
+                            provider,
+                            result.format.as_str()
                         );
                         std::fs::write(responses_dir.join(&filename), &response.content)?;
                         count += 1;
@@ -665,12 +752,20 @@ async fn run_benchmark(
 fn load_tasks(
     path: Option<PathBuf>,
     categories_arg: Option<String>,
+    task_ids_arg: Option<String>,
     data_source: DataSource,
 ) -> Result<Vec<BenchmarkTask>, Box<dyn std::error::Error>> {
     // Parse category filter
     let category_filter: Option<Vec<String>> = categories_arg.map(|s| {
         s.split(',')
             .map(|c| c.trim().to_lowercase())
+            .collect()
+    });
+
+    // Parse task ID filter
+    let task_id_filter: Option<Vec<String>> = task_ids_arg.map(|s| {
+        s.split(',')
+            .map(|id| id.trim().to_uppercase())
             .collect()
     });
 
@@ -698,6 +793,11 @@ fn load_tasks(
         tasks.retain(|t| categories.contains(&t.metadata.category.to_lowercase()));
     }
 
+    // Filter by task ID
+    if let Some(task_ids) = task_id_filter {
+        tasks.retain(|t| task_ids.contains(&t.metadata.id.to_uppercase()));
+    }
+
     Ok(tasks)
 }
 
@@ -719,8 +819,8 @@ fn generate_report(
     Ok(())
 }
 
-fn list_tasks(tasks_path: Option<PathBuf>, data_source: DataSource) -> Result<(), Box<dyn std::error::Error>> {
-    let tasks = load_tasks(tasks_path, None, data_source)?;
+fn list_tasks(tasks_path: Option<PathBuf>, categories_arg: Option<String>, task_ids_arg: Option<String>, data_source: DataSource) -> Result<(), Box<dyn std::error::Error>> {
+    let tasks = load_tasks(tasks_path, categories_arg, task_ids_arg, data_source)?;
 
     println!("Available Tasks ({}):", tasks.len());
     println!("{:-<60}", "");
@@ -754,14 +854,24 @@ fn init_config(output: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
 fn dump_prompts(
     output_dir: PathBuf,
     tasks_path: Option<PathBuf>,
+    task_ids_arg: Option<String>,
+    formats_arg: Option<String>,
     data_source: DataSource,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let tasks = load_tasks(tasks_path, None, data_source)?;
+    let tasks = load_tasks(tasks_path, None, task_ids_arg, data_source)?;
 
     if tasks.is_empty() {
         eprintln!("Error: No tasks to dump");
         std::process::exit(1);
     }
+
+    let formats = if let Some(ref fmts) = formats_arg {
+        parse_formats(fmts).map_err(|e| -> Box<dyn std::error::Error> { e.into() })?
+    } else {
+        DataFormat::all()
+    };
+
+    let format_hints = load_format_hints("accuracy-benchmark/tasks/format_hints.json");
 
     std::fs::create_dir_all(&output_dir)?;
 
@@ -771,12 +881,18 @@ fn dump_prompts(
     println!();
 
     for task in &tasks {
-        for format in DataFormat::all() {
+        for format in &formats {
+            let format = *format;
             let mut task_clone = task.clone();
-            match task_clone.prepare_prompt_with_format(format) {
+            match task_clone.prepare_prompt_with_format(format, &format_hints) {
                 Ok(()) => {
+                    let source_prefix = match data_source {
+                        DataSource::Real => "real",
+                        DataSource::Synthetic => "synthetic",
+                    };
                     let filename = format!(
-                        "{}-{}.txt",
+                        "{}-{}-{}.txt",
+                        source_prefix,
                         task.metadata.id.to_lowercase(),
                         format.as_str()
                     );
@@ -831,6 +947,6 @@ fn dump_prompts(
         }
     }
 
-    println!("\nDone. {} files written to {}", tasks.len() * 2, output_dir.display());
+    println!("\nDone. {} files written to {}", tasks.len() * formats.len(), output_dir.display());
     Ok(())
 }

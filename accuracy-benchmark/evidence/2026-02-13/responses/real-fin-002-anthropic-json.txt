@@ -1,0 +1,150 @@
+# Credit Analysis Summary: Financial Health Assessment
+
+## Individual Company Analysis
+
+### 1. APPLE INC (FY 2025)
+
+**Leverage Metrics:**
+- Total Debt: $98.7B (Commercial paper: $8.0B + Current term debt: $12.4B + Long-term debt: $78.3B)
+- Stockholders' Equity: $73.7B
+- **Debt-to-Equity Ratio: 1.34x** ⚠️
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $111.5B
+- Capital Expenditures: $12.7B
+- **Free Cash Flow: $98.8B** ✓
+- Investing Activities: +$15.2B (net inflow from securities)
+- Financing Activities: -$120.7B (primarily buybacks: $90.7B)
+
+**Coverage:**
+- Operating Income: $133.1B
+- Interest expense not separately disclosed in income statement
+
+---
+
+### 2. VISA INC. (FY 2025)
+
+**Leverage Metrics:**
+- Total Debt: $25.2B (Current: $5.6B + Long-term: $19.6B)
+- Stockholders' Equity: $37.9B
+- **Debt-to-Equity Ratio: 0.66x** ✓
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $23.1B
+- Capital Expenditures: $1.5B
+- **Free Cash Flow: $21.6B** ✓
+- Investing Activities: +$0.7B (net inflow)
+- Financing Activities: -$19.0B (buybacks: $18.3B + dividends: $4.6B)
+
+**Coverage:**
+- Operating Income: $24.0B
+- Interest Expense: $589M
+- **Interest Coverage Ratio: 40.7x** ✓
+
+---
+
+### 3. COSTCO WHOLESALE CORP (FY 2025)
+
+**Leverage Metrics:**
+- Total Debt: $5.7B (all long-term)
+- Stockholders' Equity: $29.2B
+- **Debt-to-Equity Ratio: 0.20x** ✓✓
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $13.3B
+- Capital Expenditures: $5.5B
+- **Free Cash Flow: $7.8B** ✓
+- Investing Activities: -$5.3B
+- Financing Activities: -$3.8B (dividends: $2.2B + buybacks: $0.9B)
+
+**Coverage:**
+- Operating Income: $10.4B
+- Interest Expense: $154M
+- **Interest Coverage Ratio: 67.4x** ✓✓
+
+---
+
+### 4. QUALCOMM INC (FY 2025)
+
+**Leverage Metrics:**
+- Total Debt: $14.8B (all long-term)
+- Stockholders' Equity: $21.2B
+- **Debt-to-Equity Ratio: 0.70x** ✓
+
+**Cash Flow Analysis:**
+- Operating Cash Flow: $14.0B
+- Capital Expenditures: $1.2B
+- **Free Cash Flow: $12.8B** ✓
+- Investing Activities: -$0.8B
+- Financing Activities: -$13.2B (buybacks: $8.8B + dividends: $3.8B)
+
+**Coverage:**
+- Operating Income: $12.4B
+- Interest Expense: $664M
+- **Interest Coverage Ratio: 18.6x** ✓
+
+---
+
+## Comparative Rankings
+
+### Strongest Balance Sheet (Lowest Leverage):
+1. **COSTCO** - 0.20x D/E ratio 🥇
+2. **VISA** - 0.66x D/E ratio 🥈
+3. **QUALCOMM** - 0.70x D/E ratio 🥉
+4. **APPLE** - 1.34x D/E ratio
+
+### Highest Free Cash Flow Generation:
+1. **APPLE** - $98.8B 🥇
+2. **VISA** - $21.6B 🥈
+3. **QUALCOMM** - $12.8B 🥉
+4. **COSTCO** - $7.8B
+
+### Best Interest Coverage:
+1. **COSTCO** - 67.4x 🥇
+2. **VISA** - 40.7x 🥈
+3. **QUALCOMM** - 18.6x 🥉
+
+---
+
+## Key Findings & Concerns
+
+### ✅ **Strongest Overall: COSTCO**
+- Exceptionally low leverage (0.20x)
+- Excellent interest coverage (67x)
+- Strong FCF generation relative to size
+- Minimal debt reliance
+
+### ✅ **Best Cash Generator: APPLE**
+- Generates nearly $100B in free cash flow
+- Despite higher leverage, cash generation is extraordinary
+- Returned $120.7B to shareholders (buybacks + dividends)
+
+### ⚠️ **Attention Points:**
+
+**APPLE:**
+- **Highest leverage** at 1.34x debt-to-equity
+- Debt of $98.7B exceeds equity of $73.7B
+- However, this is mitigated by:
+  - Massive FCF generation ($98.8B)
+  - Strong operating cash flow ($111.5B)
+  - Low capex intensity (11% of operating CF)
+  - Strategic use of debt for tax-efficient capital structure
+
+### 🎯 **Credit Recommendations:**
+
+**Investment Grade - Strong:**
+- **COSTCO**: Fortress balance sheet, minimal risk
+- **VISA**: Excellent metrics, asset-light business model
+- **QUALCOMM**: Solid fundamentals, strong FCF
+
+**Investment Grade - Monitor:**
+- **APPLE**: Despite high leverage, exceptional cash generation makes debt manageable. The 1.34x D/E ratio is elevated but sustainable given:
+  - FCF nearly equals total debt annually
+  - Operating CF of $111B vs. interest-bearing debt
+  - Strategic financial engineering, not distress
+
+### ❌ **No Concerning Issues Detected:**
+- All companies have **positive free cash flow**
+- All have **strong interest coverage** (where applicable)
+- No liquidity concerns
+- All are returning significant capital to shareholders

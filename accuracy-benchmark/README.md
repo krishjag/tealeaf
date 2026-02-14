@@ -10,167 +10,58 @@ This benchmark suite:
 3. Sends analysis prompts to multiple LLM providers
 4. Evaluates and compares the responses across formats
 
-## Supported Providers
+## Latest Results (14 Tasks, 7 Domains)
 
-| Provider | Environment Variable | Models |
-|----------|---------------------|--------|
-| **Anthropic** | `ANTHROPIC_API_KEY` | Claude Sonnet 4.5 (Extended Thinking) |
-| **OpenAI** | `OPENAI_API_KEY` | GPT-5.2 |
+*SEC EDGAR, CDC PLACES, BLS JOLTS, WCCA court cases, NVD CVEs, USDA food products, NYC PLUTO data. Claude Sonnet 4.5 and GPT-5.2.*
 
-## Installation
+### Accuracy
 
-### Pre-built Binaries (Recommended)
+| | TL | JSON | TOON |
+|---|---|---|---|
+| **Anthropic accuracy** | 0.948 | 0.948 | 0.947 |
+| **OpenAI accuracy** | 0.831 | 0.888 | 0.890 |
+| **Input token savings** | **-51%** | baseline | **-20%** |
 
-Download the latest release for your platform from the [GitHub Releases](https://github.com/krishjag/tealeaf/releases) page:
+### Per-Domain Accuracy (TL Format)
 
-| Platform | Architecture | File |
-|----------|--------------|------|
-| **Windows** | x64 | `accuracy-benchmark-windows-x64.zip` |
-| **Windows** | ARM64 | `accuracy-benchmark-windows-arm64.zip` |
-| **macOS** | Intel | `accuracy-benchmark-macos-x64.tar.gz` |
-| **macOS** | Apple Silicon | `accuracy-benchmark-macos-arm64.tar.gz` |
-| **Linux** | x64 | `accuracy-benchmark-linux-x64.tar.gz` |
-| **Linux** | ARM64 | `accuracy-benchmark-linux-arm64.tar.gz` |
-| **Linux** | x64 (static) | `accuracy-benchmark-linux-musl-x64.tar.gz` |
+| Domain | Anthropic | OpenAI |
+|--------|-----------|--------|
+| HR / Labor | 0.972 | 0.949 |
+| Finance | 0.960 | 0.944 |
+| Legal | 0.960 | 0.583 |
+| Healthcare | 0.958 | 0.950 |
+| Retail | 0.934 | 0.573 |
+| Real Estate | 0.928 | 0.863 |
+| Technology | 0.925 | 0.955 |
 
-### Build from Source
+### Input Token Savings (vs JSON Baseline)
 
-```bash
-# Build the benchmark suite
-cargo build -p accuracy-benchmark --release
+| Provider | TL Input | JSON Input | TOON Input | TL vs JSON | TOON vs JSON |
+|----------|----------|------------|------------|------------|--------------|
+| Anthropic | 421,141 | 864,232 | 678,626 | **-51.3%** | -21.5% |
+| OpenAI | 362,918 | 734,984 | 593,902 | **-50.6%** | -19.2% |
 
-# Or run directly
-cargo run -p accuracy-benchmark -- --help
-```
+### Key Findings
 
-## Usage
+- **~51% input token savings** with TL vs JSON on real-world data
+- **~20% input token savings** with TOON vs JSON on the same data
+- **No accuracy loss** -- scores within noise across all three formats
+- Savings range from 27% (small datasets) to 77% (tabular data with high schema repetition)
+- TeaLeaf's advantage increases with nesting depth (schema inference + positional encoding)
 
-### Run Benchmark
+### Charts
 
-```bash
-# Run with synthetic data (12 tasks, 10 domains)
-cargo run -p accuracy-benchmark -- run
+#### Accuracy by Format & Provider
 
-# Run with real-world SEC EDGAR data (2 tasks)
-cargo run -p accuracy-benchmark -- run --data-source real
+![Accuracy by Format & Provider](charts/accuracy_by_format.png)
 
-# Compare TeaLeaf vs JSON vs TOON format performance
-cargo run -p accuracy-benchmark -- run --compare-formats
+#### Input Token Usage by Format & Provider
 
-# Save raw API responses to files
-cargo run -p accuracy-benchmark -- run --compare-formats --save-responses
+![Input Tokens by Format & Provider](charts/input_tokens_by_format.png)
 
-# Run with specific providers
-cargo run -p accuracy-benchmark -- run --providers anthropic,openai
+#### Token Savings vs JSON Baseline
 
-# Run specific categories only
-cargo run -p accuracy-benchmark -- run --categories finance,retail
-
-# Custom output directory
-cargo run -p accuracy-benchmark -- run -o my-results/
-
-# Verbose output
-cargo run -p accuracy-benchmark -- -v run
-```
-
-### Other Commands
-
-```bash
-# List available tasks
-cargo run -p accuracy-benchmark -- list-tasks
-cargo run -p accuracy-benchmark -- list-tasks --data-source real
-
-# Dump rendered prompts (all 3 formats) without calling APIs
-cargo run -p accuracy-benchmark -- dump-prompts --data-source synthetic --output prompts/
-
-# Generate configuration template
-cargo run -p accuracy-benchmark -- init-config -o my-config.toml
-```
-
-## Data Sources
-
-The benchmark supports two data sources via `--data-source`:
-
-### Synthetic (default)
-
-12 tasks across 10 business domains with small, hand-crafted datasets. Task definitions in `tasks/synthetic.json`, data files in `tasks/{domain}/synthetic-data/`.
-
-### Real
-
-2 complex financial analysis tasks using real SEC EDGAR 10-K filing data (Apple, Visa, Costco, Qualcomm). Task definitions in `tasks/real.json`, data in `tasks/finance/data/sec_edgar_2025_q4.json`.
-
-See [tasks/finance/data/README.md](tasks/finance/data/README.md) for data provenance.
-
-## Benchmark Tasks
-
-### Synthetic Tasks (12)
-
-| ID | Domain | Complexity | Output Type |
-|----|--------|------------|-------------|
-| FIN-001 | Finance | Simple | Calculation |
-| FIN-002 | Finance | Moderate | Calculation |
-| RET-001 | Retail | Simple | Summary |
-| RET-002 | Retail | Complex | Recommendation |
-| HLT-001 | Healthcare | Simple | Summary |
-| TEC-001 | Technology | Moderate | Analysis |
-| MKT-001 | Marketing | Moderate | Calculation |
-| LOG-001 | Logistics | Moderate | Analysis |
-| HR-001 | HR | Moderate | Analysis |
-| MFG-001 | Manufacturing | Moderate | Calculation |
-| RE-001 | Real Estate | Complex | Recommendation |
-| LEG-001 | Legal | Complex | Analysis |
-
-### Real-World Tasks (2)
-
-| ID | Domain | Complexity | Output Type | Description |
-|----|--------|------------|-------------|-------------|
-| FIN-001 | Finance | Complex | Calculation | Balance sheet analysis, current ratio, profit margin, cross-company ranking |
-| FIN-002 | Finance | Complex | Analysis | Debt-to-equity, free cash flow, interest coverage, risk flags |
-
-## Task Definition Format
-
-Tasks are defined in JSON files (no Rust code changes needed):
-
-```json
-{
-  "version": "1.0",
-  "tasks": [
-    {
-      "id": "FIN-001",
-      "category": "finance",
-      "complexity": "simple",
-      "output_type": "calculation",
-      "prompt_template": "Analyze the following data (provided in {format_name} format):\n\n{data}\n\nCalculate totals.",
-      "data_file": "finance/synthetic-data/financial_statement_simple.json",
-      "expected_elements": [
-        {"element_type": "metric", "description": "Total revenue", "required": true, "validation_pattern": "\\$[\\d,]+"}
-      ]
-    }
-  ]
-}
-```
-
-### Placeholders
-
-| Placeholder | Substitution |
-|-------------|-------------|
-| `{data}` | The task data rendered in the current format (TeaLeaf, JSON, or TOON) |
-| `{format_name}` | Human-readable format name: "TeaLeaf", "JSON", or "TOON" |
-
-### Task Fields
-
-| Field | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `id` | yes | | Task identifier (e.g., "FIN-001") |
-| `category` | yes | | Domain category |
-| `complexity` | no | `moderate` | `simple`, `moderate`, or `complex` |
-| `output_type` | no | `analysis` | `calculation`, `analysis`, `recommendation`, or `summary` |
-| `prompt_template` | yes | | Prompt with `{data}` and optional `{format_name}` placeholders |
-| `data_file` | no | | Path to JSON data file, relative to the definition file's directory |
-| `max_tokens` | no | `2048` | Max response tokens |
-| `temperature` | no | `0.3` | Sampling temperature |
-| `expected_elements` | no | `[]` | Elements to detect in the response |
-| `grading_rubric` | no | | Custom grading criteria |
+![Token Savings vs JSON](charts/token_savings_tl_vs_json.png)
 
 ## Three-Format Comparison
 
@@ -180,37 +71,11 @@ The `--compare-formats` flag runs each task in all three formats:
 - **JSON** -- standard pretty-printed JSON (baseline)
 - **TOON** -- Token-Oriented Object Notation with tabular folding
 
-### Real-World Results (SEC EDGAR 10-K Data)
-
-*4 companies, 399 line items, ~196KB JSON baseline. Claude Sonnet 4.5 and GPT-5.2.*
-
-| | TL | JSON | TOON |
-|---|---|---|---|
-| **Anthropic accuracy** | 0.943 | 0.960 | 0.952 |
-| **OpenAI accuracy** | 0.935 | 0.935 | 0.892 |
-| **Input savings (Anthropic)** | -41.9% | baseline | -43.0% |
-| **Input savings (OpenAI)** | -41.5% | baseline | -42.3% |
-
-### Synthetic Results (12 Tasks, 10 Domains)
-
-*Small datasets. Claude Sonnet 4.5 and GPT-5.2.*
-
-| Provider | TL Score | JSON Score | Input Savings (TL) |
-|----------|----------|------------|---------------------|
-| **anthropic** | 0.988 | 0.978 | **-30.0%** |
-| **openai** | 0.901 | 0.899 | **-31.3%** |
-
-### Key Findings
-
-- **~42% input token savings** on real-world data (TL and TOON both vs JSON)
-- **~30% input token savings** on synthetic data (smaller datasets dilute savings)
-- **No accuracy loss** -- scores within noise across all three formats
-- TeaLeaf's advantage increases with nesting depth (schema inference + positional encoding)
-- TOON edges out TL by ~1% on tokenization despite being larger in bytes
-
 ## Analysis Framework
 
 ### Accuracy Metrics
+
+Responses are evaluated across five weighted dimensions:
 
 | Metric | Weight | Description |
 |--------|--------|-------------|
@@ -243,7 +108,7 @@ Expected elements are defined in the task JSON:
 
 ## Output Files
 
-Results are saved to `accuracy-benchmark/results/runs/{run-id}/`:
+Results are saved to `accuracy-benchmark/results/{run-id}/`:
 
 | File | Description |
 |------|-------------|
@@ -251,118 +116,70 @@ Results are saved to `accuracy-benchmark/results/runs/{run-id}/`:
 | `summary.json` | Aggregated scores and rankings |
 | `responses/` | Raw API responses (with `--save-responses`) |
 
-Response files are named `{task-id}-{provider}-{format}.txt` in format comparison mode, or `{task-id}-{provider}.txt` in single-format mode.
+Response files are named `{source}-{task-id}-{provider}-{format}.txt` (e.g., `real-fin-001-anthropic-tl.txt`).
 
-## Directory Structure
+### analysis.tl Structure
 
-```
-accuracy-benchmark/
-├── src/
-│   ├── main.rs              # CLI (clap), benchmark orchestration
-│   ├── lib.rs               # Library exports
-│   ├── config.rs            # Configuration, DataFormat enum
-│   ├── providers/           # LLM provider clients
-│   │   ├── traits.rs        # LLMProvider trait
-│   │   ├── anthropic.rs     # Claude (Extended Thinking)
-│   │   └── openai.rs        # GPT
-│   ├── tasks/               # Task loading and execution
-│   │   ├── mod.rs           # BenchmarkTask, DataSource, format conversion
-│   │   ├── categories.rs    # Domain, Complexity, OutputType
-│   │   └── loader.rs        # JSON + TeaLeaf file loaders
-│   ├── runner/              # Execution engine
-│   │   ├── executor.rs      # Parallel task execution (per-format)
-│   │   └── rate_limiter.rs  # RPM/TPM rate limiting
-│   ├── analysis/            # Response analysis
-│   │   ├── metrics.rs       # AccuracyMetrics
-│   │   ├── scoring.rs       # ScoringRubric
-│   │   └── comparator.rs    # Cross-provider comparison
-│   └── reporting/           # Output generation
-│       ├── tl_writer.rs     # TeaLeaf format output
-│       └── json_export.rs   # JSON summary
-├── config/
-│   └── models.toml          # Provider/model configuration
-├── tasks/                   # Task definitions and data
-│   ├── synthetic.json       # 12 synthetic task definitions
-│   ├── real.json            # 2 real-world task definitions
-│   ├── finance/
-│   │   ├── synthetic-data/  # Small hand-crafted datasets
-│   │   └── data/            # Real SEC EDGAR data + processing script
-│   ├── retail/synthetic-data/
-│   ├── healthcare/synthetic-data/
-│   ├── technology/synthetic-data/
-│   ├── marketing/synthetic-data/
-│   ├── logistics/synthetic-data/
-│   ├── hr/synthetic-data/
-│   ├── manufacturing/synthetic-data/
-│   ├── real_estate/synthetic-data/
-│   └── legal/synthetic-data/
-├── results/runs/            # Archived benchmark runs
-└── Cargo.toml
+The `analysis.tl` output uses `@struct` schema definitions for self-documenting positional tables:
+
+```tl
+# Schema definitions
+@struct api_response (task_id: string, provider: string, model: string?,
+    input_tokens: int, output_tokens: int, latency_ms: int,
+    timestamp: timestamp, status: string)
+@struct analysis_result (task_id: string, provider: string,
+    completeness: float, relevance: float, coherence: float,
+    factual_accuracy: float)
+@struct comparison_result (task_id: string, providers_ranked: []string,
+    winner: string?, margin: float?)
+
+# When --compare-formats is used, format comparison schemas are also included:
+@struct format_accuracy (provider: string, format: string,
+    avg_score: float, wins: int)
+@struct format_tokens (provider: string, format: string,
+    input_tokens: int, output_tokens: int, total_tokens: int)
 ```
 
-## Adding Custom Tasks
+The file contains these sections:
 
-### 1. Create a Data File
+| Section | Description |
+|---------|-------------|
+| `run_metadata` | Run ID, timestamps, task count, providers |
+| `responses` | `@table api_response` -- per-task API response details |
+| `analysis_results` | `@table analysis_result` -- per-task accuracy metrics |
+| `comparisons` | `@table comparison_result` -- provider rankings per task |
+| `summary` | Aggregated wins, scores, category/complexity breakdowns |
+| `format_accuracy` | `@table format_accuracy` -- per-provider accuracy by format (TL/JSON/TOON) |
+| `format_tokens` | `@table format_tokens` -- per-provider token usage by format (TL/JSON/TOON) |
 
-```json
-// tasks/custom/data/my_data.json
-{
-  "items": [
-    {"id": "A", "value": 100},
-    {"id": "B", "value": 200}
-  ]
-}
+The last two tables (`format_accuracy` and `format_tokens`) are only present when `--compare-formats` is used.
+
+## Evidence
+
+Full benchmark evidence (prompts, responses, analysis, charts) is available in [`evidence/`](evidence/).
+
+Each dated folder is a self-contained snapshot:
+
+```
+evidence/2026-02-14/
+  summary.json       # Aggregate results
+  analysis.tl        # Full per-task results
+  prompts/           # 42 files: exact prompts sent to LLMs
+  responses/         # 84 files: raw LLM responses
+  charts/            # Generated visualizations
 ```
 
-### 2. Add Task to a JSON Definition File
-
-```json
-{
-  "tasks": [
-    {
-      "id": "CUSTOM-001",
-      "category": "custom",
-      "complexity": "moderate",
-      "output_type": "analysis",
-      "prompt_template": "Analyze the following data (provided in {format_name} format):\n\n{data}\n\nProvide summary and recommendations.",
-      "data_file": "custom/data/my_data.json",
-      "expected_elements": [
-        {"element_type": "summary", "description": "Data overview", "required": true},
-        {"element_type": "metric", "description": "Total value", "required": true, "validation_pattern": "\\d+"}
-      ]
-    }
-  ]
-}
-```
-
-### 3. Run
+## Quick Start
 
 ```bash
-# Load from custom file
-cargo run -p accuracy-benchmark -- run --tasks path/to/custom-tasks.json
+# Run the full real-world benchmark
+cargo run -p accuracy-benchmark --release -- run --compare-formats --data-source real --save-responses
 
-# Or place in the tasks/ directory and use --data-source
-cargo run -p accuracy-benchmark -- list-tasks --tasks path/to/custom-tasks.json
+# Generate charts from results
+python accuracy-benchmark/scripts/generate_charts.py --results-dir accuracy-benchmark/results/<run-id>
 ```
 
-## Extending Providers
-
-To add a new LLM provider:
-
-1. Create `src/providers/newprovider.rs` implementing `LLMProvider` trait
-2. Add to `src/providers/mod.rs`
-3. Update `create_all_providers()` and `create_providers()`
-
-```rust
-#[async_trait]
-impl LLMProvider for NewProviderClient {
-    fn name(&self) -> &str { "newprovider" }
-
-    async fn complete(&self, request: CompletionRequest) -> ProviderResult<CompletionResponse> {
-        // Implementation
-    }
-}
-```
+For full CLI reference, data source details, task definitions, and customization guides, see the [documentation site](https://krishjag.github.io/tealeaf/internals/accuracy-benchmark.html).
 
 ## License
 
