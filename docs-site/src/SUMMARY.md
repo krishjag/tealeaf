@@ -84,6 +84,7 @@
 - [ADR-0002: Fuzzing Architecture](./decisions/adr-0002-fuzzing-architecture.md)
 - [ADR-0003: Nesting Depth Limit](./decisions/adr-0003-nesting-depth-limit.md)
 - [ADR-0004: ZLIB Compression](./decisions/adr-0004-zlib-compression.md)
+- [ADR-0005: Direct Value Representation](./decisions/adr-0005-direct-value-representation.md)
 
 ---
 

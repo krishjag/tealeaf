@@ -43,7 +43,6 @@ def fetch_foods(
         "query": query,
         "dataType": "Branded",
         "pageSize": min(limit, 50),
-        "pageNumber": 1,
     }
 
     headers = {
@@ -52,9 +51,11 @@ def fetch_foods(
 
     all_foods = []
     total = None
+    page = 1
 
     while True:
-        print(f"  Fetching page {params['pageNumber']}...")
+        print(f"  Fetching page {page}...")
+        params["pageNumber"] = page
         resp = requests.get(USDA_API_BASE, params=params, headers=headers, timeout=60)
         resp.raise_for_status()
         data = resp.json()
@@ -72,7 +73,7 @@ def fetch_foods(
         if len(all_foods) >= limit or len(all_foods) >= total:
             break
 
-        params["pageNumber"] += 1
+        page += 1
 
         # DEMO_KEY rate limit: 30 requests/hour
         print("  Waiting 3s for rate limit...")
