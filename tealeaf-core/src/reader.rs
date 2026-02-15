@@ -4,6 +4,7 @@
 //! - `open()` - Reads file into memory (Vec<u8>)
 //! - `open_mmap()` - Memory-maps file for zero-copy access
 
+use std::borrow::Cow;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fs::File;
@@ -299,13 +300,13 @@ impl Reader {
             )));
         }
 
-        let data = if section.compressed {
-            decompress_data(&self.data()[start..end])?
+        let data: Cow<'_, [u8]> = if section.compressed {
+            Cow::Owned(decompress_data(&self.data()[start..end])?)
         } else {
-            self.data()[start..end].to_vec()
+            Cow::Borrowed(&self.data()[start..end])
         };
 
-        let mut cursor = Cursor::new(&data);
+        let mut cursor = Cursor::new(data.as_ref());
 
         let result = if section.is_array && section.schema_idx >= 0 {
             self.decode_struct_array(&mut cursor, section.schema_idx as usize, 0)?

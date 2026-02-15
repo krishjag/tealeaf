@@ -516,8 +516,10 @@ fn tealeaf_to_json_value(tl: &Value) -> serde_json::Value {
         Value::String(s) => serde_json::Value::String(s.clone()),
         Value::Bytes(b) => {
             // Encode bytes as hex string with 0x prefix
-            let hex: String = b.iter().map(|byte| format!("{:02x}", byte)).collect();
-            serde_json::Value::String(format!("0x{}", hex))
+            let mut out = String::with_capacity(2 + b.len().saturating_mul(2));
+            out.push_str("0x");
+            push_hex_bytes(&mut out, b);
+            serde_json::Value::String(out)
         }
         Value::Array(arr) => {
             serde_json::Value::Array(arr.iter().map(tealeaf_to_json_value).collect())
@@ -630,6 +632,21 @@ fn needs_quoting(s: &str) -> bool {
     false
 }
 
+#[inline]
+fn push_hex_byte(out: &mut String, byte: u8) {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    out.push(HEX[(byte >> 4) as usize] as char);
+    out.push(HEX[(byte & 0x0F) as usize] as char);
+}
+
+#[inline]
+fn push_hex_bytes(out: &mut String, bytes: &[u8]) {
+    out.reserve(bytes.len().saturating_mul(2));
+    for &byte in bytes {
+        push_hex_byte(out, byte);
+    }
+}
+
 /// Write a key to the output, quoting if necessary for safe round-trip.
 fn write_key(out: &mut String, key: &str) {
     if needs_quoting(key) {
@@ -658,7 +675,7 @@ fn write_map_key(out: &mut String, key: &Value) {
         Value::Timestamp(ts, tz) => { out.push('"'); out.push_str(&format_timestamp_millis(*ts, *tz)); out.push('"'); }
         Value::Bytes(b) => {
             out.push_str("\"0x");
-            for byte in b { out.push_str(&format!("{:02x}", byte)); }
+            push_hex_bytes(out, b);
             out.push('"');
         }
         Value::Ref(r) => { out.push('"'); out.push('!'); out.push_str(r); out.push('"'); }
@@ -815,9 +832,7 @@ fn write_value(out: &mut String, value: &Value, indent: usize, opts: &FormatOpti
         }
         Value::Bytes(b) => {
             out.push_str("b\"");
-            for byte in b {
-                out.push_str(&format!("{:02x}", byte));
-            }
+            push_hex_bytes(out, b);
             out.push('"');
         }
         Value::Array(arr) => {
@@ -1706,9 +1721,7 @@ fn write_value_with_schemas(
         }
         Value::Bytes(b) => {
             out.push_str("b\"");
-            for byte in b {
-                out.push_str(&format!("{:02x}", byte));
-            }
+            push_hex_bytes(out, b);
             out.push('"');
         }
         Value::Array(arr) => {
@@ -1866,18 +1879,18 @@ fn write_tuple(
             }
             if let Some(v) = obj.get(&field.name) {
                 let type_base = field.field_type.base.as_str();
+                let nested_schema = resolve_schema(schemas, Some(type_base), None);
                 // For array fields with a known schema type, write tuples directly without @table
                 if field.field_type.is_array {
-                    if let Some(item_schema) = resolve_schema(schemas, Some(type_base), None) {
+                    if let Some(item_schema) = nested_schema {
                         // The schema defines the element type - write array with tuples directly
                         write_schema_array(out, v, item_schema, schemas, indent, opts);
                     } else {
                         // No schema for element type - use regular array format
                         write_value_with_schemas(out, v, schemas, None, indent, None, opts);
                     }
-                } else if resolve_schema(schemas, Some(type_base), None).is_some() {
+                } else if let Some(nested_schema) = nested_schema {
                     // Non-array field with schema type - write as nested tuple
-                    let nested_schema = resolve_schema(schemas, Some(type_base), None).unwrap();
                     write_tuple(out, v, nested_schema, schemas, indent, opts);
                 } else {
                     write_value_with_schemas(out, v, schemas, None, indent, None, opts);

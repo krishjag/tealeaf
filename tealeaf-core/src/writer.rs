@@ -395,9 +395,14 @@ impl Writer {
         buf.extend(si.to_le_bytes());
         let bms = (schema.fields.len() + 7) / 8;
         buf.extend((bms as u16).to_le_bytes());
-        // Pre-build schema lookup to avoid O(n×m) linear scan per field per row
+        // Pre-build schema lookup to avoid O(n×m) linear scans per field per row.
         let nested_schemas: Vec<Option<Schema>> = schema.fields.iter()
-            .map(|f| self.schemas.iter().find(|s| s.name == f.field_type.base).cloned())
+            .map(|f| {
+                self.schema_map
+                    .get(&f.field_type.base)
+                    .and_then(|idx| self.schemas.get(*idx as usize))
+                    .cloned()
+            })
             .collect();
         for v in arr {
             if let Value::Object(obj) = v {
@@ -448,8 +453,9 @@ impl Writer {
                 };
 
                 // For struct arrays, look up the correct element schema
-                let elem_schema = self.schemas.iter()
-                    .find(|s| s.name == field_type.base)
+                let elem_schema = self.schema_map
+                    .get(&field_type.base)
+                    .and_then(|idx| self.schemas.get(*idx as usize))
                     .cloned();
 
                 // If elem type resolves to Struct but no schema exists (e.g., "any"
@@ -579,7 +585,10 @@ impl Writer {
                         let is_null = bitmap[i / 8] & (1 << (i % 8)) != 0;
                         if !is_null {
                             if let Some(v) = obj.get(&f.name) {
-                                let nested = self.schemas.iter().find(|s| s.name == f.field_type.base).cloned();
+                                let nested = self.schema_map
+                                    .get(&f.field_type.base)
+                                    .and_then(|idx| self.schemas.get(*idx as usize))
+                                    .cloned();
                                 buf.extend(self.encode_typed_value(v, &f.field_type, nested.as_ref())?);
                             }
                         }
