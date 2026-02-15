@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://krishjag.github.io/tealeaf/</loc><priority>1.0</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/introduction.html</loc><priority>0.9</priority></url>
+
+  <!-- Getting Started -->
+  <url><loc>https://krishjag.github.io/tealeaf/getting-started/installation.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/getting-started/quick-start.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/getting-started/concepts.html</loc><priority>0.8</priority></url>
+
+  <!-- Format Specification -->
+  <url><loc>https://krishjag.github.io/tealeaf/format/text-format.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/format/type-system.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/format/schemas.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/format/binary-format.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/format/json-interop.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/format/grammar.html</loc><priority>0.7</priority></url>
+
+  <!-- CLI Reference -->
+  <url><loc>https://krishjag.github.io/tealeaf/cli/overview.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/cli/compile.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/cli/decompile.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/cli/info.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/cli/validate.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/cli/json-conversion.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/cli/binary-json-conversion.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/cli/completions.html</loc><priority>0.5</priority></url>
+
+  <!-- Rust Guide -->
+  <url><loc>https://krishjag.github.io/tealeaf/rust/overview.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/rust/derive-macros.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/rust/attributes.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/rust/builder.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/rust/schemas.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/rust/errors.html</loc><priority>0.6</priority></url>
+
+  <!-- .NET Guide -->
+  <url><loc>https://krishjag.github.io/tealeaf/dotnet/overview.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/dotnet/source-generator.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/dotnet/attributes.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/dotnet/serializer.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/dotnet/native-types.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/dotnet/diagnostics.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/dotnet/platforms.html</loc><priority>0.6</priority></url>
+
+  <!-- FFI Reference -->
+  <url><loc>https://krishjag.github.io/tealeaf/ffi/overview.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/ffi/api-reference.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/ffi/memory-management.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/ffi/building.html</loc><priority>0.6</priority></url>
+
+  <!-- Guides -->
+  <url><loc>https://krishjag.github.io/tealeaf/guides/llm-context.html</loc><priority>0.8</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/guides/schema-evolution.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/guides/performance.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/guides/round-trip.html</loc><priority>0.7</priority></url>
+
+  <!-- Architecture Decisions -->
+  <url><loc>https://krishjag.github.io/tealeaf/decisions/index.html</loc><priority>0.5</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/decisions/adr-0001-indexmap-insertion-order.html</loc><priority>0.4</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/decisions/adr-0002-fuzzing-architecture.html</loc><priority>0.4</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/decisions/adr-0003-nesting-depth-limit.html</loc><priority>0.4</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/decisions/adr-0004-zlib-compression.html</loc><priority>0.4</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/decisions/adr-0005-direct-value-representation.html</loc><priority>0.4</priority></url>
+
+  <!-- Internals -->
+  <url><loc>https://krishjag.github.io/tealeaf/internals/architecture.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/internals/binary-encoding.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/internals/string-table.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/internals/schema-inference.html</loc><priority>0.6</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/internals/testing.html</loc><priority>0.5</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/internals/benchmarks.html</loc><priority>0.5</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/internals/accuracy-benchmark.html</loc><priority>0.5</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/internals/adversarial-tests.html</loc><priority>0.5</priority></url>
+
+  <!-- Contributing -->
+  <url><loc>https://krishjag.github.io/tealeaf/contributing/guide.html</loc><priority>0.5</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/contributing/development.html</loc><priority>0.5</priority></url>
+
+  <!-- Appendix -->
+  <url><loc>https://krishjag.github.io/tealeaf/appendix/type-reference.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/appendix/comparison-matrix.html</loc><priority>0.7</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/appendix/spec-governance.html</loc><priority>0.5</priority></url>
+  <url><loc>https://krishjag.github.io/tealeaf/appendix/changelog.html</loc><priority>0.6</priority></url>
+</urlset>
