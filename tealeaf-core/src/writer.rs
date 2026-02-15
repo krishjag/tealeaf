@@ -1,6 +1,5 @@
 //! Binary format writer for TeaLeaf
 
-use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufWriter, Write, Seek, SeekFrom};
@@ -109,17 +108,11 @@ impl Writer {
         let mut entries = Vec::new();
         let mut cur_off = data_off;
         for sec in &self.sections {
-            let (written, compressed): (Cow<'_, [u8]>, bool) = if compress && sec.data.len() > 64 {
+            let (written, compressed) = if compress && sec.data.len() > 64 {
                 let c = compress_data(&sec.data)?;
-                if c.len() < (sec.data.len() as f64 * 0.9) as usize {
-                    (Cow::Owned(c), true)
-                } else {
-                    (Cow::Borrowed(sec.data.as_slice()), false)
-                }
-            } else {
-                (Cow::Borrowed(sec.data.as_slice()), false)
-            };
-            w.write_all(written.as_ref())?;
+                if c.len() < (sec.data.len() as f64 * 0.9) as usize { (c, true) } else { (sec.data.clone(), false) }
+            } else { (sec.data.clone(), false) };
+            w.write_all(&written)?;
             entries.push((self.string_map[&sec.key], cur_off, written.len() as u32, sec.data.len() as u32, sec.schema_idx, sec.tl_type, compressed, sec.is_array, sec.item_count));
             cur_off += written.len() as u64;
         }
@@ -402,9 +395,9 @@ impl Writer {
         buf.extend(si.to_le_bytes());
         let bms = (schema.fields.len() + 7) / 8;
         buf.extend((bms as u16).to_le_bytes());
-        // Pre-build schema index lookup to avoid O(n×m) linear scans per field per row.
-        let nested_schema_indices: Vec<Option<usize>> = schema.fields.iter()
-            .map(|f| self.schema_map.get(&f.field_type.base).copied().map(|i| i as usize))
+        // Pre-build schema lookup to avoid O(n×m) linear scan per field per row
+        let nested_schemas: Vec<Option<Schema>> = schema.fields.iter()
+            .map(|f| self.schemas.iter().find(|s| s.name == f.field_type.base).cloned())
             .collect();
         for v in arr {
             if let Value::Object(obj) = v {
@@ -419,9 +412,7 @@ impl Writer {
                     let is_null = bitmap[i / 8] & (1 << (i % 8)) != 0;
                     if !is_null {
                         if let Some(v) = obj.get(&f.name) {
-                            let nested_schema = nested_schema_indices[i]
-                                .and_then(|idx| self.schemas.get(idx));
-                            let data = self.encode_typed_value(v, &f.field_type, nested_schema)?;
+                            let data = self.encode_typed_value(v, &f.field_type, nested_schemas[i].as_ref())?;
                             buf.extend(data);
                         }
                     }
@@ -457,9 +448,9 @@ impl Writer {
                 };
 
                 // For struct arrays, look up the correct element schema
-                let elem_schema = self.schema_map
-                    .get(&field_type.base)
-                    .and_then(|idx| self.schemas.get(*idx as usize));
+                let elem_schema = self.schemas.iter()
+                    .find(|s| s.name == field_type.base)
+                    .cloned();
 
                 // If elem type resolves to Struct but no schema exists (e.g., "any"
                 // pseudo-type from JSON inference), use heterogeneous encoding —
@@ -479,7 +470,7 @@ impl Writer {
 
                 // Encode each element with proper type
                 for v in arr {
-                    buf.extend(self.encode_typed_value(v, &elem_type, elem_schema)?);
+                    buf.extend(self.encode_typed_value(v, &elem_type, elem_schema.as_ref())?);
                 }
                 return Ok(buf);
             }
@@ -588,10 +579,8 @@ impl Writer {
                         let is_null = bitmap[i / 8] & (1 << (i % 8)) != 0;
                         if !is_null {
                             if let Some(v) = obj.get(&f.name) {
-                                let nested = self.schema_map
-                                    .get(&f.field_type.base)
-                                    .and_then(|idx| self.schemas.get(*idx as usize));
-                                buf.extend(self.encode_typed_value(v, &f.field_type, nested)?);
+                                let nested = self.schemas.iter().find(|s| s.name == f.field_type.base).cloned();
+                                buf.extend(self.encode_typed_value(v, &f.field_type, nested.as_ref())?);
                             }
                         }
                     }
