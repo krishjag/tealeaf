@@ -206,15 +206,15 @@ update_file "$REPO_ROOT/README.md" "README.md (benchmark savings bullet)" \
 
 # README.md -- accuracy table (Anthropic row)
 update_file "$REPO_ROOT/README.md" "README.md (Anthropic accuracy)" \
-    "(\| Anthropic accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3${ACC_ANTHROPIC_TOON}\4"
+    "([|] Anthropic accuracy [|] )[0-9.]+( [|] )[0-9.]+( [|] )[0-9.]+( [|])" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3${ACC_ANTHROPIC_TOON}\4"
 
 # README.md -- accuracy table (OpenAI row)
 update_file "$REPO_ROOT/README.md" "README.md (OpenAI accuracy)" \
-    "(\| OpenAI accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_OPENAI_TL}\2${ACC_OPENAI_JSON}\3${ACC_OPENAI_TOON}\4"
+    "([|] OpenAI accuracy [|] )[0-9.]+( [|] )[0-9.]+( [|] )[0-9.]+( [|])" "\1${ACC_OPENAI_TL}\2${ACC_OPENAI_JSON}\3${ACC_OPENAI_TOON}\4"
 
 # README.md -- input savings row
 update_file "$REPO_ROOT/README.md" "README.md (input savings row)" \
-    "(\| Input token savings \| \*\*-)[0-9]+(%\*\* \| baseline \| \*\*-)[0-9]+(%\*\* \|)" "\1${TL_SAVINGS}\2${TOON_SAVINGS}\3"
+    "([|] Input token savings [|] \*\*-)[0-9]+(%\*\* [|] baseline [|] \*\*-)[0-9]+(%\*\* [|])" "\1${TL_SAVINGS}\2${TOON_SAVINGS}\3"
 
 # CLAUDE.md -- savings bullet
 update_file "$REPO_ROOT/CLAUDE.md" "CLAUDE.md (benchmark savings)" \
@@ -236,26 +236,26 @@ update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (savings
     "(\*\*~)[0-9]+(% fewer input tokens\*\* on real-world data)" "\1${TL_SAVINGS}\2"
 
 update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (Anthropic accuracy)" \
-    "(\| Anthropic accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3${ACC_ANTHROPIC_TOON}\4"
+    "([|] Anthropic accuracy [|] )[0-9.]+( [|] )[0-9.]+( [|] )[0-9.]+( [|])" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3${ACC_ANTHROPIC_TOON}\4"
 
 update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (OpenAI accuracy)" \
-    "(\| OpenAI accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_OPENAI_TL}\2${ACC_OPENAI_JSON}\3${ACC_OPENAI_TOON}\4"
+    "([|] OpenAI accuracy [|] )[0-9.]+( [|] )[0-9.]+( [|] )[0-9.]+( [|])" "\1${ACC_OPENAI_TL}\2${ACC_OPENAI_JSON}\3${ACC_OPENAI_TOON}\4"
 
 update_file "$REPO_ROOT/docs-site/src/introduction.md" "introduction.md (input savings)" \
-    "(\| Input token savings \| \*\*-)[0-9]+(%\*\* \| baseline \| \*\*-)[0-9]+(%\*\* \|)" "\1${TL_SAVINGS}\2${TOON_SAVINGS}\3"
+    "([|] Input token savings [|] \*\*-)[0-9]+(%\*\* [|] baseline [|] \*\*-)[0-9]+(%\*\* [|])" "\1${TL_SAVINGS}\2${TOON_SAVINGS}\3"
 
 # docs-site/src/guides/llm-context.md
 update_file "$REPO_ROOT/docs-site/src/guides/llm-context.md" "llm-context.md (savings stat)" \
     "(expect \*\*~)[0-9]+(% fewer data tokens\*\*)" "\1${TL_SAVINGS}\2"
 
 update_file "$REPO_ROOT/docs-site/src/guides/llm-context.md" "llm-context.md (Anthropic accuracy)" \
-    "(\| Anthropic accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3${ACC_ANTHROPIC_TOON}\4"
+    "([|] Anthropic accuracy [|] )[0-9.]+( [|] )[0-9.]+( [|] )[0-9.]+( [|])" "\1${ACC_ANTHROPIC_TL}\2${ACC_ANTHROPIC_JSON}\3${ACC_ANTHROPIC_TOON}\4"
 
 update_file "$REPO_ROOT/docs-site/src/guides/llm-context.md" "llm-context.md (OpenAI accuracy)" \
-    "(\| OpenAI accuracy \| )[0-9.]+( \| )[0-9.]+( \| )[0-9.]+( \|)" "\1${ACC_OPENAI_TL}\2${ACC_OPENAI_JSON}\3${ACC_OPENAI_TOON}\4"
+    "([|] OpenAI accuracy [|] )[0-9.]+( [|] )[0-9.]+( [|] )[0-9.]+( [|])" "\1${ACC_OPENAI_TL}\2${ACC_OPENAI_JSON}\3${ACC_OPENAI_TOON}\4"
 
 update_file "$REPO_ROOT/docs-site/src/guides/llm-context.md" "llm-context.md (input savings)" \
-    "(\| Input token savings \| \*\*-)[0-9]+(%\*\* \| baseline \| \*\*-)[0-9]+(%\*\* \|)" "\1${TL_SAVINGS}\2${TOON_SAVINGS}\3"
+    "([|] Input token savings [|] \*\*-)[0-9]+(%\*\* [|] baseline [|] \*\*-)[0-9]+(%\*\* [|])" "\1${TL_SAVINGS}\2${TOON_SAVINGS}\3"
 
 # docs-site/src/internals/accuracy-benchmark.md
 update_file "$REPO_ROOT/docs-site/src/internals/accuracy-benchmark.md" "accuracy-benchmark.md (savings headline)" \
