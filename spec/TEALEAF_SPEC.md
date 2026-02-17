@@ -148,9 +148,14 @@ Numbers with exponent notation but no decimal point (e.g., `1e3`) are parsed as 
 enabled: true
 disabled: false
 missing: ~
+explicit_null: null
 ```
 
-The tilde (`~`) represents null.
+The tilde (`~`) represents null. The `null` keyword also represents null and is equivalent to `~` in all contexts except `@table` tuples (see §2.2).
+
+In `@table` tuples, the two forms have distinct semantics:
+- **`~`** — absent field (the field was not present in the source object). For nullable fields, the parser drops the field entirely. For non-nullable fields, it is preserved as null.
+- **`null`** — explicit null (the field was present with a null value). Always preserved regardless of field type.
 
 ### 1.5 Timestamps
 
@@ -241,7 +246,8 @@ With types and nullable fields:
 # Schema-bound table
 users: @table user [
   (1, "Alice", "alice@example.com", true),
-  (2, "Bob", ~, false),
+  (2, "Bob", ~, false),       # ~ = absent field (dropped for nullable fields)
+  (3, "Carol", null, true),   # null = explicit null (always preserved)
 ]
 ```
 
@@ -809,17 +815,20 @@ Fields: [
 ```
 Count: u32
 Schema Index: u16
-Null Bitmap Size: u16
+Bitmap Size: u16              (= 2 × bms, where bms = ceil(field_count / 8))
 Rows: [
-  Null Bitmap: [u8 × bitmap_size]
-  Values: [non-null field values only]
+  Lo Bitmap: [u8 × bms]      (low bits of two-bit field state)
+  Hi Bitmap: [u8 × bms]      (high bits of two-bit field state)
+  Values: [field values for code=0 fields only]
 ]
 ```
 
-The null bitmap tracks which fields are null:
-- Bit i set = field i is null
-- Only non-null values are stored in the data section
-- Bitmap size = (field_count + 7) / 8 (integer division)
+Each field uses a two-bit state code: `code = lo_bit(i) | (hi_bit(i) << 1)`
+- **0** (lo=0, hi=0) — has value: field data follows inline
+- **1** (lo=1, hi=0) — explicit null: always preserved as null in output
+- **2** (lo=0, hi=1) — absent: dropped for nullable fields, null for non-nullable
+- Only code=0 fields have data stored in the values section
+- A null array element has all fields set to code=2 (lo bits all zero, hi bits all set)
 
 **Maps:**
 ```
@@ -884,7 +893,7 @@ key          = name | string ;
 value        = primitive | object | array | tuple | table | map
              | tagged | ref | timestamp ;
 
-primitive    = string | bytes_lit | number | bool | "~" ;
+primitive    = string | bytes_lit | number | bool | "~" | "null" ;
 bytes_lit    = "b\"" { hex_digit hex_digit } "\"" ;
 hex_digit    = "0"-"9" | "a"-"f" | "A"-"F" ;
 object       = "{" [ ( pair | ref_def ) { "," ( pair | ref_def ) } ] "}" ;

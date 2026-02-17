@@ -12,7 +12,8 @@ pub enum TokenKind {
     UInt(u64),
     Float(f64),
     Bool(bool),
-    Null,
+    Null,          // ~ (absent/omitted field)
+    ExplicitNull,  // null keyword (explicit null value)
     Timestamp(i64, i16),  // Unix milliseconds, timezone offset in minutes
     JsonNumber(String),  // Arbitrary-precision number (raw decimal string)
 
@@ -184,6 +185,7 @@ impl<'a> Lexer<'a> {
                 let kind = match word.as_str() {
                     "true" => TokenKind::Bool(true),
                     "false" => TokenKind::Bool(false),
+                    "null" => TokenKind::ExplicitNull,
                     "NaN" => TokenKind::Float(f64::NAN),
                     "inf" => TokenKind::Float(f64::INFINITY),
                     _ => TokenKind::Word(word),

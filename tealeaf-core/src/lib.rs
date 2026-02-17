@@ -1878,25 +1878,31 @@ fn write_tuple(
                 out.push_str(sep(opts.compact));
             }
             if let Some(v) = obj.get(&field.name) {
-                let type_base = field.field_type.base.as_str();
-                let nested_schema = resolve_schema(schemas, Some(type_base), None);
-                // For array fields with a known schema type, write tuples directly without @table
-                if field.field_type.is_array {
-                    if let Some(item_schema) = nested_schema {
-                        // The schema defines the element type - write array with tuples directly
-                        write_schema_array(out, v, item_schema, schemas, indent, opts);
+                if *v == Value::Null {
+                    // Explicit null — field present with null value.
+                    // Write "null" keyword to distinguish from absent (~).
+                    out.push_str("null");
+                } else {
+                    let type_base = field.field_type.base.as_str();
+                    let nested_schema = resolve_schema(schemas, Some(type_base), None);
+                    // For array fields with a known schema type, write tuples directly without @table
+                    if field.field_type.is_array {
+                        if let Some(item_schema) = nested_schema {
+                            // The schema defines the element type - write array with tuples directly
+                            write_schema_array(out, v, item_schema, schemas, indent, opts);
+                        } else {
+                            // No schema for element type - use regular array format
+                            write_value_with_schemas(out, v, schemas, None, indent, None, opts);
+                        }
+                    } else if let Some(nested_schema) = nested_schema {
+                        // Non-array field with schema type - write as nested tuple
+                        write_tuple(out, v, nested_schema, schemas, indent, opts);
                     } else {
-                        // No schema for element type - use regular array format
                         write_value_with_schemas(out, v, schemas, None, indent, None, opts);
                     }
-                } else if let Some(nested_schema) = nested_schema {
-                    // Non-array field with schema type - write as nested tuple
-                    write_tuple(out, v, nested_schema, schemas, indent, opts);
-                } else {
-                    write_value_with_schemas(out, v, schemas, None, indent, None, opts);
                 }
             } else {
-                out.push('~');
+                out.push('~');  // Absent field — not in object
             }
         }
         out.push(')');
@@ -5773,10 +5779,10 @@ root: @table root [
         assert_eq!(items_in[0]["c"], items_out[0]["c"]);
         assert_eq!(items_in[2]["c"], items_out[2]["c"]);
 
-        // Second item: 'a' and 'b' match, 'c' should be absent (was missing)
+        // Second item: 'a' and 'b' match, 'c' should be null (non-array nullable field preserved)
         assert_eq!(items_in[1]["a"], items_out[1]["a"]);
         assert_eq!(items_in[1]["b"], items_out[1]["b"]);
-        assert!(items_out[1].get("c").is_none(), "Missing field should remain absent after roundtrip");
+        assert!(items_out[1].get("c").is_none(), "Missing nullable field should be dropped (absent)");
     }
 
     #[test]
@@ -5848,7 +5854,7 @@ root: @table root [
         let people = v_out["people"].as_array().unwrap();
         assert_eq!(people[0]["address"]["city"], "Seattle");
         assert!(people[1].get("address").is_none(),
-            "Missing address should be absent: {:?}", people[1]);
+            "Missing nullable field should be dropped (absent): {:?}", people[1]);
         assert_eq!(people[2]["address"]["city"], "Portland");
     }
 
@@ -5946,6 +5952,34 @@ root: @table root [
             "Roundtripped first record should preserve field order");
         let second_keys: Vec<&str> = records[1].as_object().unwrap().keys().map(|k| k.as_str()).collect();
         assert_eq!(second_keys, vec!["name", "age"],
-            "Roundtripped second record should preserve field order (minus absent nullable)");
+            "Roundtripped second record should drop absent nullable field");
+    }
+
+    #[test]
+    fn test_explicit_null_roundtrip_text_and_binary() {
+        // Regression: fuzz_json_schemas crashed on single-object array with explicit null.
+        // Both TL and TLBX paths must preserve explicit null values.
+        use tempfile::NamedTempFile;
+
+        let json = r#"[{"key": null}]"#;
+        let doc = TeaLeaf::from_json_with_schemas(json).unwrap();
+
+        // Text roundtrip
+        let tl_text = doc.to_tl_with_schemas();
+        let reparsed = TeaLeaf::parse(&tl_text).unwrap();
+        let json_out = reparsed.to_json().unwrap();
+        let v: serde_json::Value = serde_json::from_str(&json_out).unwrap();
+        assert_eq!(v[0]["key"], serde_json::Value::Null,
+            "Text roundtrip must preserve explicit null");
+
+        // Binary roundtrip
+        let temp = NamedTempFile::new().unwrap();
+        doc.compile(temp.path(), false).unwrap();
+        let reader = Reader::from_bytes(std::fs::read(temp.path()).unwrap()).unwrap();
+        let from_bin = TeaLeaf::from_reader(&reader).unwrap();
+        let json_bin = from_bin.to_json().unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_bin).unwrap();
+        assert_eq!(v2[0]["key"], serde_json::Value::Null,
+            "Binary roundtrip must preserve explicit null");
     }
 }

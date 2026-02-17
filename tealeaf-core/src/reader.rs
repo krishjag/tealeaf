@@ -658,34 +658,52 @@ impl Reader {
         let capacity = (count as usize).min(cursor.remaining()).min(MAX_COLLECTION_SIZE);
         let mut result = Vec::with_capacity(capacity);
 
+        // Two-bit field state encoding: bitmap_size = 2 * bms
+        let bms = bitmap_size / 2;
         for _ in 0..count {
             let mut bitmap = Vec::with_capacity(bitmap_size.min(cursor.remaining()));
             for _ in 0..bitmap_size {
                 bitmap.push(cursor.read_u8()?);
             }
+            let lo_bitmap = &bitmap[..bms.min(bitmap.len())];
+            let hi_bitmap = if bitmap.len() > bms { &bitmap[bms..] } else { &[] as &[u8] };
 
-            // Check if all field bits are set — indicates a null array element
-            let all_null = (0..schema.fields.len())
-                .all(|i| i / 8 < bitmap.len() && (bitmap[i / 8] & (1 << (i % 8))) != 0);
+            // Null array element: all fields code=2 (lo=0, hi=1)
+            let all_absent = (0..schema.fields.len()).all(|i| {
+                let lo = i / 8 < lo_bitmap.len() && (lo_bitmap[i / 8] & (1 << (i % 8))) != 0;
+                let hi = i / 8 < hi_bitmap.len() && (hi_bitmap[i / 8] & (1 << (i % 8))) != 0;
+                !lo && hi
+            });
 
-            if all_null {
+            if all_absent {
                 result.push(Value::Null);
             } else {
                 let mut obj = ObjectMap::new();
                 for (i, field) in schema.fields.iter().enumerate() {
-                    let is_null = i / 8 < bitmap.len() && (bitmap[i / 8] & (1 << (i % 8))) != 0;
-                    if is_null {
-                        if !field.field_type.nullable {
+                    let lo = i / 8 < lo_bitmap.len() && (lo_bitmap[i / 8] & (1 << (i % 8))) != 0;
+                    let hi = i / 8 < hi_bitmap.len() && (hi_bitmap[i / 8] & (1 << (i % 8))) != 0;
+                    let code = (lo as u8) | ((hi as u8) << 1);
+                    match code {
+                        0 => {
+                            // Has value — decode inline data
+                            let tl_type = if self.union_map.contains_key(&field.field_type.base) {
+                                TLType::Tagged
+                            } else {
+                                field.field_type.to_tl_type()
+                            };
+                            obj.insert(field.name.clone(), self.decode_value(cursor, tl_type, depth + 1)?);
+                        }
+                        1 => {
+                            // Explicit null — always preserve
                             obj.insert(field.name.clone(), Value::Null);
                         }
-                    } else {
-                        // Resolve union types: if the base name is in union_map, decode as Tagged
-                        let tl_type = if self.union_map.contains_key(&field.field_type.base) {
-                            TLType::Tagged
-                        } else {
-                            field.field_type.to_tl_type()
-                        };
-                        obj.insert(field.name.clone(), self.decode_value(cursor, tl_type, depth + 1)?);
+                        2 => {
+                            // Absent — drop for nullable fields
+                            if !field.field_type.nullable {
+                                obj.insert(field.name.clone(), Value::Null);
+                            }
+                        }
+                        _ => {} // reserved
                     }
                 }
                 result.push(Value::Object(obj));
@@ -757,30 +775,42 @@ impl Reader {
             )));
         }
         let schema = &self.schemas[schema_idx];
-        let bitmap_size = (schema.fields.len() + 7) / 8;
+        let bms = (schema.fields.len() + 7) / 8;
+        let bitmap_size = 2 * bms;
 
         let mut bitmap = Vec::with_capacity(bitmap_size.min(cursor.remaining()));
         for _ in 0..bitmap_size {
             bitmap.push(cursor.read_u8()?);
         }
+        let lo_bitmap = &bitmap[..bms.min(bitmap.len())];
+        let hi_bitmap = if bitmap.len() > bms { &bitmap[bms..] } else { &[] as &[u8] };
 
         let mut obj = ObjectMap::new();
         for (i, field) in schema.fields.iter().enumerate() {
-            let is_null = i / 8 < bitmap.len() && (bitmap[i / 8] & (1 << (i % 8))) != 0;
-            if is_null {
-                // For nullable fields, omit null values to preserve absent-field semantics.
-                // For non-nullable fields with null (shouldn't happen but be safe), include it.
-                if !field.field_type.nullable {
+            let lo = i / 8 < lo_bitmap.len() && (lo_bitmap[i / 8] & (1 << (i % 8))) != 0;
+            let hi = i / 8 < hi_bitmap.len() && (hi_bitmap[i / 8] & (1 << (i % 8))) != 0;
+            let code = (lo as u8) | ((hi as u8) << 1);
+            match code {
+                0 => {
+                    // Has value — decode inline data
+                    let tl_type = if self.union_map.contains_key(&field.field_type.base) {
+                        TLType::Tagged
+                    } else {
+                        field.field_type.to_tl_type()
+                    };
+                    obj.insert(field.name.clone(), self.decode_value(cursor, tl_type, depth + 1)?);
+                }
+                1 => {
+                    // Explicit null — always preserve
                     obj.insert(field.name.clone(), Value::Null);
                 }
-            } else {
-                // Resolve union types: if the base name is in union_map, decode as Tagged
-                let tl_type = if self.union_map.contains_key(&field.field_type.base) {
-                    TLType::Tagged
-                } else {
-                    field.field_type.to_tl_type()
-                };
-                obj.insert(field.name.clone(), self.decode_value(cursor, tl_type, depth + 1)?);
+                2 => {
+                    // Absent — drop for nullable fields
+                    if !field.field_type.nullable {
+                        obj.insert(field.name.clone(), Value::Null);
+                    }
+                }
+                _ => {} // reserved
             }
         }
 

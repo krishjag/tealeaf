@@ -11,20 +11,20 @@ orders: @table order [
       (US-WEST-01, 342, 50, false),
       (US-EAST-02, 189, 50, false)
     ]), 1, 339.99, 339.99, "Gift wrap requested"),
-    (2, (PROD-2156, "Anker USB-C to Lightning Cable 6ft", ANK-USBC-LTN-6FT, "Electronics/Accessories", Anker, (15.99, ~, USD, 8.25), [
+    (2, (PROD-2156, "Anker USB-C to Lightning Cable 6ft", ANK-USBC-LTN-6FT, "Electronics/Accessories", Anker, (15.99, null, USD, 8.25), [
       (US-WEST-01, 2841, 500, false)
-    ]), 2, 15.99, 31.98, ~)
+    ]), 2, 15.99, 31.98, null)
   ], 371.97, 30.69, 0.0, 402.66, visa_ending_4242),
-  (ORD-2025-00848, processing, "2025-06-14T11:47:53Z", ~, CUST-18774, "sofia.r@outlook.com", ("Sofia Ramirez", "88 Beacon St Apt 3F", Boston, MA, "02108", US), [
+  (ORD-2025-00848, processing, "2025-06-14T11:47:53Z", null, CUST-18774, "sofia.r@outlook.com", ("Sofia Ramirez", "88 Beacon St Apt 3F", Boston, MA, "02108", US), [
     (1, (PROD-9034, "Patagonia Better Sweater Jacket - Navy L", PAT-BSWEATER-NVY-L, "Apparel/Outerwear", Patagonia, (149.0, 20.0, USD, 9.5), [
       (US-WEST-01, 23, 30, false),
       (US-EAST-02, 0, 30, true)
-    ]), 1, 119.2, 119.2, ~),
-    (2, (PROD-5512, "Chemex 8-Cup Pour-Over Coffee Maker", CHX-POUROVER-8CUP, "Home/Kitchen", Chemex, (44.95, ~, USD, 8.25), [
+    ]), 1, 119.2, 119.2, null),
+    (2, (PROD-5512, "Chemex 8-Cup Pour-Over Coffee Maker", CHX-POUROVER-8CUP, "Home/Kitchen", Chemex, (44.95, null, USD, 8.25), [
       (US-EAST-02, 567, 100, false)
     ]), 1, 44.95, 44.95, "Include Chemex filters sample pack"),
-    (3, (PROD-2156, "Anker USB-C to Lightning Cable 6ft", ANK-USBC-LTN-6FT, "Electronics/Accessories", Anker, (15.99, ~, USD, 8.25), [
+    (3, (PROD-2156, "Anker USB-C to Lightning Cable 6ft", ANK-USBC-LTN-6FT, "Electronics/Accessories", Anker, (15.99, null, USD, 8.25), [
       (US-WEST-01, 2841, 500, false)
-    ]), 3, 15.99, 47.97, ~)
+    ]), 3, 15.99, 47.97, null)
   ], 212.12, 18.9, 7.99, 239.01, "paypal_sofia.r@outlook.com")
 ]

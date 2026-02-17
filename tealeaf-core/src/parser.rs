@@ -335,7 +335,7 @@ impl Parser {
             return Err(Error::ParseError("maximum parse nesting depth exceeded".into()));
         }
         match self.current_kind() {
-            TokenKind::Null => { self.advance(); Ok(Value::Null) }
+            TokenKind::Null | TokenKind::ExplicitNull => { self.advance(); Ok(Value::Null) }
             TokenKind::Bool(b) => { let b = *b; self.advance(); Ok(Value::Bool(b)) }
             TokenKind::Int(i) => { let i = *i; self.advance(); Ok(Value::Int(i)) }
             TokenKind::UInt(u) => { let u = *u; self.advance(); Ok(Value::UInt(u)) }
@@ -471,11 +471,16 @@ impl Parser {
 
         let mut obj = ObjectMap::new();
         for field in &schema.fields {
+            let is_explicit_null = self.check(TokenKind::ExplicitNull);
             let value = self.parse_value_for_field(&field.field_type, depth)?;
-            // For nullable fields, omit null values from the object to preserve
-            // absent-field semantics: original JSON without the key roundtrips
-            // correctly instead of gaining an explicit "field": null.
-            if !(field.field_type.nullable && value == Value::Null) {
+            // ExplicitNull (null keyword): always preserve — the field was
+            // explicitly present with a null value in the source data.
+            // Null (~): drop for all nullable fields (absent semantics).
+            // The binary format uses two-bit encoding (code=2) for absent fields.
+            let should_drop = !is_explicit_null
+                && field.field_type.nullable
+                && value == Value::Null;
+            if !should_drop {
                 obj.insert(field.name.clone(), value);
             }
             if self.check(TokenKind::Comma) {
@@ -488,8 +493,8 @@ impl Parser {
     }
 
     fn parse_value_for_field(&mut self, field_type: &FieldType, depth: usize) -> Result<Value> {
-        // Handle null
-        if self.check(TokenKind::Null) {
+        // Handle null (~ or explicit null keyword)
+        if self.check(TokenKind::Null) || self.check(TokenKind::ExplicitNull) {
             self.advance();
             return Ok(Value::Null);
         }
@@ -843,7 +848,8 @@ mod tests {
 
         let users = data.get("users").unwrap().as_array().unwrap();
         assert_eq!(users.len(), 2);
-        assert!(users[1].as_object().unwrap().get("email").is_none());
+        assert!(users[1].as_object().unwrap().get("email").is_none(),
+            "Nullable field with ~ should be dropped (absent)");
     }
 
     #[test]

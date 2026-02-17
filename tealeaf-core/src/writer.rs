@@ -394,7 +394,7 @@ impl Writer {
         };
         buf.extend(si.to_le_bytes());
         let bms = (schema.fields.len() + 7) / 8;
-        buf.extend((bms as u16).to_le_bytes());
+        buf.extend(((2 * bms) as u16).to_le_bytes());
         // Pre-build schema lookup to avoid O(n×m) linear scans per field per row.
         let nested_schemas: Vec<Option<Schema>> = schema.fields.iter()
             .map(|f| {
@@ -406,16 +406,26 @@ impl Writer {
             .collect();
         for v in arr {
             if let Value::Object(obj) = v {
-                let mut bitmap = vec![0u8; bms];
+                // Two-bit field state: 0=has value, 1=explicit null, 2=absent
+                let mut lo_bitmap = vec![0u8; bms];
+                let mut hi_bitmap = vec![0u8; bms];
                 for (i, f) in schema.fields.iter().enumerate() {
-                    if obj.get(&f.name).map(|v| v.is_null()).unwrap_or(true) {
-                        bitmap[i / 8] |= 1 << (i % 8);
+                    match obj.get(&f.name) {
+                        Some(v) if v.is_null() => {
+                            lo_bitmap[i / 8] |= 1 << (i % 8); // code=1: explicit null
+                        }
+                        None => {
+                            hi_bitmap[i / 8] |= 1 << (i % 8); // code=2: absent
+                        }
+                        Some(_) => {} // code=0: has value
                     }
                 }
-                buf.extend_from_slice(&bitmap);
+                buf.extend_from_slice(&lo_bitmap);
+                buf.extend_from_slice(&hi_bitmap);
                 for (i, f) in schema.fields.iter().enumerate() {
-                    let is_null = bitmap[i / 8] & (1 << (i % 8)) != 0;
-                    if !is_null {
+                    let has_value = (lo_bitmap[i / 8] & (1 << (i % 8))) == 0
+                                 && (hi_bitmap[i / 8] & (1 << (i % 8))) == 0;
+                    if has_value {
                         if let Some(v) = obj.get(&f.name) {
                             let data = self.encode_typed_value(v, &f.field_type, nested_schemas[i].as_ref())?;
                             buf.extend(data);
@@ -423,12 +433,14 @@ impl Writer {
                     }
                 }
             } else {
-                // Null element: write bitmap with all field bits set, no field data
-                let mut bitmap = vec![0u8; bms];
+                // Null array element: all fields code=2 (absent)
+                let lo_bitmap = vec![0u8; bms];
+                let mut hi_bitmap = vec![0u8; bms];
                 for i in 0..schema.fields.len() {
-                    bitmap[i / 8] |= 1 << (i % 8);
+                    hi_bitmap[i / 8] |= 1 << (i % 8);
                 }
-                buf.extend_from_slice(&bitmap);
+                buf.extend_from_slice(&lo_bitmap);
+                buf.extend_from_slice(&hi_bitmap);
             }
         }
         Ok((buf, TLType::Struct, true, arr.len() as u32))
@@ -571,19 +583,28 @@ impl Writer {
 
                     let bms = (schema.fields.len() + 7) / 8;
 
-                    // Bitmap (supports >64 fields)
-                    let mut bitmap = vec![0u8; bms];
+                    // Two-bit field state: 0=has value, 1=explicit null, 2=absent
+                    let mut lo_bitmap = vec![0u8; bms];
+                    let mut hi_bitmap = vec![0u8; bms];
                     for (i, f) in schema.fields.iter().enumerate() {
-                        if obj.get(&f.name).map(|v| v.is_null()).unwrap_or(true) {
-                            bitmap[i / 8] |= 1 << (i % 8);
+                        match obj.get(&f.name) {
+                            Some(v) if v.is_null() => {
+                                lo_bitmap[i / 8] |= 1 << (i % 8); // code=1: explicit null
+                            }
+                            None => {
+                                hi_bitmap[i / 8] |= 1 << (i % 8); // code=2: absent
+                            }
+                            Some(_) => {} // code=0: has value
                         }
                     }
-                    buf.extend_from_slice(&bitmap);
+                    buf.extend_from_slice(&lo_bitmap);
+                    buf.extend_from_slice(&hi_bitmap);
 
                     // Fields
                     for (i, f) in schema.fields.iter().enumerate() {
-                        let is_null = bitmap[i / 8] & (1 << (i % 8)) != 0;
-                        if !is_null {
+                        let has_value = (lo_bitmap[i / 8] & (1 << (i % 8))) == 0
+                                     && (hi_bitmap[i / 8] & (1 << (i % 8))) == 0;
+                        if has_value {
                             if let Some(v) = obj.get(&f.name) {
                                 let nested = self.schema_map
                                     .get(&f.field_type.base)
