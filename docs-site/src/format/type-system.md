@@ -26,13 +26,15 @@ TeaLeaf has a rich type system covering primitives, containers, and type modifie
 
 ```tl
 field: string          # required string
-field: string?         # nullable string (can be ~)
+field: string?         # nullable string (can be ~ or null)
 field: []string        # required array of strings
-field: []string?       # nullable array of strings (the field itself can be ~)
+field: []string?       # nullable array of strings (the field itself can be ~ or null)
 field: []user          # array of structs
 ```
 
-The `?` modifier applies to the **field**, not array elements. However, the parser does accept `~` (null) values inside arrays, including schema-typed arrays. Null elements are tracked in the null bitmap.
+The `?` modifier applies to the **field**, not array elements. However, the parser does accept `~` and `null` values inside arrays, including schema-typed arrays.
+
+In `@table` tuples, `~` and `null` have distinct semantics for nullable fields: `~` means absent (field dropped from output), `null` means explicit null (always preserved). See [Schemas](schemas.md#nullable-fields) for details.
 
 ## Value Types (Not Schema Types)
 

@@ -1,4 +1,4 @@
-# TeaLeaf Format Specification v2.0.0-beta.13
+# TeaLeaf Format Specification v2.0.0-beta.14
 
 > **Status: Beta / Request for Comments**
 >
@@ -1110,4 +1110,4 @@ Utilities:
 
 ---
 
-*TeaLeaf Format Specification v2.0.0-beta.13*
+*TeaLeaf Format Specification v2.0.0-beta.14*

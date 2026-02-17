@@ -29,7 +29,7 @@ key          = name | string ;
 value        = primitive | object | array | tuple | table | map
              | tagged | ref | timestamp ;
 
-primitive    = string | bytes_lit | number | bool | "~" ;
+primitive    = string | bytes_lit | number | bool | "~" | "null" ;
 bytes_lit    = "b\"" { hexdigit hexdigit } "\"" ;
 object       = "{" [ ( pair | ref_def ) { "," ( pair | ref_def ) } ] "}" ;
 array        = "[" [ value { "," value } ] "]" ;

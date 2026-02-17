@@ -1,6 +1,71 @@
 # Changelog
 
-## v2.0.0-beta.13 (Current)
+## v2.0.0-beta.14 (Current)
+
+### Features
+- **`null` keyword for explicit null values** — The text format now supports `null` as a keyword alongside `~` (tilde). In most contexts they are interchangeable. In `@table` tuples, they have distinct semantics:
+  - **`~`** — absent field (the field was not present in the source object). For nullable fields, the parser drops the field entirely from the reconstructed object. For non-nullable fields, it is preserved as null.
+  - **`null`** — explicit null (the field was present with a `null` value in the source JSON). Always preserved as `null` in the output regardless of field nullability.
+  - The text serializer (`write_tuple`) writes `null` for fields that are explicitly null and `~` for fields that are absent.
+  - Lexer: new `ExplicitNull` token for the `null` keyword, distinct from `Null` (`~`).
+- **Two-bit field state encoding in binary format** — The binary struct array encoding now uses a two-bitmap layout (`lo` + `hi`) instead of the previous single null bitmap. Each field uses a two-bit state code: `code = lo_bit(i) | (hi_bit(i) << 1)`:
+  - **0** (lo=0, hi=0) — has value: field data follows inline
+  - **1** (lo=1, hi=0) — explicit null: always preserved as `null` in output
+  - **2** (lo=0, hi=1) — absent: dropped for nullable fields, preserved as null for non-nullable fields
+  - Bitmap size per row is `2 × bms` bytes (where `bms = ceil(field_count / 8)`), stored as lo bitmap followed by hi bitmap
+  - A null array element has all fields set to code=2 (lo bits all zero, hi bits all set)
+  - Applied to all 4 bitmap sites: `encode_struct_array`, `encode_typed_value(Struct)`, `decode_struct_array`, `decode_struct`
+
+### Performance
+- **Hex encoding optimization** — Replaced `format!("{:02x}")` per-byte hex encoding with lookup-table-based `push_hex_byte()`/`push_hex_bytes()` helpers. Applies to bytes literals in text serialization (`b"..."`) and JSON export (`"0x..."` strings). Eliminates allocation per byte.
+- **Zero-copy binary section reads** — `Reader::read_section()` now uses `Cow<[u8]>` — uncompressed sections borrow directly from the memory-mapped file (`Cow::Borrowed`) instead of copying to a `Vec<u8>`. Compressed sections still allocate (`Cow::Owned`).
+- **Schema lookup via HashMap** — Binary writer now uses `schema_map` (HashMap by name) for O(1) schema resolution instead of O(n) linear scans via `self.schemas.iter().find()`. Affects `encode_struct_array`, `encode_typed_value`, and nested struct field encoding.
+- **Reduced redundant schema resolution** — `write_tuple` in the text serializer now calls `resolve_schema()` once per field and reuses the result for both array and non-array branches, eliminating duplicate lookups.
+
+### Specification
+- **`null` keyword in grammar** — Added `"null"` as a primitive production: `primitive = string | bytes_lit | number | bool | "~" | "null"`
+- **Two-bit field state encoding** — Updated §4.8 struct array encoding from single null bitmap to lo/hi two-bitmap layout with three-state field codes
+- **Duplicate key semantics** — Documented that duplicate keys in objects use last-value-wins (§1.6)
+- **Reference semantics** — Documented compile-time resolution, define-before-use, multi-use, circular reference handling, and document-global scope (§1.13)
+- **Tagged value semantics** — Documented schema-free and schema-typed tagged value behavior (§1.14)
+- **Include semantics** — Documented recursive includes, circular detection, 32-level depth limit (§1.16)
+- **Map key restrictions** — Documented hashable key type restriction (string, int, uint) for map keys (§1.12)
+- **§1.19 Limits and Constraints** — New section documenting all format limits: nesting depth (256), object fields (u16), array elements (u32), string length (u32), section count (u32), schema count (u16), max decompressed section (256 MB), and empty collection encoding
+- **§1.20 File Encoding** — New section documenting UTF-8 requirement, BOM handling, byte order, and whitespace rules
+- **Reserved type code ranges** — Documented reserved type code ranges that readers should treat as errors (§4.6)
+- **String table lookup** — Documented O(1) index-based access and linear scan for name-based lookups (§4.4)
+- **Top-level array encoding rationale** — Documented why only Int32 and String use homogeneous encoding at the top level (§2.4)
+- **Type coercion rationale** — Documented LLM context use case for silent coercion (§2.5)
+
+### Accuracy Benchmark
+- **Real-world dataset expansion** — Added 7 new real-world datasets across 7 domains: SEC EDGAR (finance), BLS JOLTS (HR/labor), CDC PLACES (healthcare), Wisconsin Circuit Court (legal), NVD CVEs (technology), NYC PLUTO (real estate), USDA FoodData (retail). Each domain includes data processing scripts, README documentation, and multiple task configurations.
+- **Updated benchmark results** — 14 tasks, 7 domains. ~51% input token savings (TL vs JSON), ~20% (TOON vs JSON). Accuracy within noise (TL 0.942 vs JSON 0.945 on Claude Sonnet 4.5).
+- **Evidence archive** — New `evidence/2026-02-14-01/` with full prompts, responses, analysis.tl, summary.json, and charts for reproducibility.
+- **Chart generation** — Added `scripts/generate_charts.py` for accuracy and token comparison visualizations.
+
+### Documentation
+- **ADR-0005: Direct Value Representation** — Architecture decision record explaining why TeaLeaf uses direct value representation without an intermediate AST.
+- **Sitemap** — Added `docs-site/src/sitemap.xml` with Google search console integration for doc-site discoverability.
+- Updated accuracy benchmark documentation with real-world dataset details.
+
+### Canonical Fixtures
+- Updated `schemas.json`, `mixed_schemas.json`, `quoted_keys.json` — nullable fields with `~` in source now produce absent fields (no `"field": null`) in expected JSON output. Explicit `null` values are preserved.
+- Recompiled all `.tlbx` binary fixtures with new two-bit bitmap encoding: `schemas.tlbx`, `mixed_schemas.tlbx`, `quoted_keys.tlbx`, `large_data.tlbx`, `timestamps.tlbx`.
+
+### Testing
+- Added `test_explicit_null_roundtrip_text_and_binary` — regression test for crash input `[{"key":null}]` verifying explicit null preservation through both text and binary roundtrips
+- Verified all 8 fuzz targets pass (1,524,164 total runs at 240s each, zero crashes)
+- All 860 Rust tests + 560 .NET tests passing
+
+### Bug Fixes
+- **Fuzz crash on explicit null in JSON** — Fixed crash on input `[{"k4e2-eRy4eye-24ey":null}]` where explicit `null` values in JSON were silently dropped during roundtrip. The format now correctly distinguishes between absent fields and explicitly null fields in both text and binary representations.
+
+### Breaking Changes (Binary Format)
+- **Binary bitmap layout change** — The struct array null bitmap is now a two-bitmap (lo + hi) layout instead of a single bitmap. All `.tlbx` files compiled with beta.13 or earlier must be recompiled. Text `.tl` files are unaffected.
+
+---
+
+## v2.0.0-beta.13
 
 ### .NET
 

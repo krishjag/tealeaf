@@ -26,7 +26,9 @@ Complete reference table for all TeaLeaf types, their text syntax, binary encodi
 
 | TeaLeaf Type | Text Syntax | Binary Code | Description |
 |---|---|---|---|
-| `null` | `~` | `0x00` | Null/missing value |
+| `null` | `~` or `null` | `0x00` | Null/missing value |
+
+In `@table` tuples, `~` indicates an absent field (dropped for nullable fields) while `null` indicates an explicit null (always preserved). In the binary format, these map to two-bit field state codes: `2` (absent) and `1` (explicit null) respectively. See [Schemas](../format/schemas.md#nullable-fields) for details.
 
 ## Container Types
 

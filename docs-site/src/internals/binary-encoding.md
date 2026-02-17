@@ -43,39 +43,50 @@ Value::Int(5×10⁹)  → Int64 (8 bytes)   // needs i64
 The most optimized encoding path is for arrays of schema-typed objects:
 
 ```
-┌──────────────────────┐
-│ Count: u32           │  Number of rows
-│ Schema Index: u16    │  Which schema these rows follow
-│ Null Bitmap Size: u16│  Bytes per row for null tracking
-├──────────────────────┤
-│ Row 0:               │
-│   Null Bitmap: [u8]  │  One bit per field (1 = null)
-│   Field 0 data       │  Only if not null
-│   Field 1 data       │  Only if not null
-│   ...                │
-├──────────────────────┤
-│ Row 1:               │
-│   Null Bitmap: [u8]  │
-│   Field data...      │
-├──────────────────────┤
-│ ...                  │
-└──────────────────────┘
+┌─────────────────────────┐
+│ Count: u32              │  Number of rows
+│ Schema Index: u16       │  Which schema these rows follow
+│ Bitmap Size: u16        │  = 2 × bms (where bms = ceil(field_count / 8))
+├─────────────────────────┤
+│ Row 0:                  │
+│   Lo Bitmap: [u8 × bms] │  Low bits of two-bit field state
+│   Hi Bitmap: [u8 × bms] │  High bits of two-bit field state
+│   Field 0 data          │  Only if code=0 (has value)
+│   Field 1 data          │  Only if code=0
+│   ...                   │
+├─────────────────────────┤
+│ Row 1:                  │
+│   Lo Bitmap + Hi Bitmap │
+│   Field data...         │
+├─────────────────────────┤
+│ ...                     │
+└─────────────────────────┘
 ```
 
-### Null Bitmap
+### Two-Bit Field State
 
-- Size: `ceil((field_count + 7) / 8)` bytes per row
-- Bit `i` set = field `i` is null
-- Only non-null fields have data written
+Each field uses a two-bit state code derived from its lo and hi bitmap bits:
 
-For a schema with 5 fields, the bitmap is 1 byte. If bit 2 is set, field 2 is null and its data is skipped.
+```
+code = lo_bit(i) | (hi_bit(i) << 1)
+
+  0  (lo=0, hi=0)  →  has value — decode inline data
+  1  (lo=1, hi=0)  →  explicit null — always preserved as null in output
+  2  (lo=0, hi=1)  →  absent — dropped for nullable fields, null for non-nullable
+```
+
+- Bitmap size per row: `2 × bms` bytes, where `bms = ceil(field_count / 8)`
+- Only code=0 fields have data written in the values section
+- A null array element has all fields set to code=2 (lo bits all zero, hi bits all set)
+
+For a schema with 5 fields, `bms = 1`, so each row has 2 bitmap bytes (1 lo + 1 hi). If field 2 has `lo_bit=1, hi_bit=0` (code=1), that field is explicit null and its data is skipped.
 
 ### Field Data
 
-Each non-null field is encoded according to its schema type:
+Each code=0 field is encoded according to its schema type:
 - Primitive types: fixed-size encoding
 - String: `u32` string table index
-- Nested struct: recursively encoded fields (with their own null bitmap)
+- Nested struct: recursively encoded fields (with their own lo/hi bitmaps)
 - Array field: count + typed elements
 
 ## Homogeneous Array Encoding

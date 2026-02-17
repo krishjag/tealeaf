@@ -117,9 +117,14 @@ These keywords represent IEEE 754 special values. In JSON export, `NaN` and infi
 enabled: true
 disabled: false
 missing: ~
+explicit_null: null
 ```
 
-The tilde (`~`) is the null literal.
+The tilde (`~`) and the `null` keyword both represent null. In most contexts they are interchangeable.
+
+In `@table` tuples, the two forms have distinct semantics:
+- **`~`** -- absent field (the field was not present in the source object). For nullable fields, the parser drops the field entirely. For non-nullable fields, it is preserved as null.
+- **`null`** -- explicit null (the field was present with a null value). Always preserved regardless of field type.
 
 ## Timestamps
 

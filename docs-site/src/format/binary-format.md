@@ -252,17 +252,20 @@ Fields: [
 ```
 Count: u32
 Schema Index: u16
-Null Bitmap Size: u16
+Bitmap Size: u16              (= 2 × bms, where bms = ceil(field_count / 8))
 Rows: [
-  Null Bitmap: [u8 × bitmap_size]
-  Values: [non-null field values only]
+  Lo Bitmap: [u8 × bms]      (low bits of two-bit field state)
+  Hi Bitmap: [u8 × bms]      (high bits of two-bit field state)
+  Values: [field values for code=0 fields only]
 ]
 ```
 
-The null bitmap tracks which fields are null:
-- Bit `i` set = field `i` is null
-- Only non-null values are stored
-- Bitmap size = `ceil((field_count + 7) / 8)`
+Each field uses a two-bit state code: `code = lo_bit(i) | (hi_bit(i) << 1)`
+- **0** (lo=0, hi=0) -- has value: field data follows inline
+- **1** (lo=1, hi=0) -- explicit null: always preserved as `null` in output
+- **2** (lo=0, hi=1) -- absent: dropped for nullable fields, `null` for non-nullable
+- Only code=0 fields have data stored in the values section
+- A null array element has all fields set to code=2 (lo bits all zero, hi bits all set)
 
 ### Maps
 

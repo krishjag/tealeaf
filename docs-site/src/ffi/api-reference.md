@@ -22,7 +22,7 @@ Clears the thread-local error state.
 ```c
 const char* tl_version(void);
 ```
-Returns the library version string (e.g., `"2.0.0-beta.13"`). The returned pointer is static -- do **not** free it.
+Returns the library version string (e.g., `"2.0.0-beta.14"`). The returned pointer is static -- do **not** free it.
 
 ## Document API
 

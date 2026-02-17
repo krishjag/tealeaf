@@ -18,7 +18,7 @@ pub const VERSION_MAJOR: u16 = 2;
 /// Binary format version (minor) - for compatibility checks
 pub const VERSION_MINOR: u16 = 0;
 /// Library version string (beta/RFC stage)
-pub const VERSION: &str = "2.0.0-beta.13";
+pub const VERSION: &str = "2.0.0-beta.14";
 pub const HEADER_SIZE: usize = 64;
 /// Maximum length of a string in the string table (u32 encoding limit)
 pub const MAX_STRING_LENGTH: usize = u32::MAX as usize;

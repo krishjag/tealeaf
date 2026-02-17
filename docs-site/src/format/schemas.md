@@ -109,22 +109,29 @@ The `?` modifier makes a field nullable:
 @struct user (
   id: int,
   name: string,
-  email: string?,   # can be ~
-  phone: string?,   # can be ~
+  email: string?,   # can be ~ or null
+  phone: string?,   # can be ~ or null
 )
 
 users: @table user [
   (1, "Alice", "alice@example.com", "+1-555-0100"),
-  (2, "Bob", ~, ~),  # email and phone are null
+  (2, "Bob", ~, ~),           # ~ = absent (fields dropped from output)
+  (3, "Carol", null, ~),      # null = explicit null (email preserved as null)
 ]
 ```
+
+In `@table` tuples, `~` and `null` have different meanings:
+- **`~`** -- absent field. For nullable fields, the field is dropped entirely from the reconstructed object. For non-nullable fields, it is preserved as null.
+- **`null`** -- explicit null. The field was present with a null value in the source data. Always preserved as `null` in the output, regardless of field nullability.
+
+This distinction ensures JSON round-trip fidelity: `{"email": null}` roundtrips as `null` (preserved), while a missing `email` key roundtrips as `~` (dropped).
 
 ## Binary Encoding Benefits
 
 Schemas enable significant binary compression:
 
 1. **Positional storage** -- field names stored once in the schema table, not per row
-2. **Null bitmaps** -- one bit per nullable field per row, instead of full null markers
+2. **Two-bit field state bitmaps** -- two bits per field per row track has-value, explicit null, and absent states
 3. **Type-homogeneous arrays** -- packed encoding when all elements match a schema
 4. **String deduplication** -- repeated values like city names stored once in the string table
 
