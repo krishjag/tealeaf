@@ -1075,6 +1075,15 @@ fn singularize(name: &str) -> String {
     }
 }
 
+/// Check if a name is a value-only type keyword that the parser rejects as a schema
+/// field type (see `parse_field_type` §2.1). If we create `@struct object (b: int)` and
+/// a parent references it as `field: object`, the parser will reject the output.
+/// Only these 5 keywords are rejected — primitive type names like `int`, `bool`, etc.
+/// are allowed as schema names (the parser resolves them via LParen-guard context).
+fn is_value_only_type_name(name: &str) -> bool {
+    matches!(name, "object" | "map" | "tuple" | "ref" | "tagged")
+}
+
 /// Check if array elements are objects that match a schema's structure
 fn array_matches_schema(arr: &[Value], schema: &Schema) -> bool {
     if arr.is_empty() {
@@ -1228,6 +1237,13 @@ impl SchemaInferrer {
 
         // Generate schema name from hint
         let schema_name = singularize(hint_name);
+
+        // Skip if the inferred name is a reserved type keyword (e.g., "object",
+        // "map", "string"). The parser rejects these as schema field types, so
+        // emitting `@struct object (...)` would produce un-parseable output.
+        if is_value_only_type_name(&schema_name) {
+            return;
+        }
 
         // Skip if schema already exists
         if self.schemas.contains_key(&schema_name) {
@@ -1412,6 +1428,7 @@ impl SchemaInferrer {
         if nested_field_names.is_empty()
             || nested_field_names.iter().any(|n| n.is_empty())
             || needs_quoting(&schema_name)
+            || is_value_only_type_name(&schema_name)
         {
             return;
         }
@@ -3125,6 +3142,31 @@ mod tests {
         let customer_schema = doc.schema("customer").unwrap();
         let phone_field = customer_schema.fields.iter().find(|f| f.name == "phone").unwrap();
         assert!(phone_field.field_type.nullable, "phone field should be nullable");
+    }
+
+    #[test]
+    fn test_fuzz_crash_reserved_type_name_as_schema() {
+        // Reproduces fuzz crash: [{"object":{"b":0}}]
+        // The field name "object" is a reserved type keyword — the inferrer
+        // must not create `@struct object(...)` because the parser rejects it.
+        // Test the root-array path (analyze_array) and nested-object path
+        // (analyze_nested_objects) for all parser-rejected type keywords.
+        let reserved = ["object", "map", "tuple", "ref", "tagged"];
+        for name in &reserved {
+            // Root-array path
+            let json = format!(r#"[{{"{}":{{"b":0}}}}]"#, name);
+            let tl = TeaLeaf::from_json_with_schemas(&json).unwrap();
+            let tl_text = tl.to_tl_with_schemas();
+            TeaLeaf::parse(&tl_text)
+                .unwrap_or_else(|e| panic!("Re-parse failed for root-array '{}': {}", name, e));
+
+            // Nested-object path: {"items":[{"<reserved>":{"x":1}}]}
+            let json2 = format!(r#"{{"items":[{{"{}":{{"x":1}}}}]}}"#, name);
+            let tl2 = TeaLeaf::from_json_with_schemas(&json2).unwrap();
+            let tl_text2 = tl2.to_tl_with_schemas();
+            TeaLeaf::parse(&tl_text2)
+                .unwrap_or_else(|e| panic!("Re-parse failed for nested '{}': {}", name, e));
+        }
     }
 
     // =========================================================================
